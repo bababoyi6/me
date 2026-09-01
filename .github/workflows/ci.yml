@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  shell:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Verify repository checksums
+        run: sha256sum -c SHA256SUMS
+      - name: Install test dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends haproxy shellcheck curl ca-certificates tar
+      - name: Run ShellCheck
+        run: shellcheck telemt-dual-hop.sh tests/test.sh
+      - name: Download pinned Telemt test binary
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .ci/telemt
+          curl -fL --retry 5 --retry-all-errors \
+            https://github.com/telemt/telemt/releases/download/3.5.5/telemt-x86_64-linux-gnu.tar.gz \
+            -o .ci/telemt.tar.gz
+          printf '%s  %s\n' \
+            '2d5fb35b526f548bb6ffe7689cdf4f51f4108b97014be1b3b4186a58ab28d605' \
+            '.ci/telemt.tar.gz' | sha256sum -c -
+          tar -xzf .ci/telemt.tar.gz -C .ci/telemt
+          telemt_bin=$(find "$PWD/.ci/telemt" -type f -name telemt -perm /111 -print -quit)
+          test -n "$telemt_bin"
+          printf 'TELEMT_BIN=%s\n' "$telemt_bin" >> "$GITHUB_ENV"
+      - name: Run tests
+        run: TDH_REAL_TELEMT="$TELEMT_BIN" bash tests/test.sh
