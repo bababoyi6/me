@@ -34,4 +34,4 @@ jobs:
           test -n "$telemt_bin"
           printf 'TELEMT_BIN=%s\n' "$telemt_bin" >> "$GITHUB_ENV"
       - name: Run tests
-        run: TDH_REAL_TELEMT="$TELEMT_BIN" bash tests/test.sh
+        run: sudo env TDH_REAL_TELEMT="$TELEMT_BIN" bash tests/test.sh
