@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2119,SC2120
 # Telemt Dual-Hop - three VPS / two native MTProxy links
 # Supported OS: Ubuntu 22.04 (x86_64, aarch64)
 
@@ -1227,13 +1228,13 @@ EOF
 }
 
 restore_tuning() {
-  [[ -n $PREV_QDISC ]] && sysctl -w "net.core.default_qdisc=${PREV_QDISC}" >/dev/null 2>&1 || true
-  [[ -n $PREV_CC ]] && sysctl -w "net.ipv4.tcp_congestion_control=${PREV_CC}" >/dev/null 2>&1 || true
-  [[ -n $PREV_SOMAX ]] && sysctl -w "net.core.somaxconn=${PREV_SOMAX}" >/dev/null 2>&1 || true
-  [[ -n $PREV_SYN_BACKLOG ]] && sysctl -w "net.ipv4.tcp_max_syn_backlog=${PREV_SYN_BACKLOG}" >/dev/null 2>&1 || true
-  [[ -n $PREV_KEEPALIVE_TIME ]] && sysctl -w "net.ipv4.tcp_keepalive_time=${PREV_KEEPALIVE_TIME}" >/dev/null 2>&1 || true
-  [[ -n $PREV_KEEPALIVE_INTVL ]] && sysctl -w "net.ipv4.tcp_keepalive_intvl=${PREV_KEEPALIVE_INTVL}" >/dev/null 2>&1 || true
-  [[ -n $PREV_KEEPALIVE_PROBES ]] && sysctl -w "net.ipv4.tcp_keepalive_probes=${PREV_KEEPALIVE_PROBES}" >/dev/null 2>&1 || true
+  if [[ -n $PREV_QDISC ]]; then sysctl -w "net.core.default_qdisc=${PREV_QDISC}" >/dev/null 2>&1 || true; fi
+  if [[ -n $PREV_CC ]]; then sysctl -w "net.ipv4.tcp_congestion_control=${PREV_CC}" >/dev/null 2>&1 || true; fi
+  if [[ -n $PREV_SOMAX ]]; then sysctl -w "net.core.somaxconn=${PREV_SOMAX}" >/dev/null 2>&1 || true; fi
+  if [[ -n $PREV_SYN_BACKLOG ]]; then sysctl -w "net.ipv4.tcp_max_syn_backlog=${PREV_SYN_BACKLOG}" >/dev/null 2>&1 || true; fi
+  if [[ -n $PREV_KEEPALIVE_TIME ]]; then sysctl -w "net.ipv4.tcp_keepalive_time=${PREV_KEEPALIVE_TIME}" >/dev/null 2>&1 || true; fi
+  if [[ -n $PREV_KEEPALIVE_INTVL ]]; then sysctl -w "net.ipv4.tcp_keepalive_intvl=${PREV_KEEPALIVE_INTVL}" >/dev/null 2>&1 || true; fi
+  if [[ -n $PREV_KEEPALIVE_PROBES ]]; then sysctl -w "net.ipv4.tcp_keepalive_probes=${PREV_KEEPALIVE_PROBES}" >/dev/null 2>&1 || true; fi
 }
 
 wireguard_handshake_is_fresh() {
@@ -1792,15 +1793,16 @@ diagnose() {
 remove_ufw_rules() {
   ufw_is_active || return 0
   if [[ $TDH_ROLE == entry ]]; then
-    [[ $UFW_ADDED_A == 1 ]] && ufw --force delete allow "$PORT_A/tcp" >/dev/null 2>&1 || true
-    [[ $UFW_ADDED_B == 1 ]] && ufw --force delete allow "$PORT_B/tcp" >/dev/null 2>&1 || true
+    if [[ $UFW_ADDED_A == 1 ]]; then ufw --force delete allow "$PORT_A/tcp" >/dev/null 2>&1 || true; fi
+    if [[ $UFW_ADDED_B == 1 ]]; then ufw --force delete allow "$PORT_B/tcp" >/dev/null 2>&1 || true; fi
   else
-    [[ $UFW_ADDED_WG == 1 ]] && \
+    if [[ $UFW_ADDED_WG == 1 ]]; then
       ufw --force delete allow from "$ENTRY_PUBLIC_IP" to any port "$BACKEND_WG_PORT" proto udp >/dev/null 2>&1 || true
-    [[ $UFW_ADDED_P24431 == 1 ]] && ufw --force delete allow in on "$WG_INTERFACE" from "$ENTRY_WG_IP" to "$LOCAL_WG_IP" port "$TDH_TELEMT_PORT" proto tcp >/dev/null 2>&1 || true
-    [[ $UFW_ADDED_P24432 == 1 ]] && ufw --force delete allow in on "$WG_INTERFACE" from "$ENTRY_WG_IP" to "$LOCAL_WG_IP" port 24432 proto tcp >/dev/null 2>&1 || true
-    [[ $UFW_ADDED_P19101 == 1 ]] && ufw --force delete allow in on "$WG_INTERFACE" from "$ENTRY_WG_IP" to "$LOCAL_WG_IP" port "$TDH_AGENT_PORT" proto tcp >/dev/null 2>&1 || true
-    [[ $UFW_ADDED_P19102 == 1 ]] && ufw --force delete allow in on "$WG_INTERFACE" from "$ENTRY_WG_IP" to "$LOCAL_WG_IP" port 19102 proto tcp >/dev/null 2>&1 || true
+    fi
+    if [[ $UFW_ADDED_P24431 == 1 ]]; then ufw --force delete allow in on "$WG_INTERFACE" from "$ENTRY_WG_IP" to "$LOCAL_WG_IP" port "$TDH_TELEMT_PORT" proto tcp >/dev/null 2>&1 || true; fi
+    if [[ $UFW_ADDED_P24432 == 1 ]]; then ufw --force delete allow in on "$WG_INTERFACE" from "$ENTRY_WG_IP" to "$LOCAL_WG_IP" port 24432 proto tcp >/dev/null 2>&1 || true; fi
+    if [[ $UFW_ADDED_P19101 == 1 ]]; then ufw --force delete allow in on "$WG_INTERFACE" from "$ENTRY_WG_IP" to "$LOCAL_WG_IP" port "$TDH_AGENT_PORT" proto tcp >/dev/null 2>&1 || true; fi
+    if [[ $UFW_ADDED_P19102 == 1 ]]; then ufw --force delete allow in on "$WG_INTERFACE" from "$ENTRY_WG_IP" to "$LOCAL_WG_IP" port 19102 proto tcp >/dev/null 2>&1 || true; fi
   fi
 }
 
