@@ -118,6 +118,33 @@ require_root() {
   [[ $(id -u) -eq 0 ]] || die "请使用 sudo 或 root 运行。"
 }
 
+apt_get_with_lock_wait() {
+  local error_file rc deadline
+  error_file=$(mktemp)
+  deadline=$((SECONDS + 600))
+
+  while true; do
+    if DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=30 "$@" 2>"$error_file"; then
+      rm -f "$error_file"
+      return 0
+    else
+      rc=$?
+    fi
+
+    if grep -Eqi 'Could not get lock|Unable to lock directory|Unable to acquire the dpkg frontend lock|is held by process' "$error_file" \
+      && (( SECONDS < deadline )); then
+      warn "Ubuntu 后台更新正在占用软件包管理器；等待完成后自动重试（最长约 10 分钟）……"
+      sleep 5
+      : >"$error_file"
+      continue
+    fi
+
+    cat "$error_file" >&2
+    rm -f "$error_file"
+    return "$rc"
+  done
+}
+
 validate_runtime_paths() {
   [[ $TDH_BASE == /etc/telemt-dual-hop ]] || die "生产模式不允许覆盖 TDH_BASE。"
   [[ $TDH_STATE == /etc/telemt-dual-hop/state.env ]] || die "生产模式状态路径异常。"
@@ -133,8 +160,8 @@ ensure_bootstrap_tools() {
   command -v flock >/dev/null 2>&1 || missing+=(util-linux)
   command -v python3 >/dev/null 2>&1 || missing+=(python3)
   if (( ${#missing[@]} > 0 )); then
-    apt-get update -qq
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${missing[@]}"
+    apt_get_with_lock_wait update -qq
+    apt_get_with_lock_wait install -y --no-install-recommends "${missing[@]}"
   fi
 }
 
@@ -164,8 +191,8 @@ install_packages() {
     packages+=(haproxy)
   fi
   info "安装所需的 Ubuntu 软件包……"
-  apt-get update -qq
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${packages[@]}"
+  apt_get_with_lock_wait update -qq
+  apt_get_with_lock_wait install -y --no-install-recommends "${packages[@]}"
 }
 
 install_self() {
