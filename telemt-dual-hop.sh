@@ -6,8 +6,9 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.2.1"
+readonly TDH_VERSION="1.3.0"
 readonly TDH_CONFIG_SCHEMA="5"
+readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.5"
 readonly TELEMT_SHA256_AMD64="2d5fb35b526f548bb6ffe7689cdf4f51f4108b97014be1b3b4186a58ab28d605"
 readonly TELEMT_SHA256_ARM64="075c9e2d3e86115af0bc47da881327375ef094c21fb6ed40bde41e4a77a261f3"
@@ -18,6 +19,8 @@ readonly TDH_CONFIG_DIR="${TDH_CONFIG_DIR:-${TDH_BASE}/telemt}"
 readonly TDH_WORK_ROOT="${TDH_WORK_ROOT:-/var/lib/telemt-dual-hop}"
 readonly TDH_BIN="${TDH_BIN:-/usr/local/lib/telemt-dual-hop/telemt}"
 readonly TDH_MANAGER="${TDH_MANAGER:-/usr/local/sbin/telemt-dual-hop}"
+readonly TDH_SHORTCUT="${TDH_SHORTCUT:-/usr/local/bin/a}"
+readonly TDH_UPDATE_URL="https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh"
 readonly TDH_HAPROXY_CFG="${TDH_HAPROXY_CFG:-${TDH_BASE}/haproxy.cfg}"
 readonly TDH_LOCK="${TDH_LOCK:-/run/lock/telemt-dual-hop.lock}"
 readonly TDH_DOMAIN_A="apple.com"
@@ -97,10 +100,13 @@ readonly STATE_VARS=(
 
 usage() {
   cat <<'EOF'
-Telemt Dual-Hop 1.2.1
+Telemt Dual-Hop 1.3.0
 
 用法：
   sudo bash telemt-dual-hop.sh              打开中文菜单
+  a                                         安装后打开控制面板（自动使用 sudo）
+  a status                                  快速查看状态
+  a update                                  安全更新管理脚本（可简写为 a u）
   sudo bash telemt-dual-hop.sh entry        初始化入口 VPS
   sudo bash telemt-dual-hop.sh backend1     安装后端 VPS1
   sudo bash telemt-dual-hop.sh backend2     安装后端 VPS2
@@ -153,6 +159,9 @@ validate_runtime_paths() {
   [[ $TDH_WORK_ROOT == /var/lib/telemt-dual-hop ]] || die "生产模式工作路径异常。"
   [[ $TDH_BIN == /usr/local/lib/telemt-dual-hop/telemt ]] || die "生产模式二进制路径异常。"
   [[ $TDH_MANAGER == /usr/local/sbin/telemt-dual-hop ]] || die "生产模式管理器路径异常。"
+  [[ $TDH_SHORTCUT == /usr/local/bin/a ]] || die "生产模式快捷命令路径异常。"
+  [[ $TDH_UPDATE_URL == https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh ]] || \
+    die "生产模式更新地址异常。"
 }
 
 ensure_bootstrap_tools() {
@@ -195,13 +204,137 @@ install_packages() {
   apt_get_with_lock_wait install -y --no-install-recommends "${packages[@]}"
 }
 
-install_self() {
-  local self=${BASH_SOURCE[0]}
-  if [[ -f $self && -r $self ]]; then
-    install -m 0755 "$self" "$TDH_MANAGER"
-  else
-    warn "当前通过不可复制的输入流运行；请保留原始安装命令用于后续管理。"
+shortcut_is_managed() {
+  [[ ! -L $TDH_SHORTCUT && -f $TDH_SHORTCUT ]] && \
+    grep -Fqx '# Managed by Telemt Dual-Hop' "$TDH_SHORTCUT" 2>/dev/null
+}
+
+install_shortcut() {
+  local tmp
+  if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
+    die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；为避免覆盖，请先自行改名或移除。"
   fi
+  tmp=$(mktemp)
+  {
+    printf '%s\n' '#!/usr/bin/env bash' '# Managed by Telemt Dual-Hop'
+    printf 'readonly manager=%q\n' "$TDH_MANAGER"
+    cat <<'EOF'
+if [[ ! -x $manager ]]; then
+  printf '[失败] Telemt Dual-Hop 管理器不存在：%s\n' "$manager" >&2
+  exit 1
+fi
+if [[ $(id -u) -eq 0 ]]; then
+  exec "$manager" "$@"
+fi
+command -v sudo >/dev/null 2>&1 || {
+  printf '[失败] 当前用户不是 root，且系统没有 sudo；请切换到 root 后重试。\n' >&2
+  exit 1
+}
+exec sudo -- "$manager" "$@"
+EOF
+  } >"$tmp"
+  install -d -o root -g root -m 0755 "$(dirname "$TDH_SHORTCUT")"
+  install -m 0755 "$tmp" "$TDH_SHORTCUT"
+  rm -f "$tmp"
+}
+
+remove_shortcut() {
+  if shortcut_is_managed; then
+    rm -f "$TDH_SHORTCUT"
+  elif [[ -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ]]; then
+    warn "${TDH_SHORTCUT} 已不再由本脚本管理，卸载时予以保留。"
+  fi
+}
+
+install_self() {
+  local self=${BASH_SOURCE[0]} self_real manager_real entrypoints_changed=0
+  if [[ -f $self && -r $self ]]; then
+    if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
+      die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；为避免覆盖，请先自行改名或移除。"
+    fi
+    self_real=$(readlink -f -- "$self")
+    manager_real=$(readlink -f -- "$TDH_MANAGER" 2>/dev/null || printf '%s\n' "$TDH_MANAGER")
+    if [[ $self_real != "$manager_real" ]]; then
+      install -m 0755 "$self" "$TDH_MANAGER"
+      entrypoints_changed=1
+    fi
+    shortcut_is_managed || entrypoints_changed=1
+    install_shortcut
+    if (( entrypoints_changed == 1 )); then
+      ok "管理入口已就绪；以后直接输入 a 即可打开控制面板。"
+    fi
+  else
+    warn "当前通过不可复制的输入流运行，无法安装 a 快捷命令；请使用 README 中先下载再运行的安装方式。"
+  fi
+}
+
+extract_release_value() {
+  local file=$1 name=$2
+  awk -F'"' -v prefix="readonly ${name}=\"" 'index($0, prefix) == 1 { print $2; exit }' "$file"
+}
+
+update_manager() {
+  local download_tmp manager_tmp new_version new_schema new_protocol checksum
+  load_state || die "尚未安装，不能使用快捷更新。"
+  if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
+    die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；更新已取消。"
+  fi
+
+  download_tmp=$(mktemp)
+  info "正在从 GitHub 获取最新管理脚本……"
+  if ! curl -fL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 \
+      --proto '=https' --tlsv1.2 "$TDH_UPDATE_URL" -o "$download_tmp"; then
+    rm -f "$download_tmp"
+    die "下载失败；当前版本未作任何修改。"
+  fi
+
+  if ! grep -Fqx '# Telemt Dual-Hop - three VPS / two native MTProxy links' "$download_tmp"; then
+    rm -f "$download_tmp"
+    die "下载内容不是有效的 Telemt Dual-Hop 脚本；当前版本未作任何修改。"
+  fi
+  new_version=$(extract_release_value "$download_tmp" TDH_VERSION)
+  new_schema=$(extract_release_value "$download_tmp" TDH_CONFIG_SCHEMA)
+  new_protocol=$(extract_release_value "$download_tmp" TDH_PROTOCOL_VERSION)
+  if [[ ! $new_version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ || ! $new_schema =~ ^[0-9]+$ || \
+        ! $new_protocol =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    rm -f "$download_tmp"
+    die "下载脚本的版本信息无效；当前版本未作任何修改。"
+  fi
+  if [[ $new_schema != "$TDH_CONFIG_SCHEMA" || $new_protocol != "$TDH_PROTOCOL_VERSION" ]]; then
+    rm -f "$download_tmp"
+    die "新版本涉及配置协议升级，不能快捷更新；请查看发布说明后手动升级。"
+  fi
+  if ! dpkg --compare-versions "$new_version" ge "$TDH_VERSION"; then
+    rm -f "$download_tmp"
+    die "远端版本 ${new_version} 低于当前版本 ${TDH_VERSION}，已拒绝降级。"
+  fi
+  if ! bash -n "$download_tmp"; then
+    rm -f "$download_tmp"
+    die "新脚本未通过 Bash 语法检查；当前版本未作任何修改。"
+  fi
+  if ! bash "$download_tmp" --self-test >/dev/null; then
+    rm -f "$download_tmp"
+    die "新脚本未通过内置自检；当前版本未作任何修改。"
+  fi
+
+  checksum=$(sha256sum "$download_tmp" | awk '{print $1}')
+  manager_tmp=$(mktemp "${TDH_MANAGER}.update.XXXXXX")
+  if ! install -m 0755 "$download_tmp" "$manager_tmp"; then
+    rm -f "$download_tmp" "$manager_tmp"
+    die "无法准备新管理器；当前版本未作任何修改。"
+  fi
+  if ! mv -f "$manager_tmp" "$TDH_MANAGER"; then
+    rm -f "$download_tmp" "$manager_tmp"
+    die "无法替换管理器；当前版本未作任何修改。"
+  fi
+  rm -f "$download_tmp"
+  install_shortcut
+  if [[ $new_version == "$TDH_VERSION" ]]; then
+    ok "已重新安装最新版 ${new_version}（SHA256: ${checksum}）。"
+  else
+    ok "管理脚本已从 ${TDH_VERSION} 更新到 ${new_version}（SHA256: ${checksum}）。"
+  fi
+  info "服务和集群配置均未改动；退出当前面板后再次输入 a 即可使用新版本。"
 }
 
 init_dirs() {
@@ -247,6 +380,7 @@ rollback_transaction() {
   rm -f /etc/sysctl.d/90-telemt-dual-hop.conf /etc/modules-load.d/90-telemt-dual-hop.conf
   if declare -F restore_tuning >/dev/null; then restore_tuning; fi
   safe_remove_tree "$TDH_BASE"
+  remove_shortcut
   rm -f "$TDH_MANAGER"
   systemctl daemon-reload >/dev/null 2>&1
   set -e
@@ -280,7 +414,7 @@ load_state() {
 }
 
 state_is_current() {
-  [[ ${CONFIG_SCHEMA:-} == "$TDH_CONFIG_SCHEMA" && ${INSTALLED_VERSION:-} == "$TDH_VERSION" && \
+  [[ ${CONFIG_SCHEMA:-} == "$TDH_CONFIG_SCHEMA" && \
      ${PORT_A:-} == "$TDH_PUBLIC_PORT" && \
      ${PORT_B:-} == "$TDH_PUBLIC_PORT" ]]
 }
@@ -657,7 +791,7 @@ generate_join_code() {
   CLUSTER_ID="$CLUSTER_ID" ENTRY_PUBLIC_IP="$ENTRY_PUBLIC_IP" TDH_J_PUBLIC_PORT="$PORT_A" \
   TDH_J_DOMAIN_A="$TDH_DOMAIN_A" TDH_J_DOMAIN_B="$TDH_DOMAIN_B" \
   SECRET_A="$SECRET_A" SECRET_B="$SECRET_B" JOIN_CREATED="$JOIN_CREATED" JOIN_EXPIRES="$JOIN_EXPIRES" \
-  TELEMT_VERSION="$TELEMT_VERSION" TDH_VERSION="$TDH_VERSION" \
+  TELEMT_VERSION="$TELEMT_VERSION" TDH_VERSION="$TDH_PROTOCOL_VERSION" \
   TDH_CONFIG_SCHEMA="$TDH_CONFIG_SCHEMA" python3 - <<'PY'
 import base64, hashlib, hmac, json, os
 body = {
@@ -683,7 +817,7 @@ PY
 
 decode_join_code() {
   local code=$1
-  env TDH_VERSION="$TDH_VERSION" TDH_CONFIG_SCHEMA="$TDH_CONFIG_SCHEMA" python3 - "$code" <<'PY'
+  env TDH_VERSION="$TDH_PROTOCOL_VERSION" TDH_CONFIG_SCHEMA="$TDH_CONFIG_SCHEMA" python3 - "$code" <<'PY'
 import base64, hashlib, hmac, ipaddress, json, os, sys, time
 code = sys.argv[1].strip()
 if not code.startswith("TDH4."):
@@ -699,7 +833,7 @@ try:
     expected = hmac.new(body["enrollment_token"].encode(), raw, hashlib.sha256).hexdigest()
     if not hmac.compare_digest(sig, expected): raise ValueError("签名不匹配")
     if body["kind"] != "join" or body["v"] != 4: raise ValueError("版本错误")
-    if body["script_version"] != os.environ["TDH_VERSION"]: raise ValueError("脚本版本不一致")
+    if body["script_version"] != os.environ["TDH_VERSION"]: raise ValueError("节点协议版本不一致")
     if int(body["config_schema"]) != int(os.environ["TDH_CONFIG_SCHEMA"]): raise ValueError("配置架构不一致")
     if body["role"] not in ("backend1", "backend2"): raise ValueError("角色错误")
     if int(body["expires"]) < int(time.time()): raise ValueError("加入码已过期")
@@ -726,7 +860,7 @@ generate_response_code() {
   local backend_wg_pub=$1
   env TDH_R_ROLE="$TDH_ROLE" TDH_R_BACKEND_IP="$BACKEND_PUBLIC_IP" TDH_R_WG_PUB="$backend_wg_pub" \
   TDH_R_WG_PORT="$BACKEND_WG_PORT" TDH_R_LINK_A="$RESPONSE_LINK_A" TDH_R_LINK_B="$RESPONSE_LINK_B" \
-  TDH_R_MAX_CONNECTIONS="$BACKEND_MAX_CONNECTIONS" TDH_VERSION="$TDH_VERSION" \
+  TDH_R_MAX_CONNECTIONS="$BACKEND_MAX_CONNECTIONS" TDH_VERSION="$TDH_PROTOCOL_VERSION" \
   TDH_CONFIG_SCHEMA="$TDH_CONFIG_SCHEMA" CLUSTER_ID="$CLUSTER_ID" ENROLL_TOKEN="$ENROLL_TOKEN" python3 - <<'PY'
 import base64, hashlib, hmac, json, os, time
 body = {
@@ -748,7 +882,7 @@ PY
 
 decode_response_code() {
   local code=$1 token_b1=${2:-} token_b2=${3:-}
-  env TDH_VERSION="$TDH_VERSION" TDH_CONFIG_SCHEMA="$TDH_CONFIG_SCHEMA" \
+  env TDH_VERSION="$TDH_PROTOCOL_VERSION" TDH_CONFIG_SCHEMA="$TDH_CONFIG_SCHEMA" \
     TDH_TOKEN_B1="$token_b1" TDH_TOKEN_B2="$token_b2" python3 - "$code" <<'PY'
 import base64, hashlib, hmac, ipaddress, json, os, sys
 code = sys.argv[1].strip()
@@ -761,7 +895,7 @@ try:
     body, sig = outer["body"], outer["sig"]
     raw = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
     if body["kind"] != "response" or body["v"] != 4: raise ValueError("版本错误")
-    if body["script_version"] != os.environ["TDH_VERSION"]: raise ValueError("脚本版本不一致")
+    if body["script_version"] != os.environ["TDH_VERSION"]: raise ValueError("节点协议版本不一致")
     if int(body["config_schema"]) != int(os.environ["TDH_CONFIG_SCHEMA"]): raise ValueError("配置架构不一致")
     if body["role"] not in ("backend1", "backend2"): raise ValueError("角色错误")
     token = os.environ["TDH_TOKEN_B1"] if body["role"] == "backend1" else os.environ["TDH_TOKEN_B2"]
@@ -1422,8 +1556,8 @@ install_backend() {
   LOCAL_WG_IP=${fields[10]} ENTRY_WG_IP=${fields[11]} BACKEND_WG_PORT=${fields[12]}
   ENROLL_TOKEN=${fields[13]}
   [[ ${fields[14]} == "$TELEMT_VERSION" ]] || die "Join Code 要求的 Telemt 版本与脚本不一致。"
-  [[ ${fields[15]} == "$TDH_VERSION" && ${fields[16]} == "$TDH_CONFIG_SCHEMA" ]] || \
-    die "Join Code 与当前脚本版本不一致，请三台机器使用同一个发布包。"
+  [[ ${fields[15]} == "$TDH_PROTOCOL_VERSION" && ${fields[16]} == "$TDH_CONFIG_SCHEMA" ]] || \
+    die "Join Code 与当前配置协议不一致，请先更新三台机器的管理脚本。"
   [[ $TDH_ROLE == "$requested_role" ]] || die "Join Code 角色为 $TDH_ROLE，不是 $requested_role。"
   [[ $CLUSTER_ID =~ ^[0-9a-f]{24}$ ]] || die "集群 ID 格式无效。"
   [[ $ENROLL_TOKEN =~ ^[0-9a-f]{64}$ ]] || die "加入令牌格式无效。"
@@ -1589,8 +1723,8 @@ register_response() {
   role=${fields[1]} backend_ip=${fields[2]} wg_pub=${fields[3]} wg_port=${fields[4]}
   response_a=${fields[5]} response_b=${fields[6]}
   local max_connections=${fields[7]}
-  [[ ${fields[8]} == "$TDH_VERSION" && ${fields[9]} == "$TDH_CONFIG_SCHEMA" ]] || \
-    die "回执与当前脚本版本不一致，请三台机器使用同一个发布包。"
+  [[ ${fields[8]} == "$TDH_PROTOCOL_VERSION" && ${fields[9]} == "$TDH_CONFIG_SCHEMA" ]] || \
+    die "回执与当前配置协议不一致，请先更新三台机器的管理脚本。"
   validate_public_ipv4 "$backend_ip" || die "后端必须返回可路由的公网 IPv4。"
   [[ $backend_ip != "$ENTRY_PUBLIC_IP" ]] || die "后端与入口不能使用同一个公网 IPv4。"
   validate_wg_key "$wg_pub" || die "后端 WireGuard 公钥无效。"
@@ -1856,6 +1990,7 @@ uninstall_all() {
   rm -f /etc/sysctl.d/90-telemt-dual-hop.conf /etc/modules-load.d/90-telemt-dual-hop.conf
   restore_tuning
   safe_remove_tree "$TDH_BASE"
+  remove_shortcut
   rm -f "$TDH_MANAGER"
   systemctl daemon-reload
   ok "卸载完成；未删除系统软件包和用户原有防火墙规则。"
@@ -1872,65 +2007,171 @@ backend_response_again() {
   generate_response_code "$backend_pub"
 }
 
+clear_panel() {
+  if [[ -t 1 && ${TERM:-dumb} != dumb ]]; then
+    printf '\033[2J\033[H'
+  fi
+}
+
+pause_panel() {
+  [[ -t 1 ]] || return 0
+  printf '\n'
+  read -r -p '按 Enter 返回控制面板……' </dev/tty || true
+}
+
+read_panel_choice() {
+  local prompt=$1 default=$2 answer
+  if ! read -r -p "$prompt [$default]: " answer </dev/tty; then
+    printf '\n' >&2
+    return 1
+  fi
+  PANEL_CHOICE=${answer:-$default}
+}
+
+run_panel_action() {
+  local rc
+  # Give actions normal strict error handling, but keep the panel alive so the
+  # user can retry without running the manager command again.
+  trap - ERR
+  set +e
+  (
+    set -Eeuo pipefail
+    trap 'on_error $? $LINENO' ERR
+    "$@"
+  )
+  rc=$?
+  set -e
+  trap 'on_error $? $LINENO' ERR
+  if (( rc != 0 )); then
+    warn "操作未完成（退出码 ${rc}）。你可以返回面板重试或运行诊断。"
+  fi
+  pause_panel
+}
+
+panel_header() {
+  clear_panel
+  printf '%s%s Telemt Dual-Hop 控制面板 %s%s\n' "$C_BOLD" "$C_BLUE" "$TDH_VERSION" "$C_RESET"
+  printf '快捷入口：a    退出面板：0\n'
+  printf '%s\n' '────────────────────────────────────────'
+}
+
 menu_fresh() {
-  title "Telemt 三机双链接一键脚本 v${TDH_VERSION}"
-  printf '  1) 安装入口 VPS（默认）\n  2) 安装后端 VPS1\n  3) 安装后端 VPS2\n  0) 退出\n'
-  local choice
-  read -r -p '请选择 [1]: ' choice </dev/tty || true
-  case ${choice:-1} in
-    1) init_entry ;;
-    2) install_backend backend1 ;;
-    3) install_backend backend2 ;;
-    0) return ;;
-    *) die "无效选择。" ;;
-  esac
+  local PANEL_CHOICE
+  while [[ ! -f $TDH_STATE ]]; do
+    panel_header
+    printf '当前状态：尚未安装\n\n'
+    printf '  1) 安装入口 VPS（第一台，默认）\n'
+    printf '  2) 安装后端 VPS1（需要 Join Code）\n'
+    printf '  3) 安装后端 VPS2（需要 Join Code）\n'
+    printf '  0) 退出\n\n'
+    read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
+    case $PANEL_CHOICE in
+      1) run_panel_action init_entry ;;
+      2) run_panel_action install_backend backend1 ;;
+      3) run_panel_action install_backend backend2 ;;
+      0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
+      *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
+    esac
+  done
 }
 
 menu_existing() {
-  load_state
-  title "Telemt Dual-Hop 管理（$TDH_ROLE）"
-  if ! state_is_current; then
-    warn "检测到不兼容的旧版配置；不能与 ${TDH_VERSION} 混装。"
-    printf '  1) 查看旧集群状态\n  2) 显示旧版 MTP 链接（仅入口）\n  9) 完整卸载后重新安装 %s\n  0) 退出\n' "$TDH_VERSION"
-    local legacy_choice
-    read -r -p '请选择 [1]: ' legacy_choice </dev/tty || true
-    case ${legacy_choice:-1} in
-      1) show_status ;;
-      2)
-        if [[ $TDH_ROLE == entry ]]; then
-          show_links
-        else
-          die "后端不保存公开链接。"
-        fi
-        ;;
-      9) uninstall_all ;;
-      0) return ;;
-      *) die "无效选择。" ;;
-    esac
-    return
-  fi
-  if [[ $TDH_ROLE == entry ]]; then
-    printf '  1) 查看状态\n  2) 录入后端回执\n  3) 显示未使用的 Join Code\n  4) 显示两条 MTP 链接\n  5) 运行诊断\n  6) 重试启用入口\n  9) 卸载\n  0) 退出\n'
-    local choice
-    read -r -p '请选择 [1]: ' choice </dev/tty || true
-    case ${choice:-1} in
-      1) show_status ;; 2) register_response ;; 3) show_join_codes ;; 4) show_links ;;
-      5) diagnose ;; 6) complete_entry ;; 9) uninstall_all ;; 0) return ;; *) die "无效选择。" ;;
-    esac
-  else
-    printf '  1) 查看状态\n  2) 重新显示回执码\n  3) 运行诊断\n  9) 卸载\n  0) 退出\n'
-    local choice
-    read -r -p '请选择 [1]: ' choice </dev/tty || true
-    case ${choice:-1} in
-      1) show_status ;; 2) backend_response_again ;; 3) diagnose ;;
-      9) uninstall_all ;; 0) return ;; *) die "无效选择。" ;;
-    esac
-  fi
+  local PANEL_CHOICE progress
+  while [[ -f $TDH_STATE ]]; do
+    load_state
+    panel_header
+    printf '当前节点：%s\n' "$TDH_ROLE"
+    if ! state_is_current; then
+      warn "检测到不兼容的旧版配置；不能与 ${TDH_VERSION} 混装。"
+      printf '\n  1) 查看旧集群状态\n'
+      if [[ $TDH_ROLE == entry ]]; then printf '  2) 显示旧版 MTP 链接\n'; fi
+      printf '  8) 安全更新管理脚本\n'
+      printf '  9) 完整卸载后重新安装 %s\n' "$TDH_VERSION"
+      printf '  0) 退出\n\n'
+      read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
+      case $PANEL_CHOICE in
+        1) run_panel_action show_status ;;
+        2)
+          if [[ $TDH_ROLE == entry ]]; then run_panel_action show_links; else warn "无效选择：2"; pause_panel; fi
+          ;;
+        8) run_panel_action update_manager ;;
+        9) run_panel_action uninstall_all ;;
+        0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
+        *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
+      esac
+      continue
+    fi
+
+    if [[ $TDH_ROLE == entry ]]; then
+      progress="VPS1 $([[ $B1_REGISTERED == 1 ]] && printf '已配对' || printf '待配对') / VPS2 $([[ $B2_REGISTERED == 1 ]] && printf '已配对' || printf '待配对')"
+      printf '安装进度：%s\n\n' "$progress"
+      printf '  1) 查看运行状态（默认）\n'
+      printf '  2) 录入一个后端回执\n'
+      printf '  3) 查看未使用的 Join Code\n'
+      printf '  4) 显示两条 MTP 链接和二维码\n'
+      printf '  5) 一键诊断\n'
+      printf '  6) 完成或重试启用入口\n'
+      printf '  7) 安全更新管理脚本\n'
+      printf '  9) 卸载\n'
+      printf '  0) 退出\n\n'
+      read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
+      case $PANEL_CHOICE in
+        1) run_panel_action show_status ;;
+        2) run_panel_action register_response ;;
+        3) run_panel_action show_join_codes ;;
+        4) run_panel_action show_links ;;
+        5) run_panel_action diagnose ;;
+        6) run_panel_action complete_entry ;;
+        7) run_panel_action update_manager ;;
+        9) run_panel_action uninstall_all ;;
+        0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
+        *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
+      esac
+    else
+      printf '\n  1) 查看运行状态（默认）\n'
+      printf '  2) 重新显示给入口使用的回执码\n'
+      printf '  3) 一键诊断\n'
+      printf '  4) 安全更新管理脚本\n'
+      printf '  9) 卸载\n'
+      printf '  0) 退出\n\n'
+      read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
+      case $PANEL_CHOICE in
+        1) run_panel_action show_status ;;
+        2) run_panel_action backend_response_again ;;
+        3) run_panel_action diagnose ;;
+        4) run_panel_action update_manager ;;
+        9) run_panel_action uninstall_all ;;
+        0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
+        *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
+      esac
+    fi
+  done
+}
+
+control_panel() {
+  local PANEL_EXIT_REQUESTED=0
+  while (( PANEL_EXIT_REQUESTED == 0 )); do
+    if [[ -f $TDH_STATE ]]; then
+      menu_existing
+    else
+      menu_fresh
+    fi
+  done
 }
 
 self_test() {
-  local tmp expected_a expected_b full_a full_b normalized
+  local tmp release_fixture expected_a expected_b full_a full_b normalized
   tmp=$(mktemp -d)
+  release_fixture="${tmp}/release.sh"
+  printf 'readonly TDH_VERSION="9.8.7"\nreadonly TDH_CONFIG_SCHEMA="5"\nreadonly TDH_PROTOCOL_VERSION="1.2.1"\n' >"$release_fixture"
+  [[ $(extract_release_value "$release_fixture" TDH_VERSION) == 9.8.7 ]] || die "更新版本解析测试失败。"
+  [[ $(extract_release_value "$release_fixture" TDH_CONFIG_SCHEMA) == 5 ]] || die "更新架构解析测试失败。"
+  CONFIG_SCHEMA=$TDH_CONFIG_SCHEMA INSTALLED_VERSION=1.2.1
+  PORT_A=$TDH_PUBLIC_PORT PORT_B=$TDH_PUBLIC_PORT
+  [[ $INSTALLED_VERSION != "$TDH_VERSION" ]] || die "版本兼容性测试样本无效。"
+  state_is_current || die "旧管理器版本的配置兼容性测试失败。"
+  CONFIG_SCHEMA=4
+  if state_is_current; then die "不兼容配置架构被错误接受。"; fi
   CONFIG_SCHEMA=$TDH_CONFIG_SCHEMA CLUSTER_ID="00112233445566778899aabb" ENTRY_PUBLIC_IP="203.0.113.10"
   PORT_A=443 PORT_B=443 SECRET_A="00112233445566778899aabbccddeeff"
   SECRET_B="ffeeddccbbaa99887766554433221100" JOIN_CREATED=1700000000 JOIN_EXPIRES=4102444800
@@ -1970,6 +2211,11 @@ main() {
   check_os
   ensure_bootstrap_tools
   acquire_lock
+  # Re-running a newly downloaded copy on an existing VPS updates the manager
+  # in place and creates or repairs the short `a` entry point.
+  if [[ -f $TDH_STATE && -z ${1:-} ]]; then
+    install_self
+  fi
   case ${1:-} in
     entry) init_entry ;;
     backend1) install_backend backend1 ;;
@@ -1979,8 +2225,10 @@ main() {
     status) show_status ;;
     links) show_links ;;
     diagnose) diagnose ;;
+    update|upgrade|u) update_manager ;;
     uninstall) uninstall_all ;;
-    "") if [[ -f $TDH_STATE ]]; then menu_existing; else menu_fresh; fi ;;
+    menu|panel) control_panel ;;
+    "") control_panel ;;
     *) usage; die "未知命令：$1" ;;
   esac
 }
