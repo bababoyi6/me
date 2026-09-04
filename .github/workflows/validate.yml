@@ -1,0 +1,21 @@
+name: Validate installer
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Bash syntax
+        run: bash -n telemt-dual-hop.sh
+      - name: Run ShellCheck
+        run: shellcheck -x -S style telemt-dual-hop.sh
+      - name: Run built-in tests
+        run: bash telemt-dual-hop.sh --self-test

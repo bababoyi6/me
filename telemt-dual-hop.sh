@@ -6,7 +6,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.3.0"
+readonly TDH_VERSION="1.3.1"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.5"
@@ -100,7 +100,7 @@ readonly STATE_VARS=(
 
 usage() {
   cat <<'EOF'
-Telemt Dual-Hop 1.3.0
+Telemt Dual-Hop 1.3.1
 
 用法：
   sudo bash telemt-dual-hop.sh              打开中文菜单
@@ -512,11 +512,20 @@ validate_wg_key() { [[ $1 =~ ^[A-Za-z0-9+/]{43}=$ ]]; }
 
 detect_public_ipv4() {
   local url ip
-  for url in https://api.ipify.org https://ipv4.icanhazip.com https://ifconfig.me/ip; do
+  local -A votes=()
+  for url in \
+    https://api.ipify.org \
+    https://ipv4.icanhazip.com \
+    https://checkip.amazonaws.com \
+    https://ifconfig.me/ip \
+    https://v4.ident.me; do
     ip=$(curl -4fsS --connect-timeout 3 --max-time 6 "$url" 2>/dev/null | tr -d '[:space:]' || true)
     if validate_public_ipv4 "$ip" 2>/dev/null; then
-      printf '%s\n' "$ip"
-      return 0
+      votes["$ip"]=$(( ${votes["$ip"]:-0} + 1 ))
+      if (( votes["$ip"] >= 2 )); then
+        printf '%s\n' "$ip"
+        return 0
+      fi
     fi
   done
   return 1
@@ -649,10 +658,26 @@ PY
   done <<<"$results"
 }
 
-prompt_default() {
-  local prompt=$1 default=$2 answer
-  read -r -p "$prompt [$default]: " answer </dev/tty || true
-  printf '%s\n' "${answer:-$default}"
+select_public_ipv4() {
+  local target=$1 label=$2 detected answer
+  if detected=$(detect_public_ipv4); then
+    printf -v "$target" '%s' "$detected"
+    ok "${label}已自动识别：${detected}"
+    return 0
+  fi
+
+  warn "多个公网 IP 检测源未能取得一致结果，需要手动输入。"
+  while true; do
+    if ! read -r -p "请输入${label}: " answer </dev/tty; then
+      die "未能读取公网 IPv4。"
+    fi
+    answer=${answer//[[:space:]]/}
+    if validate_public_ipv4 "$answer" 2>/dev/null; then
+      printf -v "$target" '%s' "$answer"
+      return 0
+    fi
+    warn "${answer:-空值} 不是可路由的公网 IPv4，请重新输入。"
+  done
 }
 
 prompt_secret() {
@@ -671,6 +696,34 @@ port_is_free_udp() {
     $4 ~ ("(^|:)" port "$") {found=1}
     END {exit !found}
   '
+}
+
+select_wireguard_port() {
+  local target=$1 preferred=$2 candidate answer
+  validate_port "$preferred" || die "自动分配的 WireGuard 端口无效。"
+  for ((candidate=preferred; candidate<=preferred+200 && candidate<=65535; candidate++)); do
+    if port_is_free_udp "$candidate"; then
+      printf -v "$target" '%s' "$candidate"
+      if (( candidate == preferred )); then
+        ok "WireGuard UDP 端口已自动设置为 ${candidate}。"
+      else
+        warn "默认 UDP ${preferred} 已被占用，已自动改用 ${candidate}。"
+      fi
+      return 0
+    fi
+  done
+
+  warn "自动端口范围 ${preferred}-$(( preferred + 200 )) 均不可用，需要手动指定。"
+  while true; do
+    if ! read -r -p '请输入可用的 WireGuard UDP 端口: ' answer </dev/tty; then
+      die "未能读取 WireGuard 端口。"
+    fi
+    if validate_port "$answer" && port_is_free_udp "$answer"; then
+      printf -v "$target" '%s' "$answer"
+      return 0
+    fi
+    warn "端口无效或已被占用，请重新输入。"
+  done
 }
 
 tcp_port_is_listening() {
@@ -1538,11 +1591,10 @@ wait_for_link() {
 }
 
 install_backend() {
-  local requested_role=$1 code decoded detected ip_default wg_default backend_priv backend_pub
+  local requested_role=$1 code decoded backend_priv backend_pub
   local -a fields
   [[ ! -f $TDH_STATE ]] || die "本机已经初始化；请运行管理菜单。"
   check_os
-  install_packages backend
   code=$(prompt_secret "请粘贴入口生成的 ${requested_role} Join Code")
   decoded=$(decode_join_code "$code") || die "无法解析 Join Code。"
   mapfile -t fields <<<"$decoded"
@@ -1575,19 +1627,17 @@ install_backend() {
   else
     [[ $LOCAL_WG_IP == 10.77.2.2 && $ENTRY_WG_IP == 10.77.2.1 ]] || die "VPS2 隧道地址异常。"
   fi
+  # Validate the Join Code before a potentially long package installation so
+  # a paste/role mistake fails fast without changing the machine.
+  install_packages backend
   WG_INTERFACE=$([[ $requested_role == backend1 ]] && echo tdh-b1 || echo tdh-b2)
   tunnel_network_is_available "${LOCAL_WG_IP%.*}.0/30" "$WG_INTERFACE" || \
     die "固定 WireGuard 网段与本机现有网络冲突；为避免破坏路由，安装已停止。"
 
-  detected=$(detect_public_ipv4 || true)
-  ip_default=${detected:-请输入公网IPv4}
-  BACKEND_PUBLIC_IP=$(prompt_default "本机公网 IPv4" "$ip_default")
+  select_public_ipv4 BACKEND_PUBLIC_IP "后端 VPS 公网 IPv4"
   validate_public_ipv4 "$BACKEND_PUBLIC_IP" || die "后端必须是可路由的公网 IPv4。"
   [[ $BACKEND_PUBLIC_IP != "$ENTRY_PUBLIC_IP" ]] || die "入口与后端不能使用同一个公网 IPv4。"
-  wg_default=$([[ $requested_role == backend1 ]] && echo 51821 || echo 51822)
-  BACKEND_WG_PORT=$(prompt_default "WireGuard UDP 端口" "$wg_default")
-  validate_port "$BACKEND_WG_PORT" || die "WireGuard 端口无效。"
-  port_is_free_udp "$BACKEND_WG_PORT" || die "UDP $BACKEND_WG_PORT 已被占用。"
+  select_wireguard_port BACKEND_WG_PORT "$BACKEND_WG_PORT"
   [[ ! -e /etc/systemd/system/telemt-dual-hop-telemt.service && \
      ! -e /etc/systemd/system/telemt-a.service && ! -e /etc/systemd/system/telemt-b.service ]] || \
     die "检测到同名 Telemt systemd 服务；请先确认其来源。"
@@ -1660,7 +1710,6 @@ show_join_codes() {
 }
 
 init_entry() {
-  local detected ip_default
   [[ ! -f $TDH_STATE ]] || die "本机已经初始化；请运行管理菜单。"
   check_os
   if systemctl is-active --quiet haproxy.service 2>/dev/null; then
@@ -1668,9 +1717,7 @@ init_entry() {
   fi
   install_packages entry
   systemctl disable --now haproxy.service >/dev/null 2>&1 || true
-  detected=$(detect_public_ipv4 || true)
-  ip_default=${detected:-请输入公网IPv4}
-  ENTRY_PUBLIC_IP=$(prompt_default "入口 VPS 公网 IPv4" "$ip_default")
+  select_public_ipv4 ENTRY_PUBLIC_IP "入口 VPS 公网 IPv4"
   validate_public_ipv4 "$ENTRY_PUBLIC_IP" || die "入口必须是可路由的公网 IPv4。"
   PORT_A=$TDH_PUBLIC_PORT PORT_B=$TDH_PUBLIC_PORT
   port_is_free_tcp "$TDH_PUBLIC_PORT" || die "TCP ${TDH_PUBLIC_PORT} 已被占用；双 SNI 模式必须独占该端口。"
@@ -2160,7 +2207,7 @@ control_panel() {
 }
 
 self_test() {
-  local tmp release_fixture expected_a expected_b full_a full_b normalized
+  local tmp release_fixture selected_port expected_a expected_b full_a full_b normalized
   tmp=$(mktemp -d)
   release_fixture="${tmp}/release.sh"
   printf 'readonly TDH_VERSION="9.8.7"\nreadonly TDH_CONFIG_SCHEMA="5"\nreadonly TDH_PROTOCOL_VERSION="1.2.1"\n' >"$release_fixture"
@@ -2172,6 +2219,9 @@ self_test() {
   state_is_current || die "旧管理器版本的配置兼容性测试失败。"
   CONFIG_SCHEMA=4
   if state_is_current; then die "不兼容配置架构被错误接受。"; fi
+  port_is_free_udp() { [[ $1 == 51823 ]]; }
+  select_wireguard_port selected_port 51821 >/dev/null 2>&1
+  [[ $selected_port == 51823 ]] || die "WireGuard 自动端口顺延测试失败。"
   CONFIG_SCHEMA=$TDH_CONFIG_SCHEMA CLUSTER_ID="00112233445566778899aabb" ENTRY_PUBLIC_IP="203.0.113.10"
   PORT_A=443 PORT_B=443 SECRET_A="00112233445566778899aabbccddeeff"
   SECRET_B="ffeeddccbbaa99887766554433221100" JOIN_CREATED=1700000000 JOIN_EXPIRES=4102444800
