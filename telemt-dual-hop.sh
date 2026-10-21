@@ -6,7 +6,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.4.0"
+readonly TDH_VERSION="1.4.1"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.5"
@@ -100,7 +100,7 @@ readonly STATE_VARS=(
 
 usage() {
   cat <<'EOF'
-Telemt Dual-Hop 1.4.0
+Telemt Dual-Hop 1.4.1
 
 用法：
   sudo bash telemt-dual-hop.sh              打开中文菜单
@@ -109,8 +109,6 @@ Telemt Dual-Hop 1.4.0
   a update                                  安全更新管理脚本（可简写为 a u）
   a update-rollback                         恢复上次 a update 前的管理脚本
   a perf [2-30]                             只读脱敏性能采样（默认 5 秒）
-  a perf-apply                              显式试用入口内核转发（先阅读性能报告）
-  a perf-rollback                           恢复试用前的入口配置并平滑重载
   sudo bash telemt-dual-hop.sh entry        初始化入口 VPS
   sudo bash telemt-dual-hop.sh backend1     安装后端 VPS1
   sudo bash telemt-dual-hop.sh backend2     安装后端 VPS2
@@ -334,23 +332,27 @@ update_manager() {
       die "无法保存旧管理器；更新已取消。"
     fi
   fi
+  if ! install_shortcut; then
+    rm -f "$download_tmp" "$manager_tmp"
+    die "无法准备快捷入口；当前管理器保持原样。"
+  fi
   if ! mv -f "$manager_tmp" "$TDH_MANAGER"; then
     rm -f "$download_tmp" "$manager_tmp"
     die "无法替换管理器；当前版本未作任何修改。"
   fi
   rm -f "$download_tmp"
-  install_shortcut
   if [[ $new_version == "$TDH_VERSION" ]]; then
     ok "已重新安装最新版 ${new_version}（SHA256: ${checksum}）。"
   else
     ok "管理脚本已从 ${TDH_VERSION} 更新到 ${new_version}（SHA256: ${checksum}）。"
   fi
-  info "服务和集群配置均未改动；退出当前面板后再次输入 a 即可使用新版本。"
+  info "升级完成，无需重新部署。现有服务、IP、端口、Secret、链接和主备配置均保留。"
+  info "本次为兼容性与只读诊断升级，没有经生产验证的大幅提速，未自动修改传输参数。"
+  info "退出当前面板后再次输入 a 即可使用新版本；诊断为按需功能，不是升级步骤。"
 }
 
 rollback_manager() {
   local previous="${TDH_MANAGER}.previous" tmp
-  [[ ! -d ${TDH_BASE}/performance-backup ]] || die "入口仍有性能试用备份；请先 a perf-rollback，再回退管理器。"
   [[ -f $previous && ! -L $previous ]] || die "没有上次 a update 的管理器备份。"
   [[ $(extract_release_value "$previous" TDH_CONFIG_SCHEMA) == "$TDH_CONFIG_SCHEMA" && \
      $(extract_release_value "$previous" TDH_PROTOCOL_VERSION) == "$TDH_PROTOCOL_VERSION" ]] || die "备份协议不兼容，拒绝回退。"
@@ -2024,121 +2026,6 @@ diagnose() {
   if (( failures == 0 )); then ok "全部本机检查通过。"; else die "发现 $failures 项异常。"; fi
 }
 
-render_splice_candidate() {
-  python3 - "$1" "$2" <<'PY'
-import pathlib, re, sys
-source, target = map(pathlib.Path, sys.argv[1:])
-text = source.read_text()
-active = "\n".join(line.split("#", 1)[0] for line in text.splitlines())
-if re.search(r"\b(nosplice|maxpipes|splice-auto|splice-request|splice-response)\b", active):
-    raise SystemExit("已有自定义 splice/maxpipes 配置；拒绝叠加。")
-sections = {"global": "    maxpipes 256\n", "backend telemt_a": "    option splice-auto\n",
-            "backend telemt_b": "    option splice-auto\n"}
-for section, addition in sections.items():
-    pattern = r"(?m)^" + re.escape(section) + r"[ \t]*(?:#[^\n]*)?\n"
-    if len(re.findall(pattern, text)) != 1:
-        raise SystemExit("配置布局不兼容；未改动运行配置。")
-    text = re.sub(pattern, lambda m: m[0] + addition, text)
-target.write_text(text)
-PY
-}
-
-haproxy_worker_pid() {
-  printf 'show info\n' | timeout 3 socat - UNIX-CONNECT:/run/telemt-dual-hop/haproxy.sock 2>/dev/null | \
-    awk -F': ' '$1=="Pid" && $2 ~ /^[0-9]+$/ {print $2}'
-}
-
-wait_haproxy_generation() {
-  local old_pid=$1 new_pid attempt
-  for ((attempt=1; attempt<=15; attempt++)); do
-    new_pid=$(haproxy_worker_pid) || new_pid=""
-    if [[ $new_pid =~ ^[0-9]+$ && $new_pid != "$old_pid" ]] && \
-       systemctl is-active --quiet telemt-dual-hop-haproxy.service && haproxy_all_telemt_up; then
-      return 0
-    fi
-    sleep 1
-  done
-  return 1
-}
-
-performance_apply() (
-  load_state || die "尚未安装。"
-  require_current_state
-  [[ $TDH_ROLE == entry ]] || die "此试用仅适用于入口 HAProxy。"
-  local backup="${TDH_BASE}/performance-backup" changed=0 rc old_pid restore_pid
-  [[ ! -e $backup && ! -L $backup ]] || die "已有试用备份；请先 a perf-rollback。"
-  [[ -f $TDH_HAPROXY_CFG && ! -L $TDH_HAPROXY_CFG ]] || die "HAProxy 配置必须是普通文件。"
-  haproxy -vv 2>/dev/null | grep -q '+LINUX_SPLICE' || die "当前 HAProxy 未编译 Linux splice。"
-  systemctl is-active --quiet telemt-dual-hop-haproxy.service || die "HAProxy 尚未运行。"
-  haproxy_all_telemt_up || die "四条逻辑路径尚未全部 UP；请先处理现有故障。"
-  old_pid=$(haproxy_worker_pid) || die "无法读取当前 HAProxy worker。"
-  [[ $old_pid =~ ^[0-9]+$ ]] || die "当前 HAProxy worker 标识无效。"
-  mkdir -m 0700 "$backup" || exit 1
-  # Keep exact original bytes and metadata. Never regenerate user configuration.
-  trap '
-    rc=$?
-    if (( rc != 0 )); then
-      if (( changed == 1 )); then
-        warn "试用未通过；恢复原配置并平滑重载……"
-        restore_pid=$(haproxy_worker_pid) || restore_pid=""
-        if cp -p "$backup/before.cfg" "${TDH_HAPROXY_CFG}.restore" &&
-           mv -f "${TDH_HAPROXY_CFG}.restore" "$TDH_HAPROXY_CFG" &&
-           timeout 15 systemctl reload telemt-dual-hop-haproxy.service &&
-           wait_haproxy_generation "$restore_pid"; then
-          changed=0
-        else
-          warn "自动恢复未完成；备份保留，请执行 a perf-rollback。"
-        fi
-      fi
-      if (( changed == 0 )); then
-        rm -f "$backup/before.cfg" "$backup/after.cfg" "$backup/after.sha256"
-        rmdir "$backup" || true
-      fi
-      rm -f "${TDH_HAPROXY_CFG}.candidate" "${TDH_HAPROXY_CFG}.restore"
-    fi
-  ' EXIT
-  trap 'exit 130' INT
-  trap 'exit 143' TERM
-  cp -p "$TDH_HAPROXY_CFG" "$backup/before.cfg" || exit 1
-  cp -p "$TDH_HAPROXY_CFG" "$backup/after.cfg" || exit 1
-  render_splice_candidate "$backup/before.cfg" "$backup/after.cfg" || exit 1
-  haproxy -c -f "$backup/after.cfg" >/dev/null 2>&1 || die "候选配置校验失败。"
-  sha256sum "$backup/after.cfg" | awk '{print $1}' >"$backup/after.sha256" || exit 1
-  # Prepare beside the destination so rename stays atomic on the same filesystem.
-  cp -p "$backup/after.cfg" "${TDH_HAPROXY_CFG}.candidate" || exit 1
-  # shellcheck disable=SC2034
-  changed=1
-  mv -f "${TDH_HAPROXY_CFG}.candidate" "$TDH_HAPROXY_CFG" || exit 1
-  timeout 15 systemctl reload telemt-dual-hop-haproxy.service || exit 1
-  wait_haproxy_generation "$old_pid" || die "新 worker 或主备路径未恢复。"
-  systemctl is-active --quiet telemt-dual-hop-haproxy.service || exit 1
-  ok "已试用 splice-auto（最多 256 条内核管道）；已有连接由旧 worker 继续服务。"
-  info "请按同一测速方案比较吞吐、CPU 与小消息延迟；无收益请运行 a perf-rollback。"
-)
-
-performance_rollback() {
-  local backup="${TDH_BASE}/performance-backup" actual expected before old_pid
-  load_state || die "尚未安装。"
-  [[ $TDH_ROLE == entry ]] || die "仅入口有 HAProxy 试用配置。"
-  [[ -d $backup && ! -L $backup && -f $backup/before.cfg && -f $backup/after.sha256 ]] || die "没有完整的性能试用备份。"
-  actual=$(sha256sum "$TDH_HAPROXY_CFG" | awk '{print $1}')
-  expected=$(<"$backup/after.sha256")
-  before=$(sha256sum "$backup/before.cfg" | awk '{print $1}')
-  [[ $actual == "$expected" || $actual == "$before" ]] || die "配置在试用后被另外修改；为保护手动修改，拒绝自动覆盖。原配置位于 ${backup}/before.cfg。"
-  haproxy -c -f "$backup/before.cfg" >/dev/null 2>&1 || die "原配置现已无法通过本机 HAProxy 校验；备份保留。"
-  old_pid=$(haproxy_worker_pid) || die "无法读取当前 HAProxy worker；备份保留。"
-  [[ $old_pid =~ ^[0-9]+$ ]] || die "当前 HAProxy worker 标识无效；备份保留。"
-  cp -p "$backup/before.cfg" "${TDH_HAPROXY_CFG}.restore"
-  mv -f "${TDH_HAPROXY_CFG}.restore" "$TDH_HAPROXY_CFG"
-  if ! timeout 15 systemctl reload telemt-dual-hop-haproxy.service; then
-    die "原配置已恢复到磁盘，但重载未完成；备份保留，可重试 a perf-rollback。"
-  fi
-  wait_haproxy_generation "$old_pid" || die "回滚后新 worker 或主备路径未就绪；备份保留，可重试。"
-  rm -f "$backup/before.cfg" "$backup/after.cfg" "$backup/after.sha256"
-  rmdir "$backup"
-  ok "已恢复试用前的完整 HAProxy 配置并平滑重载。"
-}
-
 # This path deliberately bypasses bootstrap installation, state sourcing and the
 # manager lock. Only fixed read commands and allow-listed numeric fields escape.
 performance_report() {
@@ -2582,8 +2469,6 @@ menu_existing() {
       printf '  6) 完成或重试启用入口\n'
       printf '  7) 安全更新管理脚本\n'
       printf '  8) 只读脱敏性能采样（5 秒）\n'
-      printf '  p) 显式试用入口内核转发（请先阅读 docs/PERFORMANCE.md）\n'
-      printf '  r) 回滚入口内核转发试用\n'
       printf '  9) 卸载\n'
       printf '  0) 退出\n\n'
       read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
@@ -2596,8 +2481,6 @@ menu_existing() {
         6) run_panel_action complete_entry ;;
         7) run_panel_action update_manager ;;
         8) run_panel_action performance_report ;;
-        p) run_panel_action performance_apply ;;
-        r) run_panel_action performance_rollback ;;
         9) run_panel_action uninstall_all ;;
         0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
         *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
@@ -2712,8 +2595,6 @@ main() {
     diagnose) diagnose ;;
     update|upgrade|u) update_manager ;;
     update-rollback) rollback_manager ;;
-    perf-apply) performance_apply ;;
-    perf-rollback) performance_rollback ;;
     uninstall) uninstall_all ;;
     menu|panel) control_panel ;;
     "") control_panel ;;

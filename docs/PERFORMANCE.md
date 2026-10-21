@@ -1,8 +1,8 @@
 # Telemt Dual-Hop 性能审计与验证手册
 
-审计日期：2026-10-21。项目基线：`452c50d268c8a95d68bdda0d27878f4e9ddcefb2`，管理器 1.3.1、schema 5、节点协议 1.2.1、Telemt 3.5.5。本次管理器为 1.4.0，schema、协议和 Telemt 固定版本均保持不变。
+审计日期：2026-10-21。项目基线：`452c50d268c8a95d68bdda0d27878f4e9ddcefb2`，管理器 1.3.1、schema 5、节点协议 1.2.1、Telemt 3.5.5。本次管理器为 1.4.1，schema、协议和 Telemt 固定版本均保持不变。
 
-**没有连接或修改生产 VPS，没有获得三台服务器、用户网络或 Telegram 的测速数据。生产主瓶颈尚未确定，也不能认定已经接近线路上限。** 本次实际交付为源码审计、只读脱敏采样、一个经本机对照验证的可回滚入口转发试用，以及自动化回归和受控测速工具。没有默认堆叠 sysctl、修改 MTU/offload、改变主备策略或升级 Telemt。
+**没有连接或修改生产 VPS，没有获得三台服务器、用户网络或 Telegram 的测速数据。生产主瓶颈尚未确定，也不能认定已经接近线路上限。** 本次实际交付为源码审计、只读脱敏采样、仅限本机回环环境的入口转发研究，以及自动化回归和受控测速工具。没有默认堆叠 sysctl、修改 MTU/offload、改变主备策略或升级 Telemt。
 
 ## 1. 真实数据路径与容量边界
 
@@ -33,7 +33,7 @@ HAProxy 不做加解密；入口内核做 WG ChaCha20-Poly1305 加密/解密，�
 |---|---|---|---|
 | P0 | 当前仓库没有性能采样；无法证明运行中接口确为 fq、连接确为 BBR | 原 `tuning_is_active` 仅检查两个默认 sysctl；默认值不会重配已存在接口或旧 TCP socket。用 `a perf` 观察实际 qdisc 和分段 TCP | 修正“已实际生效”的过度表述，增加只读采样 |
 | P0 | 用户→入口、入口→后端、后端→DC 的路由/丢包未知 | 同一时段分段测单流/四流、双向、CPU/steal、重传与队列。仅见低速不能归因程序 | 不编造生产瓶颈和加速比例 |
-| P1 | HAProxy 没有启用 splice，持续转发会经过用户态复制 | 若入口 CPU 已饱和，可减少复制与系统调用成本；增加少量管道/fd/内核内存，实际收益依赖内核和负载。A/B 同速比较 CPU/GiB、小消息延迟和完整性 | 增加显式 `a perf-apply`；默认配置不变 |
+| P1 | HAProxy 没有启用 splice，持续转发会经过用户态复制 | 若入口 CPU 已饱和，可减少复制与系统调用成本；增加少量管道/fd/内核内存，实际收益依赖内核和负载。A/B 同速比较 CPU/GiB、小消息延迟和完整性 | 仅保留回环实验，生产管理器不提供启用入口 |
 | P1 | WG 未显式设置 MTU，采用 wg-quick 自动推导 | 自动 MTU 不等于跨网 PMTU；不对称路由、UDP 分片/黑洞可能导致卡顿。双向 DF 探测配合计数器和传输测量，不能仅凭 ping 推断 WG 容量 | 采集实际 MTU、分片/重组失败；不盲设 1280/1420 |
 | P1 | 健康策略要求全部五个固定 DC 可达 | 每 10 秒探测，连续两轮失败置 down；API 每秒检查，单次失败即影响 agent。显式 down 不受普通 TCP check 的 `fall 3` 延迟保护。一个 DC 局部故障也会使整后端退出新连接选择 | 保留可用性策略，采集 chkdown/downtime；建议先关联波动与 DC/agent 状态再改策略 |
 | P2 | 单实例 Direct copy buffer 有进程预算和压力降级 | 预算安装时取内存 1/4，最大 1 GiB；3.5.5 从 4/8 KiB 起步，分别增长至默认 64/256 KiB，进程内存/连接/预算压力会降级。不是为每个连接立刻分配 320 KiB；copy buffer 也不是 TCP 接收窗口 | 不提高预算；现有 API 不直接暴露预算全部指标，报告不能据 RSS 宣称预算饱和 |
@@ -84,7 +84,7 @@ wg-quick 通常按出接口/endpoint 推导 MTU 并预留封装空间；实际�
 
 复核批次本机首字节延迟（合成ClientHello后端响应，非Telegram）单流各组最大值不超过0.953ms，四流不超过2.896ms；该短测试不能证明移动网络P95、抖动、丢包或长期稳定性。它未包括WG加密、Telemt、真实MTProto会话、DC流控、客户端缓存或公网拥塞。
 
-**吞吐几乎相同，不能报“提速 17%–22%”。** 这里只验证同速入口 CPU 开销下降；限速测试只建立容量下界，未测极限吞吐。若生产入口 CPU 不饱和，真实体感可能没有变化。为稳定性优先，splice 不进入默认部署配置，保留为 A 类显式试用。
+**吞吐几乎相同，不能报“提速 17%–22%”。** 这里只验证同速入口 CPU 开销下降；限速测试只建立容量下界，未测极限吞吐。若生产入口 CPU 不饱和，真实体感可能没有变化。为稳定性优先，splice 不进入生产管理器；不通过 `a update` 自动开启，也不要求用户额外执行试用命令。
 
 本机复现（只绑定 loopback，有时长/速率/轮数上限）：
 
@@ -97,7 +97,7 @@ python3 tests/lab.py --haproxy /path/to/haproxy \
 
 ### 首先只读采样
 
-安装 1.4.0 管理器后，在三台分别执行：
+安装 1.4.1 管理器后，在三台分别执行：
 
 ```bash
 a perf 5
@@ -146,39 +146,47 @@ python3 tools/iperf_matrix.py --peer 10.77.1.2 --rate-mbps 20 --seconds 8 --roun
 
 每种方案至少5轮，建议20轮后再讨论P95；同时记录 min/max、丢失样本和并发人数，保留原始CSV。固定端点与Secret；比较优化前、试用后、回滚后的同等条件。若中位数差异落在原波动范围内、P95恶化或重连上升，就不认定有益并回滚。工具没有机器人/Telegram 用户凭据，不自动替用户登录、发消息或下载私有文件。
 
-## 6. 更新、显式应用与回滚
+## 6. 只运行 a update 的兼容升级边界
 
-以下是用户自行在 VPS 执行的步骤，本审计没有执行生产操作。**需先把本次变更合并到你选用的发布来源后，`a update` 才能取得新代码。** 下载未合并的 main 不会凭空获得1.4.0功能。现有 schema5、协议1.2.1 的1.3.1节点无需重部署，旧Secret/链接/公网端口继续使用；更老schema仍拒绝混装，本次不设计未经审查的历史架构迁移。
+本次发布定位是**保留现有连接信息的诊断与维护升级，没有已证明的生产大幅提速**。本机 splice 对照只证明入口 CPU 开销降低，不能证明生产吞吐或稳定性；因此生产脚本移除了 `perf-apply`、参数试用菜单及相应配置修改路径。研究代码仅在 `tests/lab.py` 的回环环境内运行。
+
+发布到 `bababoyi6/me/main` 后，在三台 VPS **分别只执行一次**：
 
 ```bash
-# 三台：只更新管理器；不更新 apt 包、Telemt、WireGuard、HAProxy 或其运行配置
 a update
-a perf 5
-
-# 仅入口：基线数据和维护条件满足时，显式试用
-a perf-apply
-
-# 仅入口：同条件复测；无收益或出现异常即恢复
-a perf-rollback
 ```
 
-试用只在现有 HAProxy 配置的 global 添加 `maxpipes 256`，两个 Telemt backend 各加 `option splice-auto`。不重新生成用户配置、不触碰WG/Telemt/sysctl。先检查构建能力、schema、运行状态及四条逻辑路径UP；若存在自定义 splice/maxpipes 或布局不兼容则拒绝叠加。最多256条pipe，两个方向独立使用，耗尽自动走原复制方式；增加管道fd和有限内核页内存，不预分配最大用户连接数的管道。
+即完成该节点本次管理器升级，不需要重装、`a complete`、参数应用命令、重新生成链接或客户端改动。可选的 `a perf` 只是之后定位瓶颈的工具，不是升级步骤。入口执行一次不会远程修改另外两台；现有项目不保存远程管理凭据，本次也不引入它们。
 
-原文件逐字节、权限和属主保存到 `/etc/telemt-dual-hop/performance-backup/before.cfg`，目录0700。候选先经本机 `haproxy -c` 校验，再同文件系统原子替换并 `systemctl reload`（USR2），不 `restart`。原连接由旧worker排空，新连接使用新worker；12小时长连接意味着旧worker可能存活很久，多次重载会暂时叠加资源，因此禁止未回滚先重复apply。不要为清理旧worker强制终止业务连接。
+schema保持5、节点协议保持1.2.1、Telemt固定3.5.5及校验值不变。HAProxy/WireGuard/Telemt配置生成器和服务unit模板与1.3.1一致；运行中的Secret、完整链接、入口IPv4和443端口、WG密钥、访问控制、伪装和主备顺序均不改写，不重启或重载数据服务。没有通过改内核、sysctl、MTU、offload换取未验证的速度。
 
-重载失败、健康验证失败、INT/TERM触发自动恢复；若自动恢复也失败，保留备份并明确提示。SIGKILL/断电无法由trap处理；重跑 `a perf-rollback`，支持磁盘仍为候选或已是原配置的恢复状态。磁盘在试用后被其他操作修改则按SHA256拒绝覆盖，需要人工核对差异。回滚只恢复入口完整配置并平滑重载；不卸载服务、不改Secret。不要在试用期间运行 `a complete` 重新生成入口配置。
+自动测试直接使用从基线提取的**真实1.3.1更新函数**，模拟入口/backend1/backend2各运行一次旧版 `a update`，核对新管理器成功安装，状态、连接信息、隧道文件、密钥和服务配置逐字节保持不变，而且没有systemctl操作。不是只测试新版更新新版。
 
-从**新管理器**执行 `a update` 会先保存旧管理器至 `/usr/local/sbin/telemt-dual-hop.previous`，可 `a update-rollback` 原子恢复兼容且自检通过的备份。首次从旧1.3.1更新时，旧更新逻辑尚没有此功能，可预先执行：
+需要明确旧更新器的技术边界：1.3.1会校验下载的新脚本，再替换管理器；它不会执行新版的运行配置迁移钩子。不能既保留其行为，又宣称首次 `a update` 已自动升级所有正在运行的组件。本次选择不迁移数据面，所以单次升级无需补做配置应用。这不构成生产速度提升的承诺。
+
+从新管理器进行后续更新时，会保存上次不同版本的管理器到 `/usr/local/sbin/telemt-dual-hop.previous`，可用 `a update-rollback` 恢复兼容且自检通过的备份。重复安装相同内容不覆盖备份；快捷入口准备失败不替换当前管理器。下载失败、身份/协议/语法/自检不通过时，现有服务配置不变。
+
+**首次从原版1.3.1升级时，它本身不创建旧管理器备份**；不能谎称新版能在旧进程已执行的步骤里补上备份，也不把有副作用的迁移塞进 `--self-test`。若首次升级后需要退回管理界面，可从已审计的基线下载旧管理器到临时文件，先校验SHA256（基线SHA256见下文），再原子替换管理器；无需回退任何数据面配置，因为本次没有修改。后续版本才有上述一键管理器回退。管理器回退不等于组件回退。
+
+基线脚本SHA256：`07642df50587cbad056865445bfe4d38802322b2eb02d564234d1b4252a528dc`。首次管理器回退可执行（只恢复管理脚本，不改服务配置）：
 
 ```bash
-sudo cp -p /usr/local/sbin/telemt-dual-hop /usr/local/sbin/telemt-dual-hop.previous
+t=$(mktemp)
+curl --proto '=https' --proto-redir '=https' --tlsv1.2 -fL --connect-timeout 10 --max-time 120 \
+  https://raw.githubusercontent.com/bababoyi6/me/452c50d268c8a95d68bdda0d27878f4e9ddcefb2/telemt-dual-hop.sh -o "$t" &&
+printf '%s  %s\n' 07642df50587cbad056865445bfe4d38802322b2eb02d564234d1b4252a528dc "$t" | sha256sum -c - &&
+bash -n "$t" && bash "$t" --self-test &&
+sudo install -m 0755 "$t" /usr/local/sbin/telemt-dual-hop.rollback &&
+sudo mv -f /usr/local/sbin/telemt-dual-hop.rollback /usr/local/sbin/telemt-dual-hop
+rm -f "$t"
 ```
 
-注意：直接下载脚本再无参数运行沿用原 `install_self` 行为，不经过 `a update` 的备份流程，事先自行留存管理器。若要回退到无新命令的1.3.1，**先 `a perf-rollback` 再回退管理器**；否则原HAProxy配置备份还在，但旧管理器不认识性能命令。管理器回退从来不等于组件或配置回退。
+
+更老schema的历史架构迁移不包含在本次发布中；遇到不兼容配置会拒绝迁移，而不是改Secret或重部署集群。本次源码变更从来不会自行操作生产VPS。
 
 ## 7. 架构建议与收益边界
 
-**A：原架构内。** 先用三段数据选瓶颈，再考虑入口splice、经双向PMTU证据支持的单隧道MTU、确有窗口限制时的有限buffer上限调整。后两者本次未应用。当前资源策略、SNI、两后端优先级、安全边界均保留；不为漂亮数字去掉WG或认证。
+**A：原架构内。** 先用三段数据选瓶颈，再研究入口splice、经双向PMTU证据支持的单隧道MTU、确有窗口限制时的有限buffer上限调整。这些运行参数本次均未应用。当前资源策略、SNI、两后端优先级、安全边界均保留；不为漂亮数字去掉WG或认证。
 
 **B：使用方式不变的增强。** 若同一时段同一DC/文件多轮证明某后端始终更优，可研究保持SNI/Secret/公网443的连接级主后端选择或带滞回的运维选择；只影响新连接，不保证一个下载合并带宽。需要测两链接负载、故障恢复与振荡，先不加自动跨站测速/动态调度守护进程。若发现agent对单DC故障过于敏感，应测试“按DC可达性与连接失败率决策”的明确语义，不能随意把all改any牺牲完整DC覆盖。
 
@@ -197,6 +205,6 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 timeout 60 python3 tests/lab.py
 ```
 
-Actions 在Ubuntu22.04安装测试用HAProxy/ShellCheck，运行上述检查。本机另使用Ubuntu22.04 HAProxy2.4.30执行配置/行为测试；这不等于已在生产内核验证。自动测试覆盖配置生成、安全绑定、旧schema5兼容、更新拒绝不兼容内容、原配置回滚、失败自动恢复、漂移保护、诊断脱敏/不执行state/时长与子进程输出限制、iperf聚合限速，以及实际HAProxy分流/故障切换/重载传输。静态测试通过不代表真实速度提升。
+Actions 在Ubuntu22.04安装测试用HAProxy/ShellCheck，运行上述检查。本机另使用Ubuntu22.04 HAProxy2.4.30执行配置/行为测试；这不等于已在生产内核验证。自动测试覆盖配置生成、安全绑定、旧schema5兼容、更新拒绝不兼容内容、管理器回退、旧更新器一步兼容、连接信息不变、诊断脱敏/不执行state/时长与子进程输出限制、iperf聚合限速，以及实际HAProxy分流/故障切换/重载传输。静态测试通过不代表真实速度提升。
 
 主要参考为[HAProxy 2.4官方配置手册](https://docs.haproxy.org/2.4/configuration.html)（inspect-delay、splice、socket buffer、agent语义）、[Linux TCP参数文档](https://docs.kernel.org/networking/ip-sysctl.html)、[wg-quick官方实现](https://git.zx2c4.com/wireguard-tools/tree/src/wg-quick/linux.bash)、[Telemt 3.5.5 Direct relay](https://github.com/telemt/telemt/blob/3.5.5/src/proxy/direct_relay.rs)、[Direct budget](https://github.com/telemt/telemt/blob/3.5.5/src/proxy/direct_buffer_budget.rs)、[nonce实现](https://github.com/telemt/telemt/blob/3.5.5/src/proxy/handshake/nonce.rs)和[官方3.5.8兼容性说明](https://github.com/telemt/telemt/releases/tag/3.5.8)。官方WireGuard网页上的历史测速很旧，未用它估算当前VPS容量。

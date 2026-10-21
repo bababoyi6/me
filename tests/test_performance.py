@@ -48,13 +48,12 @@ backend telemt_b
 """)
         self.original = self.config.read_bytes()
 
-    def bash(self, body, success=True, prelude="", timeout=20):
+    def bash(self, body, success=True, prelude="", timeout=20, script=SCRIPT):
         setup = '''
 set -Eeuo pipefail
 export TDH_SOURCE_ONLY=1
 source "$TDH_TEST_SCRIPT"
 unset TDH_SOURCE_ONLY
-TDH_REAL_WAIT=$(declare -f wait_haproxy_generation)
 load_state() { TDH_ROLE=entry; CONFIG_SCHEMA=5; PORT_A=443; PORT_B=443; }
 haproxy() {
     if [[ ${1:-} == -vv ]]; then printf '+LINUX_SPLICE\\n';
@@ -65,12 +64,8 @@ timeout() {
   if [[ ${2:-} == systemctl ]]; then shift; "$@";
   else command timeout "$@"; fi
 }
-haproxy_all_telemt_up() { return 0; }
-wait_haproxy_backends() { return 0; }
-haproxy_worker_pid() { echo 100; }
-wait_haproxy_generation() { return 0; }
 '''
-        env = dict(self.env, TDH_TEST_SCRIPT=str(SCRIPT), TDH_TEST_HAPROXY=HAPROXY)
+        env = dict(self.env, TDH_TEST_SCRIPT=str(script), TDH_TEST_HAPROXY=HAPROXY)
         result = subprocess.run(["bash", "-c", setup + prelude + "\n" + body], env=env,
                                 text=True, capture_output=True, timeout=timeout)
         if success:
@@ -78,67 +73,6 @@ wait_haproxy_generation() { return 0; }
         else:
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         return result
-
-    def test_candidate_preserves_existing_configuration(self):
-        self.bash('render_splice_candidate "$TDH_HAPROXY_CFG" "$TDH_BASE/candidate"')
-        candidate = (self.base / "candidate").read_text()
-        self.assertEqual(candidate.replace("    maxpipes 256\n", "").replace("    option splice-auto\n", ""),
-                         self.original.decode())
-        self.assertEqual(candidate.count("option splice-auto"), 2)
-
-    def test_reject_custom_splice_and_ambiguous_layout(self):
-        for extra in ("    maxpipes 10\n", "    nosplice\n", "backend telemt_a\n"):
-            self.config.write_bytes(self.original + extra.encode())
-            self.bash('render_splice_candidate "$TDH_HAPROXY_CFG" "$TDH_BASE/candidate"', success=False)
-
-    @unittest.skipUnless(HAPROXY, "requires HAProxy")
-    def test_apply_and_exact_rollback(self):
-        self.config.chmod(0o640)
-        self.bash("performance_apply")
-        self.assertIn("option splice-auto", self.config.read_text())
-        self.assertEqual(self.config.stat().st_mode & 0o777, 0o640)
-        self.assertEqual((self.base / "performance-backup/before.cfg").read_bytes(), self.original)
-        self.assertEqual((self.base / "performance-backup").stat().st_mode & 0o777, 0o700)
-        self.bash("performance_rollback")
-        self.assertEqual(self.config.read_bytes(), self.original)
-        self.assertFalse((self.base / "performance-backup").exists())
-        log = (self.base / "systemctl.log").read_text()
-        self.assertNotIn("restart", log)
-        self.assertNotIn("stop", log)
-
-    @unittest.skipUnless(HAPROXY, "requires HAProxy")
-    def test_failed_reload_automatically_restores(self):
-        self.bash("performance_apply", success=False, prelude='''
-systemctl() {
-  if [[ $1 == reload && ! -f $TDH_BASE/failed ]]; then
-    touch "$TDH_BASE/failed"; return 1
-  fi
-  return 0
-}
-timeout() { shift; "$@"; }
-''')
-        self.assertEqual(self.config.read_bytes(), self.original)
-        self.assertFalse((self.base / "performance-backup").exists())
-
-    @unittest.skipUnless(HAPROXY, "requires HAProxy")
-    def test_post_reload_health_failure_restores(self):
-        self.bash("performance_apply", success=False, prelude="wait_haproxy_generation() { return 1; }")
-        self.assertEqual(self.config.read_bytes(), self.original)
-
-    @unittest.skipUnless(HAPROXY, "requires HAProxy")
-    def test_reject_drift_and_repeated_apply(self):
-        self.bash("performance_apply")
-        self.bash("performance_apply", success=False)
-        modified = self.config.read_text() + "# user change\n"
-        self.config.write_text(modified)
-        self.bash("performance_rollback", success=False)
-        self.assertEqual(self.config.read_text(), modified)
-        self.assertTrue((self.base / "performance-backup/before.cfg").exists())
-
-    def test_reject_unhealthy_before_mutation(self):
-        self.bash("performance_apply", success=False, prelude="haproxy_all_telemt_up() { return 1; }")
-        self.assertEqual(self.config.read_bytes(), self.original)
-        self.assertFalse((self.base / "performance-backup").exists())
 
     def test_resources_and_legacy_schema(self):
         self.bash('''
@@ -212,16 +146,6 @@ if state_is_current; then exit 1; fi
             result = namespace["telemt"]()
         self.assertEqual(result, {"core": {"connections_total": 7}, "upstream": {"connect_success_total": 2}})
 
-    def test_new_worker_required_before_success(self):
-        self.bash('''
-eval "$TDH_REAL_WAIT"
-haproxy_worker_pid() { echo 100; }
-sleep() { :; }
-if wait_haproxy_generation 100; then exit 1; fi
-haproxy_worker_pid() { echo 101; }
-wait_haproxy_generation 100
-''')
-
     def test_socket_summary_aggregates_without_endpoint_disclosure(self):
         source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]
         tree = ast.parse(source)
@@ -256,7 +180,7 @@ if [[ ${1:-} == --self-test ]]; then exit 0; fi
 
     def test_manager_update_and_failure_preserve_running_configuration(self):
         manager = self.base / "manager"
-        manager.write_text(SCRIPT.read_text().replace('TDH_VERSION="1.4.0"', 'TDH_VERSION="1.3.1"'))
+        manager.write_text(SCRIPT.read_text().replace('TDH_VERSION="1.4.1"', 'TDH_VERSION="1.3.1"'))
         old_manager = manager.read_bytes()
         old_state = self.state.read_bytes()
         download = self.base / "download"
@@ -275,6 +199,60 @@ if [[ ${1:-} == --self-test ]]; then exit 0; fi
             self.bash("update_manager", success=False, prelude=prelude)
             self.assertEqual(manager.read_bytes(), SCRIPT.read_bytes())
             self.assertEqual(self.config.read_bytes(), self.original)
+
+    def test_real_legacy_updater_preserves_all_connection_information(self):
+        legacy = ROOT / "tests/fixtures/manager-1.3.1-updater.sh"
+        previous_state = self.state.read_bytes()
+        # Synthetic identities only. These files must remain byte-identical.
+        files = {
+            "keys/entry.key": b"SYNTHETIC_PRIVATE_KEY_DO_NOT_CHANGE\n",
+            "telemt/telemt.toml": b'[access.users]\nline_a = "SYNTHETIC_SECRET"\n',
+            "links.txt": b"https://t.me/proxy?server=203.0.113.10&port=443&secret=synthetic\n",
+            "wireguard.conf": b"AllowedIPs = 10.77.1.2/32\n",
+        }
+        for name, content in files.items():
+            path = self.base / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+        (self.base / "download").write_bytes(SCRIPT.read_bytes())
+        for role in ("entry", "backend1", "backend2"):
+            (self.base / "manager").write_bytes(legacy.read_bytes())
+            prelude = f'''load_state() {{ TDH_ROLE={role}; CONFIG_SCHEMA=5; PORT_A=443; PORT_B=443; }}
+curl() {{ cp "$TDH_BASE/download" "${{@: -1}}"; }}
+install_shortcut() {{ :; }}
+'''
+            self.bash("update_manager", script=legacy, prelude=prelude)
+            self.assertEqual((self.base / "manager").read_bytes(), SCRIPT.read_bytes())
+            self.assertEqual(self.state.read_bytes(), previous_state)
+            self.assertEqual(self.config.read_bytes(), self.original)
+            for name, content in files.items():
+                self.assertEqual((self.base / name).read_bytes(), content)
+            self.assertFalse((self.base / "systemctl.log").exists())
+
+    def test_shortcut_failure_does_not_replace_manager(self):
+        manager = self.base / "manager"
+        manager.write_text("old manager bytes\n")
+        old = manager.read_bytes()
+        (self.base / "download").write_bytes(SCRIPT.read_bytes())
+        self.bash("update_manager", success=False, prelude='''
+curl() { cp "$TDH_BASE/download" "${@: -1}"; }
+install_shortcut() { return 1; }
+''')
+        self.assertEqual(manager.read_bytes(), old)
+        self.assertEqual(self.config.read_bytes(), self.original)
+
+    def test_release_has_no_production_performance_apply_path(self):
+        self.assertNotIn("performance_apply()", SCRIPT.read_text())
+        self.assertNotIn("perf-apply)", SCRIPT.read_text())
+
+    def test_runtime_templates_match_production_baseline(self):
+        import hashlib
+        manifest = json.loads((ROOT / "tests/fixtures/runtime-template-hashes.json").read_text())
+        text = SCRIPT.read_text()
+        for name, expected in manifest["functions"].items():
+            start = text.index(name + "() {\n")
+            end = text.index("\n}\n", start) + 3
+            self.assertEqual(hashlib.sha256(text[start:end].encode()).hexdigest(), expected, name)
 
     def test_iperf_aggregate_cap_and_no_raw_error_output(self):
         import importlib.util
