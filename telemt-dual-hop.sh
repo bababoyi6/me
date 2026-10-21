@@ -6,7 +6,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.4.1"
+readonly TDH_VERSION="1.4.2"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.5"
@@ -100,7 +100,7 @@ readonly STATE_VARS=(
 
 usage() {
   cat <<'EOF'
-Telemt Dual-Hop 1.4.1
+Telemt Dual-Hop 1.4.2
 
 用法：
   sudo bash telemt-dual-hop.sh              打开中文菜单
@@ -314,7 +314,7 @@ update_manager() {
     rm -f "$download_tmp"
     die "新脚本未通过 Bash 语法检查；当前版本未作任何修改。"
   fi
-  if ! bash "$download_tmp" --self-test >/dev/null; then
+  if ! timeout 60 bash "$download_tmp" --self-test >/dev/null; then
     rm -f "$download_tmp"
     die "新脚本未通过内置自检；当前版本未作任何修改。"
   fi
@@ -356,7 +356,7 @@ rollback_manager() {
   [[ -f $previous && ! -L $previous ]] || die "没有上次 a update 的管理器备份。"
   [[ $(extract_release_value "$previous" TDH_CONFIG_SCHEMA) == "$TDH_CONFIG_SCHEMA" && \
      $(extract_release_value "$previous" TDH_PROTOCOL_VERSION) == "$TDH_PROTOCOL_VERSION" ]] || die "备份协议不兼容，拒绝回退。"
-  if ! bash -n "$previous" || ! bash "$previous" --self-test >/dev/null; then
+  if ! bash -n "$previous" || ! timeout 60 bash "$previous" --self-test >/dev/null; then
     die "备份自检失败。"
   fi
   tmp=$(mktemp "${TDH_MANAGER}.rollback.XXXXXX")
@@ -1598,11 +1598,17 @@ EOF
 }
 
 query_telemt_link() {
-  local api_port=$1 username=$2 domain=$3 domain_hex
-  local -a auth=()
-  if [[ -n $API_TOKEN ]]; then auth=(-H "Authorization: Bearer ${API_TOKEN}"); fi
+  local api_port=$1 username=$2 domain=$3 domain_hex escaped_token
+  validate_port "$api_port" || return 1
+  [[ $API_TOKEN != *[$'\r\n']* ]] || return 1
+  escaped_token=${API_TOKEN//\\/\\\\}
+  escaped_token=${escaped_token//\"/\\\"}
   domain_hex=$(printf '%s' "$domain" | od -An -tx1 | tr -d ' \n')
-  curl -fsS --connect-timeout 2 --max-time 5 "${auth[@]}" "http://127.0.0.1:${api_port}/v1/users" | \
+  # Loopback credentials must never inherit proxies, .curlrc or appear in argv.
+  {
+    if [[ -n $API_TOKEN ]]; then printf 'header = "Authorization: Bearer %s"\n' "$escaped_token"; fi
+  } | curl -q --noproxy '*' --config - -fsS --connect-timeout 2 --max-time 5 \
+      "http://127.0.0.1:${api_port}/v1/users" | \
     jq -er --arg username "$username" --arg suffix "$domain_hex" \
       'first(.data[] | select(.username == $username) | .links.tls[]? | select(ascii_downcase | endswith($suffix)))'
 }
@@ -1614,7 +1620,7 @@ wait_for_link() {
     if [[ -n $link ]]; then printf '%s\n' "$link"; return 0; fi
     sleep 1
   done
-  journalctl -u telemt-dual-hop-telemt.service -n 50 --no-pager >&2 || true
+  warn "Telemt 在等待期内未生成可用链接；请检查服务状态和本机诊断。"
   return 1
 }
 
@@ -1943,7 +1949,7 @@ status_entry() {
   done
   printf '\nHAProxy 后端：\n'
   if [[ -S /run/telemt-dual-hop/haproxy.sock ]]; then
-    printf 'show stat\n' | socat - UNIX-CONNECT:/run/telemt-dual-hop/haproxy.sock 2>/dev/null | \
+    printf 'show stat\n' | timeout 3 socat - UNIX-CONNECT:/run/telemt-dual-hop/haproxy.sock 2>/dev/null | \
       awk -F, 'NR==1 || $1=="telemt_a" || $1=="telemt_b" {print $1, $2, $18}'
   else
     warn "HAProxy Runtime Socket 不存在。"
@@ -2106,11 +2112,21 @@ def counters():
             for name, value in zip(header.split()[1:], values.split()[1:]):
                 if name in allowed and integer(value) is not None:
                     result[prefix + "." + name] = int(value)
+    result.update({"Vm." + k: v for k, v in numeric_fields(read("/proc/vmstat"),
+                   {"oom_kill", "pgmajfault", "pswpin", "pswpout"}).items()})
     return result
 
 def cpu():
     return {row[0]: list(map(int, row[1:9])) for line in read("/proc/stat").splitlines()
             if (row := line.split()) and re.fullmatch(r"cpu\d*", row[0])}
+
+def cpu_usage(before, after):
+    delta = [b - a for a, b in zip(before, after)]
+    total = sum(delta)
+    if len(delta) < 8 or total <= 0 or any(v < 0 for v in delta):
+        return {"busy_percent": None, "steal_percent": None}
+    return {"busy_percent": round(100 * (total - delta[3] - delta[4] - delta[7]) / total, 2),
+            "steal_percent": round(100 * delta[7] / total, 2)}
 
 def processes():
     result = {}
@@ -2274,12 +2290,7 @@ for name, row in i1.items():
     for field in ("rx_bytes", "tx_bytes", "rx_dropped", "tx_dropped", "rx_errors", "tx_errors"):
         old, new = i0.get(name, {}).get(field), row[field]
         row[field + "_delta"] = new - old if old is not None and new is not None and new >= old else None
-cpu_load = {}
-for name, values in c1.items():
-    delta = [b - a for a, b in zip(c0.get(name, values), values)]
-    total = sum(delta)
-    cpu_load[name] = {"busy_percent": round(100 * (total - delta[3] - delta[4]) / total, 2) if total else None,
-                      "steal_percent": round(100 * delta[7] / total, 2) if total else None}
+cpu_load = {name: cpu_usage(c0.get(name, values), values) for name, values in c1.items()}
 sysctls = {}
 for key in ("net.core.default_qdisc", "net.ipv4.tcp_congestion_control", "net.ipv4.tcp_available_congestion_control",
             "net.ipv4.tcp_rmem", "net.ipv4.tcp_wmem", "net.core.rmem_max", "net.core.wmem_max",
@@ -2302,6 +2313,7 @@ report = {"说明": "只读本机采样；无主动测速、无上传；null 表
           "memory_kib": numeric_fields(read("/proc/meminfo"), {"MemTotal", "MemAvailable", "SwapFree", "SwapTotal"}),
           "cpu": cpu_load, "services": p1, "interfaces": i1, "tcp": sockets(), "wireguard": wg,
           "system_counters_delta": {k: v - n0[k] if k in n0 and v >= n0[k] else None for k, v in n1.items()},
+          "vm_counters_total": {k: v for k, v in n1.items() if k.startswith("Vm.")},
           "sysctl": sysctls, "haproxy": haproxy(), "telemt": telemt(), "direct_buffer_pressure": None}
 print(json.dumps(report, ensure_ascii=False, indent=2))
 PY

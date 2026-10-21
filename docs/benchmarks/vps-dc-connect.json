@@ -1,0 +1,197 @@
+{
+  "scope": "temporary Netherlands host to configured Telegram DCs TCP/443 connection setup only; no MTProto/files or production path",
+  "rows": [
+    {
+      "round": 1,
+      "dc_index": 1,
+      "ok": true,
+      "connect_ms": 107.52290799973707
+    },
+    {
+      "round": 1,
+      "dc_index": 2,
+      "ok": true,
+      "connect_ms": 0.7913079998616013
+    },
+    {
+      "round": 1,
+      "dc_index": 3,
+      "ok": true,
+      "connect_ms": 109.30836900024588
+    },
+    {
+      "round": 1,
+      "dc_index": 4,
+      "ok": true,
+      "connect_ms": 0.7405189999190043
+    },
+    {
+      "round": 1,
+      "dc_index": 5,
+      "ok": true,
+      "connect_ms": 160.1351010003782
+    },
+    {
+      "round": 2,
+      "dc_index": 1,
+      "ok": true,
+      "connect_ms": 106.78589400049532
+    },
+    {
+      "round": 2,
+      "dc_index": 2,
+      "ok": true,
+      "connect_ms": 0.6708889995934442
+    },
+    {
+      "round": 2,
+      "dc_index": 3,
+      "ok": true,
+      "connect_ms": 104.72335200029192
+    },
+    {
+      "round": 2,
+      "dc_index": 4,
+      "ok": true,
+      "connect_ms": 0.6964590002098703
+    },
+    {
+      "round": 2,
+      "dc_index": 5,
+      "ok": true,
+      "connect_ms": 162.0056689998819
+    },
+    {
+      "round": 3,
+      "dc_index": 1,
+      "ok": true,
+      "connect_ms": 104.57521399985126
+    },
+    {
+      "round": 3,
+      "dc_index": 2,
+      "ok": true,
+      "connect_ms": 0.6876760007799021
+    },
+    {
+      "round": 3,
+      "dc_index": 3,
+      "ok": true,
+      "connect_ms": 107.22681700008252
+    },
+    {
+      "round": 3,
+      "dc_index": 4,
+      "ok": true,
+      "connect_ms": 0.5276159999993979
+    },
+    {
+      "round": 3,
+      "dc_index": 5,
+      "ok": true,
+      "connect_ms": 159.50057999998535
+    },
+    {
+      "round": 4,
+      "dc_index": 1,
+      "ok": true,
+      "connect_ms": 109.36795300040103
+    },
+    {
+      "round": 4,
+      "dc_index": 2,
+      "ok": true,
+      "connect_ms": 0.7875110004533781
+    },
+    {
+      "round": 4,
+      "dc_index": 3,
+      "ok": true,
+      "connect_ms": 104.71611800039682
+    },
+    {
+      "round": 4,
+      "dc_index": 4,
+      "ok": true,
+      "connect_ms": 0.7370530001935549
+    },
+    {
+      "round": 4,
+      "dc_index": 5,
+      "ok": true,
+      "connect_ms": 160.0989810003739
+    },
+    {
+      "round": 5,
+      "dc_index": 1,
+      "ok": true,
+      "connect_ms": 106.77259600015532
+    },
+    {
+      "round": 5,
+      "dc_index": 2,
+      "ok": true,
+      "connect_ms": 0.6632680006077862
+    },
+    {
+      "round": 5,
+      "dc_index": 3,
+      "ok": true,
+      "connect_ms": 106.64718000043649
+    },
+    {
+      "round": 5,
+      "dc_index": 4,
+      "ok": true,
+      "connect_ms": 0.8136220003507333
+    },
+    {
+      "round": 5,
+      "dc_index": 5,
+      "ok": true,
+      "connect_ms": 159.39934899961372
+    }
+  ],
+  "summary": [
+    {
+      "dc_index": 1,
+      "successes": 5,
+      "median_ms": 106.78589400049532,
+      "p95_ms": 109.36795300040103,
+      "min_ms": 104.57521399985126,
+      "max_ms": 109.36795300040103
+    },
+    {
+      "dc_index": 2,
+      "successes": 5,
+      "median_ms": 0.6876760007799021,
+      "p95_ms": 0.7913079998616013,
+      "min_ms": 0.6632680006077862,
+      "max_ms": 0.7913079998616013
+    },
+    {
+      "dc_index": 3,
+      "successes": 5,
+      "median_ms": 106.64718000043649,
+      "p95_ms": 109.30836900024588,
+      "min_ms": 104.71611800039682,
+      "max_ms": 109.30836900024588
+    },
+    {
+      "dc_index": 4,
+      "successes": 5,
+      "median_ms": 0.7370530001935549,
+      "p95_ms": 0.8136220003507333,
+      "min_ms": 0.5276159999993979,
+      "max_ms": 0.8136220003507333
+    },
+    {
+      "dc_index": 5,
+      "successes": 5,
+      "median_ms": 160.0989810003739,
+      "p95_ms": 162.0056689998819,
+      "min_ms": 159.39934899961372,
+      "max_ms": 162.0056689998819
+    }
+  ]
+}

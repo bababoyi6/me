@@ -1,0 +1,251 @@
+{
+  "scope": "private namespace synthetic file transfer; not Telegram or production",
+  "kernel": "5.15.0-161-generic",
+  "rtt_ms_configured": 200,
+  "loss_percent_per_direction": 0.5,
+  "link_rate_mbps": 100,
+  "application_limit_mbps": 50,
+  "wireguard_mtu": 1420,
+  "rows": [
+    {
+      "round": 1,
+      "mode": "raw",
+      "streams": 1,
+      "direction": "D",
+      "receiver_mbps": 28.04548079379798,
+      "elapsed_seconds": 5.348455285999989,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 679743488
+    },
+    {
+      "round": 1,
+      "mode": "wireguard",
+      "streams": 1,
+      "direction": "D",
+      "receiver_mbps": 27.031259338087654,
+      "elapsed_seconds": 5.549131031000343,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 675340288
+    },
+    {
+      "round": 1,
+      "mode": "raw",
+      "streams": 1,
+      "direction": "U",
+      "receiver_mbps": 28.32683917285804,
+      "elapsed_seconds": 5.295331367000017,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 675344384
+    },
+    {
+      "round": 1,
+      "mode": "wireguard",
+      "streams": 1,
+      "direction": "U",
+      "receiver_mbps": 27.51329873453205,
+      "elapsed_seconds": 5.451908963999813,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 675352576
+    },
+    {
+      "round": 1,
+      "mode": "raw",
+      "streams": 4,
+      "direction": "D",
+      "receiver_mbps": 39.625921055333215,
+      "elapsed_seconds": 3.785400969999955,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 664363008
+    },
+    {
+      "round": 1,
+      "mode": "wireguard",
+      "streams": 4,
+      "direction": "D",
+      "receiver_mbps": 40.160967675194144,
+      "elapsed_seconds": 3.734969765000187,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 664928256
+    },
+    {
+      "round": 1,
+      "mode": "raw",
+      "streams": 4,
+      "direction": "U",
+      "receiver_mbps": 36.47357111116371,
+      "elapsed_seconds": 4.11256686500019,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 664834048
+    },
+    {
+      "round": 1,
+      "mode": "wireguard",
+      "streams": 4,
+      "direction": "U",
+      "receiver_mbps": 36.92035886670638,
+      "elapsed_seconds": 4.062799078999888,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 667869184
+    },
+    {
+      "round": 2,
+      "mode": "wireguard",
+      "streams": 1,
+      "direction": "D",
+      "receiver_mbps": 29.701497767348275,
+      "elapsed_seconds": 5.05025036699999,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 667873280
+    },
+    {
+      "round": 2,
+      "mode": "raw",
+      "streams": 1,
+      "direction": "D",
+      "receiver_mbps": 27.006411023826388,
+      "elapsed_seconds": 5.554236727999978,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 667873280
+    },
+    {
+      "round": 2,
+      "mode": "wireguard",
+      "streams": 1,
+      "direction": "U",
+      "receiver_mbps": 26.27442178866307,
+      "elapsed_seconds": 5.708974347999629,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 667623424
+    },
+    {
+      "round": 2,
+      "mode": "raw",
+      "streams": 1,
+      "direction": "U",
+      "receiver_mbps": 27.751642283216892,
+      "elapsed_seconds": 5.405085525000231,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 667627520
+    },
+    {
+      "round": 2,
+      "mode": "wireguard",
+      "streams": 4,
+      "direction": "D",
+      "receiver_mbps": 40.15980551520831,
+      "elapsed_seconds": 3.7350778489999357,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 665223168
+    },
+    {
+      "round": 2,
+      "mode": "raw",
+      "streams": 4,
+      "direction": "D",
+      "receiver_mbps": 39.897267058830366,
+      "elapsed_seconds": 3.75965601300004,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663904256
+    },
+    {
+      "round": 2,
+      "mode": "wireguard",
+      "streams": 4,
+      "direction": "U",
+      "receiver_mbps": 34.11154083617306,
+      "elapsed_seconds": 4.397338740000123,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 664199168
+    },
+    {
+      "round": 2,
+      "mode": "raw",
+      "streams": 4,
+      "direction": "U",
+      "receiver_mbps": 36.222762378949334,
+      "elapsed_seconds": 4.141042542000378,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663801856
+    },
+    {
+      "round": 3,
+      "mode": "raw",
+      "streams": 1,
+      "direction": "D",
+      "receiver_mbps": 16.94047371947026,
+      "elapsed_seconds": 8.854533968999931,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663838720
+    },
+    {
+      "round": 3,
+      "mode": "wireguard",
+      "streams": 1,
+      "direction": "D",
+      "receiver_mbps": 27.520308024666335,
+      "elapsed_seconds": 5.450520388999848,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663105536
+    },
+    {
+      "round": 3,
+      "mode": "raw",
+      "streams": 1,
+      "direction": "U",
+      "receiver_mbps": 28.074307945202378,
+      "elapsed_seconds": 5.342963406000308,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663109632
+    },
+    {
+      "round": 3,
+      "mode": "wireguard",
+      "streams": 1,
+      "direction": "U",
+      "receiver_mbps": 25.271215102947625,
+      "elapsed_seconds": 5.935606949999965,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663113728
+    },
+    {
+      "round": 3,
+      "mode": "raw",
+      "streams": 4,
+      "direction": "D",
+      "receiver_mbps": 40.69086656850777,
+      "elapsed_seconds": 3.6863309300001674,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663605248
+    },
+    {
+      "round": 3,
+      "mode": "wireguard",
+      "streams": 4,
+      "direction": "D",
+      "receiver_mbps": 11.460126150294997,
+      "elapsed_seconds": 13.088861155000359,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663199744
+    },
+    {
+      "round": 3,
+      "mode": "raw",
+      "streams": 4,
+      "direction": "U",
+      "receiver_mbps": 37.614707281736166,
+      "elapsed_seconds": 3.9878018690001227,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 663355392
+    },
+    {
+      "round": 3,
+      "mode": "wireguard",
+      "streams": 4,
+      "direction": "U",
+      "receiver_mbps": 37.56753061350547,
+      "elapsed_seconds": 3.992809682999905,
+      "sha256_verified": true,
+      "minimum_available_memory_bytes": 670867456
+    }
+  ]
+}

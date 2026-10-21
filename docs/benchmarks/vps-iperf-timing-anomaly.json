@@ -1,0 +1,408 @@
+[
+  {
+    "omit": 2,
+    "streams": 1,
+    "reverse": false,
+    "elapsed": 19.227449069999693,
+    "end": {
+      "sum_sent": {
+        "start": 0,
+        "end": 5.999983,
+        "seconds": 5.999983,
+        "bytes": 71827456,
+        "bits_per_second": 95770212.68226926,
+        "retransmits": 0,
+        "sender": true
+      },
+      "sum_received": {
+        "start": 0,
+        "end": 16.213048,
+        "seconds": 16.213048,
+        "bytes": 74262744,
+        "bits_per_second": 36643446.1922274,
+        "sender": true
+      },
+      "cpu_utilization_percent": {
+        "host_total": 3.5239501461319622,
+        "host_user": 0.68997787071008,
+        "host_system": 2.8339605717568093,
+        "remote_total": 2.8576342518894524,
+        "remote_user": 0.3424737658263683,
+        "remote_system": 2.51515528690464
+      }
+    },
+    "intervals": [
+      {
+        "start": 0,
+        "end": 1.000088,
+        "seconds": 1.0000879764556885,
+        "bytes": 5449944,
+        "bits_per_second": 43595716.60337003,
+        "retransmits": 0,
+        "omitted": true,
+        "sender": true
+      },
+      {
+        "start": 1.000088,
+        "end": 2.000055,
+        "seconds": 0.9999669790267944,
+        "bytes": 11927552,
+        "bits_per_second": 95423566.9790484,
+        "retransmits": 0,
+        "omitted": true,
+        "sender": true
+      },
+      {
+        "start": 2.7e-05,
+        "end": 0.999983,
+        "seconds": 1.0000100135803223,
+        "bytes": 12058624,
+        "bits_per_second": 96468026.009673,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 0.999983,
+        "end": 1.999985,
+        "seconds": 1.0000020265579224,
+        "bytes": 11927552,
+        "bits_per_second": 95420222.6253919,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 1.999985,
+        "end": 2.99998,
+        "seconds": 0.999994993209839,
+        "bytes": 11927552,
+        "bits_per_second": 95420893.752392,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 2.99998,
+        "end": 3.999982,
+        "seconds": 1.0000020265579224,
+        "bytes": 11927552,
+        "bits_per_second": 95420222.6253919,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 3.999982,
+        "end": 4.999982,
+        "seconds": 1,
+        "bytes": 11927552,
+        "bits_per_second": 95420416,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 4.999982,
+        "end": 5.999983,
+        "seconds": 1.0000009536743164,
+        "bytes": 12058624,
+        "bits_per_second": 96468900.00008774,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      }
+    ]
+  },
+  {
+    "omit": 2,
+    "streams": 4,
+    "reverse": true,
+    "elapsed": 9.5267086570002,
+    "end": {
+      "sum_sent": {
+        "start": 0,
+        "end": 6.183922,
+        "seconds": 6.183922,
+        "bytes": 34340864,
+        "bits_per_second": 44425998.9049021,
+        "retransmits": 0,
+        "sender": false
+      },
+      "sum_received": {
+        "start": 0,
+        "end": 5.890305,
+        "seconds": 5.890305,
+        "bytes": 33554432,
+        "bits_per_second": 45572420.44342356,
+        "sender": false
+      },
+      "cpu_utilization_percent": {
+        "host_total": 2.028599170093072,
+        "host_user": 0.38327514817647,
+        "host_system": 1.6453240219166019,
+        "remote_total": 1.3563765514000887,
+        "remote_user": 0.35073742202188735,
+        "remote_system": 1.0056357635375792
+      }
+    },
+    "intervals": [
+      {
+        "start": 0,
+        "end": 1.195579,
+        "seconds": 1.1955790519714355,
+        "bytes": 1048576,
+        "bits_per_second": 7016355.78690318,
+        "omitted": true,
+        "sender": false
+      },
+      {
+        "start": 1.195579,
+        "end": 2.193197,
+        "seconds": 0.997618019580841,
+        "bytes": 2621440,
+        "bits_per_second": 21021593.02296022,
+        "omitted": true,
+        "sender": false
+      },
+      {
+        "start": 4.9e-05,
+        "end": 1.065402,
+        "seconds": 1.0654510259628296,
+        "bytes": 3670016,
+        "bits_per_second": 27556525.156534307,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 1.065402,
+        "end": 2.014422,
+        "seconds": 0.949020028114319,
+        "bytes": 6291456,
+        "bits_per_second": 53035390.7282735,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 2.014422,
+        "end": 3.08138,
+        "seconds": 1.066957950592041,
+        "bytes": 8912896,
+        "bits_per_second": 66828470.5694679,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 3.08138,
+        "end": 4.103143,
+        "seconds": 1.02176296710968,
+        "bytes": 4718592,
+        "bits_per_second": 36944709.50222636,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 4.103143,
+        "end": 5.018019,
+        "seconds": 0.9148759841918945,
+        "bytes": 4718592,
+        "bits_per_second": 41261041.55345522,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 5.018019,
+        "end": 5.890305,
+        "seconds": 0.872286021709442,
+        "bytes": 5242880,
+        "bits_per_second": 48084044.63229057,
+        "omitted": false,
+        "sender": false
+      }
+    ]
+  },
+  {
+    "omit": 0,
+    "streams": 1,
+    "reverse": false,
+    "elapsed": 17.2179107879997,
+    "end": {
+      "sum_sent": {
+        "start": 0,
+        "end": 6.000035,
+        "seconds": 6.000035,
+        "bytes": 65218776,
+        "bits_per_second": 86957860.74581233,
+        "retransmits": 0,
+        "sender": true
+      },
+      "sum_received": {
+        "start": 0,
+        "end": 16.226909,
+        "seconds": 16.226909,
+        "bytes": 65218776,
+        "bits_per_second": 32153394.586732447,
+        "sender": true
+      },
+      "cpu_utilization_percent": {
+        "host_total": 4.220555310970873,
+        "host_user": 1.213009283504073,
+        "host_system": 3.0075307462301573,
+        "remote_total": 1.2379229645202587,
+        "remote_user": 0.1765736009324273,
+        "remote_system": 1.0613458307026586
+      }
+    },
+    "intervals": [
+      {
+        "start": 0,
+        "end": 1.000061,
+        "seconds": 1.00006103515625,
+        "bytes": 5449944,
+        "bits_per_second": 43596891.05694233,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 1.000061,
+        "end": 2.000061,
+        "seconds": 1,
+        "bytes": 11927552,
+        "bits_per_second": 95420416,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 2.000061,
+        "end": 3.000022,
+        "seconds": 0.999961018562317,
+        "bytes": 12058624,
+        "bits_per_second": 96472752.6465954,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 3.000022,
+        "end": 4.000053,
+        "seconds": 1.0000309944152832,
+        "bytes": 11927552,
+        "bits_per_second": 95417458.59166314,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 4.000053,
+        "end": 5.000063,
+        "seconds": 1.0000100135803223,
+        "bytes": 11927552,
+        "bits_per_second": 95419460.5095679,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      },
+      {
+        "start": 5.000063,
+        "end": 6.000035,
+        "seconds": 0.9999719858169556,
+        "bytes": 11927552,
+        "bits_per_second": 95423089.1998875,
+        "retransmits": 0,
+        "omitted": false,
+        "sender": true
+      }
+    ]
+  },
+  {
+    "omit": 0,
+    "streams": 4,
+    "reverse": true,
+    "elapsed": 7.575845414000014,
+    "end": {
+      "sum_sent": {
+        "start": 0,
+        "end": 6.178779,
+        "seconds": 6.178779,
+        "bytes": 30238640,
+        "bits_per_second": 39151605.84316093,
+        "retransmits": 0,
+        "sender": false
+      },
+      "sum_received": {
+        "start": 0,
+        "end": 6.078224,
+        "seconds": 6.078224,
+        "bytes": 19922944,
+        "bits_per_second": 26222059.601620477,
+        "sender": false
+      },
+      "cpu_utilization_percent": {
+        "host_total": 2.1732513579933177,
+        "host_user": 0.3886560992020977,
+        "host_system": 1.78459525879122,
+        "remote_total": 1.449448978482543,
+        "remote_user": 0.3216223699488393,
+        "remote_system": 1.1277961359987712
+      }
+    },
+    "intervals": [
+      {
+        "start": 0,
+        "end": 1.16584,
+        "seconds": 1.1658400297164917,
+        "bytes": 1048576,
+        "bits_per_second": 7195333.653142736,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 1.16584,
+        "end": 2.07875,
+        "seconds": 0.912909984588623,
+        "bytes": 2621440,
+        "bits_per_second": 22972166.318731,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 2.07875,
+        "end": 3.0135,
+        "seconds": 0.9347500205039978,
+        "bytes": 3145728,
+        "bits_per_second": 26922517.729853712,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 3.0135,
+        "end": 4.128274,
+        "seconds": 1.1147739887237549,
+        "bytes": 4194304,
+        "bits_per_second": 30099762.229305938,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 4.128274,
+        "end": 5.110379,
+        "seconds": 0.982105016708374,
+        "bytes": 4194304,
+        "bits_per_second": 34165828.93798988,
+        "omitted": false,
+        "sender": false
+      },
+      {
+        "start": 5.110379,
+        "end": 6.078224,
+        "seconds": 0.9678450226783752,
+        "bytes": 4718592,
+        "bits_per_second": 39002872.48007503,
+        "omitted": false,
+        "sender": false
+      }
+    ]
+  }
+]

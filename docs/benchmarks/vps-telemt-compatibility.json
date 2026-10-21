@@ -1,0 +1,52 @@
+{
+  "scope": "loopback synthetic identities, nobody UID; no MTProto file/DC throughput or production claim",
+  "kernel": "5.15.0-161-generic",
+  "results": [
+    {
+      "version": "3.5.5",
+      "ready": true,
+      "startup_seconds": 6.6209725039998375,
+      "unauthenticated_api_status": 401,
+      "read_only_write_status": 403,
+      "synthetic_links_match": true,
+      "config_unchanged": true,
+      "verified_faketls_handshakes": 26,
+      "sequential_ms": {
+        "median": 15.059722499927375,
+        "p95": 19.51003700014553,
+        "min": 9.448064000025624,
+        "max": 19.51003700014553
+      },
+      "concurrent16_ms": {
+        "median": 14.757880999923145,
+        "p95": 22.782810000080644,
+        "min": 8.969489999799407,
+        "max": 22.782810000080644
+      },
+      "rss_bytes_after_probes": 15994880
+    },
+    {
+      "version": "3.5.14",
+      "ready": true,
+      "startup_seconds": 6.410936614000093,
+      "unauthenticated_api_status": 401,
+      "read_only_write_status": 403,
+      "synthetic_links_match": true,
+      "config_unchanged": true,
+      "verified_faketls_handshakes": 26,
+      "sequential_ms": {
+        "median": 14.408173000219904,
+        "p95": 17.616323999845918,
+        "min": 9.466010999858554,
+        "max": 17.616323999845918
+      },
+      "concurrent16_ms": {
+        "median": 16.507494000052247,
+        "p95": 18.98650400016777,
+        "min": 9.666393999850698,
+        "max": 18.98650400016777
+      },
+      "rss_bytes_after_probes": 16134144
+    }
+  ]
+}

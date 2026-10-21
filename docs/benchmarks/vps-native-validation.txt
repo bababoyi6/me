@@ -1,0 +1,39 @@
+5.15.0-161-generic
+[成功] 内置单元测试通过。
+test_authentication_header_never_appears_in_curl_arguments (test_api_privacy.ApiPrivacyTests) ... ok
+test_current_helper_bypasses_proxies_and_ignores_curlrc (test_api_privacy.ApiPrivacyTests) ... ok
+test_header_control_characters_are_rejected_before_network (test_api_privacy.ApiPrivacyTests) ... ok
+test_invalid_port_is_rejected_before_network (test_api_privacy.ApiPrivacyTests) ... ok
+test_legacy_counterexample_reaches_environment_proxy (test_api_privacy.ApiPrivacyTests) ... ok
+test_link_readiness_failure_never_dumps_service_logs (test_api_privacy.ApiPrivacyTests) ... ok
+test_quotes_and_backslashes_preserve_the_exact_header (test_api_privacy.ApiPrivacyTests) ... ok
+test_nonfinite_and_nonpositive_values_are_rejected (test_measurement_quality.MeasurementQualityTests) ... ok
+test_real_duration_mismatch_is_not_accepted_as_path_throughput (test_measurement_quality.MeasurementQualityTests) ... ok
+test_small_receiver_timing_difference_is_expected (test_measurement_quality.MeasurementQualityTests) ... ok
+test_stream_probe_cli_is_bounded_before_network_setup (test_measurement_quality.MeasurementQualityTests) ... ok
+test_cleanup_only_removes_created_resources (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_unprivileged_run_is_refused_before_any_command (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_world_accessible_directory_is_refused (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_api_sampling_uses_fixed_loopback_and_numeric_allowlist (test_performance.PerformanceTests) ... ok
+test_iperf_aggregate_cap_and_no_raw_error_output (test_performance.PerformanceTests) ... ok
+test_manager_rollback_preserves_state (test_performance.PerformanceTests) ... ok
+test_manager_update_and_failure_preserve_running_configuration (test_performance.PerformanceTests) ... ok
+test_real_generated_config_and_telemt_security (test_performance.PerformanceTests) ... ok
+test_real_legacy_updater_preserves_all_connection_information (test_performance.PerformanceTests) ... ok
+test_release_has_no_production_performance_apply_path (test_performance.PerformanceTests) ... ok
+test_report_command_timeout_and_output_limit (test_performance.PerformanceTests) ... ok
+test_report_distinguishes_cpu_steal_and_memory_pressure (test_performance.PerformanceTests) ... ok
+test_report_has_no_state_evaluation_or_secret_output (test_performance.PerformanceTests) ... ok
+test_report_rejects_unbounded_load (test_performance.PerformanceTests) ... ok
+test_resources_and_legacy_schema (test_performance.PerformanceTests) ... ok
+test_runtime_templates_match_production_baseline (test_performance.PerformanceTests) ... ok
+test_shortcut_failure_does_not_replace_manager (test_performance.PerformanceTests) ... ok
+test_socket_summary_aggregates_without_endpoint_disclosure (test_performance.PerformanceTests) ... ok
+test_stalled_selftest_cannot_replace_manager_or_rollback (test_performance.PerformanceTests) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 11.347s
+
+OK
+SNI / fragmented ClientHello / PROXYv2 / SHA256 / agent failover passed
+NATIVE_VALIDATION_PASSED

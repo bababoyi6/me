@@ -104,6 +104,18 @@ if state_is_current; then exit 1; fi
         for invalid in ("0", "1", "31", "999999", "-1", "2;false", "02"):
             self.bash(f"performance_report '{invalid}'", success=False)
 
+    def test_report_distinguishes_cpu_steal_and_memory_pressure(self):
+        source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]
+        tree = ast.parse(source)
+        namespace = {}
+        definitions = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom, ast.FunctionDef))]
+        exec(compile(ast.Module(body=definitions, type_ignores=[]), "report", "exec"), namespace)
+        usage = namespace["cpu_usage"]([0] * 8, [10, 0, 10, 60, 0, 0, 0, 20])
+        self.assertEqual(usage, {"busy_percent": 20, "steal_percent": 20})
+        self.assertIsNone(namespace["cpu_usage"]([10] * 8, [0] * 8)["busy_percent"])
+        namespace["read"] = lambda path: "oom_kill 2\npgmajfault 5\npswpin 0\npswpout 0\nSYNTHETIC_SECRET 123\n" if path == "/proc/vmstat" else ""
+        self.assertEqual(namespace["counters"](), {"Vm.oom_kill": 2, "Vm.pgmajfault": 5, "Vm.pswpin": 0, "Vm.pswpout": 0})
+
     def test_report_command_timeout_and_output_limit(self):
         source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]
         tree = ast.parse(source)
@@ -180,7 +192,7 @@ if [[ ${1:-} == --self-test ]]; then exit 0; fi
 
     def test_manager_update_and_failure_preserve_running_configuration(self):
         manager = self.base / "manager"
-        manager.write_text(SCRIPT.read_text().replace('TDH_VERSION="1.4.1"', 'TDH_VERSION="1.3.1"'))
+        manager.write_text(SCRIPT.read_text().replace('TDH_VERSION="1.4.2"', 'TDH_VERSION="1.3.1"'))
         old_manager = manager.read_bytes()
         old_state = self.state.read_bytes()
         download = self.base / "download"
@@ -240,6 +252,28 @@ install_shortcut() { return 1; }
 ''')
         self.assertEqual(manager.read_bytes(), old)
         self.assertEqual(self.config.read_bytes(), self.original)
+
+    def test_stalled_selftest_cannot_replace_manager_or_rollback(self):
+        manager = self.base / "manager"
+        manager.write_text("old manager bytes\n")
+        before = manager.read_bytes()
+        (self.base / "download").write_bytes(SCRIPT.read_bytes())
+        guard = '''
+curl() { cp "$TDH_BASE/download" "${@: -1}"; }
+install_shortcut() { :; }
+timeout() {
+  [[ $1 == 60 && $2 == bash && ${4:-} == --self-test ]] || return 99
+  printf 'selftest deadline applied\\n' >>"$TDH_BASE/deadlines"
+  return 124
+}
+'''
+        self.bash("update_manager", success=False, prelude=guard)
+        self.assertEqual(manager.read_bytes(), before)
+        (self.base / "manager.previous").write_bytes(SCRIPT.read_bytes())
+        self.bash("rollback_manager", success=False, prelude=guard)
+        self.assertEqual(manager.read_bytes(), before)
+        self.assertEqual((self.base / "deadlines").read_text().splitlines(), ["selftest deadline applied"] * 2)
+        self.assertFalse((self.base / "systemctl.log").exists())
 
     def test_release_has_no_production_performance_apply_path(self):
         self.assertNotIn("performance_apply()", SCRIPT.read_text())

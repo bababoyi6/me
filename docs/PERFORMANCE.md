@@ -1,8 +1,8 @@
 # Telemt Dual-Hop 性能审计与验证手册
 
-审计日期：2026-10-21。项目基线：`452c50d268c8a95d68bdda0d27878f4e9ddcefb2`，管理器 1.3.1、schema 5、节点协议 1.2.1、Telemt 3.5.5。本次管理器为 1.4.1，schema、协议和 Telemt 固定版本均保持不变。
+审计日期：2026-10-21。项目基线：`452c50d268c8a95d68bdda0d27878f4e9ddcefb2`，管理器 1.3.1、schema 5、节点协议 1.2.1、Telemt 3.5.5。本次管理器为 1.4.2，schema、协议和 Telemt 固定版本均保持不变。
 
-**没有连接或修改生产 VPS，没有获得三台服务器、用户网络或 Telegram 的测速数据。生产主瓶颈尚未确定，也不能认定已经接近线路上限。** 本次实际交付为源码审计、只读脱敏采样、仅限本机回环环境的入口转发研究，以及自动化回归和受控测速工具。没有默认堆叠 sysctl、修改 MTU/offload、改变主备策略或升级 Telemt。
+**没有连接或修改生产 VPS，没有获得三台生产服务器、用户网络或 Telegram 文件的测速数据。生产主瓶颈尚未确定，也不能认定已经接近线路上限。** 用户另行提供的一台临时 1 核 1 GB Ubuntu 22.04 测试机已用于真实 5.15 内核兼容、WireGuard 私有网络与 Telemt 二进制验证，详见 [临时 VPS 验证报告](VPS-VALIDATION.md)。单机合成路径不能代表三机公网线路。本次交付还包含只读脱敏采样、自动化回归和受控测速工具，没有默认堆叠 sysctl、修改生产 MTU/offload、改变主备策略或升级生产 Telemt。
 
 ## 1. 真实数据路径与容量边界
 
@@ -37,7 +37,7 @@ HAProxy 不做加解密；入口内核做 WG ChaCha20-Poly1305 加密/解密，�
 | P1 | WG 未显式设置 MTU，采用 wg-quick 自动推导 | 自动 MTU 不等于跨网 PMTU；不对称路由、UDP 分片/黑洞可能导致卡顿。双向 DF 探测配合计数器和传输测量，不能仅凭 ping 推断 WG 容量 | 采集实际 MTU、分片/重组失败；不盲设 1280/1420 |
 | P1 | 健康策略要求全部五个固定 DC 可达 | 每 10 秒探测，连续两轮失败置 down；API 每秒检查，单次失败即影响 agent。显式 down 不受普通 TCP check 的 `fall 3` 延迟保护。一个 DC 局部故障也会使整后端退出新连接选择 | 保留可用性策略，采集 chkdown/downtime；建议先关联波动与 DC/agent 状态再改策略 |
 | P2 | 单实例 Direct copy buffer 有进程预算和压力降级 | 预算安装时取内存 1/4，最大 1 GiB；3.5.5 从 4/8 KiB 起步，分别增长至默认 64/256 KiB，进程内存/连接/预算压力会降级。不是为每个连接立刻分配 320 KiB；copy buffer 也不是 TCP 接收窗口 | 不提高预算；现有 API 不直接暴露预算全部指标，报告不能据 RSS 宣称预算饱和 |
-| P2 | 更新只换管理器 | `update_manager` 下载/身份/版本/schema/协议/语法/自检后原子替换；不更新包、二进制、unit、WG、HAProxy 或 Telemt 配置 | 明确独立试用流程，增加管理器备份/回退 |
+| P2 | 更新只换管理器 | `update_manager` 下载/身份/版本/schema/协议/语法/自检后原子替换；不更新包、二进制、unit、WG、HAProxy 或 Telemt 配置 | 保持一步管理器升级，增加管理器备份/回退，不提供生产参数试用入口 |
 
 源码定位使用基线的函数名便于跨版本查阅：[原始脚本](https://github.com/bababoyi6/me/blob/452c50d268c8a95d68bdda0d27878f4e9ddcefb2/telemt-dual-hop.sh)，重点为 `write_haproxy_config`、`write_entry_wg`、`write_backend_wg`、`write_health_agent`、`calculate_direct_buffer_budget`、`apply_tuning`、`update_manager`、`complete_entry`。已完整检查仓库三份原始文件：脚本、README、Actions 工作流。
 
@@ -97,7 +97,7 @@ python3 tests/lab.py --haproxy /path/to/haproxy \
 
 ### 首先只读采样
 
-安装 1.4.1 管理器后，在三台分别执行：
+安装 1.4.2 管理器后，在三台分别执行：
 
 ```bash
 a perf 5
@@ -107,7 +107,7 @@ a perf 5
 
 `a perf` 默认 5 秒，可选 2–30 秒；整个操作有 55 秒超时，子命令和读取大小有上限，预算不足的字段返回 null。它不安装依赖、不启动测速服务、不发 ping/iperf、不改配置/防火墙/sysctl、不重启服务、不上传。角色只做文本匹配，不 source 状态文件；不调用会暴露密钥的 `wg show ... dump`，不输出日志、命令行、连接地址、真实 IP、WG 公钥/私钥、Secret、API token 或配置正文。普通网卡匿名为 nicN，TDH 专用接口保留名称。
 
-包含：CPU 每核忙碌/steal、服务组进程 CPU/RSS/fd/限制、内存、接口 MTU/字节及错误/丢弃增量、实际 qdisc、可选 offload、WG 握手年龄、按方向分组的 TCP 队列/RTT/cwnd/BBR 计数、重传/分片/监听丢弃增量、HAProxy 队列/失败/切换统计和实际组件版本。若受保护的API token文件可用，仅对固定回环地址执行一次只读 GET，保留连接/握手/上游失败的白名单计数，不读取用户或配置API，不通过命令行/环境变量传token，也不跟随代理或重定向。CPU 100% 指一个核心，haproxy 包含 worker；服务更换 PID 时 CPU 返回 null。socket RTT P95 是当前连接分布，不能当作连续时间序列的抖动 P95。内核系统计数还包含本机其他业务，需结合负载对齐。
+包含：CPU 每核忙碌/steal、服务组进程 CPU/RSS/fd/限制、内存、接口 MTU/字节及错误/丢弃增量、实际 qdisc、可选 offload、WG 握手年龄、按方向分组的 TCP 队列/RTT/cwnd/BBR 计数、重传/分片/监听丢弃增量、HAProxy 队列/失败/切换统计和实际组件版本。1.4.2 将每核 busy 与宿主抢占的 steal 分开计算，并加入 OOM、主缺页与换页计数的总量/增量，避免把内存不足或宿主争抢误判为代理算力不足。若受保护的API token文件可用，仅对固定回环地址执行一次只读 GET，保留连接/握手/上游失败的白名单计数，不读取用户或配置API，不通过命令行/环境变量传token，也不跟随代理或重定向。CPU 100% 指一个核心，haproxy 包含 worker；服务更换 PID 时 CPU 返回 null。socket RTT P95 是当前连接分布，不能当作连续时间序列的抖动 P95。内核系统计数（包括 OOM）还包含本机其他业务，需结合负载对齐。
 
 报告没有收集全部 TCP_INFO、路由表、Telemt 内部 buffer pressure 或主动 PMTU，不能凭报告一项数字自动诊断全链路。采集三台空闲、真实下载中、真实上传中各 5 轮，记录相同客户端、线路 A/B、运营商、日期时段、负载。报告虽不含凭据，依然由用户决定是否分享其运行统计。
 
@@ -138,7 +138,7 @@ timeout 240 iperf3 -s -B 10.77.1.2 -p 5201
 python3 tools/iperf_matrix.py --peer 10.77.1.2 --rate-mbps 20 --seconds 8 --rounds 5
 ```
 
-默认 20 次测试，每次8秒、间隔3秒，总计约220秒（连接失败会增加时间）；每项另有连接和整体超时。端口服务先启动再跑，测试完成关闭，不开放公网5201。VPS2单独重复，避免同时争抢入口。脚本 JSON 只保留白名单指标和泛化错误，不输出 iperf 原始连接信息。若担心业务影响，可用3轮、每轮3秒、间隔2秒并相应缩短服务timeout。生产带宽余量小于默认预算时继续下调速率。UDP 丢包/抖动测试只在隔离环境或另行审批窗口做，小速率并设置时间上限；不将其误认为 TCP 文件有效速率。
+默认 20 次测试，每次8秒、间隔3秒，总计约220秒（连接失败会增加时间）；每项另有连接和整体超时。端口服务先启动再跑，测试完成关闭，不开放公网5201。VPS2单独重复，避免同时争抢入口。脚本 JSON 只保留白名单指标和泛化错误，不输出 iperf 原始连接信息。1.4.2 校验收发统计时段及数值：时段差大于 max(1秒,设定时长的20%) 的结果保留指标、标为异常并排除汇总；这不是自动认定工具或线路故障，需要检查结束阶段、排队和交叉传输。若担心业务影响，可用3轮、每轮3秒、间隔2秒并相应缩短服务timeout。生产带宽余量小于默认预算时继续下调速率。UDP 丢包/抖动测试只在隔离环境或另行审批窗口做，小速率并设置时间上限；不将其误认为 TCP 文件有效速率。
 
 ### Telegram 真实体验的 A/B 记录
 
@@ -200,11 +200,11 @@ rm -f "$t"
 bash -n telemt-dual-hop.sh
 shellcheck -x -S style telemt-dual-hop.sh
 bash telemt-dual-hop.sh --self-test
-python3 -m py_compile tests/lab.py tests/test_performance.py tools/iperf_matrix.py
+python3 -m compileall -q tests tools
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 timeout 60 python3 tests/lab.py
 ```
 
-Actions 在Ubuntu22.04安装测试用HAProxy/ShellCheck，运行上述检查。本机另使用Ubuntu22.04 HAProxy2.4.30执行配置/行为测试；这不等于已在生产内核验证。自动测试覆盖配置生成、安全绑定、旧schema5兼容、更新拒绝不兼容内容、管理器回退、旧更新器一步兼容、连接信息不变、诊断脱敏/不执行state/时长与子进程输出限制、iperf聚合限速，以及实际HAProxy分流/故障切换/重载传输。静态测试通过不代表真实速度提升。
+Actions 在Ubuntu22.04安装测试用HAProxy/ShellCheck，运行上述检查。本机另使用Ubuntu22.04 HAProxy2.4.30执行配置/行为测试；临时VPS增加了原生Ubuntu22.04/5.15验证，依然不等于生产三机验证。自动测试覆盖配置生成、安全绑定、旧schema5兼容、更新拒绝不兼容内容、管理器回退、自检超时、旧更新器一步兼容、连接信息不变、诊断脱敏/不执行state/时长与子进程输出限制、CPU steal/OOM、认证头代理与进程参数保护、iperf聚合限速/计时质量、实验清理，以及实际HAProxy分流/故障切换/重载传输。静态测试通过不代表真实速度提升。
 
 主要参考为[HAProxy 2.4官方配置手册](https://docs.haproxy.org/2.4/configuration.html)（inspect-delay、splice、socket buffer、agent语义）、[Linux TCP参数文档](https://docs.kernel.org/networking/ip-sysctl.html)、[wg-quick官方实现](https://git.zx2c4.com/wireguard-tools/tree/src/wg-quick/linux.bash)、[Telemt 3.5.5 Direct relay](https://github.com/telemt/telemt/blob/3.5.5/src/proxy/direct_relay.rs)、[Direct budget](https://github.com/telemt/telemt/blob/3.5.5/src/proxy/direct_buffer_budget.rs)、[nonce实现](https://github.com/telemt/telemt/blob/3.5.5/src/proxy/handshake/nonce.rs)和[官方3.5.8兼容性说明](https://github.com/telemt/telemt/releases/tag/3.5.8)。官方WireGuard网页上的历史测速很旧，未用它估算当前VPS容量。

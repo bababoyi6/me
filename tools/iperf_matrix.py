@@ -15,6 +15,18 @@ def summarize(values):
             "min": min(values), "max": max(values)}
 
 
+def checked_metrics(end, requested_seconds):
+    sent, received = end["sum_sent"], end["sum_received"]
+    values = (sent["seconds"], received["seconds"], received["bits_per_second"])
+    if not all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) and v > 0 for v in values):
+        raise ValueError("invalid measurement")
+    consistent = (abs(sent["seconds"] - received["seconds"]) <= max(1, requested_seconds * .2)
+                  and abs(sent["seconds"] - requested_seconds) <= max(1, requested_seconds * .2))
+    return {"receiver_mbps": received["bits_per_second"] / 1000000,
+            "sender_retransmits": sent.get("retransmits"), "seconds": received["seconds"],
+            "sender_seconds": sent["seconds"], "timing_consistent": consistent}
+
+
 def run(args):
     if not shutil.which("iperf3"):
         raise SystemExit("缺少 iperf3；本工具不会安装软件或启动服务。")
@@ -34,10 +46,10 @@ def run(args):
                     payload = json.loads(result.stdout)
                     if result.returncode or "error" in payload:
                         raise ValueError("iperf failed")
-                    end = payload["end"]
-                    row.update({"ok": True, "receiver_mbps": end["sum_received"]["bits_per_second"] / 1000000,
-                                "sender_retransmits": end["sum_sent"].get("retransmits"),
-                                "seconds": end["sum_received"]["seconds"]})
+                    row.update(checked_metrics(payload["end"], args.seconds))
+                    row["ok"] = row["timing_consistent"]
+                    if not row["ok"]:
+                        row["error"] = "收发统计时段异常；保留原始指标，但不纳入吞吐汇总。请交叉验证工具、排队与结束阶段。"
                 except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError):
                     # Do not copy raw errors, addresses or server strings into reports.
                     row.update({"ok": False, "error": "测试失败/超时；检查隧道、临时服务及访问控制。"})

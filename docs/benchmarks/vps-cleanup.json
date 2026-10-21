@@ -1,0 +1,22 @@
+{
+  "scope": "post-test cleanup verification; counts only",
+  "lab_namespaces_remaining": 0,
+  "lab_processes_remaining": 0,
+  "private_key_files_remaining": 0,
+  "oom_kills_since_boot": 2,
+  "tcp_listeners": [
+    {
+      "port": 22,
+      "loopback": false
+    },
+    {
+      "port": 53,
+      "loopback": true
+    },
+    {
+      "port": 22,
+      "loopback": false
+    }
+  ],
+  "available_memory_kib": 654708
+}

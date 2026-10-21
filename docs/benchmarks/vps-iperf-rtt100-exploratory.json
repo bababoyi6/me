@@ -1,0 +1,442 @@
+{
+  "scope": "single VPS private namespaces; synthetic path, not production or Telegram throughput",
+  "kernel": "5.15.0-161-generic",
+  "rtt_ms_configured": 100,
+  "loss_percent_per_direction": 0,
+  "rate_mbps_per_direction": 100,
+  "wireguard_mtu": 1420,
+  "seconds": 6,
+  "warmup_seconds": 2,
+  "rounds": 3,
+  "congestion_control": "bbr",
+  "veth_offload": "disabled for packet loss realism",
+  "netem_placement": "intermediate router egress, both directions",
+  "rows": [
+    {
+      "round": 1,
+      "streams": 1,
+      "reverse": false,
+      "mode": "raw",
+      "receiver_mbps": 36.541303038533755,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 11.02,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 19.27246269200009,
+      "minimum_available_memory_bytes": 649801728
+    },
+    {
+      "round": 1,
+      "streams": 1,
+      "reverse": false,
+      "mode": "wireguard",
+      "receiver_mbps": 34.92007952521363,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 12.02,
+      "whole_vm_steal_seconds": 0.02,
+      "elapsed_seconds": 19.255769037000164,
+      "minimum_available_memory_bytes": 649654272
+    },
+    {
+      "round": 1,
+      "streams": 1,
+      "reverse": true,
+      "mode": "raw",
+      "receiver_mbps": 95.64019331765485,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.76,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.261368549999816,
+      "minimum_available_memory_bytes": 649682944
+    },
+    {
+      "round": 1,
+      "streams": 1,
+      "reverse": true,
+      "mode": "wireguard",
+      "receiver_mbps": 91.56222346759533,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.73,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.239579763999927,
+      "minimum_available_memory_bytes": 649699328
+    },
+    {
+      "round": 1,
+      "streams": 4,
+      "reverse": false,
+      "mode": "raw",
+      "receiver_mbps": 86.92327745340623,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.63,
+      "whole_vm_steal_seconds": 0.01,
+      "elapsed_seconds": 9.649019038999995,
+      "minimum_available_memory_bytes": 645345280
+    },
+    {
+      "round": 1,
+      "streams": 4,
+      "reverse": false,
+      "mode": "wireguard",
+      "receiver_mbps": 89.68640325230693,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.63,
+      "whole_vm_steal_seconds": 0.01,
+      "elapsed_seconds": 9.584185186000013,
+      "minimum_available_memory_bytes": 641200128
+    },
+    {
+      "round": 1,
+      "streams": 4,
+      "reverse": true,
+      "mode": "raw",
+      "receiver_mbps": 87.93556186793296,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.58,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.799516082000082,
+      "minimum_available_memory_bytes": 640479232
+    },
+    {
+      "round": 1,
+      "streams": 4,
+      "reverse": true,
+      "mode": "wireguard",
+      "receiver_mbps": 33.71285083797172,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.04,
+      "whole_vm_steal_seconds": 0.01,
+      "elapsed_seconds": 9.505165053999917,
+      "minimum_available_memory_bytes": 639946752
+    },
+    {
+      "round": 2,
+      "streams": 1,
+      "reverse": false,
+      "mode": "wireguard",
+      "receiver_mbps": 34.881174749613486,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 12.09,
+      "whole_vm_steal_seconds": 0.02,
+      "elapsed_seconds": 19.241355556000144,
+      "minimum_available_memory_bytes": 639967232
+    },
+    {
+      "round": 2,
+      "streams": 1,
+      "reverse": false,
+      "mode": "raw",
+      "receiver_mbps": 36.5404332619564,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 11.06,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 19.2726225790002,
+      "minimum_available_memory_bytes": 639995904
+    },
+    {
+      "round": 2,
+      "streams": 1,
+      "reverse": true,
+      "mode": "wireguard",
+      "receiver_mbps": 91.56234553284014,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.73,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.255860362000021,
+      "minimum_available_memory_bytes": 640016384
+    },
+    {
+      "round": 2,
+      "streams": 1,
+      "reverse": true,
+      "mode": "raw",
+      "receiver_mbps": 95.64379759711187,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.84,
+      "whole_vm_steal_seconds": 0.01,
+      "elapsed_seconds": 9.26844296399986,
+      "minimum_available_memory_bytes": 640159744
+    },
+    {
+      "round": 2,
+      "streams": 4,
+      "reverse": false,
+      "mode": "wireguard",
+      "receiver_mbps": 87.21051745760437,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.6,
+      "whole_vm_steal_seconds": 0.02,
+      "elapsed_seconds": 9.476903822000168,
+      "minimum_available_memory_bytes": 636030976
+    },
+    {
+      "round": 2,
+      "streams": 4,
+      "reverse": false,
+      "mode": "raw",
+      "receiver_mbps": 87.0526835444164,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.64,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.67242913300015,
+      "minimum_available_memory_bytes": 635498496
+    },
+    {
+      "round": 2,
+      "streams": 4,
+      "reverse": true,
+      "mode": "wireguard",
+      "receiver_mbps": 32.892632239344394,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.06,
+      "whole_vm_steal_seconds": 0.01,
+      "elapsed_seconds": 9.517998128999807,
+      "minimum_available_memory_bytes": 635260928
+    },
+    {
+      "round": 2,
+      "streams": 4,
+      "reverse": true,
+      "mode": "raw",
+      "receiver_mbps": 84.09073848470537,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.67,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.800731226000153,
+      "minimum_available_memory_bytes": 632975360
+    },
+    {
+      "round": 3,
+      "streams": 1,
+      "reverse": false,
+      "mode": "raw",
+      "receiver_mbps": 95.5796942504854,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.07,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.266480496999975,
+      "minimum_available_memory_bytes": 632442880
+    },
+    {
+      "round": 3,
+      "streams": 1,
+      "reverse": false,
+      "mode": "wireguard",
+      "receiver_mbps": 34.87209443235835,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 12.11,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 19.240311924999787,
+      "minimum_available_memory_bytes": 632463360
+    },
+    {
+      "round": 3,
+      "streams": 1,
+      "reverse": true,
+      "mode": "raw",
+      "receiver_mbps": 95.64016142258909,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.63,
+      "whole_vm_steal_seconds": 0.01,
+      "elapsed_seconds": 9.260758038999938,
+      "minimum_available_memory_bytes": 632500224
+    },
+    {
+      "round": 3,
+      "streams": 1,
+      "reverse": true,
+      "mode": "wireguard",
+      "receiver_mbps": 91.56176572582588,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.76,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.240400475000115,
+      "minimum_available_memory_bytes": 632512512
+    },
+    {
+      "round": 3,
+      "streams": 4,
+      "reverse": false,
+      "mode": "raw",
+      "receiver_mbps": 82.53814197384892,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.65,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.700834142000076,
+      "minimum_available_memory_bytes": 632528896
+    },
+    {
+      "round": 3,
+      "streams": 4,
+      "reverse": false,
+      "mode": "wireguard",
+      "receiver_mbps": 86.98483894839133,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 1.61,
+      "whole_vm_steal_seconds": 0.0,
+      "elapsed_seconds": 9.548996189999798,
+      "minimum_available_memory_bytes": 632545280
+    },
+    {
+      "round": 3,
+      "streams": 4,
+      "reverse": true,
+      "mode": "raw",
+      "receiver_mbps": 86.8906319202394,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 0.69,
+      "whole_vm_steal_seconds": 0.01,
+      "elapsed_seconds": 9.771231795999938,
+      "minimum_available_memory_bytes": 632557568
+    },
+    {
+      "round": 3,
+      "streams": 4,
+      "reverse": true,
+      "mode": "wireguard",
+      "receiver_mbps": 38.067724497426184,
+      "retransmits": 0,
+      "whole_vm_busy_cpu_seconds": 4.21,
+      "whole_vm_steal_seconds": 0.02,
+      "elapsed_seconds": 9.51757042700001,
+      "minimum_available_memory_bytes": 632578048
+    }
+  ],
+  "summary": [
+    {
+      "streams": 1,
+      "reverse": false,
+      "mode": "raw",
+      "receiver_mbps": {
+        "median": 36.541303038533755,
+        "p95": 95.5796942504854,
+        "min": 36.5404332619564,
+        "max": 95.5796942504854
+      },
+      "whole_vm_busy_cpu_seconds": {
+        "median": 11.02,
+        "p95": 11.06,
+        "min": 1.07,
+        "max": 11.06
+      }
+    },
+    {
+      "streams": 1,
+      "reverse": false,
+      "mode": "wireguard",
+      "receiver_mbps": {
+        "median": 34.881174749613486,
+        "p95": 34.92007952521363,
+        "min": 34.87209443235835,
+        "max": 34.92007952521363
+      },
+      "whole_vm_busy_cpu_seconds": {
+        "median": 12.09,
+        "p95": 12.11,
+        "min": 12.02,
+        "max": 12.11
+      }
+    },
+    {
+      "streams": 1,
+      "reverse": true,
+      "mode": "raw",
+      "receiver_mbps": {
+        "median": 95.64019331765485,
+        "p95": 95.64379759711187,
+        "min": 95.64016142258909,
+        "max": 95.64379759711187
+      },
+      "whole_vm_busy_cpu_seconds": {
+        "median": 0.76,
+        "p95": 0.84,
+        "min": 0.63,
+        "max": 0.84
+      }
+    },
+    {
+      "streams": 1,
+      "reverse": true,
+      "mode": "wireguard",
+      "receiver_mbps": {
+        "median": 91.56222346759533,
+        "p95": 91.56234553284014,
+        "min": 91.56176572582588,
+        "max": 91.56234553284014
+      },
+      "whole_vm_busy_cpu_seconds": {
+        "median": 1.73,
+        "p95": 1.76,
+        "min": 1.73,
+        "max": 1.76
+      }
+    },
+    {
+      "streams": 4,
+      "reverse": false,
+      "mode": "raw",
+      "receiver_mbps": {
+        "median": 86.92327745340623,
+        "p95": 87.0526835444164,
+        "min": 82.53814197384892,
+        "max": 87.0526835444164
+      },
+      "whole_vm_busy_cpu_seconds": {
+        "median": 0.64,
+        "p95": 0.65,
+        "min": 0.63,
+        "max": 0.65
+      }
+    },
+    {
+      "streams": 4,
+      "reverse": false,
+      "mode": "wireguard",
+      "receiver_mbps": {
+        "median": 87.21051745760437,
+        "p95": 89.68640325230693,
+        "min": 86.98483894839133,
+        "max": 89.68640325230693
+      },
+      "whole_vm_busy_cpu_seconds": {
+        "median": 1.61,
+        "p95": 1.63,
+        "min": 1.6,
+        "max": 1.63
+      }
+    },
+    {
+      "streams": 4,
+      "reverse": true,
+      "mode": "raw",
+      "receiver_mbps": {
+        "median": 86.8906319202394,
+        "p95": 87.93556186793296,
+        "min": 84.09073848470537,
+        "max": 87.93556186793296
+      },
+      "whole_vm_busy_cpu_seconds": {
+        "median": 0.67,
+        "p95": 0.69,
+        "min": 0.58,
+        "max": 0.69
+      }
+    },
+    {
+      "streams": 4,
+      "reverse": true,
+      "mode": "wireguard",
+      "receiver_mbps": {
+        "median": 33.71285083797172,
+        "p95": 38.067724497426184,
+        "min": 32.892632239344394,
+        "max": 38.067724497426184
+      },
+      "whole_vm_busy_cpu_seconds": {
+        "median": 1.06,
+        "p95": 4.21,
+        "min": 1.04,
+        "max": 4.21
+      }
+    }
+  ]
+}
