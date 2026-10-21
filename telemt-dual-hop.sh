@@ -6,7 +6,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.3.1"
+readonly TDH_VERSION="1.4.1"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.5"
@@ -100,13 +100,15 @@ readonly STATE_VARS=(
 
 usage() {
   cat <<'EOF'
-Telemt Dual-Hop 1.3.1
+Telemt Dual-Hop 1.4.1
 
 用法：
   sudo bash telemt-dual-hop.sh              打开中文菜单
   a                                         安装后打开控制面板（自动使用 sudo）
   a status                                  快速查看状态
   a update                                  安全更新管理脚本（可简写为 a u）
+  a update-rollback                         恢复上次 a update 前的管理脚本
+  a perf [2-30]                             只读脱敏性能采样（默认 5 秒）
   sudo bash telemt-dual-hop.sh entry        初始化入口 VPS
   sudo bash telemt-dual-hop.sh backend1     安装后端 VPS1
   sudo bash telemt-dual-hop.sh backend2     安装后端 VPS2
@@ -323,18 +325,44 @@ update_manager() {
     rm -f "$download_tmp" "$manager_tmp"
     die "无法准备新管理器；当前版本未作任何修改。"
   fi
+  if ! cmp -s "$download_tmp" "$TDH_MANAGER"; then
+    if ! cp -p "$TDH_MANAGER" "${TDH_MANAGER}.previous.tmp" || \
+       ! mv -f "${TDH_MANAGER}.previous.tmp" "${TDH_MANAGER}.previous"; then
+      rm -f "$download_tmp" "$manager_tmp" "${TDH_MANAGER}.previous.tmp"
+      die "无法保存旧管理器；更新已取消。"
+    fi
+  fi
+  if ! install_shortcut; then
+    rm -f "$download_tmp" "$manager_tmp"
+    die "无法准备快捷入口；当前管理器保持原样。"
+  fi
   if ! mv -f "$manager_tmp" "$TDH_MANAGER"; then
     rm -f "$download_tmp" "$manager_tmp"
     die "无法替换管理器；当前版本未作任何修改。"
   fi
   rm -f "$download_tmp"
-  install_shortcut
   if [[ $new_version == "$TDH_VERSION" ]]; then
     ok "已重新安装最新版 ${new_version}（SHA256: ${checksum}）。"
   else
     ok "管理脚本已从 ${TDH_VERSION} 更新到 ${new_version}（SHA256: ${checksum}）。"
   fi
-  info "服务和集群配置均未改动；退出当前面板后再次输入 a 即可使用新版本。"
+  info "升级完成，无需重新部署。现有服务、IP、端口、Secret、链接和主备配置均保留。"
+  info "本次为兼容性与只读诊断升级，没有经生产验证的大幅提速，未自动修改传输参数。"
+  info "退出当前面板后再次输入 a 即可使用新版本；诊断为按需功能，不是升级步骤。"
+}
+
+rollback_manager() {
+  local previous="${TDH_MANAGER}.previous" tmp
+  [[ -f $previous && ! -L $previous ]] || die "没有上次 a update 的管理器备份。"
+  [[ $(extract_release_value "$previous" TDH_CONFIG_SCHEMA) == "$TDH_CONFIG_SCHEMA" && \
+     $(extract_release_value "$previous" TDH_PROTOCOL_VERSION) == "$TDH_PROTOCOL_VERSION" ]] || die "备份协议不兼容，拒绝回退。"
+  if ! bash -n "$previous" || ! bash "$previous" --self-test >/dev/null; then
+    die "备份自检失败。"
+  fi
+  tmp=$(mktemp "${TDH_MANAGER}.rollback.XXXXXX")
+  install -m 0755 "$previous" "$tmp"
+  mv -f "$tmp" "$TDH_MANAGER"
+  ok "管理器已恢复；服务和集群配置未改动，退出面板后重新输入 a。"
 }
 
 init_dirs() {
@@ -1438,7 +1466,7 @@ EOF
   sysctl -p /etc/sysctl.d/90-telemt-dual-hop.conf >/dev/null || \
     die "无法应用 BBR/fq 或 TCP 调优参数。"
   tuning_is_active || die "BBR/fq 写入后未实际生效；安装已停止。"
-  ok "BBR + fq 已启用并完成实时校验。"
+  ok "BBR / 默认 qdisc=fq 已写入；实际接口队列和连接拥塞算法请用 a perf 核实。"
 }
 
 restore_tuning() {
@@ -1828,7 +1856,7 @@ wait_all_backend_health() {
 
 haproxy_all_telemt_up() {
   [[ -S /run/telemt-dual-hop/haproxy.sock ]] || return 1
-  printf 'show stat\n' | socat - UNIX-CONNECT:/run/telemt-dual-hop/haproxy.sock 2>/dev/null | \
+  printf 'show stat\n' | timeout 3 socat - UNIX-CONNECT:/run/telemt-dual-hop/haproxy.sock 2>/dev/null | \
     awk -F, '
       ($1=="telemt_a" || $1=="telemt_b") && ($2=="vps1" || $2=="vps2") {
         seen++; if ($18 ~ /^UP/) up++
@@ -1955,7 +1983,7 @@ diagnose() {
     else
       warn "至少一条 WireGuard 隧道超过 180 秒没有握手"; ((failures+=1))
     fi
-    if tuning_is_active; then ok "BBR + fq 已生效"; else warn "BBR/fq 未生效"; ((failures+=1)); fi
+    if tuning_is_active; then ok "BBR / 默认队列 fq 已设置；a perf 可查看实际连接和接口"; else warn "BBR/fq 默认值异常"; ((failures+=1)); fi
     if haproxy -c -f "$TDH_HAPROXY_CFG" >/dev/null; then ok "HAProxy 配置"; else warn "HAProxy 配置"; ((failures+=1)); fi
     if maxconn=$(configured_cluster_connection_limit 2>/dev/null) && \
        grep -q "^    maxconn ${maxconn}$" "$TDH_HAPROXY_CFG"; then
@@ -1972,7 +2000,7 @@ diagnose() {
       if systemctl is-active --quiet "$unit"; then ok "$unit"; else warn "$unit"; ((failures+=1)); fi
     done
     if wireguard_handshake_is_fresh "$WG_INTERFACE"; then ok "WireGuard 握手新鲜"; else warn "WireGuard 超过 180 秒没有握手"; ((failures+=1)); fi
-    if tuning_is_active; then ok "BBR + fq 已生效"; else warn "BBR/fq 未生效"; ((failures+=1)); fi
+    if tuning_is_active; then ok "BBR / 默认队列 fq 已设置；a perf 可查看实际连接和接口"; else warn "BBR/fq 默认值异常"; ((failures+=1)); fi
     if telemt_binary_is_expected; then ok "Telemt ${TELEMT_VERSION} 二进制"; else warn "Telemt 二进制版本异常"; ((failures+=1)); fi
     if health_agent_is_up "$LOCAL_WG_IP" "$TDH_AGENT_PORT"; then ok "Telemt API 与 5 个 Telegram DC 全部可达"; else warn "Telemt 或 Telegram DC 完整连通性异常"; ((failures+=1)); fi
     RESPONSE_LINK_A=$(query_telemt_link "$TDH_API_PORT" line_a "$TDH_DOMAIN_A" 2>/dev/null || true)
@@ -1996,6 +2024,287 @@ diagnose() {
     if tcp_port_is_bound_only_to 127.0.0.1 "$TDH_API_PORT"; then ok "Telemt API 只监听回环地址"; else warn "Telemt API 监听范围异常"; ((failures+=1)); fi
   fi
   if (( failures == 0 )); then ok "全部本机检查通过。"; else die "发现 $failures 项异常。"; fi
+}
+
+# This path deliberately bypasses bootstrap installation, state sourcing and the
+# manager lock. Only fixed read commands and allow-listed numeric fields escape.
+performance_report() {
+  local seconds=${1:-5}
+  [[ $seconds =~ ^([2-9]|[12][0-9]|30)$ ]] || die "采样时长必须为 2-30 秒。"
+  command -v python3 >/dev/null || die "缺少 python3；只读诊断不会自动安装软件。"
+  command -v timeout >/dev/null || die "缺少 timeout。"
+  timeout 55 python3 - "$seconds" "$TDH_STATE" <<'PY'
+import csv
+import datetime
+import http.client
+import io
+import json
+import os
+import pathlib
+import re
+import signal
+import socket
+import statistics
+import subprocess
+import sys
+import time
+
+DEADLINE = time.monotonic() + 50
+
+def read(path):
+    try:
+        with open(path, encoding="utf-8", errors="replace") as f:
+            return f.read(1048576)
+    except OSError:
+        return ""
+
+def command(*args):
+    # Bound time AND output, and never emit command errors or raw output.
+    try:
+        remaining = DEADLINE - time.monotonic()
+        if remaining < .05:
+            return ""
+        with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, start_new_session=True) as p:
+            import threading
+            def stop():
+                try:
+                    os.killpg(p.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            timer = threading.Timer(min(2, remaining), stop)
+            timer.start()
+            try:
+                data = p.stdout.read(1048576)
+                if len(data) == 1048576:
+                    stop()
+                p.wait(timeout=1)
+                return data.decode("utf-8", "replace") if p.returncode == 0 else ""
+            finally:
+                timer.cancel()
+                if p.poll() is None:
+                    stop()
+                    p.wait()
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+def integer(value):
+    return int(value) if re.fullmatch(r"\d+", str(value)) else None
+
+def numeric_fields(text, names):
+    return {k: int(v) for k, v in re.findall(r"^([A-Za-z_]+):?\s+(\d+)", text, re.M) if k in names}
+
+def counters():
+    result = {}
+    allowed = {"RetransSegs", "OutSegs", "InSegs", "ListenOverflows", "ListenDrops",
+               "TCPTimeouts", "TCPLostRetransmit", "TCPMemoryPressures", "TCPBacklogDrop",
+               "TCPRcvQDrop", "IpFragFails", "FragFails", "FragCreates", "ReasmFails",
+               "InErrors", "RcvbufErrors", "SndbufErrors"}
+    for path in ("/proc/net/snmp", "/proc/net/netstat"):
+        lines = read(path).splitlines()
+        for header, values in zip(lines[::2], lines[1::2]):
+            prefix = header.split()[0].rstrip(":")
+            for name, value in zip(header.split()[1:], values.split()[1:]):
+                if name in allowed and integer(value) is not None:
+                    result[prefix + "." + name] = int(value)
+    return result
+
+def cpu():
+    return {row[0]: list(map(int, row[1:9])) for line in read("/proc/stat").splitlines()
+            if (row := line.split()) and re.fullmatch(r"cpu\d*", row[0])}
+
+def processes():
+    result = {}
+    for name in ("haproxy", "telemt", "health-agent"):
+        unit = "telemt-dual-hop-" + ("health-agent" if name == "health-agent" else name) + ".service"
+        props = dict(line.split("=", 1) for line in command("systemctl", "show", unit,
+                     "--property=MainPID,ControlGroup,LimitNOFILE,MemoryCurrent,TasksCurrent").splitlines() if "=" in line)
+        pid = integer(props.get("MainPID", ""))
+        pids = {pid} if pid else set()
+        group = props.get("ControlGroup", "")
+        if group.startswith("/") and ".." not in group:
+            pids.update(int(x) for x in read("/sys/fs/cgroup" + group + "/cgroup.procs").split() if x.isdigit())
+        # Include HAProxy workers on cgroup v1 as well as v2.
+        for parent in list(pids):
+            pids.update(int(x) for x in read(f"/proc/{parent}/task/{parent}/children").split() if x.isdigit())
+        ticks = rss = fds = 0
+        for member in pids:
+            fields = read(f"/proc/{member}/stat").rsplit(")", 1)[-1].split()
+            if len(fields) >= 22:
+                ticks += int(fields[11]) + int(fields[12])
+                rss += int(fields[21]) * os.sysconf("SC_PAGE_SIZE")
+            try:
+                fds += len(os.listdir(f"/proc/{member}/fd"))
+            except OSError:
+                pass
+        result[name] = {"running": bool(pid), "ticks": ticks, "rss_bytes": rss, "fds": fds,
+                        "fd_limit": integer(props.get("LimitNOFILE", "")),
+                        "tasks": integer(props.get("TasksCurrent", "")), "identity": sorted(pids), "at": time.monotonic()}
+    return result
+
+def interfaces(details=False):
+    result = {}
+    for path in sorted(pathlib.Path("/sys/class/net").glob("*")):
+        if path.name == "lo":
+            continue
+        name = path.name
+        if not re.fullmatch(r"[A-Za-z0-9_.:-]{1,15}", name):
+            continue
+        alias = name if name in ("tdh1", "tdh2", "tdh-b1", "tdh-b2") else f"nic{len(result)}"
+        row = {"mtu": integer(read(path / "mtu").strip())}
+        for field in ("rx_bytes", "tx_bytes", "rx_dropped", "tx_dropped", "rx_errors", "tx_errors"):
+            row[field] = integer(read(path / "statistics" / field).strip())
+        if details:
+            try:
+                queues = json.loads(command("tc", "-j", "-s", "qdisc", "show", "dev", name))
+                row["qdisc"] = [{key: q[key] for key in ("kind", "drops", "overlimits", "backlog", "qlen")
+                                 if key in q and (key == "kind" or isinstance(q[key], (int, float)))} for q in queues
+                                if re.fullmatch(r"[a-z0-9_]+", str(q.get("kind", "")))]
+            except (ValueError, TypeError):
+                row["qdisc"] = None
+            features = command("ethtool", "-k", name)
+            row["offload"] = {k: v == "on" for k, v in re.findall(
+                r"^(generic-receive-offload|generic-segmentation-offload|tcp-segmentation-offload|tx-udp-segmentation): (on|off)", features, re.M)} or None
+        result[alias] = row
+    return result
+
+def sockets():
+    groups = {}
+    # Address and process information stay in memory; only aggregates leave.
+    text = command("ss", "-Htinmp", "state", "established")
+    current = None
+    for line in text.splitlines():
+        if line and not line[0].isspace():
+            fields = line.split()
+            current = None
+            if len(fields) < 4:
+                continue
+            local, remote = fields[2:4]
+            if remote.startswith(("10.77.1.2:24431", "10.77.2.2:24431")):
+                current = "entry-backend"
+            elif local.startswith(("10.77.1.2:24431", "10.77.2.2:24431")):
+                current = "backend-entry"
+            elif local.endswith(":443") and '"haproxy"' in line:
+                current = "user-entry"
+            elif '"telemt"' in line and remote.endswith(":443"):
+                current = "backend-upstream"
+            if current:
+                row = groups.setdefault(current, {"count": 0, "recv_q_bytes": 0, "send_q_bytes": 0,
+                                                   "rtt_ms": [], "cwnd_segments": [], "bbr": 0})
+                row["count"] += 1
+                row["recv_q_bytes"] += integer(fields[0]) or 0
+                row["send_q_bytes"] += integer(fields[1]) or 0
+        elif current:
+            row = groups[current]
+            row["bbr"] += int(bool(re.search(r"\bbbr\b", line)))
+            for field, pattern in (("rtt_ms", r"\brtt:([\d.]+)"), ("cwnd_segments", r"\bcwnd:(\d+)")):
+                match = re.search(pattern, line)
+                if match:
+                    row[field].append(float(match[1]))
+    for row in groups.values():
+        for field in ("rtt_ms", "cwnd_segments"):
+            values = sorted(row.pop(field))
+            row[field + "_median"] = statistics.median(values) if values else None
+            row[field + "_p95"] = values[max(0, (95 * len(values) + 99) // 100 - 1)] if values else None
+    return groups
+
+def haproxy():
+    try:
+        with socket.socket(socket.AF_UNIX) as s:
+            s.settimeout(2)
+            s.connect("/run/telemt-dual-hop/haproxy.sock")
+            s.sendall(b"show stat\n")
+            data = bytearray()
+            while len(data) < 262144:
+                block = s.recv(8192)
+                if not block:
+                    break
+                data.extend(block)
+        rows = csv.DictReader(io.StringIO(data.decode().lstrip("# ")))
+        return [{k: r[k] for k in ("pxname", "svname", "status") if k in r} |
+                {k: integer(r.get(k, "")) for k in ("qcur", "qmax", "scur", "smax", "slim", "bin", "bout",
+                 "econ", "eresp", "wretr", "wredis", "chkfail", "chkdown", "downtime", "qtime", "ctime", "rtime", "ttime")}
+                for r in rows if r.get("pxname") in ("mtp_tls", "telemt_a", "telemt_b")
+                and r.get("svname") in ("FRONTEND", "BACKEND", "vps1", "vps2")
+                and re.fullmatch(r"[A-Z0-9 /()+_-]{1,40}|DOWN \(agent\)", r.get("status", ""))]
+    except (OSError, ValueError, UnicodeError):
+        return None
+
+def telemt():
+    # Use the protected token file, never argv/environment or user/config APIs.
+    token = read(pathlib.Path(sys.argv[2]).parent / "telemt/api.token").strip()
+    if not re.fullmatch(r"[0-9a-f]{64}", token) or DEADLINE - time.monotonic() < 3:
+        return None
+    connection = http.client.HTTPConnection("127.0.0.1", 19091, timeout=2)
+    try:
+        connection.request("GET", "/v1/stats/zero/all", headers={"Authorization": "Bearer " + token})
+        response = connection.getresponse()
+        if response.status != 200:
+            return None
+        data = json.loads(response.read(262144)).get("data", {})
+        allowed = {"core": ("connections_total", "connections_bad_total", "handshake_timeouts_total",
+                            "accept_permit_timeout_total", "conntrack_pressure_active"),
+                   "upstream": ("connect_attempt_total", "connect_success_total", "connect_fail_total",
+                                "connect_failfast_hard_error_total", "connect_duration_success_bucket_le_100ms",
+                                "connect_duration_success_bucket_101_500ms", "connect_duration_success_bucket_501_1000ms",
+                                "connect_duration_success_bucket_gt_1000ms")}
+        return {group: {key: data[group][key] for key in keys
+                        if key in data.get(group, {}) and isinstance(data[group][key], (int, bool))}
+                for group, keys in allowed.items()}
+    except (OSError, ValueError, TypeError, AttributeError, http.client.HTTPException):
+        return None
+    finally:
+        connection.close()
+
+seconds = int(sys.argv[1])
+role_match = re.search(r"^TDH_ROLE=(entry|backend1|backend2)$", read(sys.argv[2]), re.M)
+role = role_match[1] if role_match else "unknown"
+start = time.monotonic()
+c0, p0, i0, n0 = cpu(), processes(), interfaces(), counters()
+time.sleep(seconds)
+c1, p1, i1, n1 = cpu(), processes(), interfaces(True), counters()
+elapsed = time.monotonic() - start
+for name, row in p1.items():
+    previous = p0.get(name, {})
+    ticks = row.pop("ticks")
+    same_process = row.pop("identity") == previous.get("identity")
+    duration = row.pop("at") - previous.get("at", start)
+    row["sample_seconds"] = round(duration, 3)
+    row["cpu_percent_one_core"] = round(100 * (ticks - previous["ticks"]) / os.sysconf("SC_CLK_TCK") / duration, 2) if same_process else None
+for name, row in i1.items():
+    for field in ("rx_bytes", "tx_bytes", "rx_dropped", "tx_dropped", "rx_errors", "tx_errors"):
+        old, new = i0.get(name, {}).get(field), row[field]
+        row[field + "_delta"] = new - old if old is not None and new is not None and new >= old else None
+cpu_load = {}
+for name, values in c1.items():
+    delta = [b - a for a, b in zip(c0.get(name, values), values)]
+    total = sum(delta)
+    cpu_load[name] = {"busy_percent": round(100 * (total - delta[3] - delta[4]) / total, 2) if total else None,
+                      "steal_percent": round(100 * delta[7] / total, 2) if total else None}
+sysctls = {}
+for key in ("net.core.default_qdisc", "net.ipv4.tcp_congestion_control", "net.ipv4.tcp_available_congestion_control",
+            "net.ipv4.tcp_rmem", "net.ipv4.tcp_wmem", "net.core.rmem_max", "net.core.wmem_max",
+            "net.ipv4.tcp_mtu_probing", "net.core.somaxconn", "net.ipv4.tcp_max_syn_backlog"):
+    value = read("/proc/sys/" + key.replace(".", "/")).strip()
+    sysctls[key] = value if re.fullmatch(r"[a-z0-9_ \t]+", value) else None
+wg = {}
+for name in ("tdh1", "tdh2", "tdh-b1", "tdh-b2"):
+    if pathlib.Path("/sys/class/net", name).exists():
+        timestamps = [int(v) for v in re.findall(r"\t(\d+)\n", command("wg", "show", name, "latest-handshakes"))]
+        wg[name] = {"handshake_age_seconds": int(time.time()) - max(timestamps) if timestamps and max(timestamps) else None}
+versions = {}
+for name, args, pattern in (("haproxy", ("haproxy", "-v"), r"HAProxy version ([0-9][a-zA-Z0-9.+_-]*)"),
+                            ("telemt", ("/usr/local/lib/telemt-dual-hop/telemt", "--version"), r"^telemt ([0-9.]+)")):
+    match = re.search(pattern, command(*args))
+    versions[name] = match[1] if match else None
+report = {"说明": "只读本机采样；无主动测速、无上传；null 表示不可用。TCP RTT 为当前连接分布，不是时间序列 P95。",
+          "schema": 1, "role": role, "kernel": os.uname().release, "sample_seconds": round(elapsed, 3),
+          "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), "versions": versions,
+          "memory_kib": numeric_fields(read("/proc/meminfo"), {"MemTotal", "MemAvailable", "SwapFree", "SwapTotal"}),
+          "cpu": cpu_load, "services": p1, "interfaces": i1, "tcp": sockets(), "wireguard": wg,
+          "system_counters_delta": {k: v - n0[k] if k in n0 and v >= n0[k] else None for k, v in n1.items()},
+          "sysctl": sysctls, "haproxy": haproxy(), "telemt": telemt(), "direct_buffer_pressure": None}
+print(json.dumps(report, ensure_ascii=False, indent=2))
+PY
 }
 
 remove_ufw_rules() {
@@ -2159,6 +2468,7 @@ menu_existing() {
       printf '  5) 一键诊断\n'
       printf '  6) 完成或重试启用入口\n'
       printf '  7) 安全更新管理脚本\n'
+      printf '  8) 只读脱敏性能采样（5 秒）\n'
       printf '  9) 卸载\n'
       printf '  0) 退出\n\n'
       read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
@@ -2170,6 +2480,7 @@ menu_existing() {
         5) run_panel_action diagnose ;;
         6) run_panel_action complete_entry ;;
         7) run_panel_action update_manager ;;
+        8) run_panel_action performance_report ;;
         9) run_panel_action uninstall_all ;;
         0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
         *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
@@ -2179,6 +2490,7 @@ menu_existing() {
       printf '  2) 重新显示给入口使用的回执码\n'
       printf '  3) 一键诊断\n'
       printf '  4) 安全更新管理脚本\n'
+      printf '  5) 只读脱敏性能采样（5 秒）\n'
       printf '  9) 卸载\n'
       printf '  0) 退出\n\n'
       read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
@@ -2187,6 +2499,7 @@ menu_existing() {
         2) run_panel_action backend_response_again ;;
         3) run_panel_action diagnose ;;
         4) run_panel_action update_manager ;;
+        5) run_panel_action performance_report ;;
         9) run_panel_action uninstall_all ;;
         0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
         *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
@@ -2259,6 +2572,11 @@ main() {
   validate_runtime_paths
   require_root
   check_os
+  if [[ ${1:-} == perf ]]; then
+    (( $# <= 2 )) || die "用法：a perf [2-30]"
+    performance_report "${2:-5}"
+    return
+  fi
   ensure_bootstrap_tools
   acquire_lock
   # Re-running a newly downloaded copy on an existing VPS updates the manager
@@ -2276,6 +2594,7 @@ main() {
     links) show_links ;;
     diagnose) diagnose ;;
     update|upgrade|u) update_manager ;;
+    update-rollback) rollback_manager ;;
     uninstall) uninstall_all ;;
     menu|panel) control_panel ;;
     "") control_panel ;;

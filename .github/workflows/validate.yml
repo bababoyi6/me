@@ -13,9 +13,17 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      - name: Install local test dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends haproxy shellcheck
       - name: Check Bash syntax
-        run: bash -n telemt-dual-hop.sh
+        run: bash -n telemt-dual-hop.sh && bash -n tests/fixtures/manager-1.3.1-updater.sh
       - name: Run ShellCheck
-        run: shellcheck -x -S style telemt-dual-hop.sh
+        run: shellcheck -x -S style telemt-dual-hop.sh tests/fixtures/manager-1.3.1-updater.sh
       - name: Run built-in tests
         run: bash telemt-dual-hop.sh --self-test
+      - name: Check Python tools
+        run: python3 -m py_compile tests/lab.py tests/test_performance.py tools/iperf_matrix.py
+      - name: Test diagnostics, configuration and rollback
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Test real HAProxy SNI and failover on loopback
+        run: timeout 60 python3 tests/lab.py
