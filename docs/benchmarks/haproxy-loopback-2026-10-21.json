@@ -1,0 +1,636 @@
+{
+  "scope": "loopback HAProxy only; no WireGuard, Telemt or Telegram measurement",
+  "kernel": "6.18.40.1-microsoft-standard-WSL2",
+  "haproxy": "HAProxy version 2.4.30-0ubuntu0.22.04.2 2026/06/19 - https://haproxy.org/",
+  "rate_limit_mbps_aggregate": 500,
+  "seconds": 3,
+  "rounds": 5,
+  "rows": [
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "D",
+      "round": 1,
+      "mbps": 498.7974069338436,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 0.575030000000254,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "D",
+      "round": 1,
+      "mbps": 499.01379388267384,
+      "cpu_seconds_per_GiB": 0.9162596898133334,
+      "hello_ms_max": 0.4840480000005698,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "D",
+      "round": 2,
+      "mbps": 499.1980395143158,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 0.494017000001179,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "D",
+      "round": 2,
+      "mbps": 499.10047254925905,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 0.3762940000022752,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "D",
+      "round": 3,
+      "mbps": 499.1610128318244,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 0.5442759999993996,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "D",
+      "round": 3,
+      "mbps": 499.2058242702943,
+      "cpu_seconds_per_GiB": 0.8017272285866668,
+      "hello_ms_max": 0.41059800000198265,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "D",
+      "round": 4,
+      "mbps": 499.20864081753945,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 0.5607530000020233,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "D",
+      "round": 4,
+      "mbps": 499.120424698827,
+      "cpu_seconds_per_GiB": 0.9162596898133334,
+      "hello_ms_max": 0.6745789999982321,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "D",
+      "round": 5,
+      "mbps": 499.04692533880603,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 1.0387800000017933,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "D",
+      "round": 5,
+      "mbps": 499.2061603669608,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 0.3952189999978373,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "U",
+      "round": 1,
+      "mbps": 499.06031766433614,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 0.9674139999944487,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "U",
+      "round": 1,
+      "mbps": 499.2063780076518,
+      "cpu_seconds_per_GiB": 0.9162596898133334,
+      "hello_ms_max": 0.5085039999954688,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "U",
+      "round": 2,
+      "mbps": 499.15932900262226,
+      "cpu_seconds_per_GiB": 0.8017272285866668,
+      "hello_ms_max": 0.46592300000014575,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "U",
+      "round": 2,
+      "mbps": 499.07560799989733,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 0.39249900000015714,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "U",
+      "round": 3,
+      "mbps": 499.0428604131756,
+      "cpu_seconds_per_GiB": 1.0880583816533334,
+      "hello_ms_max": 1.2206999999904156,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "U",
+      "round": 3,
+      "mbps": 499.1096675451682,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 0.5322880000022678,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "U",
+      "round": 4,
+      "mbps": 499.1890972628421,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 0.45246800000597887,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "U",
+      "round": 4,
+      "mbps": 499.09316933868394,
+      "cpu_seconds_per_GiB": 0.9735259204266667,
+      "hello_ms_max": 0.8273389999970959,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 1,
+      "direction": "U",
+      "round": 5,
+      "mbps": 499.05080071922595,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 0.6851939999990009,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 1,
+      "direction": "U",
+      "round": 5,
+      "mbps": 499.2037698207344,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 0.4730870000031473,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "D",
+      "round": 1,
+      "mbps": 498.5513796966234,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 2.9180930000052285,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "D",
+      "round": 1,
+      "mbps": 498.6819559965667,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 2.0918510000029755,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "D",
+      "round": 2,
+      "mbps": 498.6198975757998,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 2.6295759999896973,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "D",
+      "round": 2,
+      "mbps": 498.5704756318365,
+      "cpu_seconds_per_GiB": 0.9735259204266667,
+      "hello_ms_max": 2.969720999999481,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "D",
+      "round": 3,
+      "mbps": 498.5870243165683,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 2.7106290000062927,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "D",
+      "round": 3,
+      "mbps": 498.646490255967,
+      "cpu_seconds_per_GiB": 0.8017272285866668,
+      "hello_ms_max": 2.7230529999968667,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "D",
+      "round": 4,
+      "mbps": 498.58803044122675,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 2.4614720000073476,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "D",
+      "round": 4,
+      "mbps": 498.6483788300114,
+      "cpu_seconds_per_GiB": 1.0880583816533334,
+      "hello_ms_max": 2.4332029999811766,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "D",
+      "round": 5,
+      "mbps": 498.66832137404214,
+      "cpu_seconds_per_GiB": 0.9735259204266667,
+      "hello_ms_max": 3.1491409999944153,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "D",
+      "round": 5,
+      "mbps": 498.7350882859324,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 2.1599060000028203,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "U",
+      "round": 1,
+      "mbps": 498.5578100237452,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 3.079318000004605,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "U",
+      "round": 1,
+      "mbps": 498.6047128815535,
+      "cpu_seconds_per_GiB": 0.8017272285866668,
+      "hello_ms_max": 2.120496999992838,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "U",
+      "round": 2,
+      "mbps": 498.68927005704575,
+      "cpu_seconds_per_GiB": 0.7444609979733333,
+      "hello_ms_max": 2.2709860000134086,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "U",
+      "round": 2,
+      "mbps": 498.51121768436747,
+      "cpu_seconds_per_GiB": 1.0880583816533334,
+      "hello_ms_max": 3.1974620000028153,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "U",
+      "round": 3,
+      "mbps": 498.5857923124235,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 3.304268999983151,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "U",
+      "round": 3,
+      "mbps": 498.65656834191594,
+      "cpu_seconds_per_GiB": 0.8017272285866668,
+      "hello_ms_max": 2.2446410000043215,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "U",
+      "round": 4,
+      "mbps": 498.7553880158043,
+      "cpu_seconds_per_GiB": 0.8017272285866668,
+      "hello_ms_max": 2.1857339999939995,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "U",
+      "round": 4,
+      "mbps": 498.67444138596187,
+      "cpu_seconds_per_GiB": 1.0880583816533334,
+      "hello_ms_max": 2.2459340000011707,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": false,
+      "streams": 4,
+      "direction": "U",
+      "round": 5,
+      "mbps": 498.7514795774343,
+      "cpu_seconds_per_GiB": 1.03079215104,
+      "hello_ms_max": 2.270661000011387,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    },
+    {
+      "splice": true,
+      "streams": 4,
+      "direction": "U",
+      "round": 5,
+      "mbps": 498.6124741707989,
+      "cpu_seconds_per_GiB": 0.8589934591999999,
+      "hello_ms_max": 2.2663069999850904,
+      "pipes_used_during_transfer": 0,
+      "sha256_verified": true
+    }
+  ],
+  "summary": [
+    {
+      "streams": 1,
+      "direction": "D",
+      "splice": false,
+      "mbps": {
+        "median": 499.10047254925905,
+        "p95": 499.1610128318244,
+        "min": 498.7974069338436,
+        "max": 499.1610128318244
+      },
+      "cpu_seconds_per_GiB": {
+        "median": 1.03079215104,
+        "p95": 1.03079215104,
+        "min": 0.9162596898133334,
+        "max": 1.03079215104
+      },
+      "hello_ms_max": {
+        "median": 0.575030000000254,
+        "p95": 1.0387800000017933,
+        "min": 0.3762940000022752,
+        "max": 1.0387800000017933
+      }
+    },
+    {
+      "streams": 1,
+      "direction": "D",
+      "splice": true,
+      "mbps": {
+        "median": 499.2058242702943,
+        "p95": 499.20864081753945,
+        "min": 499.01379388267384,
+        "max": 499.20864081753945
+      },
+      "cpu_seconds_per_GiB": {
+        "median": 0.8589934591999999,
+        "p95": 0.9162596898133334,
+        "min": 0.8017272285866668,
+        "max": 0.9162596898133334
+      },
+      "hello_ms_max": {
+        "median": 0.4840480000005698,
+        "p95": 0.5607530000020233,
+        "min": 0.3952189999978373,
+        "max": 0.5607530000020233
+      }
+    },
+    {
+      "streams": 1,
+      "direction": "U",
+      "splice": false,
+      "mbps": {
+        "median": 499.06031766433614,
+        "p95": 499.09316933868394,
+        "min": 499.0428604131756,
+        "max": 499.09316933868394
+      },
+      "cpu_seconds_per_GiB": {
+        "median": 1.03079215104,
+        "p95": 1.0880583816533334,
+        "min": 0.9735259204266667,
+        "max": 1.0880583816533334
+      },
+      "hello_ms_max": {
+        "median": 0.8273389999970959,
+        "p95": 1.2206999999904156,
+        "min": 0.39249900000015714,
+        "max": 1.2206999999904156
+      }
+    },
+    {
+      "streams": 1,
+      "direction": "U",
+      "splice": true,
+      "mbps": {
+        "median": 499.1890972628421,
+        "p95": 499.2063780076518,
+        "min": 499.1096675451682,
+        "max": 499.2063780076518
+      },
+      "cpu_seconds_per_GiB": {
+        "median": 0.8589934591999999,
+        "p95": 0.9162596898133334,
+        "min": 0.8017272285866668,
+        "max": 0.9162596898133334
+      },
+      "hello_ms_max": {
+        "median": 0.4730870000031473,
+        "p95": 0.5322880000022678,
+        "min": 0.45246800000597887,
+        "max": 0.5322880000022678
+      }
+    },
+    {
+      "streams": 4,
+      "direction": "D",
+      "splice": false,
+      "mbps": {
+        "median": 498.5870243165683,
+        "p95": 498.66832137404214,
+        "min": 498.5513796966234,
+        "max": 498.66832137404214
+      },
+      "cpu_seconds_per_GiB": {
+        "median": 1.03079215104,
+        "p95": 1.0880583816533334,
+        "min": 0.9735259204266667,
+        "max": 1.0880583816533334
+      },
+      "hello_ms_max": {
+        "median": 2.9180930000052285,
+        "p95": 3.1491409999944153,
+        "min": 2.4332029999811766,
+        "max": 3.1491409999944153
+      }
+    },
+    {
+      "streams": 4,
+      "direction": "D",
+      "splice": true,
+      "mbps": {
+        "median": 498.646490255967,
+        "p95": 498.7350882859324,
+        "min": 498.58803044122675,
+        "max": 498.7350882859324
+      },
+      "cpu_seconds_per_GiB": {
+        "median": 0.8589934591999999,
+        "p95": 0.8589934591999999,
+        "min": 0.8017272285866668,
+        "max": 0.8589934591999999
+      },
+      "hello_ms_max": {
+        "median": 2.4614720000073476,
+        "p95": 2.7230529999968667,
+        "min": 2.0918510000029755,
+        "max": 2.7230529999968667
+      }
+    },
+    {
+      "streams": 4,
+      "direction": "U",
+      "splice": false,
+      "mbps": {
+        "median": 498.5857923124235,
+        "p95": 498.7514795774343,
+        "min": 498.51121768436747,
+        "max": 498.7514795774343
+      },
+      "cpu_seconds_per_GiB": {
+        "median": 1.03079215104,
+        "p95": 1.0880583816533334,
+        "min": 1.03079215104,
+        "max": 1.0880583816533334
+      },
+      "hello_ms_max": {
+        "median": 3.079318000004605,
+        "p95": 3.304268999983151,
+        "min": 2.2459340000011707,
+        "max": 3.304268999983151
+      }
+    },
+    {
+      "streams": 4,
+      "direction": "U",
+      "splice": true,
+      "mbps": {
+        "median": 498.65656834191594,
+        "p95": 498.7553880158043,
+        "min": 498.6047128815535,
+        "max": 498.7553880158043
+      },
+      "cpu_seconds_per_GiB": {
+        "median": 0.8017272285866668,
+        "p95": 0.8589934591999999,
+        "min": 0.7444609979733333,
+        "max": 0.8589934591999999
+      },
+      "hello_ms_max": {
+        "median": 2.2446410000043215,
+        "p95": 2.2709860000134086,
+        "min": 2.120496999992838,
+        "max": 2.2709860000134086
+      }
+    }
+  ]
+}
