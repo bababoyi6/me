@@ -1,0 +1,28 @@
+{
+  "date_utc": "2026-10-23T14:46:06.144366+00:00",
+  "export_sha256": "6c8af47602ed535d12a4034dbeea67985165fe265e86c160d6789ddd81c9890b",
+  "removed_paths": [
+    "/root/tdh-audit-20261021/tdh-audit-continue-20261023",
+    "/root/tdh-audit-20261021/continue-source-20261023.tar.gz",
+    "/root/tdh-audit-20261021/continue-results-20261023.tar.gz",
+    "/root/tdh-audit-20261021/continue-preflight-20261023.py",
+    "/root/tdh-audit-20261021/continue_setup.py",
+    "/root/tdh-audit-20261021/continue_checks.py",
+    "/root/tdh-audit-20261021/continue_run.py",
+    "/root/tdh-audit-20261021/continue_report.py",
+    "/root/tdh-audit-20261021/continue_export.py",
+    "/root/tdh-audit-20261021/continue_cleanup.py"
+  ],
+  "removed_lab_logical_bytes": 76498947,
+  "lab_namespaces_remaining": [],
+  "transient_lab_units_remaining": [],
+  "temporary_lab_directories_remaining": [],
+  "lab_key_files_remaining": [],
+  "listeners_unchanged": true,
+  "host_oom_kill_delta": 0,
+  "historical_binaries_sha256_unchanged": true,
+  "host_memory_available_bytes_after": 632741888,
+  "global_zero_byte_coordination_lock_retained": "/run/lock/tdh-audit-network.lock",
+  "host_kernel_firewall_ssh_configuration_modified": false,
+  "production_nodes_accessed": false
+}
