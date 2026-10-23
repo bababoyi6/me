@@ -29,10 +29,14 @@ def main():
     parser.add_argument("--wg", default="wg")
     parser.add_argument("--rtt", type=int, choices=(20, 50, 100, 200), default=100)
     parser.add_argument("--max-streams", type=int, choices=(1, 4, 8, 16, 32), default=4)
+    parser.add_argument("--min-streams", type=int, choices=(1, 4, 8, 16, 32), default=1)
     parser.add_argument("--payload-mib", type=int, choices=(8, 16, 64, 256), default=16)
     parser.add_argument("--rate-mbps", type=int, choices=(100, 1000), default=100)
     parser.add_argument("--rounds", type=int, choices=(1, 2, 3), default=3)
+    parser.add_argument("--socket-details", action="store_true")
     args = parser.parse_args()
+    if args.min_streams > args.max_streams:
+        parser.error("minimum stream tier exceeds maximum")
     if args.payload_mib > 128 and args.max_streams < 4:
         parser.error("per-stream payload cannot exceed 128 MiB")
     root = Path(args.root).resolve()
@@ -49,6 +53,7 @@ def main():
                 "rtt_ms_configured": args.rtt, "rate_mbps_per_direction": args.rate_mbps,
                 "payload_bytes_total_per_trial": args.payload_mib * 1024**2, "direction": "U", "kernel": os.uname().release,
                 "command": sys.argv, "rounds": args.rounds, "rows": rows, "complete": False}
+    manifest["socket_observation"] = "detailed" if args.socket_details else "off"
     def save():
         destination.write_text(json.dumps(manifest, indent=2) + "\n")
     try:
@@ -71,7 +76,7 @@ def main():
                     if dc.poll() is not None or time.monotonic() > deadline:
                         raise RuntimeError("mock DC readiness failed")
                     time.sleep(.1)
-                tiers = [streams for streams in (1, 4, 8, 16, 32) if streams <= args.max_streams]
+                tiers = [streams for streams in (1, 4, 8, 16, 32) if args.min_streams <= streams <= args.max_streams]
                 # Fixed total payload per tier and paired order; no concurrent competing A/B workers.
                 for streams in tiers:
                     if args.payload_mib * 1024**2 // streams > 128 * 1024**2:
@@ -87,17 +92,23 @@ def main():
                                     "--output", str(output), "--rounds", "1", "--streams", str(streams),
                                     "--bytes", str(args.payload_mib * 1024**2), "--direction", "U",
                                     "--slow-readers", "--dc-timeout", "25", "--rate-mbps", str(args.rate_mbps),
-                                    "--small-probes", "--observe-network"]
-                            worker = subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                    "--small-probes", "--observe-network", "--socket-observation",
+                                    "detailed" if args.socket_details else "off"]
+                            log_name = name.removesuffix('.json') + '.log'
+                            log_file = (destination.parent / log_name).open('xb')
+                            worker = subprocess.Popen(argv, stdout=log_file, stderr=subprocess.STDOUT)
                             net.processes.append(worker)
                             try:
-                                code = worker.wait(timeout=100)
-                            except subprocess.TimeoutExpired:
-                                worker.terminate()
-                                worker.wait(timeout=10)
-                                code = 124
+                                try:
+                                    code = worker.wait(timeout=100)
+                                except subprocess.TimeoutExpired:
+                                    worker.terminate()
+                                    worker.wait(timeout=10)
+                                    code = 124
+                            finally:
+                                log_file.close()
                             row = {"pair_round": turn + 1, "streams": streams, "build": build,
-                                   "exit": code, "result_file": name, "command": argv}
+                                   "exit": code, "result_file": name, "worker_log": log_name, "command": argv}
                             if output.exists():
                                 row["trial"] = json.loads(output.read_text())
                             rows.append(row)

@@ -339,6 +339,15 @@ frontend mtp_tls
             (shared/'backend1.restart').touch()
             wait_state(True)
             routed('apple.com','U',1)
+            # Disconnect only the test entry's first tunnel, then verify recovery.
+            command('ip','link','set','wg-lab','down')
+            try:
+                wait_state(False)
+                routed('apple.com','U',2)
+            finally:
+                command('ip','link','set','wg-lab','up')
+            wait_state(True)
+            routed('apple.com','U',1)
         for number in (1,2):
             assert not json.loads((shared/f'backend{number}.json').read_text())['errors'],'mock DC failure'
         output={'scope':'single native VPS, private entry/two backends and router namespaces; actual HAProxy/WireGuard/Telemt, synthetic DC only',
@@ -350,6 +359,7 @@ frontend mtp_tls
         output['classification']='SINGLE_VPS_VIRTUAL_3NODE'
         output['separate_mock_dc_namespace']=args.separate_dc
         output['actual_backend_process_restart_verified']=args.separate_dc
+        output['wireguard_link_outage_recovery_verified']=args.separate_dc
         output['rtt_ms_configured']=args.rtt
         save(ROOT/'results'/f'dualhop-native-{args.build}{"-soak" if args.soak else "-benchmark" if args.benchmark else ""}.json',output)
         print(json.dumps({k:v for k,v in output.items() if k!='rows'}),flush=True)

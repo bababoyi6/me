@@ -27,10 +27,11 @@ class LabRunnerTests(unittest.TestCase):
     def test_systemd_owns_all_descendants_with_finite_resource_limits(self):
         limits = budget(956*MIB, 616*MIB, 4096*MIB)
         argv = systemd_command("tdh-audit-test", limits, ["python3", "synthetic-lab.py"], 600)
-        for value in ("--wait", "--collect", "--property=KillMode=control-group", "--property=CPUQuota=60%",
+        for value in ("--wait", "--property=KillMode=control-group", "--property=CPUQuota=60%",
                       "--property=MemorySwapMax=0", "--property=RuntimeMaxSec=600", "--property=TasksMax=192",
                       "--property=OOMPolicy=stop", "--property=UMask=0077"):
             self.assertIn(value, argv)
+        self.assertNotIn("--collect", argv)
         self.assertEqual(argv[-3:], ["--", "python3", "synthetic-lab.py"])
 
     @unittest.skipUnless(sys.platform == "linux", "namespace tool is Linux only")

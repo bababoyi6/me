@@ -27,6 +27,7 @@ parser.add_argument('--slow-readers',action='store_true')
 parser.add_argument('--rate-mbps',type=int,choices=(100,1000),default=100)
 parser.add_argument('--dc-timeout',type=int,choices=(8,25),default=8)
 parser.add_argument('--observe-network',action='store_true')
+parser.add_argument('--socket-observation',choices=('detailed','off'),default='detailed')
 args=parser.parse_args()
 if not 0<args.bytes<=256*1024**2 or args.bytes//(args.streams or 1)>128*1024**2:
     parser.error('payload must be bounded to 128 MiB per stream and 256 MiB total')
@@ -72,7 +73,9 @@ def network_counters():
         {key:row.get(key) for key in ('dev','kind','bytes','packets','drops','overlimits','backlog','qlen')}
         for row in qdiscs if row['kind']=='netem'],'endpoint_fq':endpoint_qdiscs}
 def observe():
-    lines=subprocess.check_output(['ss','-Htinmp','state','established'],text=True,timeout=3).splitlines()
+    # Filter inside ss before formatting: avoid dumping unrelated endpoint sockets.
+    selection=f'( sport = :{lab.listen} or dport = :26000 )'
+    lines=subprocess.check_output(['ss','-Htinmp','state','established',selection],text=True,timeout=3).splitlines()
     values=[]
     for index,line in enumerate(lines):
         if f'pid={lab.telemt.pid},' not in line: continue
@@ -100,6 +103,7 @@ def trial(turn,streams,direction):
     baseline_oom=oom()
     samples,probes,probe_errors=[],[],[]
     last_probe=-1
+    last_socket_sample=-1
     with concurrent.futures.ThreadPoolExecutor(max_workers=streams) as pool, close_on_error(lab):
         futures=[pool.submit(lab.transfer,'apple.com',direction,size,args.rate_mbps*125000//streams,io_timeout=25,
                              direct=args.slow_readers, persistent=args.slow_readers,
@@ -117,7 +121,9 @@ def trial(turn,streams,direction):
                     probe_errors.append({'type':type(exc).__name__,'phase':getattr(exc,'lab_phase','unknown'),
                                          'received_bytes':getattr(exc,'lab_received_bytes',None)})
                 last_probe=time.monotonic()-started
-            samples.extend(observe())
+            if args.socket_observation=='detailed' and time.monotonic()-started-last_socket_sample>=1:
+                samples.extend(observe())
+                last_socket_sample=time.monotonic()-started
             time.sleep(.2)
         success,errors,details=[],[],[]
         for future in futures:
@@ -139,6 +145,8 @@ def trial(turn,streams,direction):
          'host_cpu_interval':cpu_interval(before_host_cpu,cpu_snapshot()),
          'minimum_available_memory_sampled_bytes':mem,'oom_delta':oom()-baseline_oom,
          'maximum_telemt_rss_sampled_bytes':maximum_rss,
+         'socket_sample_interval_seconds':1 if args.socket_observation=='detailed' else None,
+         'socket_observation':args.socket_observation,
          'small_probes':probes,'socket_samples':samples}
     if args.observe_network:
         row['network_counters_before']=before_network
