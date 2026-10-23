@@ -4,7 +4,6 @@ import concurrent.futures
 import json
 import os
 from pathlib import Path
-import re
 import signal
 import subprocess
 import sys
@@ -12,6 +11,7 @@ import time
 
 from e2e_lab import FullLab, close_on_error
 from network_lab import memory_available, cpu_snapshot, cpu_interval
+from kernel_observer import observe_sockets, qdiscs_in_namespace
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--root',required=True)
@@ -63,33 +63,17 @@ def network_counters():
             all_values=dict(zip(line.split()[1:],map(int,lines[index+1].split()[1:])))
             tcp={key:all_values[key] for key in ('RetransSegs','OutSegs','InSegs')}
             break
-    qdiscs=json.loads(subprocess.check_output(['ip','netns','exec','tdh-audit-wan','tc','-j','-s','qdisc','show'],text=True,timeout=3))
+    qdiscs=qdiscs_in_namespace('tdh-audit-wan')
     endpoint_qdiscs={}
     for name in ('tdh-audit-a','tdh-audit-b'):
-        values=json.loads(subprocess.check_output(['ip','netns','exec',name,'tc','-j','-s','qdisc','show'],text=True,timeout=3))
+        values=qdiscs_in_namespace(name)
         endpoint_qdiscs[name]=[{key:row.get(key) for key in ('dev','kind','bytes','packets','drops','overlimits','requeues','backlog','qlen')}
                                for row in values if row['kind']=='fq']
     return {'client_namespace_tcp':tcp,'wan_netem':[
         {key:row.get(key) for key in ('dev','kind','bytes','packets','drops','overlimits','backlog','qlen')}
         for row in qdiscs if row['kind']=='netem'],'endpoint_fq':endpoint_qdiscs}
 def observe():
-    # Filter inside ss before formatting: avoid dumping unrelated endpoint sockets.
-    selection=f'( sport = :{lab.listen} or dport = :26000 )'
-    lines=subprocess.check_output(['ss','-Htinmp','state','established',selection],text=True,timeout=3).splitlines()
-    values=[]
-    for index,line in enumerate(lines):
-        if f'pid={lab.telemt.pid},' not in line: continue
-        role='client' if f'127.0.0.1:{lab.listen} ' in line else 'dc' if '198.51.100.2:26000 ' in line else None
-        if not role: continue
-        text=' '.join(lines[index+1:index+3])
-        item={'role':role}
-        for field,pattern in (('rb',r'\brb(\d+)'),('tb',r'\btb(\d+)'),('r_allocated',r'\br(\d+)'),('w_queued',r'\bw(\d+)'),
-                              ('rtt_ms',r'\brtt:([\d.]+)'),('rwnd_limited_ms',r'\brwnd_limited:(\d+)ms'),
-                              ('sndbuf_limited_ms',r'\bsndbuf_limited:(\d+)ms')):
-            match=re.search(pattern,text)
-            if match: item[field]=float(match[1])
-        values.append(item)
-    return values
+    return observe_sockets(lab.telemt.pid, lab.listen)
 def trial(turn,streams,direction):
     size=args.bytes//streams
     assert 0<size<=128*1024**2
@@ -102,6 +86,9 @@ def trial(turn,streams,direction):
     maximum_rss=rss()
     baseline_oom=oom()
     samples,probes,probe_errors=[],[],[]
+    telemetry_errors=[]
+    observer_durations=[]
+    observer_errors=[]
     last_probe=-1
     last_socket_sample=-1
     with concurrent.futures.ThreadPoolExecutor(max_workers=streams) as pool, close_on_error(lab):
@@ -121,8 +108,16 @@ def trial(turn,streams,direction):
                     probe_errors.append({'type':type(exc).__name__,'phase':getattr(exc,'lab_phase','unknown'),
                                          'received_bytes':getattr(exc,'lab_received_bytes',None)})
                 last_probe=time.monotonic()-started
-            if args.socket_observation=='detailed' and time.monotonic()-started-last_socket_sample>=1:
-                samples.extend(observe())
+            if args.socket_observation=='detailed' and not telemetry_errors and time.monotonic()-started-last_socket_sample>=1:
+                try:
+                    sample_started=time.monotonic()
+                    batch=observe()
+                    observer_durations.append(time.monotonic()-sample_started)
+                    samples.extend(dict(item,sample_index=len(observer_durations),
+                                        sampled_elapsed_seconds=time.monotonic()-started) for item in batch)
+                except OSError as exc:
+                    telemetry_errors.append(type(exc).__name__)
+                    observer_errors.append({'type':type(exc).__name__,'elapsed_seconds':time.monotonic()-sample_started})
                 last_socket_sample=time.monotonic()-started
             time.sleep(.2)
         success,errors,details=[],[],[]
@@ -147,9 +142,12 @@ def trial(turn,streams,direction):
          'maximum_telemt_rss_sampled_bytes':maximum_rss,
          'socket_sample_interval_seconds':1 if args.socket_observation=='detailed' else None,
          'socket_observation':args.socket_observation,
+         'observer_implementation':'bounded-netlink-v2',
+         'socket_observer_batch_seconds':observer_durations,
+         'socket_observer_errors':observer_errors,
          'small_probes':probes,'socket_samples':samples}
-    row['measurement_complete']=True
-    row['telemetry_errors']=[]
+    row['measurement_complete']=not telemetry_errors
+    row['telemetry_errors']=telemetry_errors
     if args.observe_network:
         row['network_counters_before']=before_network
         try:

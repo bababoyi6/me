@@ -8,3 +8,4 @@ patches/*.patch -text -whitespace
 patches/TELEMT-LICENSE.txt -text -whitespace
 # Keep exported laboratory evidence byte-for-byte across Windows checkouts.
 docs/benchmarks/next-lab-20261023/** -text -whitespace
+docs/benchmarks/next-continue-20261023/** -text -whitespace

@@ -54,7 +54,7 @@ def main():
     parser.add_argument("--root", required=True)
     parser.add_argument("--haproxy", default="haproxy")
     parser.add_argument("--wg", default="wg")
-    parser.add_argument("--profile", choices=("smoke", "ab", "soak"), default="smoke")
+    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer"), default="smoke")
     parser.add_argument("--rtt", type=int, choices=(20, 50, 100, 200), default=100)
     parser.add_argument("--max-streams", type=int, choices=(1, 4, 8, 16, 32), default=4)
     parser.add_argument("--min-streams", type=int, choices=(1, 4, 8, 16, 32), default=1)
@@ -81,6 +81,8 @@ def main():
                   "--payload-mib", str(args.payload_mib), "--rounds", str(args.rounds), "--rate-mbps", str(args.rate_mbps)]
         if args.socket_details:
             worker.append("--socket-details")
+    elif args.profile == "observer":
+        worker = [sys.executable, str(REPO / "tests/observer_oracle.py"), "--root", str(root), "--wg", args.wg]
     else:
         worker = [sys.executable, str(REPO / "tests/dualhop_lab.py"), "--root", str(root), "--build", "auto",
                   "--haproxy", args.haproxy, "--wg", args.wg, "--rtt", str(args.rtt), "--separate-dc",
@@ -89,6 +91,8 @@ def main():
     command = systemd_command(unit, report["budget"], worker, 600)
     plan = {"preflight": report, "command": command, "profile": args.profile,
             "classification": "SINGLE_VPS_VIRTUAL_3NODE" if args.profile != "ab" else "SINGLE_VPS_SYNTHETIC"}
+    if args.profile == "observer":
+        plan["classification"] = "SINGLE_VPS_OBSERVER_ORACLE"
     if not args.execute:
         print(json.dumps(plan, indent=2))
         return 0

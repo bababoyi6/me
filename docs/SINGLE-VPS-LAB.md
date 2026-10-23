@@ -45,7 +45,15 @@ sudo python3 tools/lab_runner.py --root /root/tdh-audit-lab --profile ab --execu
 
 这里的 `flush` 是 audit1，`auto` 是 audit2；**它不是 1.5.0 与本开发分支的两种新旧核心**。本分支没有引入新的吞吐补丁，audit2 与 1.5.0 默认核心字节相同。
 
-默认关闭昂贵的详细 socket 查询，需要时加 `--socket-details`。它限于 Telemt 两侧端口、最多每秒一次，命令期限仍为3s；模式和频率随 trial 记录。全量高频及随后过滤的观测器都在受限32流测试中出现过超时，相关失败必须保留。关闭该查询保留其他资源/完整性保护，但不再提供详细 socket 样本；不能混合两种观测模式计算提速或宣称根因已确定。
+默认关闭详细 socket 查询，需要时加 `--socket-details`。新版通过 Python 标准库直接读取 Netlink，不再逐次启动 `ss` 或 `ip netns exec … tc`。每次观测的目标期限为2秒，最多4MiB、4096条；不完整、截断或中断的 dump 会判为测量失败。系统调用、调度或内存回收仍可能超过期限；v2 在返回后再次核对包含描述符读取/解码/namespace 恢复的总耗时，迟到样本也判为无效，不承诺硬实时抢占。socket 查询只允许私有客户端 namespace，以进程持有的 socket inode 与两侧地址筛选；最多每秒一次，保存每批耗时、样本编号、缓冲上限和实际记账字段。缓冲上限不是实际内存占用，各内核记账字段也不能任意相加。
+
+qdisc 查询只进入固定的三个实验 namespace，并在主线程 `finally` 中恢复原网络环境；恢复失败会终止 worker。先用低负载核对工具验证读数，再进入 A/B：
+
+```bash
+sudo python3 tools/lab_runner.py --root /root/tdh-audit-lab --profile observer --execute
+```
+
+该核对使用真实 `ss`、`tc`、socket 参数及稳定计数，仍由同一资源 supervisor 管理。它只证明所测内核/字段，不证明所有内核 ABI。旧的全量/过滤命令观测器曾在32流实验中超时，失败记录继续保留。观测失败时保存已完成传输并将 measurement 标记无效，不据此发布提速比例。关闭详细查询不提供 socket 样本；不同观测器或模式的结果不能混算提速。
 
 数据走原始 DC TCP 段，虽然初始化了 WG，该 A/B 的有效载荷不经过 WG。应标记 `SINGLE_VPS_SYNTHETIC`；完整拓扑功能测试标记 `SINGLE_VPS_VIRTUAL_3NODE`。两者都不是 Telegram 文件测速。
 
