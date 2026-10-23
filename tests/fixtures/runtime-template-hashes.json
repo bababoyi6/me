@@ -7,10 +7,11 @@
     "write_entry_wg": "6b6fccf4b61637808b606fec0c169afe459ebd89ee34d6754ba5ee6c4ec8985c",
     "write_telemt_config": "55ea75279f9216d205e88c657b083235116b32f631cb99f5c7b9bf22da5eda7a",
     "write_telemt_unit": "30ddd92222cb955614c651748b2eae0b08bb2d702f91c8ad5ede0ee84afb332b",
-    "write_health_agent": "c55cc30fa2171c1c70cdc1e1d3306b518bb7d2a43cedec21398bc9aa8deba1a9",
+    "write_health_agent": "2aa612fc8a7899636ef310b6e2932218954e879af05b163af98b880832615e9f",
     "open_firewall_entry": "a465280996c2a654ea22f54fdab144ca4cd3404f99d8979ee2c51c8d5f40309f",
     "open_firewall_backend": "cd275842d21545cb42acc0450d98b7280db1a07f50e783c3fde471a23c73d084",
     "calculate_connection_limit": "8d0d505452d08b5543450a0dd75c2f080b9844d9a69915af694deb2bffcd7f68",
     "calculate_direct_buffer_budget": "cbb808e6a92b04e79c23c90a75c98d362f48290bef00895b6115964b93587561"
-  }
+  },
+  "health_agent_change": "2026-10-23 candidate: bounded API JSON, freshness expiry, two-round DC recovery; all five DC policy retained"
 }
