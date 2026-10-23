@@ -37,10 +37,16 @@ def healthy(http, api_port):
     except (OSError, ValueError, urllib.error.URLError):
         return False
 
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        # A local readiness endpoint must not forward its bearer token elsewhere.
+        return None
+
+
 def monitor_api():
     global API_READY, API_CHECKED
     # Never inherit HTTP(S)_PROXY for the loopback API or expose its bearer token.
-    http = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    http = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     while True:
         current = healthy(http, API_PORT)
         with READY_LOCK:
@@ -90,10 +96,14 @@ def ready(now=None):
                 and 0 <= now - API_CHECKED <= API_MAX_AGE and 0 <= now - DC_CHECKED <= DC_MAX_AGE)
 
 
-threading.Thread(target=monitor_api, daemon=True).start()
-threading.Thread(target=monitor_dcs, daemon=True).start()
+monitors = [threading.Thread(target=target, daemon=True) for target in (monitor_api, monitor_dcs)]
+for monitor in monitors:
+    monitor.start()
 
 while True:
+    if any(not monitor.is_alive() for monitor in monitors):
+        # Let the existing systemd restart policy replace a failed monitor thread.
+        raise SystemExit("health monitor stopped")
     for key, _ in sel.select(timeout=30):
         listener = key.fileobj
         try:
