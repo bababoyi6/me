@@ -19,7 +19,8 @@ parser.add_argument('--haproxy',default='haproxy')
 parser.add_argument('--build',choices=('official','baseline','flush','auto'),required=True)
 parser.add_argument('--output',required=True)
 parser.add_argument('--rounds',type=int,choices=(1,2,3),default=3)
-parser.add_argument('--streams',type=int,choices=(1,4,16,32))
+parser.add_argument('--streams',type=int,choices=(1,4,8,16,32))
+parser.add_argument('--direction',choices=('D','U','both'),default='both')
 parser.add_argument('--bytes',type=int,default=16777216)
 parser.add_argument('--small-probes',action='store_true')
 parser.add_argument('--slow-readers',action='store_true')
@@ -149,7 +150,7 @@ def trial(turn,streams,direction):
 try:
     stream_counts=(args.streams,) if args.streams else (1,4)
     for turn in range(args.rounds):
-        cases=[(streams,direction) for streams in stream_counts for direction in ('D','U')]
+        cases=[(streams,direction) for streams in stream_counts for direction in (('D','U') if args.direction=='both' else (args.direction,))]
         for streams,direction in cases[::1 if turn%2==0 else -1]: trial(turn,streams,direction)
     lab.validate(0)
 finally:

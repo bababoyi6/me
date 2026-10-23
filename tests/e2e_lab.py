@@ -129,7 +129,8 @@ class FullLab:
         if listen_endpoint is not None and (listen_endpoint not in (("10.77.1.2", 24431), ("10.77.2.2", 24431))
                                             or real_dc or start_haproxy):
             raise ValueError("private namespace backend requires a fixed WG bind and no local frontend")
-        if dc_endpoint is not None and dc_endpoint != ("198.51.100.2", 26000):
+        if dc_endpoint is not None and dc_endpoint not in (("198.51.100.2", 26000),
+                                                          ("198.18.0.1", 26000), ("198.18.0.5", 26000)):
             raise ValueError("external mock DC must be the fixed private namespace endpoint")
         if real_dc and (dc_endpoint or socket_library or experimental_binary):
             raise ValueError("experimental socket policies are forbidden for public DC probes")

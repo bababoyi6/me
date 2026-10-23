@@ -27,10 +27,11 @@ parser.add_argument('--root',required=True)
 parser.add_argument('--haproxy',default='haproxy')
 parser.add_argument('--wg',default='wg')
 parser.add_argument('--build',choices=('official','auto'),default='official')
+parser.add_argument('--separate-dc',action='store_true')
 profile=parser.add_mutually_exclusive_group()
 profile.add_argument('--soak',action='store_true')
 profile.add_argument('--benchmark',action='store_true')
-parser.add_argument('--rtt',type=int,choices=(10,100,200),default=10)
+parser.add_argument('--rtt',type=int,choices=(10,20,50,100,200),default=10)
 parser.add_argument('role',choices=('run','backend','entry'))
 parser.add_argument('--shared')
 parser.add_argument('--index',type=int,choices=(1,2))
@@ -68,7 +69,11 @@ def backend():
         metadata=json.loads((ROOT/'auto-build.json').read_text())
         binary=ROOT/'telemt-auto'
         experimental=(metadata['sha256'],metadata['version'])
-    lab=FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,experimental_binary=experimental)
+    def create_lab():
+        endpoint=(f'198.18.0.{1 if args.index==1 else 5}',26000) if args.separate_dc else None
+        return FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,
+                       experimental_binary=experimental,dc_endpoint=endpoint)
+    lab=create_lab()
     agent=None
     try:
         agent=Agent((address,19101),AgentHandler)
@@ -76,8 +81,19 @@ def backend():
         agent.down=shared/f'backend{args.index}.down'
         threading.Thread(target=agent.serve_forever,daemon=True).start()
         while True:
-            save(shared/f'backend{args.index}.json',{'ready':True,'completed':lab.dc.completed,
-                                                   'errors':lab.dc.errors,'telemt':lab.version})
+            if (shared/f'backend{args.index}.stop').exists() and lab.telemt.poll() is None:
+                lab.telemt.terminate()
+                lab.telemt.wait(timeout=5)
+            restart=shared/f'backend{args.index}.restart'
+            if restart.exists():
+                restart.unlink()
+                lab.close()
+                lab=create_lab()
+                agent.process=lab.telemt
+            state=(json.loads((shared/'dc.json').read_text())['backends'][args.index-1] if args.separate_dc else
+                   {'completed':lab.dc.completed,'errors':lab.dc.errors})
+            save(shared/f'backend{args.index}.json',{'ready':lab.telemt.poll() is None,'completed':state['completed'],
+                                                   'errors':state['errors'],'telemt':lab.version})
             time.sleep(.1)
     finally:
         if agent:
@@ -128,6 +144,28 @@ def network_extra(net):
             command('ip','netns','exec',ns,wg,'set',dev,'peer',peer,'preshared-key',str(path))
         command('ip','netns','exec',NAMES[0],'ping','-n','-c','3','-W','2',f'10.77.{number}.2',timeout=10)
 
+def separate_dc(net,shared):
+    """Attach mock DC links only to backend namespaces; no host/external route exists."""
+    dc='tdh-audit-dc'
+    command('ip','netns','add',dc)
+    net.created.append(dc)
+    command('ip','-n',dc,'link','set','lo','up')
+    for index,backend_ns in enumerate((NAMES[2],'tdh-audit-b2')):
+        back_dev,dc_dev=f'dc-back{index}',f'dc-link{index}'
+        command('ip','-n',backend_ns,'link','add',back_dev,'type','veth','peer','name',dc_dev,'netns',dc)
+        for ns,dev,last in ((backend_ns,back_dev,index*4+2),(dc,dc_dev,index*4+1)):
+            command('ip','-n',ns,'address','add',f'198.18.0.{last}/30','dev',dev)
+            command('ip','-n',ns,'link','set',dev,'up')
+    process=subprocess.Popen(['ip','netns','exec',dc,'python3',str(HERE.with_name('mock_dc_worker.py')),
+                              '--topology','dualhop','--output',str(shared/'dc.json')],
+                             stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+    net.processes.append(process)
+    deadline=time.monotonic()+5
+    while not (shared/'dc.json').exists():
+        if process.poll() is not None or time.monotonic()>deadline:
+            raise RuntimeError('separate mock DC readiness failed')
+        time.sleep(.1)
+
 def entry():
     shared=Path(args.shared)
     config=shared/'haproxy.cfg'
@@ -173,12 +211,11 @@ frontend mtp_tls
             while block:=sock.recv(8192): data.extend(block)
             return data.decode()
     def counts():
-        if args.benchmark:
-            # Assignment counters do not race a timed-out transfer's late DC completion.
-            records=list(csv.DictReader(io.StringIO(stat('show stat').lstrip('# '))))
-            return [sum(int(r.get('stot') or 0) for r in records
-                        if r['pxname'] in ('telemt_a','telemt_b') and r['svname']==f'vps{i}') for i in (1,2)]
-        return [json.loads((shared/f'backend{i}.json').read_text())['completed'] for i in (1,2)]
+        # DC completion can overlap a later transfer, particularly during reload.
+        # Count assignments at connection establishment in every profile.
+        records=list(csv.DictReader(io.StringIO(stat('show stat').lstrip('# '))))
+        return [sum(int(r.get('stot') or 0) for r in records
+                    if r['pxname'] in ('telemt_a','telemt_b') and r['svname']==f'vps{i}') for i in (1,2)]
     def transfer(domain,direction,size=131072,rate=2500000,fragment=False):
         phase="connect"
         try:
@@ -208,7 +245,7 @@ frontend mtp_tls
         result['backend_index']=expected
         rows.append(result)
     def wait_state(up):
-        deadline=time.monotonic()+12
+        deadline=time.monotonic()+45
         while time.monotonic()<deadline:
             records=csv.DictReader(io.StringIO(stat('show stat').lstrip('# ')))
             state=next(r['status'] for r in records if r['pxname']=='telemt_a' and r['svname']=='vps1')
@@ -294,6 +331,14 @@ frontend mtp_tls
             result=active.result(timeout=320 if args.soak else 12)
             result['backend_index_at_connection_start']=1
             rows.append(result)
+        if args.separate_dc:
+            (shared/'backend1.stop').touch()
+            wait_state(False)
+            routed('apple.com','U',2)
+            (shared/'backend1.stop').unlink()
+            (shared/'backend1.restart').touch()
+            wait_state(True)
+            routed('apple.com','U',1)
         for number in (1,2):
             assert not json.loads((shared/f'backend{number}.json').read_text())['errors'],'mock DC failure'
         output={'scope':'single native VPS, private entry/two backends and router namespaces; actual HAProxy/WireGuard/Telemt, synthetic DC only',
@@ -302,6 +347,9 @@ frontend mtp_tls
                 'telemt':json.loads((shared/'backend1.json').read_text())['telemt'],'agent_failover_and_recovery':True,'master_worker_reload_with_existing_transfer':all(reload_flow_active),'reload_flow_active':reload_flow_active,
                 'splice_auto_pipes_allocated_observed':auto_pipes,'forced_splice_test_pipes_allocated_observed':forced_pipes,
                 'master_worker_reload_count':1+(forced_pipes is not None),'rows':rows}
+        output['classification']='SINGLE_VPS_VIRTUAL_3NODE'
+        output['separate_mock_dc_namespace']=args.separate_dc
+        output['actual_backend_process_restart_verified']=args.separate_dc
         output['rtt_ms_configured']=args.rtt
         save(ROOT/'results'/f'dualhop-native-{args.build}{"-soak" if args.soak else "-benchmark" if args.benchmark else ""}.json',output)
         print(json.dumps({k:v for k,v in output.items() if k!='rows'}),flush=True)
@@ -321,9 +369,12 @@ def run():
         assert memory_available()>192*1024**2,'memory safety margin'
         net.setup()
         network_extra(net)
+        if args.separate_dc:
+            separate_dc(net,shared)
         for number,ns in ((1,NAMES[2]),(2,'tdh-audit-b2')):
             process=subprocess.Popen(['ip','netns','exec',ns,'python3',str(HERE),
                                       '--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
+                                      *(['--separate-dc'] if args.separate_dc else []),
                                       'backend','--shared',str(shared),'--index',str(number)],
                                      stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
             net.processes.append(process)
@@ -334,9 +385,10 @@ def run():
             assert time.monotonic()<deadline,'backend readiness deadline'
             time.sleep(.2)
         entry_args=['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
-        entry_deadline=370 if args.soak else 180 if args.benchmark else 60
+        entry_deadline=450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
         result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),'ip','netns','exec',NAMES[0],
                                'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
+                               *(['--separate-dc'] if args.separate_dc else []),
                                *entry_args,'entry','--shared',str(shared)],
                               capture_output=True,text=True,timeout=entry_deadline+10)
         if result.returncode: raise RuntimeError('entry experiment failed: '+result.stderr[:3000])
