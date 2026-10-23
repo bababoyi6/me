@@ -1,0 +1,9 @@
+{
+  "complete": true,
+  "all_targets_attested_disposable_kvm": true,
+  "owned_project_states_removed": 1,
+  "preinstalled_os_packages_retained": true,
+  "factory_clean_images": false,
+  "production_accessed": false,
+  "download_boundary": "unpublished script and core only; remaining operations real"
+}

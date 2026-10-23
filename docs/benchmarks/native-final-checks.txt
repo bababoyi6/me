@@ -1,0 +1,71 @@
+[成功] 内置单元测试通过。
+test_authentication_header_never_appears_in_curl_arguments (test_api_privacy.ApiPrivacyTests) ... ok
+test_current_helper_bypasses_proxies_and_ignores_curlrc (test_api_privacy.ApiPrivacyTests) ... ok
+test_header_control_characters_are_rejected_before_network (test_api_privacy.ApiPrivacyTests) ... ok
+test_invalid_port_is_rejected_before_network (test_api_privacy.ApiPrivacyTests) ... ok
+test_legacy_counterexample_reaches_environment_proxy (test_api_privacy.ApiPrivacyTests) ... ok
+test_link_readiness_failure_never_dumps_service_logs (test_api_privacy.ApiPrivacyTests) ... ok
+test_quotes_and_backslashes_preserve_the_exact_header (test_api_privacy.ApiPrivacyTests) ... ok
+test_patch_helper_matches_rust_regression_source (test_core_patch.CorePatchTests) ... ok
+test_patch_scope_and_unofficial_marking (test_core_patch.CorePatchTests) ... ok
+test_download_and_launch_then_clean_private_temporary_file (test_install_command.InstallCommandTests) ... ok
+test_download_failure_never_launches_or_leaves_partial_file (test_install_command.InstallCommandTests) ... ok
+test_nonroot_install_uses_sudo_boundary (test_install_command.InstallCommandTests) ... ok
+test_creates_private_regular_lock_and_no_temporary_residue (test_lock_safety.LockSafetyTests) ... ok
+test_legacy_counterexample_truncates_symlink_target (test_lock_safety.LockSafetyTests) ... ok
+test_legacy_holder_blocks_new_manager_until_release (test_lock_safety.LockSafetyTests) ... ok
+test_preserves_legacy_inode_and_contents (test_lock_safety.LockSafetyTests) ... ok
+test_rejects_fifo_and_hardlinked_file_without_blocking (test_lock_safety.LockSafetyTests) ... ok
+test_rejects_symlink_without_touching_target (test_lock_safety.LockSafetyTests) ... ok
+test_rejects_writable_file_or_unsafe_shared_directory (test_lock_safety.LockSafetyTests) ... ok
+test_failed_final_rename_keeps_old_executable_and_backup (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_failed_first_replacement_does_not_invent_previous_backup (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_first_install_creates_working_shortcut (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_legacy_fixed_backup_temporary_path_is_never_used (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_real_shortcut_permission_failure_is_not_masked (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_refuses_manager_and_backup_symlinks_without_touching_target (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_rejects_downloaded_downgrade_and_protocol_change (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_repeat_install_and_rollback_preserve_three_role_identities (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_selftest_deadline_failure_keeps_existing_manager (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_shortcut_failure_keeps_manager_and_removes_staged_file (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_high_rtt_lab_cli_is_bounded_before_resource_creation (test_measurement_quality.MeasurementQualityTests) ... ok
+test_nonfinite_and_nonpositive_values_are_rejected (test_measurement_quality.MeasurementQualityTests) ... ok
+test_real_duration_mismatch_is_not_accepted_as_path_throughput (test_measurement_quality.MeasurementQualityTests) ... ok
+test_small_receiver_timing_difference_is_expected (test_measurement_quality.MeasurementQualityTests) ... ok
+test_stream_probe_cli_is_bounded_before_network_setup (test_measurement_quality.MeasurementQualityTests) ... ok
+test_crypto_stream_keeps_counter_across_fragmented_reads (test_mtproto_transport.TransportTests) ... ok
+test_experimental_policy_is_confined_before_any_resource_creation (test_mtproto_transport.TransportTests) ... ok
+test_invalid_nonce_is_rejected (test_mtproto_transport.TransportTests) ... ok
+test_nist_aes256_ctr_vector_and_partial_updates (test_mtproto_transport.TransportTests) ... ok
+test_packet_stream_preserves_boundaries_and_partial_reads (test_mtproto_transport.TransportTests) ... ok
+test_packet_stream_rejects_unbounded_frames_before_body_read (test_mtproto_transport.TransportTests) ... ok
+test_synthetic_transfer_cannot_use_public_dc_mode (test_mtproto_transport.TransportTests) ... ok
+test_tls_stream_handles_ccs_and_partial_records (test_mtproto_transport.TransportTests) ... ok
+test_tls_stream_rejects_bad_type_version_or_oversized_record (test_mtproto_transport.TransportTests) ... ok
+test_truncated_packet_is_an_error (test_mtproto_transport.TransportTests) ... ok
+test_unknown_binary_is_rejected_before_any_process_or_temp_resource (test_mtproto_transport.TransportTests) ... ok
+test_cleanup_only_removes_created_resources (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_unprivileged_run_is_refused_before_any_command (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_world_accessible_directory_is_refused (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_api_sampling_uses_fixed_loopback_and_numeric_allowlist (test_performance.PerformanceTests) ... ok
+test_iperf_aggregate_cap_and_no_raw_error_output (test_performance.PerformanceTests) ... ok
+test_manager_rollback_preserves_state (test_performance.PerformanceTests) ... ok
+test_manager_update_and_failure_preserve_running_configuration (test_performance.PerformanceTests) ... ok
+test_real_generated_config_and_telemt_security (test_performance.PerformanceTests) ... ok
+test_real_legacy_updater_preserves_all_connection_information (test_performance.PerformanceTests) ... ok
+test_release_has_no_production_performance_apply_path (test_performance.PerformanceTests) ... ok
+test_report_command_timeout_and_output_limit (test_performance.PerformanceTests) ... ok
+test_report_distinguishes_cpu_steal_and_memory_pressure (test_performance.PerformanceTests) ... ok
+test_report_has_no_state_evaluation_or_secret_output (test_performance.PerformanceTests) ... ok
+test_report_rejects_unbounded_load (test_performance.PerformanceTests) ... ok
+test_resources_and_legacy_schema (test_performance.PerformanceTests) ... ok
+test_runtime_templates_match_production_baseline (test_performance.PerformanceTests) ... ok
+test_shortcut_failure_does_not_replace_manager (test_performance.PerformanceTests) ... ok
+test_socket_summary_aggregates_without_endpoint_disclosure (test_performance.PerformanceTests) ... ok
+test_stalled_selftest_cannot_replace_manager_or_rollback (test_performance.PerformanceTests) ... ok
+
+----------------------------------------------------------------------
+Ran 64 tests in 15.202s
+
+OK
+SNI / fragmented ClientHello / PROXYv2 / SHA256 / agent failover passed

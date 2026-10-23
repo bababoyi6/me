@@ -1,0 +1,79 @@
+{
+  "scope": "numeric buffers for private official Telemt process during two synthetic loopback transfers; no high-RTT performance claim",
+  "telemt": "telemt 3.5.5",
+  "sha256_verified_transfers": 2,
+  "rows": [
+    {
+      "sample": 1,
+      "role": "client-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 1,
+      "role": "dc-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 1,
+      "role": "dc-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 1,
+      "role": "client-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 2,
+      "role": "client-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 2,
+      "role": "dc-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 2,
+      "role": "dc-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 2,
+      "role": "client-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 3,
+      "role": "client-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 3,
+      "role": "dc-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 3,
+      "role": "dc-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    },
+    {
+      "sample": 3,
+      "role": "client-facing",
+      "receive_buffer_limit_bytes": 524288,
+      "send_buffer_limit_bytes": 524288
+    }
+  ]
+}

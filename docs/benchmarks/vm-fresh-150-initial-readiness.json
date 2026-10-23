@@ -1,0 +1,16 @@
+{
+  "scope": "first 1.5.0 lab preparation attempt; installer not yet executed",
+  "complete": false,
+  "failure": "150 second SSH readiness deadline before entry guest finished booting",
+  "entry_boot_final_cloud_init_seconds": 218.68,
+  "owned_project_uninstalls_before_failure": 0,
+  "new_installs_before_failure": 0,
+  "three_guest_logical_memory_total_mib": 4096,
+  "shared_qemu_cgroup_physical_memory_cap_mib": 512,
+  "shared_cpu_quota_percent_of_one_host_core": 80,
+  "cgroup_oom_events": 0,
+  "cgroup_oom_kill_events": 0,
+  "follow_up_ssh_hostname_check_passed": true,
+  "production_accessed": false,
+  "host_resource_limits_increased": false
+}

@@ -1,0 +1,321 @@
+{
+  "scope": "Bounded loopback liveness test with a DC that waits for application replies.\n\nDownload digest/EOF are withheld until the client acknowledges all payload bytes,\nso closing the DC cannot accidentally rescue a buffered tail. No Telegram files.\n",
+  "rows": [
+    {
+      "build": "official",
+      "telemt": "telemt 3.5.5",
+      "persistent_dc": false,
+      "direction": "D",
+      "bytes": 65536,
+      "complete": true,
+      "result": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 65536,
+        "elapsed_seconds": 0.09141723200000129,
+        "handshake_ms": 26.180047000000428,
+        "sha256_verified": true,
+        "persistent_dc": false
+      },
+      "elapsed_seconds": 0.09143001600000034
+    },
+    {
+      "build": "official",
+      "telemt": "telemt 3.5.5",
+      "persistent_dc": false,
+      "direction": "D",
+      "bytes": 8388608,
+      "complete": true,
+      "result": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 8388608,
+        "elapsed_seconds": 2.7453676629999997,
+        "handshake_ms": 18.87855999999921,
+        "sha256_verified": true,
+        "persistent_dc": false
+      },
+      "elapsed_seconds": 2.745382501
+    },
+    {
+      "build": "official",
+      "telemt": "telemt 3.5.5",
+      "persistent_dc": false,
+      "direction": "U",
+      "bytes": 65536,
+      "complete": true,
+      "result": {
+        "direction": "U",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 65536,
+        "elapsed_seconds": 0.06095017800000058,
+        "handshake_ms": 18.552043999999768,
+        "sha256_verified": true,
+        "persistent_dc": false
+      },
+      "elapsed_seconds": 0.060957371999998955
+    },
+    {
+      "build": "official",
+      "telemt": "telemt 3.5.5",
+      "persistent_dc": false,
+      "direction": "U",
+      "bytes": 8388608,
+      "complete": true,
+      "result": {
+        "direction": "U",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 8388608,
+        "elapsed_seconds": 2.726211053,
+        "handshake_ms": 21.963270000000534,
+        "sha256_verified": true,
+        "persistent_dc": false
+      },
+      "elapsed_seconds": 2.7262217730000007
+    },
+    {
+      "build": "official",
+      "telemt": "telemt 3.5.5",
+      "persistent_dc": true,
+      "direction": "D",
+      "bytes": 65536,
+      "complete": true,
+      "result": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 65536,
+        "elapsed_seconds": 0.08060179599999984,
+        "handshake_ms": 18.09032800000132,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "elapsed_seconds": 0.08061134500000122
+    },
+    {
+      "build": "official",
+      "telemt": "telemt 3.5.5",
+      "persistent_dc": true,
+      "direction": "D",
+      "bytes": 8388608,
+      "complete": true,
+      "result": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 8388608,
+        "elapsed_seconds": 2.7455370640000005,
+        "handshake_ms": 19.79311700000075,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "elapsed_seconds": 2.7455493659999988
+    },
+    {
+      "build": "official",
+      "telemt": "telemt 3.5.5",
+      "persistent_dc": true,
+      "direction": "U",
+      "bytes": 65536,
+      "complete": true,
+      "result": {
+        "direction": "U",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 65536,
+        "elapsed_seconds": 0.06432895300000041,
+        "handshake_ms": 20.92491499999838,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "elapsed_seconds": 0.06433607600000002
+    },
+    {
+      "build": "official",
+      "telemt": "telemt 3.5.5",
+      "persistent_dc": true,
+      "direction": "U",
+      "bytes": 8388608,
+      "complete": true,
+      "result": {
+        "direction": "U",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 8388608,
+        "elapsed_seconds": 2.734189104000002,
+        "handshake_ms": 26.790780000002457,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "elapsed_seconds": 2.7341978110000014
+    },
+    {
+      "build": "candidate",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "persistent_dc": false,
+      "direction": "D",
+      "bytes": 65536,
+      "complete": true,
+      "result": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 65536,
+        "elapsed_seconds": 0.07747622799999831,
+        "handshake_ms": 14.972659999997973,
+        "sha256_verified": true,
+        "persistent_dc": false
+      },
+      "elapsed_seconds": 0.07748422300000257
+    },
+    {
+      "build": "candidate",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "persistent_dc": false,
+      "direction": "D",
+      "bytes": 8388608,
+      "complete": true,
+      "result": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 8388608,
+        "elapsed_seconds": 2.7492958640000005,
+        "handshake_ms": 19.699865999999844,
+        "sha256_verified": true,
+        "persistent_dc": false
+      },
+      "elapsed_seconds": 2.7493062339999987
+    },
+    {
+      "build": "candidate",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "persistent_dc": false,
+      "direction": "U",
+      "bytes": 65536,
+      "complete": true,
+      "result": {
+        "direction": "U",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 65536,
+        "elapsed_seconds": 0.05629175600000025,
+        "handshake_ms": 14.043706999999017,
+        "sha256_verified": true,
+        "persistent_dc": false
+      },
+      "elapsed_seconds": 0.0563001320000005
+    },
+    {
+      "build": "candidate",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "persistent_dc": false,
+      "direction": "U",
+      "bytes": 8388608,
+      "complete": true,
+      "result": {
+        "direction": "U",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 8388608,
+        "elapsed_seconds": 2.722476032999996,
+        "handshake_ms": 16.70451200000045,
+        "sha256_verified": true,
+        "persistent_dc": false
+      },
+      "elapsed_seconds": 2.7224857610000015
+    },
+    {
+      "build": "candidate",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "persistent_dc": true,
+      "direction": "D",
+      "bytes": 65536,
+      "complete": true,
+      "result": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 65536,
+        "elapsed_seconds": 0.08445705500000145,
+        "handshake_ms": 19.21257099999707,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "elapsed_seconds": 0.08446392800000524
+    },
+    {
+      "build": "candidate",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "persistent_dc": true,
+      "direction": "D",
+      "bytes": 8388608,
+      "complete": true,
+      "result": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 8388608,
+        "elapsed_seconds": 2.741663289999998,
+        "handshake_ms": 15.616151999999772,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "elapsed_seconds": 2.741675403000002
+    },
+    {
+      "build": "candidate",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "persistent_dc": true,
+      "direction": "U",
+      "bytes": 65536,
+      "complete": true,
+      "result": {
+        "direction": "U",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 65536,
+        "elapsed_seconds": 0.061061557000002153,
+        "handshake_ms": 15.870132999999953,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "elapsed_seconds": 0.06107198700000538
+    },
+    {
+      "build": "candidate",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "persistent_dc": true,
+      "direction": "U",
+      "bytes": 8388608,
+      "complete": true,
+      "result": {
+        "direction": "U",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 8388608,
+        "elapsed_seconds": 2.734647309000003,
+        "handshake_ms": 29.12822300000073,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "elapsed_seconds": 2.734658740999997
+    }
+  ],
+  "dc_results": [
+    {
+      "build": "official",
+      "completed": 8,
+      "errors": []
+    },
+    {
+      "build": "candidate",
+      "completed": 8,
+      "errors": []
+    }
+  ]
+}

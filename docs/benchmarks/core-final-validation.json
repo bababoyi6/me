@@ -1,0 +1,11 @@
+{
+  "native_regressions_passed": true,
+  "backpressure_matrix_passed": true,
+  "isolated_recovery_passed": true,
+  "private_bundle_created": true,
+  "experimental_network_namespaces_remaining": 0,
+  "e2e_temporary_directories_remaining": 0,
+  "synthetic_wireguard_key_files_remaining": 0,
+  "production_accessed": false,
+  "github_written": false
+}

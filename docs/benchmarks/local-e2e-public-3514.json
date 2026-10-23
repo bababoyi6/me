@@ -1,0 +1,25 @@
+{
+  "scope": "public req_pq handshake through real proxy layers; no account/files or throughput claim",
+  "kernel": "6.18.40.1-microsoft-standard-WSL2",
+  "telemt": "telemt 3.5.14",
+  "rows": [
+    {
+      "dc_index": 2,
+      "req_pq_nonce_verified": true,
+      "elapsed_seconds": 0.36944162400004643
+    },
+    {
+      "dc_index": 2,
+      "req_pq_nonce_verified": true,
+      "elapsed_seconds": 0.7091553699999622
+    },
+    {
+      "dc_index": 2,
+      "req_pq_nonce_verified": true,
+      "elapsed_seconds": 0.6883091839999906
+    }
+  ],
+  "fast_mode": true,
+  "haproxy": "HAProxy version 3.2.9-1ubuntu2.2 2026/06/19 - https://haproxy.org/",
+  "config_unchanged": true
+}

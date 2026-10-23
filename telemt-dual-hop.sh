@@ -6,12 +6,15 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.4.2"
+readonly TDH_VERSION="1.5.0"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.5"
-readonly TELEMT_SHA256_AMD64="2d5fb35b526f548bb6ffe7689cdf4f51f4108b97014be1b3b4186a58ab28d605"
 readonly TELEMT_SHA256_ARM64="075c9e2d3e86115af0bc47da881327375ef094c21fb6ed40bde41e4a77a261f3"
+readonly TELEMT_CORE_VERSION_AMD64="3.5.5+tdh.audit2"
+readonly TELEMT_CORE_ARCHIVE_SHA256_AMD64="c205183e479716f015378e4e2241103ae8d488e06f6ef65946be0bd94624f356"
+readonly TELEMT_CORE_BINARY_SHA256_AMD64="2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1"
+readonly TELEMT_CORE_URL_AMD64="https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.audit2/telemt-3.5.5-tdh.audit2-x86_64-linux-gnu.tar.gz"
 readonly TDH_BASE="${TDH_BASE:-/etc/telemt-dual-hop}"
 readonly TDH_STATE="${TDH_STATE:-${TDH_BASE}/state.env}"
 readonly TDH_KEY_DIR="${TDH_KEY_DIR:-${TDH_BASE}/keys}"
@@ -44,9 +47,12 @@ fi
 info() { printf '%s[信息]%s %s\n' "$C_BLUE" "$C_RESET" "$*"; }
 ok() { printf '%s[成功]%s %s\n' "$C_GREEN" "$C_RESET" "$*"; }
 warn() { printf '%s[注意]%s %s\n' "$C_YELLOW" "$C_RESET" "$*" >&2; }
+transaction_is_owned() {
+  [[ ${TX_ACTIVE:-0} == 1 && ${TX_OWNER_PID:-} == "$BASHPID" ]]
+}
 die() {
   printf '%s[失败]%s %s\n' "$C_RED" "$C_RESET" "$*" >&2
-  if [[ ${TX_ACTIVE:-0} == 1 ]] && declare -F rollback_transaction >/dev/null; then
+  if transaction_is_owned && declare -F rollback_transaction >/dev/null; then
     rollback_transaction
   fi
   exit 1
@@ -55,13 +61,38 @@ title() { printf '\n%s%s%s\n' "$C_BOLD" "$*" "$C_RESET"; }
 
 on_error() {
   local rc=$1 line=$2
-  if [[ ${TX_ACTIVE:-0} == 1 ]] && declare -F rollback_transaction >/dev/null; then
+  if transaction_is_owned && declare -F rollback_transaction >/dev/null; then
     rollback_transaction
   fi
   printf '%s[失败]%s 脚本在第 %s 行停止（退出码 %s）。没有通过校验的配置不会启用。\n' \
     "$C_RED" "$C_RESET" "$line" "$rc" >&2
 }
 trap 'on_error $? $LINENO' ERR
+
+on_exit() {
+  local rc=$1
+  trap - EXIT
+  if transaction_is_owned && declare -F rollback_transaction >/dev/null; then
+    # Do not leave a half-installed node on explicit exit or handled signals.
+    trap '' HUP INT TERM
+    rollback_transaction
+    (( rc != 0 )) || rc=1
+  fi
+  exit "$rc"
+}
+trap 'on_exit $?' EXIT
+on_signal() {
+  local rc=$1
+  trap '' HUP INT TERM
+  if [[ -n ${PANEL_ACTION_PID:-} ]]; then
+    kill -TERM "$PANEL_ACTION_PID" 2>/dev/null || true
+    wait "$PANEL_ACTION_PID" 2>/dev/null || true
+  fi
+  exit "$rc"
+}
+trap 'on_signal 130' INT
+trap 'on_signal 143' TERM
+trap 'on_signal 129' HUP
 
 # State variables are deliberately scalar and allow-listed.
 TDH_ROLE="" CONFIG_SCHEMA="" INSTALLED_VERSION="" CLUSTER_ID="" ENTRY_PUBLIC_IP="" PORT_A="" PORT_B=""
@@ -80,7 +111,8 @@ UFW_ADDED_P24431=0 UFW_ADDED_P24432=0 UFW_ADDED_P19101=0 UFW_ADDED_P19102=0
 CREATED_TELEMT_USER=0 CREATED_TELEMT_GROUP=0
 PREV_QDISC="" PREV_CC="" PREV_SOMAX="" PREV_SYN_BACKLOG=""
 PREV_KEEPALIVE_TIME="" PREV_KEEPALIVE_INTVL="" PREV_KEEPALIVE_PROBES=""
-TX_ACTIVE=0 TX_KIND=""
+TX_ACTIVE=0 TX_KIND="" TX_OWNER_PID=""
+PANEL_ACTION_PID=""
 
 readonly STATE_VARS=(
   TDH_ROLE CONFIG_SCHEMA INSTALLED_VERSION CLUSTER_ID ENTRY_PUBLIC_IP PORT_A PORT_B SECRET_A SECRET_B
@@ -100,7 +132,7 @@ readonly STATE_VARS=(
 
 usage() {
   cat <<'EOF'
-Telemt Dual-Hop 1.4.2
+Telemt Dual-Hop 1.5.0
 
 用法：
   sudo bash telemt-dual-hop.sh              打开中文菜单
@@ -127,12 +159,15 @@ require_root() {
 }
 
 apt_get_with_lock_wait() {
-  local error_file rc deadline
+  local error_file rc deadline update_retries=0
+  local -a options=(-o DPkg::Lock::Timeout=30 -o Acquire::Retries=2
+    -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30)
+  if [[ ${1:-} == update ]]; then options+=(-o APT::Update::Error-Mode=any); fi
   error_file=$(mktemp)
   deadline=$((SECONDS + 600))
 
   while true; do
-    if DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=30 "$@" 2>"$error_file"; then
+    if LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get "${options[@]}" "$@" 2>"$error_file"; then
       rm -f "$error_file"
       return 0
     else
@@ -142,6 +177,14 @@ apt_get_with_lock_wait() {
     if grep -Eqi 'Could not get lock|Unable to lock directory|Unable to acquire the dpkg frontend lock|is held by process' "$error_file" \
       && (( SECONDS < deadline )); then
       warn "Ubuntu 后台更新正在占用软件包管理器；等待完成后自动重试（最长约 10 分钟）……"
+      sleep 5
+      : >"$error_file"
+      continue
+    fi
+    if [[ ${1:-} == update ]] && (( update_retries < 2 && SECONDS < deadline )) && \
+       grep -Eqi 'Hash Sum mismatch|File has unexpected size|Mirror sync in progress|Temporary failure resolving|Could not resolve|Could not connect|Connection timed out|Connection reset by peer' "$error_file"; then
+      update_retries=$((update_retries + 1))
+      warn "Ubuntu 软件源同步或连接暂时异常；5 秒后重新获取并校验索引（重试 ${update_retries}/2）。"
       sleep 5
       : >"$error_file"
       continue
@@ -176,9 +219,39 @@ ensure_bootstrap_tools() {
   fi
 }
 
+lock_file_is_safe() {
+  local owner permissions links metadata
+  [[ -f $TDH_LOCK && ! -L $TDH_LOCK ]] || return 1
+  metadata=$(stat -c '%u %a %h' -- "$TDH_LOCK" 2>/dev/null) || return 1
+  read -r owner permissions links <<<"$metadata"
+  [[ $owner == "$EUID" && $links == 1 && $permissions =~ ^[0-7]{1,4}$ ]] || return 1
+  (( (8#$permissions & 0022) == 0 ))
+}
+
 acquire_lock() {
-  mkdir -p "$(dirname "$TDH_LOCK")"
-  exec 9>"$TDH_LOCK"
+  local directory owner permissions temporary identity descriptor
+  directory=$(dirname "$TDH_LOCK")
+  mkdir -p "$directory"
+  read -r owner permissions < <(stat -Lc '%u %a' -- "$directory")
+  [[ $owner == "$EUID" && $permissions =~ ^[0-7]{1,4}$ ]] || die "管理锁目录权限异常，已停止以保护现有文件。"
+  (( (8#$permissions & 0022) == 0 || (8#$permissions & 01000) != 0 )) || \
+    die "管理锁目录权限异常，已停止以保护现有文件。"
+  if [[ ! -e $TDH_LOCK && ! -L $TDH_LOCK ]]; then
+    temporary=$(mktemp "${TDH_LOCK}.XXXXXX")
+    if ! ln -T -- "$temporary" "$TDH_LOCK" 2>/dev/null; then
+      rm -f -- "$temporary"
+      die "管理锁已被其他操作占用或发生变化，请稍后重试。"
+    fi
+    rm -f -- "$temporary"
+  fi
+  lock_file_is_safe || die "管理锁文件权限或类型异常，已停止以保护现有文件。"
+  # Keep the legacy inode for mutual exclusion, without truncating its contents.
+  exec 9<>"$TDH_LOCK"
+  identity=$(stat -c '%d:%i:%u:%a:%h' -- "$TDH_LOCK")
+  descriptor=$(stat -Lc '%d:%i:%u:%a:%h' -- "/proc/$$/fd/9")
+  if [[ $identity != "$descriptor" ]] || ! lock_file_is_safe; then
+    die "管理锁发生变化，请稍后重试。"
+  fi
   flock -n 9 || die "另一个 Telemt Dual-Hop 操作正在运行。"
 }
 
@@ -216,8 +289,9 @@ install_shortcut() {
   if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
     die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；为避免覆盖，请先自行改名或移除。"
   fi
-  tmp=$(mktemp)
-  {
+  install -d -o root -g root -m 0755 "$(dirname "$TDH_SHORTCUT")" || return 1
+  tmp=$(mktemp "${TDH_SHORTCUT}.update.XXXXXX") || return 1
+  if ! {
     printf '%s\n' '#!/usr/bin/env bash' '# Managed by Telemt Dual-Hop'
     printf 'readonly manager=%q\n' "$TDH_MANAGER"
     cat <<'EOF'
@@ -234,10 +308,14 @@ command -v sudo >/dev/null 2>&1 || {
 }
 exec sudo -- "$manager" "$@"
 EOF
-  } >"$tmp"
-  install -d -o root -g root -m 0755 "$(dirname "$TDH_SHORTCUT")"
-  install -m 0755 "$tmp" "$TDH_SHORTCUT"
-  rm -f "$tmp"
+  } >"$tmp"; then
+    rm -f "$tmp"
+    return 1
+  fi
+  if ! chmod 0755 "$tmp" || ! mv -fT "$tmp" "$TDH_SHORTCUT"; then
+    rm -f "$tmp"
+    return 1
+  fi
 }
 
 remove_shortcut() {
@@ -249,19 +327,31 @@ remove_shortcut() {
 }
 
 install_self() {
-  local self=${BASH_SOURCE[0]} self_real manager_real entrypoints_changed=0
+  local self=${BASH_SOURCE[0]} self_real manager_real installed_version entrypoints_changed=0
   if [[ -f $self && -r $self ]]; then
+    [[ ! -L $TDH_MANAGER && ( ! -e $TDH_MANAGER || -f $TDH_MANAGER ) ]] || die "管理器文件类型异常；已保留原文件。"
     if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
       die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；为避免覆盖，请先自行改名或移除。"
     fi
     self_real=$(readlink -f -- "$self")
     manager_real=$(readlink -f -- "$TDH_MANAGER" 2>/dev/null || printf '%s\n' "$TDH_MANAGER")
     if [[ $self_real != "$manager_real" ]]; then
-      install -m 0755 "$self" "$TDH_MANAGER"
+      if [[ -f $TDH_STATE && -f $TDH_MANAGER ]]; then
+        installed_version=$(extract_release_value "$TDH_MANAGER" TDH_VERSION)
+        [[ $installed_version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "现有管理器版本无效；已保留原文件。"
+        [[ $(extract_release_value "$TDH_MANAGER" TDH_CONFIG_SCHEMA) == "$TDH_CONFIG_SCHEMA" && \
+           $(extract_release_value "$TDH_MANAGER" TDH_PROTOCOL_VERSION) == "$TDH_PROTOCOL_VERSION" ]] || \
+          die "安装命令与现有配置协议不兼容；已保留原管理器与服务，请查看升级说明。"
+        dpkg --compare-versions "$TDH_VERSION" ge "$installed_version" || die "安装命令取得了旧版本；已拒绝覆盖较新的管理器。"
+      fi
+      if ! bash -n "$self" || ! timeout 60 bash "$self" --self-test >/dev/null; then
+        die "安装脚本未通过检查；现有管理器与服务保持原样。"
+      fi
+      activate_manager "$self"
       entrypoints_changed=1
+    else
+      install_shortcut
     fi
-    shortcut_is_managed || entrypoints_changed=1
-    install_shortcut
     if (( entrypoints_changed == 1 )); then
       ok "管理入口已就绪；以后直接输入 a 即可打开控制面板。"
     fi
@@ -270,13 +360,63 @@ install_self() {
   fi
 }
 
+activate_manager() {
+  local candidate=$1 staged backup="" prior_backup="" previous="${TDH_MANAGER}.previous"
+  if [[ -L $TDH_MANAGER || ( -e $TDH_MANAGER && ! -f $TDH_MANAGER ) || \
+        -L $previous || ( -e $previous && ! -f $previous ) ]]; then
+    die "管理器或备份文件类型异常；已停止替换。"
+  fi
+  staged=$(mktemp "${TDH_MANAGER}.update.XXXXXX")
+  if ! install -m 0755 "$candidate" "$staged"; then
+    rm -f "$staged"
+    die "无法准备新管理器；当前版本未作任何修改。"
+  fi
+  # Unique adjacent files and rename keep replacement atomic on this filesystem.
+  if [[ -f $TDH_MANAGER ]] && ! cmp -s "$staged" "$TDH_MANAGER"; then
+    backup=$(mktemp "${TDH_MANAGER}.previous.XXXXXX")
+    if ! cp -p "$TDH_MANAGER" "$backup"; then
+      rm -f "$staged" "$backup"
+      die "无法保存旧管理器；更新已取消。"
+    fi
+  fi
+  if ! install_shortcut; then
+    rm -f "$staged"
+    [[ -z $backup ]] || rm -f "$backup"
+    die "无法准备快捷入口；当前管理器保持原样。"
+  fi
+  if [[ -n $backup ]]; then
+    if [[ -f $previous ]]; then
+      prior_backup=$(mktemp "${TDH_MANAGER}.restore.XXXXXX")
+      if ! cp -p "$previous" "$prior_backup"; then
+        rm -f "$staged" "$backup" "$prior_backup"
+        die "无法保护已有回退备份；更新已取消。"
+      fi
+    fi
+    if ! mv -fT "$backup" "$previous"; then
+      rm -f "$staged" "$backup"
+      [[ -z $prior_backup ]] || rm -f "$prior_backup"
+      die "无法保存旧管理器；更新已取消。"
+    fi
+  fi
+  if ! mv -fT "$staged" "$TDH_MANAGER"; then
+    rm -f "$staged"
+    if [[ -n $prior_backup ]]; then
+      mv -fT "$prior_backup" "$previous" || warn "原回退备份仍保存在 ${prior_backup}，请保留此文件。"
+    elif [[ -n $backup ]]; then
+      rm -f "$previous"
+    fi
+    die "无法替换管理器；当前版本未作任何修改。"
+  fi
+  [[ -z $prior_backup ]] || rm -f "$prior_backup"
+}
+
 extract_release_value() {
   local file=$1 name=$2
   awk -F'"' -v prefix="readonly ${name}=\"" 'index($0, prefix) == 1 { print $2; exit }' "$file"
 }
 
 update_manager() {
-  local download_tmp manager_tmp new_version new_schema new_protocol checksum
+  local download_tmp new_version new_schema new_protocol checksum
   load_state || die "尚未安装，不能使用快捷更新。"
   if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
     die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；更新已取消。"
@@ -320,26 +460,7 @@ update_manager() {
   fi
 
   checksum=$(sha256sum "$download_tmp" | awk '{print $1}')
-  manager_tmp=$(mktemp "${TDH_MANAGER}.update.XXXXXX")
-  if ! install -m 0755 "$download_tmp" "$manager_tmp"; then
-    rm -f "$download_tmp" "$manager_tmp"
-    die "无法准备新管理器；当前版本未作任何修改。"
-  fi
-  if ! cmp -s "$download_tmp" "$TDH_MANAGER"; then
-    if ! cp -p "$TDH_MANAGER" "${TDH_MANAGER}.previous.tmp" || \
-       ! mv -f "${TDH_MANAGER}.previous.tmp" "${TDH_MANAGER}.previous"; then
-      rm -f "$download_tmp" "$manager_tmp" "${TDH_MANAGER}.previous.tmp"
-      die "无法保存旧管理器；更新已取消。"
-    fi
-  fi
-  if ! install_shortcut; then
-    rm -f "$download_tmp" "$manager_tmp"
-    die "无法准备快捷入口；当前管理器保持原样。"
-  fi
-  if ! mv -f "$manager_tmp" "$TDH_MANAGER"; then
-    rm -f "$download_tmp" "$manager_tmp"
-    die "无法替换管理器；当前版本未作任何修改。"
-  fi
+  activate_manager "$download_tmp"
   rm -f "$download_tmp"
   if [[ $new_version == "$TDH_VERSION" ]]; then
     ok "已重新安装最新版 ${new_version}（SHA256: ${checksum}）。"
@@ -353,6 +474,8 @@ update_manager() {
 
 rollback_manager() {
   local previous="${TDH_MANAGER}.previous" tmp
+  [[ ! -L $TDH_MANAGER && ( ! -e $TDH_MANAGER || -f $TDH_MANAGER ) ]] || \
+    die "管理器文件类型异常；已保留当前文件和回退备份。"
   [[ -f $previous && ! -L $previous ]] || die "没有上次 a update 的管理器备份。"
   [[ $(extract_release_value "$previous" TDH_CONFIG_SCHEMA) == "$TDH_CONFIG_SCHEMA" && \
      $(extract_release_value "$previous" TDH_PROTOCOL_VERSION) == "$TDH_PROTOCOL_VERSION" ]] || die "备份协议不兼容，拒绝回退。"
@@ -360,21 +483,43 @@ rollback_manager() {
     die "备份自检失败。"
   fi
   tmp=$(mktemp "${TDH_MANAGER}.rollback.XXXXXX")
-  install -m 0755 "$previous" "$tmp"
-  mv -f "$tmp" "$TDH_MANAGER"
+  if ! install -m 0755 "$previous" "$tmp"; then
+    rm -f -- "$tmp"
+    die "无法准备回退管理器；当前文件和回退备份保持原样。"
+  fi
+  if ! mv -fT -- "$tmp" "$TDH_MANAGER"; then
+    rm -f -- "$tmp"
+    die "无法替换管理器；当前文件和回退备份保持原样。"
+  fi
   ok "管理器已恢复；服务和集群配置未改动，退出面板后重新输入 a。"
 }
 
 init_dirs() {
   install -d -o root -g root -m 0700 "$TDH_BASE" "$TDH_KEY_DIR"
-  install -d -o root -g root -m 0750 "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
   # Telemt runs unprivileged. It needs search permission on the private base
   # directory and its work-root parent, but state and WireGuard keys stay root-only.
-  if [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] && getent group telemt >/dev/null 2>&1; then
-    chown root:telemt "$TDH_BASE" "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
-    chmod 0710 "$TDH_BASE"
-    chmod 0750 "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
+  if [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]]; then
+    install -d -o root -g root -m 0750 "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
+    if getent group telemt >/dev/null 2>&1; then
+      chown root:telemt "$TDH_BASE" "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
+      chmod 0710 "$TDH_BASE"
+      chmod 0750 "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
+    fi
   fi
+}
+
+assert_fresh_install_paths() {
+  local path root=${TDH_BASE%/*} unit
+  local -a reserved=("$TDH_BASE" "$TDH_WORK_ROOT" "$(dirname "$TDH_BIN")" "$TDH_MANAGER" "$TDH_SHORTCUT"
+    "${root}/sysctl.d/90-telemt-dual-hop.conf" "${root}/modules-load.d/90-telemt-dual-hop.conf")
+  for unit in telemt-dual-hop-haproxy telemt-dual-hop-telemt telemt-dual-hop-health-agent telemt-a telemt-b; do
+    reserved+=("${root}/systemd/system/${unit}.service")
+  done
+  for unit in tdh1 tdh2 tdh-b1 tdh-b2; do reserved+=("${root}/wireguard/${unit}.conf"); done
+  for path in "${reserved[@]}"; do
+    [[ ! -e $path && ! -L $path ]] || \
+      die "新安装路径已存在：${path}。已保留原内容；请先确认其来源，不会自动覆盖或清理。"
+  done
 }
 
 safe_remove_tree() {
@@ -388,7 +533,10 @@ safe_remove_tree() {
 
 rollback_transaction() {
   local kind=${TX_KIND:-unknown} interface=""
+  # Once cleanup starts, finish it even if the terminal disconnects again.
+  trap '' HUP INT TERM
   TX_ACTIVE=0
+  TX_OWNER_PID=""
   set +e
   warn "安装未通过，正在回滚本次创建的配置……"
   if [[ $kind == backend1 || $kind == backend2 ]]; then
@@ -448,7 +596,7 @@ state_is_current() {
 }
 
 require_current_state() {
-  state_is_current || die "检测到不兼容的旧版配置。为避免旧服务依赖或容量参数与新版混装，请先用管理菜单完整卸载旧集群，再在三台 VPS 重新安装 ${TDH_VERSION}。"
+  state_is_current || die "当前管理器不支持此配置协议。已保留现有服务与连接信息，请使用兼容版本或按发布说明迁移；不要直接重新初始化。"
 }
 
 rand_hex() { openssl rand -hex "${1:-16}"; }
@@ -1021,28 +1169,189 @@ PY
 }
 
 download_telemt() {
-  local arch asset expected url tmp found actual
+  local asset expected url tmp version binary_sha="" mode
   case $(uname -m) in
-    x86_64|amd64) arch="x86_64"; expected=$TELEMT_SHA256_AMD64 ;;
-    aarch64|arm64) arch="aarch64"; expected=$TELEMT_SHA256_ARM64 ;;
+    x86_64|amd64)
+      asset="telemt-3.5.5-tdh.audit2-x86_64-linux-gnu.tar.gz"
+      expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64 url=$TELEMT_CORE_URL_AMD64
+      version=$TELEMT_CORE_VERSION_AMD64 binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 mode=audited
+      info "安装经受控测试的非官方 Telemt ${version}（转发修复 / TCP 自动缓冲）。"
+      ;;
+    aarch64|arm64)
+      asset="telemt-aarch64-linux-gnu.tar.gz" expected=$TELEMT_SHA256_ARM64
+      url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
+      version=$TELEMT_VERSION mode=official
+      info "ARM 使用官方 Telemt ${version}；本轮提速核心仅验证了 x86_64。"
+      ;;
     *) die "Telemt 不支持当前架构。" ;;
   esac
-  asset="telemt-${arch}-linux-gnu.tar.gz"
-  url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
-  tmp=$(mktemp -d)
-  info "下载 Telemt ${TELEMT_VERSION} 官方构建……"
-  curl -fL --retry 5 --retry-all-errors --connect-timeout 10 --max-time 180 "$url" -o "${tmp}/${asset}"
-  actual=$(sha256sum "${tmp}/${asset}" | awk '{print $1}')
-  [[ $actual == "$expected" ]] || { rm -rf "$tmp"; die "Telemt SHA256 校验失败。"; }
-  tar -xzf "${tmp}/${asset}" -C "$tmp"
-  found=$(find "$tmp" -type f -name telemt -perm /111 -print -quit)
-  [[ -n $found ]] || { rm -rf "$tmp"; die "发布包中未找到 telemt 可执行文件。"; }
+  [[ ! -e $TDH_BIN && ! -L $TDH_BIN ]] || die "已存在 Telemt 核心；新安装不会覆盖它。"
+  tmp=$(mktemp -d "${TDH_BASE}/core-download.XXXXXX")
+  if ! curl -q -fL --retry 3 --retry-all-errors --connect-timeout 10 --max-time 180 --max-filesize 67108864 \
+      --proto '=https' --tlsv1.2 "$url" -o "${tmp}/${asset}"; then
+    rm -rf -- "$tmp"
+    die "核心下载失败；安装已停止，不会悄悄改用其他构建。"
+  fi
   install -d -m 0755 "$(dirname "$TDH_BIN")"
-  install -m 0755 "$found" "$TDH_BIN"
-  rm -rf "$tmp"
-  actual=$("$TDH_BIN" --version 2>/dev/null || true)
-  [[ $actual == "telemt ${TELEMT_VERSION}" ]] || \
-    die "Telemt 二进制版本异常：期望 ${TELEMT_VERSION}，实际 ${actual:-无法运行}。"
+  if ! python3 - "${tmp}/${asset}" "$TDH_BIN" "$expected" "$version" "$binary_sha" "$mode" <<'TDH_CORE_INSTALL_PY'
+# BEGIN GENERATED CORE INSTALLER
+"""Validate a pinned core archive and stage a fresh install; never update a node.
+
+This source is embedded verbatim in the single-file Bash installer. All archive
+bytes and members are verified before any executable is run or installed.
+"""
+import hashlib
+import json
+import os
+from pathlib import Path, PurePosixPath
+import pwd
+import stat
+import subprocess
+import sys
+import tarfile
+import tempfile
+
+
+class InstallError(RuntimeError):
+    pass
+
+
+AUDIT_FILES = {'telemt','TELEMT-LICENSE.txt','NOTICE.txt','source.patch','build-provenance.json','manifest.json'}
+
+
+def checksum(path):
+    value = hashlib.sha256()
+    with Path(path).open('rb') as source:
+        for block in iter(lambda: source.read(1024*1024), b''):
+            value.update(block)
+    return value.hexdigest()
+
+
+def durable_file(path, content, mode):
+    with Path(path).open('xb') as output:
+        output.write(content)
+        output.flush()
+        os.fchmod(output.fileno(), mode)
+        os.fsync(output.fileno())
+
+
+def archive_payload(path, expected_archive, version, expected_binary='', audited=False):
+    path = Path(path)
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or not 0 < info.st_size <= 64*1024**2:
+        raise InstallError('invalid archive type or size')
+    if checksum(path) != expected_archive:
+        raise InstallError('archive checksum mismatch')
+    files, names, total = {}, set(), 0
+    with tarfile.open(path, mode='r|gz') as archive:
+        for number, member in enumerate(archive, 1):
+            name = PurePosixPath(member.name)
+            if (number > 32 or name.is_absolute() or '..' in name.parts or not name.parts
+                    or str(name) in names or (not member.isfile() and not member.isdir())):
+                raise InstallError('unsafe or duplicate archive member')
+            names.add(str(name))
+            if member.isdir():
+                if audited:
+                    raise InstallError('unexpected directory in audited archive')
+                continue
+            if not 0 < member.size <= 64*1024**2:
+                raise InstallError('invalid member size')
+            total += member.size
+            if total > 64*1024**2:
+                raise InstallError('archive payload exceeds limit')
+            if audited and str(name) not in AUDIT_FILES:
+                raise InstallError('unexpected audited archive member')
+            content = archive.extractfile(member).read(member.size+1)
+            if len(content) != member.size:
+                raise InstallError('incomplete archive member')
+            files[str(name)] = content
+    binaries = [content for name, content in files.items() if PurePosixPath(name).name == 'telemt']
+    if len(binaries) != 1:
+        raise InstallError('archive must contain one telemt binary')
+    binary = binaries[0]
+    if expected_binary and hashlib.sha256(binary).hexdigest() != expected_binary:
+        raise InstallError('binary checksum mismatch')
+    if audited:
+        if set(files) != AUDIT_FILES:
+            raise InstallError('incomplete audited archive')
+        if len(binary) < 64 or binary[:6] != b'\x7fELF\x02\x01' or binary[18:20] != b'\x3e\x00':
+            raise InstallError('x86_64 ELF required')
+        manifest = json.loads(files['manifest.json'])
+        if (manifest.get('schema') != 1 or manifest.get('version') != version
+                or manifest.get('architecture') != 'x86_64' or manifest.get('os') != 'linux'
+                or manifest.get('libc') != 'gnu' or manifest.get('minimum_glibc') != '2.35'
+                or manifest.get('unofficial') is not True
+                or set(manifest.get('files', {})) != AUDIT_FILES-{'manifest.json'}):
+            raise InstallError('audited manifest identity mismatch')
+        for name, metadata in manifest['files'].items():
+            if (metadata.get('sha256') != hashlib.sha256(files[name]).hexdigest()
+                    or metadata.get('bytes') != len(files[name])
+                    or metadata.get('mode') != ('0755' if name == 'telemt' else '0644')):
+                raise InstallError('audited manifest member mismatch')
+    return binary, {name:files[name] for name in AUDIT_FILES-{'telemt'} if name in files}
+
+
+def fresh_install(archive, target, expected_archive, version, expected_binary='', audited=False):
+    target = Path(target)
+    parent = target.parent
+    if not target.is_absolute() or target.resolve() != target or target.exists() or target.is_symlink():
+        raise InstallError('fresh install refuses an existing core or symlink')
+    parent_info = parent.lstat()
+    if not stat.S_ISDIR(parent_info.st_mode) or parent_info.st_uid != os.geteuid() or parent_info.st_mode & 0o022:
+        raise InstallError('unsafe installation directory')
+    binary, documents = archive_payload(archive, expected_archive, version, expected_binary, audited)
+    identity = pwd.getpwnam('telemt')
+    if identity.pw_uid == 0 or identity.pw_gid == 0:
+        raise InstallError('unprivileged telemt identity required')
+    with tempfile.TemporaryDirectory(prefix='.telemt-install-', dir=parent) as temporary:
+        stage = Path(temporary)
+        candidate = stage/'telemt'
+        durable_file(candidate, binary, 0o755)
+        stage.chmod(0o755)
+        result = subprocess.run([str(candidate),'--version'], user=identity.pw_uid, group=identity.pw_gid,
+                                extra_groups=[], cwd='/', capture_output=True, timeout=5, check=True)
+        if result.stdout.strip() != ('telemt '+version).encode() or len(result.stdout) > 256:
+            raise InstallError('candidate runtime version mismatch')
+        if audited:
+            legal = stage/'core-source-notice'
+            legal.mkdir(mode=0o755)
+            for name, content in documents.items():
+                document = legal/name
+                durable_file(document, content, 0o644)
+            destination = parent/'core-source-notice'
+            if destination.exists() or destination.is_symlink():
+                raise InstallError('refusing to replace existing core notice')
+            os.rename(legal, destination)
+        # Exclusive link cannot clobber a concurrent or pre-existing executable.
+        os.link(candidate, target)
+        directory = os.open(parent, os.O_RDONLY|os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    return version
+
+
+if __name__ == '__main__':
+    try:
+        if os.geteuid() != 0 or len(sys.argv) != 7:
+            raise InstallError('root and exact install arguments required')
+        archive, target, archive_sha, version, binary_sha, mode = sys.argv[1:]
+        if mode not in ('official','audited'):
+            raise InstallError('unknown archive mode')
+        fresh_install(archive, target, archive_sha, version, binary_sha, mode == 'audited')
+    except Exception as error:
+        # No untrusted archive fields, paths, environment or service logs escape.
+        print('核心安装验证失败：'+(str(error) if isinstance(error, InstallError) else type(error).__name__), file=sys.stderr)
+        raise SystemExit(1)
+# END GENERATED CORE INSTALLER
+TDH_CORE_INSTALL_PY
+  then
+    rm -rf -- "$tmp"
+    die "核心未通过完整性、架构、许可清单或运行校验；安装已取消。"
+  fi
+  rm -rf -- "$tmp"
+  ok "Telemt ${version} 已验证并安装。"
 }
 
 ensure_telemt_user() {
@@ -1428,8 +1737,18 @@ tuning_is_active() {
      $(sysctl -n net.ipv4.tcp_congestion_control 2>/dev/null || true) == bbr ]]
 }
 
+check_tuning_support() {
+  modprobe sch_fq >/dev/null 2>&1 || \
+    die "当前内核缺少 fq 支持（可能为裁剪内核或缺少匹配模块）；请确认内核功能后重试。"
+  modprobe tcp_bbr >/dev/null 2>&1 || \
+    die "当前内核缺少 BBR 支持（可能为裁剪内核或缺少匹配模块）；请确认内核功能后重试。"
+  sysctl -n net.ipv4.tcp_available_congestion_control 2>/dev/null | grep -qw bbr || \
+    die "当前内核未提供 BBR；安装已停止，请先确认内核功能。"
+}
+
 apply_tuning() {
   local somax syn_backlog
+  check_tuning_support
   if [[ -z $PREV_SOMAX ]]; then
     PREV_QDISC=$(sysctl -n net.core.default_qdisc 2>/dev/null || true)
     PREV_CC=$(sysctl -n net.ipv4.tcp_congestion_control 2>/dev/null || true)
@@ -1444,10 +1763,6 @@ apply_tuning() {
   syn_backlog=$(sysctl -n net.ipv4.tcp_max_syn_backlog 2>/dev/null || echo 4096)
   if (( somax < 65535 )); then somax=65535; fi
   if (( syn_backlog < 32768 )); then syn_backlog=32768; fi
-  modprobe sch_fq >/dev/null 2>&1 || die "当前内核无法加载 sch_fq；请更换为 Ubuntu 22.04 官方内核后重试。"
-  modprobe tcp_bbr >/dev/null 2>&1 || die "当前内核无法加载 tcp_bbr；请更换为 Ubuntu 22.04 官方内核后重试。"
-  sysctl -n net.ipv4.tcp_available_congestion_control 2>/dev/null | grep -qw bbr || \
-    die "当前内核未提供 BBR；为避免静默降级，安装已停止。"
   install -d -m 0755 /etc/modules-load.d
   cat >/etc/modules-load.d/90-telemt-dual-hop.conf <<'EOF'
 sch_fq
@@ -1488,7 +1803,12 @@ wireguard_handshake_is_fresh() {
 }
 
 telemt_binary_is_expected() {
-  [[ -x $TDH_BIN && $("$TDH_BIN" --version 2>/dev/null || true) == "telemt ${TELEMT_VERSION}" ]]
+  local version
+  [[ -x $TDH_BIN ]] || return 1
+  version=$(timeout 5 "$TDH_BIN" --version 2>/dev/null) || return 1
+  if [[ $version == "telemt ${TELEMT_VERSION}" ]]; then return 0; fi
+  [[ $version == "telemt ${TELEMT_CORE_VERSION_AMD64}" && \
+     $(sha256sum "$TDH_BIN" | awk '{print $1}') == "$TELEMT_CORE_BINARY_SHA256_AMD64" ]]
 }
 
 write_haproxy_config() {
@@ -1628,6 +1948,7 @@ install_backend() {
   local requested_role=$1 code decoded backend_priv backend_pub
   local -a fields
   [[ ! -f $TDH_STATE ]] || die "本机已经初始化；请运行管理菜单。"
+  assert_fresh_install_paths
   check_os
   code=$(prompt_secret "请粘贴入口生成的 ${requested_role} Join Code")
   decoded=$(decode_join_code "$code") || die "无法解析 Join Code。"
@@ -1663,7 +1984,9 @@ install_backend() {
   fi
   # Validate the Join Code before a potentially long package installation so
   # a paste/role mistake fails fast without changing the machine.
+  if command -v modprobe >/dev/null 2>&1; then check_tuning_support; fi
   install_packages backend
+  check_tuning_support
   WG_INTERFACE=$([[ $requested_role == backend1 ]] && echo tdh-b1 || echo tdh-b2)
   tunnel_network_is_available "${LOCAL_WG_IP%.*}.0/30" "$WG_INTERFACE" || \
     die "固定 WireGuard 网段与本机现有网络冲突；为避免破坏路由，安装已停止。"
@@ -1680,7 +2003,7 @@ install_backend() {
 
   check_front_domain "$TDH_DOMAIN_A"
   check_front_domain "$TDH_DOMAIN_B"
-  TX_ACTIVE=1 TX_KIND=$requested_role
+  TX_ACTIVE=1 TX_KIND=$requested_role TX_OWNER_PID=$BASHPID
   init_dirs
   API_TOKEN=$(rand_hex 32)
   BACKEND_MAX_CONNECTIONS=$(calculate_connection_limit) || die "本机资源检测失败；至少需要 1 vCPU 和 768 MiB RAM。"
@@ -1745,12 +2068,15 @@ show_join_codes() {
 
 init_entry() {
   [[ ! -f $TDH_STATE ]] || die "本机已经初始化；请运行管理菜单。"
+  assert_fresh_install_paths
   check_os
   if systemctl is-active --quiet haproxy.service 2>/dev/null; then
     die "检测到已有 haproxy.service 正在运行。为避免破坏现有业务，请先确认并停止它。"
   fi
+  if command -v modprobe >/dev/null 2>&1; then check_tuning_support; fi
   install_packages entry
   systemctl disable --now haproxy.service >/dev/null 2>&1 || true
+  check_tuning_support
   select_public_ipv4 ENTRY_PUBLIC_IP "入口 VPS 公网 IPv4"
   validate_public_ipv4 "$ENTRY_PUBLIC_IP" || die "入口必须是可路由的公网 IPv4。"
   PORT_A=$TDH_PUBLIC_PORT PORT_B=$TDH_PUBLIC_PORT
@@ -1762,7 +2088,7 @@ init_entry() {
   check_china_dns_apple_owned "$TDH_DOMAIN_A"
   check_china_dns_apple_owned "$TDH_DOMAIN_B"
 
-  TX_ACTIVE=1 TX_KIND=entry
+  TX_ACTIVE=1 TX_KIND=entry TX_OWNER_PID=$BASHPID
   init_dirs
   TDH_ROLE="entry"
   CONFIG_SCHEMA=$TDH_CONFIG_SCHEMA
@@ -1892,6 +2218,7 @@ complete_entry() {
     die "10.77.1.0/30 与入口现有网络冲突；未修改路由。"
   tunnel_network_is_available 10.77.2.0/30 tdh2 || \
     die "10.77.2.0/30 与入口现有网络冲突；未修改路由。"
+  check_tuning_support
   info "配置两条 WireGuard 隧道……"
   install -d -m 0700 /etc/wireguard
   write_entry_wg 1
@@ -2007,7 +2334,7 @@ diagnose() {
     done
     if wireguard_handshake_is_fresh "$WG_INTERFACE"; then ok "WireGuard 握手新鲜"; else warn "WireGuard 超过 180 秒没有握手"; ((failures+=1)); fi
     if tuning_is_active; then ok "BBR / 默认队列 fq 已设置；a perf 可查看实际连接和接口"; else warn "BBR/fq 默认值异常"; ((failures+=1)); fi
-    if telemt_binary_is_expected; then ok "Telemt ${TELEMT_VERSION} 二进制"; else warn "Telemt 二进制版本异常"; ((failures+=1)); fi
+    if telemt_binary_is_expected; then ok "Telemt 二进制身份通过（a perf 可查看构建标识）"; else warn "Telemt 二进制身份异常"; ((failures+=1)); fi
     if health_agent_is_up "$LOCAL_WG_IP" "$TDH_AGENT_PORT"; then ok "Telemt API 与 5 个 Telegram DC 全部可达"; else warn "Telemt 或 Telegram DC 完整连通性异常"; ((failures+=1)); fi
     RESPONSE_LINK_A=$(query_telemt_link "$TDH_API_PORT" line_a "$TDH_DOMAIN_A" 2>/dev/null || true)
     RESPONSE_LINK_B=$(query_telemt_link "$TDH_API_PORT" line_b "$TDH_DOMAIN_B" 2>/dev/null || true)
@@ -2095,6 +2422,11 @@ def command(*args):
 
 def integer(value):
     return int(value) if re.fullmatch(r"\d+", str(value)) else None
+
+def telemt_version():
+    value = command("/usr/local/lib/telemt-dual-hop/telemt", "--version").strip()
+    match = re.fullmatch(r"telemt ([0-9]+\.[0-9]+\.[0-9]+(?:[-+][a-zA-Z0-9.+-]{1,48})?)", value)
+    return match[1] if match else None
 
 def numeric_fields(text, names):
     return {k: int(v) for k, v in re.findall(r"^([A-Za-z_]+):?\s+(\d+)", text, re.M) if k in names}
@@ -2185,6 +2517,12 @@ def interfaces(details=False):
 
 def sockets():
     groups = {}
+    numeric = {
+        "rtt_ms": r"\brtt:([\d.]+)", "cwnd_segments": r"\bcwnd:(\d+)",
+        "recv_buffer_limit_bytes": r"\brb(\d+)", "send_buffer_limit_bytes": r"\btb(\d+)",
+        "snd_wnd_bytes": r"\bsnd_wnd:(\d+)", "rcv_space_bytes": r"\brcv_space:(\d+)",
+        "rwnd_limited_ms": r"\brwnd_limited:(\d+)ms", "sndbuf_limited_ms": r"\bsndbuf_limited:(\d+)ms",
+    }
     # Address and process information stay in memory; only aggregates leave.
     text = command("ss", "-Htinmp", "state", "established")
     current = None
@@ -2205,22 +2543,29 @@ def sockets():
                 current = "backend-upstream"
             if current:
                 row = groups.setdefault(current, {"count": 0, "recv_q_bytes": 0, "send_q_bytes": 0,
-                                                   "rtt_ms": [], "cwnd_segments": [], "bbr": 0})
+                                                   "bbr": 0, **{field: [] for field in numeric}})
                 row["count"] += 1
                 row["recv_q_bytes"] += integer(fields[0]) or 0
                 row["send_q_bytes"] += integer(fields[1]) or 0
         elif current:
             row = groups[current]
             row["bbr"] += int(bool(re.search(r"\bbbr\b", line)))
-            for field, pattern in (("rtt_ms", r"\brtt:([\d.]+)"), ("cwnd_segments", r"\bcwnd:(\d+)")):
+            for field, pattern in numeric.items():
                 match = re.search(pattern, line)
                 if match:
-                    row[field].append(float(match[1]))
+                    try:
+                        value = float(match[1])
+                    except ValueError:
+                        continue
+                    if 0 <= value < float("inf"):
+                        row[field].append(value)
     for row in groups.values():
-        for field in ("rtt_ms", "cwnd_segments"):
+        for field in numeric:
             values = sorted(row.pop(field))
             row[field + "_median"] = statistics.median(values) if values else None
             row[field + "_p95"] = values[max(0, (95 * len(values) + 99) // 100 - 1)] if values else None
+            row[field + "_min"] = values[0] if values else None
+            row[field + "_max"] = values[-1] if values else None
     return groups
 
 def haproxy():
@@ -2302,11 +2647,9 @@ for name in ("tdh1", "tdh2", "tdh-b1", "tdh-b2"):
     if pathlib.Path("/sys/class/net", name).exists():
         timestamps = [int(v) for v in re.findall(r"\t(\d+)\n", command("wg", "show", name, "latest-handshakes"))]
         wg[name] = {"handshake_age_seconds": int(time.time()) - max(timestamps) if timestamps and max(timestamps) else None}
-versions = {}
-for name, args, pattern in (("haproxy", ("haproxy", "-v"), r"HAProxy version ([0-9][a-zA-Z0-9.+_-]*)"),
-                            ("telemt", ("/usr/local/lib/telemt-dual-hop/telemt", "--version"), r"^telemt ([0-9.]+)")):
-    match = re.search(pattern, command(*args))
-    versions[name] = match[1] if match else None
+versions = {"telemt": telemt_version()}
+haproxy_version = re.search(r"HAProxy version ([0-9][a-zA-Z0-9.+_-]*)", command("haproxy", "-v"))
+versions["haproxy"] = haproxy_version[1] if haproxy_version else None
 report = {"说明": "只读本机采样；无主动测速、无上传；null 表示不可用。TCP RTT 为当前连接分布，不是时间序列 P95。",
           "schema": 1, "role": role, "kernel": os.uname().release, "sample_seconds": round(elapsed, 3),
           "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), "versions": versions,
@@ -2402,12 +2745,20 @@ run_panel_action() {
   # user can retry without running the manager command again.
   trap - ERR
   set +e
+  PANEL_ACTION_PID=""
   (
     set -Eeuo pipefail
     trap 'on_error $? $LINENO' ERR
+    trap 'on_exit $?' EXIT
+    trap 'on_signal 130' INT
+    trap 'on_signal 143' TERM
+    trap 'on_signal 129' HUP
     "$@"
-  )
+  ) <&0 &
+  PANEL_ACTION_PID=$!
+  wait "$PANEL_ACTION_PID"
   rc=$?
+  PANEL_ACTION_PID=""
   set -e
   trap 'on_error $? $LINENO' ERR
   if (( rc != 0 )); then

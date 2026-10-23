@@ -1,0 +1,13 @@
+{
+  "complete": true,
+  "full_python_tests": 129,
+  "isolated_recovery_cases": 27,
+  "manager_sha256": "2d1e6c59ef0ce69d0fd734d1d9a6cab89881ac92e26e54d38f4b2080bc16acc3",
+  "source_archive_sha256": "e65944e3fe0d4d0659f3a155bb0fb99503a9aa42a4114c708c7540d5dcddef0c",
+  "bash_shellcheck_selftest_haproxy_passed": true,
+  "host_accounts_unchanged": true,
+  "owned_network_namespaces_remaining": 0,
+  "private_proxy_temp_directories_remaining": 0,
+  "production_accessed": false,
+  "github_written": false
+}

@@ -1,0 +1,23 @@
+{
+  "scope": "public req_pq handshake through real proxy layers; no account/files or throughput claim",
+  "kernel": "6.18.40.1-microsoft-standard-WSL2",
+  "telemt": "telemt 3.5.5",
+  "rows": [
+    {
+      "dc_index": 2,
+      "req_pq_nonce_verified": true,
+      "elapsed_seconds": 1.463222506000001
+    },
+    {
+      "dc_index": 2,
+      "req_pq_nonce_verified": true,
+      "elapsed_seconds": 0.36676824599999946
+    },
+    {
+      "dc_index": 2,
+      "req_pq_nonce_verified": true,
+      "elapsed_seconds": 0.7219051209999989
+    }
+  ],
+  "config_unchanged": true
+}

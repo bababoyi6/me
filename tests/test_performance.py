@@ -158,6 +158,20 @@ if state_is_current; then exit 1; fi
             result = namespace["telemt"]()
         self.assertEqual(result, {"core": {"connections_total": 7}, "upstream": {"connect_success_total": 2}})
 
+    def test_report_preserves_unofficial_core_label_and_rejects_unbounded_output(self):
+        source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]
+        tree = ast.parse(source)
+        definitions = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom, ast.FunctionDef))]
+        namespace = {}
+        exec(compile(ast.Module(body=definitions, type_ignores=[]), "report", "exec"), namespace)
+        cases = (("telemt 3.5.5\n", "3.5.5"), ("telemt 3.5.5+tdh.audit2\n", "3.5.5+tdh.audit2"),
+                 ("telemt 3.5.5-rc.1", "3.5.5-rc.1"), ("telemt 3.5.5\nSENSITIVE", None),
+                 ("telemt 3.5.5+" + "x" * 1000, None), ("unrecognized", None))
+        for output, expected in cases:
+            with self.subTest(output=output[:80]):
+                namespace["command"] = lambda *_, text=output: text
+                self.assertEqual(namespace["telemt_version"](), expected)
+
     def test_socket_summary_aggregates_without_endpoint_disclosure(self):
         source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]
         tree = ast.parse(source)
@@ -165,7 +179,11 @@ if state_is_current; then exit 1; fi
         namespace = {}
         exec(compile(ast.Module(body=definitions, type_ignores=[]), "report", "exec"), namespace)
         namespace["command"] = lambda *_: '''0 1024 10.77.1.1:40000 10.77.1.2:24431 users:(("haproxy",pid=10,fd=4))
-\t skmem:(r0,rb131072) bbr rtt:42.5/2.1 cwnd:30
+\t skmem:(r0,rb131072,t0,tb524288) bbr rtt:42.5/2.1 cwnd:30 snd_wnd:65536 rcv_space:30000 rwnd_limited:210ms(12%) sndbuf_limited:15ms(1%)
+0 0 10.77.1.2:24431 10.77.1.1:40001 users:(("telemt",pid=11,fd=6))
+\t skmem:(r0,rb524288,t0,tb524288) bbr rtt:100.0/1 cwnd:20
+0 0 10.77.1.2:24431 10.77.1.1:40002 users:(("telemt",pid=11,fd=7))
+\t skmem:(r0,rb262144,t0,tb262144) bbr rtt:110.0/1 cwnd:10
 0 0 203.0.113.10:443 198.51.100.1:50000 users:(("haproxy",pid=10,fd=5))
 \t cubic rtt:120.0/5 cwnd:10
 '''
@@ -173,6 +191,16 @@ if state_is_current; then exit 1; fi
         self.assertEqual(result["entry-backend"]["send_q_bytes"], 1024)
         self.assertEqual(result["entry-backend"]["rtt_ms_median"], 42.5)
         self.assertEqual(result["entry-backend"]["bbr"], 1)
+        self.assertEqual(result["entry-backend"]["recv_buffer_limit_bytes_median"], 131072)
+        self.assertEqual(result["entry-backend"]["send_buffer_limit_bytes_median"], 524288)
+        self.assertEqual(result["entry-backend"]["snd_wnd_bytes_median"], 65536)
+        self.assertEqual(result["entry-backend"]["rcv_space_bytes_median"], 30000)
+        self.assertEqual(result["entry-backend"]["rwnd_limited_ms_median"], 210)
+        self.assertEqual(result["entry-backend"]["sndbuf_limited_ms_median"], 15)
+        self.assertEqual(result["backend-entry"]["recv_buffer_limit_bytes_min"], 262144)
+        self.assertEqual(result["backend-entry"]["recv_buffer_limit_bytes_max"], 524288)
+        self.assertEqual(result["backend-entry"]["recv_buffer_limit_bytes_median"], 393216)
+        self.assertIsNone(result["user-entry"]["snd_wnd_bytes_median"])
         self.assertEqual(result["user-entry"]["count"], 1)
         self.assertNotIn("203.0.113.10", json.dumps(result))
 
@@ -192,7 +220,7 @@ if [[ ${1:-} == --self-test ]]; then exit 0; fi
 
     def test_manager_update_and_failure_preserve_running_configuration(self):
         manager = self.base / "manager"
-        manager.write_text(SCRIPT.read_text().replace('TDH_VERSION="1.4.2"', 'TDH_VERSION="1.3.1"'))
+        manager.write_text(SCRIPT.read_text().replace('TDH_VERSION="1.5.0"', 'TDH_VERSION="1.3.1"'))
         old_manager = manager.read_bytes()
         old_state = self.state.read_bytes()
         download = self.base / "download"

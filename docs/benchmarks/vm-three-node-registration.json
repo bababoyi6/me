@@ -1,0 +1,20 @@
+{
+  "backend1": {
+    "backend": "backend1",
+    "complete": true,
+    "phase": "complete",
+    "registered": {
+      "B1_REGISTERED": "1",
+      "B2_REGISTERED": "0"
+    }
+  },
+  "backend2": {
+    "backend": "backend2",
+    "complete": true,
+    "phase": "complete",
+    "registered": {
+      "B1_REGISTERED": "1",
+      "B2_REGISTERED": "1"
+    }
+  }
+}

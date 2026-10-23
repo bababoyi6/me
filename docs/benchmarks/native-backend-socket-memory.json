@@ -1,0 +1,1942 @@
+{
+  "scope": "read-only Telemt socket accounting; late observer, not the whole endurance run",
+  "worker_elapsed_at_observer_start_seconds": 340.59828696800105,
+  "samples": [
+    {
+      "observer_elapsed_seconds": 0.010625223003444262,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 75004,
+        "w": 84740,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 2.019466124009341,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 4.0348439310037065,
+      "socket_count": 6,
+      "totals": {
+        "rb": 3983726,
+        "tb": 12211200,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 177579,
+        "w": 2645,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 6.058607569008018,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 8.074044935012353,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 10.09538697800599,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 157596,
+        "w": 14436,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 12.10555634800403,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 14.117259727005148,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 73728,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 16.141051780999987,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 18.161717599010444,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 20.187409850012045,
+      "socket_count": 6,
+      "totals": {
+        "rb": 3983726,
+        "tb": 12211200,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 189867,
+        "w": 2645,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 22.205008159013232,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 24.214667054999154,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 94956,
+        "w": 77076,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 26.23657908300811,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 76796,
+        "w": 91140,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 28.247848474013153,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 110592,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 30.259933804001776,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 32.271760301009635,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 34.282248824005364,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 36.29364745100611,
+      "socket_count": 5,
+      "totals": {
+        "rb": 3852654,
+        "tb": 12080640,
+        "bl": 0,
+        "r": 1375,
+        "t": 0,
+        "f": 135261,
+        "w": 39492,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 38.30875453700719,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 4176,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 40.329470340002445,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 81920,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 42.34114076801052,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 44.35546232100751,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 46.37174116499955,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 48.3911924080021,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 50.40610774300876,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 52.4237860560097,
+      "socket_count": 5,
+      "totals": {
+        "rb": 3852654,
+        "tb": 12080640,
+        "bl": 0,
+        "r": 1375,
+        "t": 8352,
+        "f": 78493,
+        "w": 75780,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 54.43525112399948,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 56.45538103900617,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 58.46610595101083,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 60.47733520201291,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 62.49787462801032,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 111660,
+        "w": 60372,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 64.50928501400631,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 76796,
+        "w": 91140,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 66.53160586500599,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 77824,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 68.5536783610005,
+      "socket_count": 5,
+      "totals": {
+        "rb": 3852654,
+        "tb": 12080640,
+        "bl": 0,
+        "r": 1375,
+        "t": 0,
+        "f": 182945,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 70.5650988430134,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 72.57588804401166,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 74.59248680699966,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 76.61847137199948,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 78.63093867299904,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 73728,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 80.6493041030044,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 82.68175166900619,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 84.70372520900855,
+      "socket_count": 5,
+      "totals": {
+        "rb": 3852654,
+        "tb": 12080640,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 192512,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 86.72030501400877,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 88.74219469100353,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 165948,
+        "w": 6084,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 90.75496035401011,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 92.76642276100756,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 73728,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 94.77961060700181,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 96.79182427401247,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 98.80297873201198,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 100.81440468601068,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 102.82483069100999,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 104.84214250800142,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 73728,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 106.85392295000202,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 108.87063852700521,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 110.89700221100065,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 112.90971271500166,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 114.92011991800973,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 100580,
+        "w": 71452,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 116.94519139200565,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 74236,
+        "w": 93700,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 118.96343556701322,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 77824,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 120.98025348001102,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 122.99200414500956,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 125.02095923600427,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 127.03873458900489,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 129.06349160399986,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 131.0748321400024,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 74748,
+        "w": 80900,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 133.09374784601096,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 135.11779021800612,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 137.13008392200572,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 139.145609351006,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 141.16438856300374,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 153420,
+        "w": 18612,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 143.1844603940117,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 145.20538773600128,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 73728,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 147.21776235100697,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 149.2404007090081,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 151.26047712701256,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 153.27806290000444,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 155.29082621000998,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 103308,
+        "w": 68724,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 157.30061193399888,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 76540,
+        "w": 87300,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 159.31219007300388,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 161.32411261700327,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 110592,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 163.34067089301243,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 165.35700010400615,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 167.37642377600423,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 149244,
+        "w": 22788,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 169.3952173639991,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 171.40792383800726,
+      "socket_count": 6,
+      "totals": {
+        "rb": 3983726,
+        "tb": 12211200,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 80632,
+        "w": 1288,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 173.4276633210102,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 175.44263440099894,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 177.45490855100797,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 179.4754116670083,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 181.50118940501125,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 90780,
+        "w": 81252,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 183.5150939800078,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 76540,
+        "w": 87300,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 185.53810342001088,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 81920,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 187.5624701880006,
+      "socket_count": 6,
+      "totals": {
+        "rb": 3983726,
+        "tb": 12211200,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 183032,
+        "w": 1288,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 189.58438544200908,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 191.602062638005,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 193.61973638500785,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 195.630858886012,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 197.65421650100325,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 74492,
+        "w": 77060,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 199.67372284299927,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 201.69521708300454,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 203.71718129501096,
+      "socket_count": 6,
+      "totals": {
+        "rb": 3983726,
+        "tb": 12211200,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 187128,
+        "w": 1288,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 205.72924121300457,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 207.7419701910112,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 140892,
+        "w": 31140,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 209.7643892650085,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 211.7933457170002,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 73728,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 213.80754776400863,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 215.8197719380114,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 217.8321778170066,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 219.8439547730086,
+      "socket_count": 6,
+      "totals": {
+        "rb": 3983726,
+        "tb": 12211200,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 177579,
+        "w": 2645,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 221.86753507600224,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 86604,
+        "w": 85428,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 223.8854750169994,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 77820,
+        "w": 86020,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 225.90891276000184,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 227.9288924880093,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 229.9546205700026,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 184320,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 231.96923709900875,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 233.98800029700215,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 236.0144344970031,
+      "socket_count": 69,
+      "totals": {
+        "rb": 25566022,
+        "tb": 142333440,
+        "bl": 0,
+        "r": 1375,
+        "t": 0,
+        "f": 500381,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 238.2331891230133,
+      "socket_count": 68,
+      "totals": {
+        "rb": 25434950,
+        "tb": 138393600,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 790528,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 240.27810605900595,
+      "socket_count": 68,
+      "totals": {
+        "rb": 25434950,
+        "tb": 138393600,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 550908,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 242.3057424370054,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 244.33155529900978,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 8352,
+        "f": 75004,
+        "w": 84740,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 246.35167057100625,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 81920,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 248.36939063300088,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 180224,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 250.38320976000978,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 176128,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 252.39970495201123,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 172032,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 254.41368108001188,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 161772,
+        "w": 10260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 256.42579162200855,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 75772,
+        "w": 96260,
+        "o": 0,
+        "d": 0
+      }
+    },
+    {
+      "observer_elapsed_seconds": 258.43847170000663,
+      "socket_count": 4,
+      "totals": {
+        "rb": 3721582,
+        "tb": 8140800,
+        "bl": 0,
+        "r": 0,
+        "t": 0,
+        "f": 73728,
+        "w": 0,
+        "o": 0,
+        "d": 0
+      }
+    }
+  ],
+  "observed_process_gone": true
+}

@@ -1,0 +1,287 @@
+{
+  "scope": "one disposable Ubuntu 22.04 1-core/1GB VPS; raw TCP synthetic DC leg, 100ms RTT/1000Mbps budget; not real Telegram or physical three-VPS capacity",
+  "single_64mib_three_rounds": {
+    "flush": {
+      "D": {
+        "rounds": 3,
+        "mbps_median": 16.145789227255793,
+        "mbps_min": 16.07945557994263,
+        "mbps_max": 16.24499979901737,
+        "sha256_verified_bulk_streams": 3,
+        "sha256_verified_small_probes": 76,
+        "minimum_available_memory_sampled_bytes": 514568192,
+        "maximum_telemt_rss_sampled_bytes": 25305088,
+        "maximum_host_busy_percent": 17.527675276752767
+      },
+      "U": {
+        "rounds": 3,
+        "mbps_median": 23.043841450241427,
+        "mbps_min": 22.44051643483151,
+        "mbps_max": 23.248799985942394,
+        "sha256_verified_bulk_streams": 3,
+        "sha256_verified_small_probes": 55,
+        "minimum_available_memory_sampled_bytes": 512802816,
+        "maximum_telemt_rss_sampled_bytes": 25575424,
+        "maximum_host_busy_percent": 12.107821475916925
+      }
+    },
+    "auto": {
+      "D": {
+        "rounds": 3,
+        "mbps_median": 156.68212226894522,
+        "mbps_min": 156.4774782617395,
+        "mbps_max": 156.83046041732902,
+        "sha256_verified_bulk_streams": 3,
+        "sha256_verified_small_probes": 9,
+        "minimum_available_memory_sampled_bytes": 504504320,
+        "maximum_telemt_rss_sampled_bytes": 25698304,
+        "maximum_host_busy_percent": 37.60683760683761
+      },
+      "U": {
+        "rounds": 3,
+        "mbps_median": 169.43426224739892,
+        "mbps_min": 169.1040129538676,
+        "mbps_max": 169.46843245558784,
+        "sha256_verified_bulk_streams": 3,
+        "sha256_verified_small_probes": 9,
+        "minimum_available_memory_sampled_bytes": 504504320,
+        "maximum_telemt_rss_sampled_bytes": 25698304,
+        "maximum_host_busy_percent": 36.45161290322581
+      }
+    }
+  },
+  "backpressure_32_streams_8mib_each": {
+    "flush": {
+      "first_auto_then_flush": {
+        "D": {
+          "rounds": 1,
+          "mbps_median": 125.89262592774017,
+          "mbps_min": 125.89262592774017,
+          "mbps_max": 125.89262592774017,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 13,
+          "minimum_available_memory_sampled_bytes": 440823808,
+          "maximum_telemt_rss_sampled_bytes": 35311616,
+          "maximum_host_busy_percent": 40.55459272097054
+        },
+        "U": {
+          "rounds": 1,
+          "mbps_median": 421.2193875150765,
+          "mbps_min": 421.2193875150765,
+          "mbps_max": 421.2193875150765,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 3,
+          "minimum_available_memory_sampled_bytes": 415772672,
+          "maximum_telemt_rss_sampled_bytes": 46579712,
+          "maximum_host_busy_percent": 86.70520231213872
+        }
+      },
+      "repeat_flush_then_auto": {
+        "D": {
+          "rounds": 3,
+          "mbps_median": 124.44817590373584,
+          "mbps_min": 124.41937336703205,
+          "mbps_max": 132.1288338160215,
+          "sha256_verified_bulk_streams": 96,
+          "sha256_verified_small_probes": 38,
+          "minimum_available_memory_sampled_bytes": 417075200,
+          "maximum_telemt_rss_sampled_bytes": 41533440,
+          "maximum_host_busy_percent": 43.13967861557478
+        },
+        "U": {
+          "rounds": 3,
+          "mbps_median": 375.8063924658289,
+          "mbps_min": 361.4682118727189,
+          "mbps_max": 426.8854520796009,
+          "sha256_verified_bulk_streams": 96,
+          "sha256_verified_small_probes": 11,
+          "minimum_available_memory_sampled_bytes": 405622784,
+          "maximum_telemt_rss_sampled_bytes": 48517120,
+          "maximum_host_busy_percent": 88.0539499036609
+        }
+      }
+    },
+    "auto": {
+      "first_auto_then_flush": {
+        "D": {
+          "rounds": 1,
+          "mbps_median": 132.72214739539373,
+          "mbps_min": 132.72214739539373,
+          "mbps_max": 132.72214739539373,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 11,
+          "minimum_available_memory_sampled_bytes": 431484928,
+          "maximum_telemt_rss_sampled_bytes": 35872768,
+          "maximum_host_busy_percent": 45.24549409571162
+        },
+        "U": {
+          "rounds": 1,
+          "mbps_median": 279.6512413185908,
+          "mbps_min": 279.6512413185908,
+          "mbps_max": 279.6512413185908,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 6,
+          "minimum_available_memory_sampled_bytes": 403300352,
+          "maximum_telemt_rss_sampled_bytes": 46112768,
+          "maximum_host_busy_percent": 74.02597402597402
+        }
+      },
+      "repeat_flush_then_auto": {
+        "D": {
+          "rounds": 3,
+          "mbps_median": 118.7617618081938,
+          "mbps_min": 95.93219091057506,
+          "mbps_max": 121.46351479731125,
+          "sha256_verified_bulk_streams": 96,
+          "sha256_verified_small_probes": 41,
+          "minimum_available_memory_sampled_bytes": 400351232,
+          "maximum_telemt_rss_sampled_bytes": 43769856,
+          "maximum_host_busy_percent": 40.056497175141246
+        },
+        "U": {
+          "rounds": 3,
+          "mbps_median": 273.4767669228814,
+          "mbps_min": 272.30939366524854,
+          "mbps_max": 281.0695820209062,
+          "sha256_verified_bulk_streams": 96,
+          "sha256_verified_small_probes": 17,
+          "minimum_available_memory_sampled_bytes": 392130560,
+          "maximum_telemt_rss_sampled_bytes": 47988736,
+          "maximum_host_busy_percent": 75.92105263157895
+        }
+      }
+    }
+  },
+  "initial_eight_second_mock_deadline_run": {
+    "complete": false,
+    "verified_streams": 28,
+    "failed_streams": 4,
+    "mock_dc_payload_timeouts": 4,
+    "oom_delta": 0
+  },
+  "control_changes": "Only mock DC socket deadline 8 -> 25 seconds; same core binaries, network, payload, pause and receive buffer; bounded client/trial/worker deadlines retained",
+  "production_timeouts_changed": false,
+  "throughput_not_universally_faster": true,
+  "additional_network_observations": {
+    "flush": {
+      "observed": {
+        "D": {
+          "rounds": 1,
+          "mbps_median": 127.43126357619452,
+          "mbps_min": 127.43126357619452,
+          "mbps_max": 127.43126357619452,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 12,
+          "minimum_available_memory_sampled_bytes": 439230464,
+          "maximum_telemt_rss_sampled_bytes": 36601856,
+          "maximum_host_busy_percent": 43.01075268817204,
+          "client_namespace_retransmitted_segments_delta": 271,
+          "wan_qdisc_drop_delta": 0
+        },
+        "U": {
+          "rounds": 1,
+          "mbps_median": 369.97371912770035,
+          "mbps_min": 369.97371912770035,
+          "mbps_max": 369.97371912770035,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 4,
+          "minimum_available_memory_sampled_bytes": 416280576,
+          "maximum_telemt_rss_sampled_bytes": 45834240,
+          "maximum_host_busy_percent": 83.81112984822934,
+          "client_namespace_retransmitted_segments_delta": 156,
+          "wan_qdisc_drop_delta": 0
+        }
+      },
+      "endpoints": {
+        "D": {
+          "rounds": 1,
+          "mbps_median": 122.15424417696347,
+          "mbps_min": 122.15424417696347,
+          "mbps_max": 122.15424417696347,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 12,
+          "minimum_available_memory_sampled_bytes": 399609856,
+          "maximum_telemt_rss_sampled_bytes": 36442112,
+          "maximum_host_busy_percent": 50.76835515082527,
+          "client_namespace_retransmitted_segments_delta": 332,
+          "wan_qdisc_drop_delta": 0,
+          "endpoint_fq_drop_delta": 0
+        },
+        "U": {
+          "rounds": 1,
+          "mbps_median": 375.862542143289,
+          "mbps_min": 375.862542143289,
+          "mbps_max": 375.862542143289,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 4,
+          "minimum_available_memory_sampled_bytes": 380801024,
+          "maximum_telemt_rss_sampled_bytes": 46329856,
+          "maximum_host_busy_percent": 84.27152317880795,
+          "client_namespace_retransmitted_segments_delta": 135,
+          "wan_qdisc_drop_delta": 0,
+          "endpoint_fq_drop_delta": 0
+        }
+      }
+    },
+    "auto": {
+      "observed": {
+        "D": {
+          "rounds": 1,
+          "mbps_median": 123.6125099619543,
+          "mbps_min": 123.6125099619543,
+          "mbps_max": 123.6125099619543,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 12,
+          "minimum_available_memory_sampled_bytes": 433057792,
+          "maximum_telemt_rss_sampled_bytes": 35647488,
+          "maximum_host_busy_percent": 41.450471698113205,
+          "client_namespace_retransmitted_segments_delta": 232,
+          "wan_qdisc_drop_delta": 0
+        },
+        "U": {
+          "rounds": 1,
+          "mbps_median": 274.85641477291466,
+          "mbps_min": 274.85641477291466,
+          "mbps_max": 274.85641477291466,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 6,
+          "minimum_available_memory_sampled_bytes": 402169856,
+          "maximum_telemt_rss_sampled_bytes": 46043136,
+          "maximum_host_busy_percent": 71.69576059850374,
+          "client_namespace_retransmitted_segments_delta": 2454,
+          "wan_qdisc_drop_delta": 0
+        }
+      },
+      "endpoints": {
+        "D": {
+          "rounds": 1,
+          "mbps_median": 129.97122283280657,
+          "mbps_min": 129.97122283280657,
+          "mbps_max": 129.97122283280657,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 11,
+          "minimum_available_memory_sampled_bytes": 434085888,
+          "maximum_telemt_rss_sampled_bytes": 36052992,
+          "maximum_host_busy_percent": 43.68098159509202,
+          "client_namespace_retransmitted_segments_delta": 218,
+          "wan_qdisc_drop_delta": 0,
+          "endpoint_fq_drop_delta": 0
+        },
+        "U": {
+          "rounds": 1,
+          "mbps_median": 240.14641611814412,
+          "mbps_min": 240.14641611814412,
+          "mbps_max": 240.14641611814412,
+          "sha256_verified_bulk_streams": 32,
+          "sha256_verified_small_probes": 6,
+          "minimum_available_memory_sampled_bytes": 403419136,
+          "maximum_telemt_rss_sampled_bytes": 45010944,
+          "maximum_host_busy_percent": 63.83219954648526,
+          "client_namespace_retransmitted_segments_delta": 2392,
+          "wan_qdisc_drop_delta": 0,
+          "endpoint_fq_drop_delta": 0
+        }
+      }
+    }
+  }
+}

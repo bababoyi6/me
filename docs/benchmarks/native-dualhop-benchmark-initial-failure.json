@@ -1,0 +1,111 @@
+{
+  "scope": "single native VPS; real entry HAProxy, WG+PSK to two Telemt backends; local synthetic DC",
+  "telemt": "telemt 3.5.5",
+  "build": "official",
+  "rtt_ms_configured": 100,
+  "kernel": "5.15.0-161-generic",
+  "rate_mbps_per_direction": 100,
+  "wireguard_psk": true,
+  "wireguard_mtu": 1420,
+  "rows": [
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7825098729990714,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6930127209998318,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 2,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7416588759988372,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 2,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7041245159998653,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 16777216,
+      "elapsed_seconds": 5.914531611999337,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 1,
+      "complete": true
+    },
+    {
+      "benchmark_round": 1,
+      "direction": "U",
+      "bytes": 16777216,
+      "complete": false,
+      "exception": "TimeoutError",
+      "phase": "digest",
+      "sha256_verified": false
+    },
+    {
+      "benchmark_round": 2,
+      "direction": "U",
+      "bytes": 16777216,
+      "complete": false,
+      "exception": "TimeoutError",
+      "phase": "digest",
+      "sha256_verified": false
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 16777216,
+      "elapsed_seconds": 5.8870383859994035,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 2,
+      "complete": true
+    },
+    {
+      "benchmark_round": 3,
+      "direction": "D",
+      "bytes": 16777216,
+      "complete": false,
+      "exception": "AssertionError",
+      "phase": "unknown",
+      "sha256_verified": false
+    },
+    {
+      "benchmark_round": 3,
+      "direction": "U",
+      "bytes": 16777216,
+      "complete": false,
+      "exception": "TimeoutError",
+      "phase": "digest",
+      "sha256_verified": false
+    }
+  ],
+  "backend_dc_errors": [
+    [],
+    []
+  ],
+  "failure_review": {
+    "status": "incomplete initial result retained",
+    "counterexample": "third download raised route-count assertion although earlier uploads could finish at DC after their client timeout",
+    "change": "lab only: compare HAProxy server assignment stot rather than asynchronously completed DC counts",
+    "rerun": "official binary unchanged; three downloads passed SHA256, three uploads timed out at digest",
+    "not_classified_as": "file corruption or production routing failure"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "scope": "after full-system functional tests; not removal of all private audit files",
+  "all_three_guests_stopped": true,
+  "lab_server_stopped": true,
+  "owned_cgroup_removed": true,
+  "temporary_vm_ram_files_remaining": 0,
+  "lab_tcp_listeners_remaining": [],
+  "oom_kill_events": 0,
+  "private_vm_disks_retained": 3,
+  "private_vm_ssh_key_retained": true,
+  "private_material_directory_mode": "0700",
+  "private_key_mode": "0o600",
+  "host_services_or_packages_changed_for_vm_lab": false,
+  "production_accessed": false
+}

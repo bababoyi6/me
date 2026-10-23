@@ -1,0 +1,215 @@
+{
+  "scope": "three Ubuntu 22.04 KVM guests, real Telegram public DH only; no file speed/capacity claim",
+  "complete": true,
+  "stages": [
+    {
+      "stage": "both_backends_healthy",
+      "cases": [
+        {
+          "sni": "apple.com",
+          "authenticated_faketls": true,
+          "res_pq_nonce_verified": true,
+          "fragmented_hello": true
+        },
+        {
+          "sni": "gs.apple.com",
+          "authenticated_faketls": true,
+          "res_pq_nonce_verified": true,
+          "fragmented_hello": true
+        }
+      ],
+      "routing": [
+        {
+          "backend": "telemt_a",
+          "server": "vps1",
+          "session_delta": 1
+        },
+        {
+          "backend": "telemt_a",
+          "server": "vps2",
+          "session_delta": 0
+        },
+        {
+          "backend": "telemt_b",
+          "server": "vps2",
+          "session_delta": 1
+        },
+        {
+          "backend": "telemt_b",
+          "server": "vps1",
+          "session_delta": 0
+        }
+      ],
+      "health": [
+        {
+          "pxname": "telemt_a",
+          "svname": "vps1",
+          "status": "UP",
+          "stot": "1",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_a",
+          "svname": "vps2",
+          "status": "UP",
+          "stot": "0",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_b",
+          "svname": "vps2",
+          "status": "UP",
+          "stot": "1",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_b",
+          "svname": "vps1",
+          "status": "UP",
+          "stot": "0",
+          "scur": "0"
+        }
+      ]
+    },
+    {
+      "stage": "actual_backend1_telemt_stopped",
+      "cases": [
+        {
+          "sni": "apple.com",
+          "authenticated_faketls": true,
+          "res_pq_nonce_verified": true,
+          "fragmented_hello": false
+        },
+        {
+          "sni": "gs.apple.com",
+          "authenticated_faketls": true,
+          "res_pq_nonce_verified": true,
+          "fragmented_hello": false
+        }
+      ],
+      "routing": [
+        {
+          "backend": "telemt_a",
+          "server": "vps1",
+          "session_delta": 0
+        },
+        {
+          "backend": "telemt_a",
+          "server": "vps2",
+          "session_delta": 1
+        },
+        {
+          "backend": "telemt_b",
+          "server": "vps2",
+          "session_delta": 1
+        },
+        {
+          "backend": "telemt_b",
+          "server": "vps1",
+          "session_delta": 0
+        }
+      ],
+      "health": [
+        {
+          "pxname": "telemt_a",
+          "svname": "vps1",
+          "status": "DOWN (agent)",
+          "stot": "1",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_a",
+          "svname": "vps2",
+          "status": "UP",
+          "stot": "1",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_b",
+          "svname": "vps2",
+          "status": "UP",
+          "stot": "2",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_b",
+          "svname": "vps1",
+          "status": "DOWN (agent)",
+          "stot": "0",
+          "scur": "0"
+        }
+      ]
+    },
+    {
+      "stage": "backend1_recovered",
+      "cases": [
+        {
+          "sni": "apple.com",
+          "authenticated_faketls": true,
+          "res_pq_nonce_verified": true,
+          "fragmented_hello": false
+        },
+        {
+          "sni": "gs.apple.com",
+          "authenticated_faketls": true,
+          "res_pq_nonce_verified": true,
+          "fragmented_hello": false
+        }
+      ],
+      "routing": [
+        {
+          "backend": "telemt_a",
+          "server": "vps1",
+          "session_delta": 1
+        },
+        {
+          "backend": "telemt_a",
+          "server": "vps2",
+          "session_delta": 0
+        },
+        {
+          "backend": "telemt_b",
+          "server": "vps2",
+          "session_delta": 1
+        },
+        {
+          "backend": "telemt_b",
+          "server": "vps1",
+          "session_delta": 0
+        }
+      ],
+      "health": [
+        {
+          "pxname": "telemt_a",
+          "svname": "vps1",
+          "status": "UP",
+          "stot": "2",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_a",
+          "svname": "vps2",
+          "status": "UP",
+          "stot": "1",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_b",
+          "svname": "vps2",
+          "status": "UP",
+          "stot": "3",
+          "scur": "0"
+        },
+        {
+          "pxname": "telemt_b",
+          "svname": "vps1",
+          "status": "UP",
+          "stot": "0",
+          "scur": "0"
+        }
+      ]
+    }
+  ],
+  "actual_backend_stop": true,
+  "existing_tcp_session_migration_tested": false
+}

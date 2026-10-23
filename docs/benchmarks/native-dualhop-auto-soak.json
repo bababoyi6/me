@@ -1,0 +1,95 @@
+{
+  "scope": "single native VPS, private entry/two backends and router namespaces; actual HAProxy/WireGuard/Telemt, synthetic DC only",
+  "kernel": "5.15.0-161-generic",
+  "wireguard_psk": true,
+  "wireguard_mtu": 1420,
+  "rtt_ms_configured": 100,
+  "haproxy": "HAProxy version 2.4.30-0ubuntu0.22.04.2 2026/06/19 - https://haproxy.org/",
+  "telemt": "telemt 3.5.5+tdh.audit2",
+  "agent_failover_and_recovery": true,
+  "master_worker_reload_with_existing_transfer": true,
+  "splice_auto_pipes_allocated_observed": 0,
+  "forced_splice_test_pipes_allocated_observed": 1,
+  "master_worker_reload_count": 2,
+  "rows": [
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.750690083000336,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7001670859999649,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 2,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7496569020004245,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 2,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6980120809994332,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6678766719996929,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 1.6904419100001178,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 1.678099731999282,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6683707570000479,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 75000000,
+      "elapsed_seconds": 300.3454033879998,
+      "sha256_verified": true,
+      "backend_index_at_connection_start": 1
+    }
+  ],
+  "health_check_interval_seconds": 2,
+  "agent_interval_seconds": 2,
+  "synthetic_agent_policy": "process liveness plus explicit test down flag; not production five-DC checks",
+  "artifact": {
+    "sha256": "2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1",
+    "version": "telemt 3.5.5+tdh.audit2"
+  }
+}

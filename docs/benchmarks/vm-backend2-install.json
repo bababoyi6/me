@@ -1,0 +1,10 @@
+{
+  "node": "backend2",
+  "scope": "clean Ubuntu 22.04 KVM functional test; shared file-backed guest RAM, not capacity benchmark",
+  "published_source": true,
+  "complete": true,
+  "phase": "complete",
+  "exit": 0,
+  "manager_version_line": "Telemt Dual-Hop 1.4.1",
+  "postincident_fixture_reinstallation": true
+}

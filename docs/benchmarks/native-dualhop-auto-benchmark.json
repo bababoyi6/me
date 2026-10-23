@@ -1,0 +1,127 @@
+{
+  "scope": "single native VPS; real entry HAProxy, WG+PSK to two Telemt backends; local synthetic DC",
+  "telemt": "telemt 3.5.5+tdh.audit2",
+  "build": "auto",
+  "rtt_ms_configured": 100,
+  "kernel": "5.15.0-161-generic",
+  "rate_mbps_per_direction": 100,
+  "wireguard_psk": true,
+  "wireguard_mtu": 1420,
+  "rows": [
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7532983399996738,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6928926410000713,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 2,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7498825200000283,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 2,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7047949629995856,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 16777216,
+      "elapsed_seconds": 2.4033261540007516,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 1,
+      "complete": true
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 16777216,
+      "elapsed_seconds": 2.421524026000043,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 1,
+      "complete": true
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 16777216,
+      "elapsed_seconds": 2.445932358999926,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 2,
+      "complete": true
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 16777216,
+      "elapsed_seconds": 2.4003891770007613,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 2,
+      "complete": true
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 16777216,
+      "elapsed_seconds": 2.3957198549996974,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 3,
+      "complete": true
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 16777216,
+      "elapsed_seconds": 2.4321873690005305,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 3,
+      "complete": true
+    }
+  ],
+  "backend_dc_errors": [
+    [],
+    []
+  ],
+  "environment": {
+    "vcpus": 1,
+    "mem_total_kib": 979300,
+    "test_os": "Ubuntu 22.04.5",
+    "splicing_in_benchmark": false,
+    "one_physical_host_shared_cpu": true,
+    "telegram_real_files": false,
+    "samples_per_direction": 3,
+    "version_batch_order": [
+      "official",
+      "auto"
+    ],
+    "primary_backend_index": 1,
+    "backend_assignment_check": "DC completed transfer counters; candidate had no timed out preceding flows"
+  },
+  "artifact": {
+    "sha256": "2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1",
+    "version": "telemt 3.5.5+tdh.audit2"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "scope": "loopback synthetic HAProxy only; no WireGuard/Telemt/Telegram production claim",
+  "kernel": "6.18.40.1-microsoft-standard-WSL2",
+  "haproxy": "HAProxy version 3.2.9-1ubuntu2.2 2026/06/19 - https://haproxy.org/",
+  "elapsed_seconds": 300.13404674199995,
+  "payload_bytes": 750000000,
+  "rate_mbps_aggregate": 20,
+  "verified_long_streams": 2,
+  "verified_short_probes": 30,
+  "master_worker_reloads_during_transfer": 1,
+  "sha256_all": true,
+  "memory_snapshots": [
+    {
+      "elapsed_seconds": 0.000437459000000473,
+      "memory_available_bytes": 7003246592
+    },
+    {
+      "elapsed_seconds": 10.014087316,
+      "memory_available_bytes": 7012773888
+    },
+    {
+      "elapsed_seconds": 20.023446388000004,
+      "memory_available_bytes": 7092965376
+    },
+    {
+      "elapsed_seconds": 30.03259695,
+      "memory_available_bytes": 7118450688
+    },
+    {
+      "elapsed_seconds": 40.041943776000004,
+      "memory_available_bytes": 7127023616
+    },
+    {
+      "elapsed_seconds": 50.051042927000005,
+      "memory_available_bytes": 7129587712
+    },
+    {
+      "elapsed_seconds": 60.059907897,
+      "memory_available_bytes": 7129128960
+    },
+    {
+      "elapsed_seconds": 70.069198391,
+      "memory_available_bytes": 7129751552
+    },
+    {
+      "elapsed_seconds": 80.078207781,
+      "memory_available_bytes": 7127859200
+    },
+    {
+      "elapsed_seconds": 90.087436205,
+      "memory_available_bytes": 7126720512
+    },
+    {
+      "elapsed_seconds": 100.097269204,
+      "memory_available_bytes": 7122333696
+    },
+    {
+      "elapsed_seconds": 110.106534912,
+      "memory_available_bytes": 6969978880
+    },
+    {
+      "elapsed_seconds": 120.11575074999999,
+      "memory_available_bytes": 6950166528
+    },
+    {
+      "elapsed_seconds": 130.12459768600002,
+      "memory_available_bytes": 7122345984
+    },
+    {
+      "elapsed_seconds": 140.14438074,
+      "memory_available_bytes": 7129546752
+    },
+    {
+      "elapsed_seconds": 150.154174468,
+      "memory_available_bytes": 7134130176
+    },
+    {
+      "elapsed_seconds": 160.163276808,
+      "memory_available_bytes": 7069270016
+    },
+    {
+      "elapsed_seconds": 170.172805592,
+      "memory_available_bytes": 7069978624
+    },
+    {
+      "elapsed_seconds": 180.181986072,
+      "memory_available_bytes": 7072751616
+    },
+    {
+      "elapsed_seconds": 190.191596223,
+      "memory_available_bytes": 7070404608
+    },
+    {
+      "elapsed_seconds": 200.20065109200002,
+      "memory_available_bytes": 7072542720
+    },
+    {
+      "elapsed_seconds": 210.209731759,
+      "memory_available_bytes": 6975033344
+    },
+    {
+      "elapsed_seconds": 220.219175868,
+      "memory_available_bytes": 6840565760
+    },
+    {
+      "elapsed_seconds": 230.228730638,
+      "memory_available_bytes": 7046434816
+    },
+    {
+      "elapsed_seconds": 240.238095832,
+      "memory_available_bytes": 7057711104
+    },
+    {
+      "elapsed_seconds": 250.2477484,
+      "memory_available_bytes": 7064035328
+    },
+    {
+      "elapsed_seconds": 260.269086289,
+      "memory_available_bytes": 7070203904
+    },
+    {
+      "elapsed_seconds": 270.27866272,
+      "memory_available_bytes": 7071952896
+    },
+    {
+      "elapsed_seconds": 280.288170624,
+      "memory_available_bytes": 7070154752
+    },
+    {
+      "elapsed_seconds": 290.298132131,
+      "memory_available_bytes": 7071158272
+    }
+  ],
+  "splice": true,
+  "pipes_allocated_max": 1
+}

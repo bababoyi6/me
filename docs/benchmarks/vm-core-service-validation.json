@@ -1,0 +1,92 @@
+{
+  "scope": "disposable KVM backend2 only; no production access or updater integration",
+  "complete": true,
+  "stages": [
+    {
+      "activation": {
+        "phase": "committed",
+        "sha256": "2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1",
+        "version": "telemt 3.5.5+tdh.audit2",
+        "real_service_ready": true
+      }
+    },
+    {
+      "candidate_status": {
+        "sha256": "2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1",
+        "version": "telemt 3.5.5+tdh.audit2",
+        "config_keys_links_and_units_unchanged": true,
+        "protected_file_count": 7,
+        "unit_security": {
+          "User": "telemt",
+          "Group": "telemt",
+          "ProtectHome": "yes",
+          "ProtectSystem": "strict",
+          "NoNewPrivileges": "yes",
+          "ActiveState": "active"
+        },
+        "real_service_ready": true
+      },
+      "real_dc_handshakes": [
+        {
+          "sni": "apple.com",
+          "verified_res_pq": true,
+          "fragmented_hello": true,
+          "backend2_session_delta": 1
+        },
+        {
+          "sni": "gs.apple.com",
+          "verified_res_pq": true,
+          "fragmented_hello": true,
+          "backend2_session_delta": 1
+        }
+      ]
+    },
+    {
+      "explicit_rollback": {
+        "phase": "recovered",
+        "official_restored": true,
+        "real_service_ready": true
+      }
+    },
+    {
+      "failed_readiness_recovery": {
+        "simulated_readiness_gate_rejection": true,
+        "real_official_binary_restored": true,
+        "real_service_ready": true,
+        "config_unchanged": true
+      }
+    }
+  ],
+  "candidate_left_running": false,
+  "all_targets_attested_disposable_kvm": true,
+  "transaction_source_sha256": "b5bb3e95a3c3a3d43859c7c142f2b48945704ea1802211faf86fc86f5fd32501",
+  "prepare": {
+    "prepared": true,
+    "protected_file_count": 7
+  },
+  "final_recovery": {
+    "phase": "unchanged",
+    "official_restored": true,
+    "real_service_ready": true
+  },
+  "final_status": {
+    "sha256": "cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd",
+    "version": "telemt 3.5.5",
+    "config_keys_links_and_units_unchanged": true,
+    "protected_file_count": 7,
+    "unit_security": {
+      "User": "telemt",
+      "Group": "telemt",
+      "ProtectHome": "yes",
+      "ProtectSystem": "strict",
+      "NoNewPrivileges": "yes",
+      "ActiveState": "active"
+    },
+    "real_service_ready": true
+  },
+  "production_updater_integrated": false,
+  "core_process_crash_injected": false,
+  "readiness_rejection_was_test_callback": true,
+  "production_accessed": false,
+  "github_written": false
+}

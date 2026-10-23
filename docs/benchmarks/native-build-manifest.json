@@ -1,0 +1,36 @@
+{
+  "source_repository": "https://github.com/telemt/telemt",
+  "source_tag": "3.5.5",
+  "source_commit": "ac71d92ec41dea00a7eafd6b8d350c3486633500",
+  "official_source_unmodified_checkout_retained": true,
+  "experimental_builds_are_not_official_releases": true,
+  "toolchain": {
+    "rust": "1.99.1",
+    "zig": "0.17.0",
+    "gnu_target": "x86_64-linux-gnu.2.35",
+    "cmake": "4.4.4",
+    "ninja": "1.13.2",
+    "jobs": 2,
+    "release_lto": "thin",
+    "release_codegen_units": 8,
+    "cargo_locked": true
+  },
+  "patch_sha256": "3daeee2ebec742d259372d45480647029bc9437f700ecaa8b94e0124af74b734",
+  "tested_helper_sha256": "35b23d84ab1e6394e0ec4d36c215ff9295d1cd8828e214c9d79dd55577f17ef9",
+  "builds": {
+    "baseline": {
+      "sha256": "e2de8bb6384bf10c3a11486e72cf97aacc90900e8e105e921556930b16e853d9",
+      "version": "telemt 3.5.5"
+    },
+    "flush": {
+      "sha256": "e0aa14b4032bbfa32fd5389e815371008a78aeae39ec099f9b850e2db3160582",
+      "version": "telemt 3.5.5+tdh.audit1"
+    },
+    "auto": {
+      "sha256": "2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1",
+      "version": "telemt 3.5.5+tdh.audit2"
+    }
+  },
+  "arm_tested": false,
+  "production_installed": false
+}

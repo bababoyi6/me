@@ -1,0 +1,117 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,6 +1,6 @@
+ [package]
+ name = "telemt"
+-version = "3.5.5"
++version = "3.5.5+tdh.audit2"
+ edition = "2024"
+ 
+ [features]
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2900,7 +2900,7 @@
+ 
+ [[package]]
+ name = "telemt"
+-version = "3.5.5"
++version = "3.5.5+tdh.audit2"
+ dependencies = [
+  "aes",
+  "anyhow",
+--- a/src/proxy/relay/adaptive_copy.rs
++++ b/src/proxy/relay/adaptive_copy.rs
+@@ -5,7 +5,7 @@
+ use std::task::{Context, Poll};
+ use std::time::Duration;
+ 
+-use tokio::io::{AsyncBufRead, AsyncRead, AsyncWrite, AsyncWriteExt, ReadBuf, copy_buf};
++use tokio::io::{AsyncBufRead, AsyncRead, AsyncWrite, AsyncWriteExt, ReadBuf};
+ use tokio::time::Instant;
+ use tokio_util::sync::CancellationToken;
+ use tracing::{debug, warn};
+@@ -25,7 +25,11 @@
+ use super::io::{SharedCounters, StatsIo, is_quota_io_error};
+ use super::watchdog_delta;
+ 
++// Flushes buffered ciphertext while an open source has no new data.
++mod flushed_copy;
+ mod write_pressure;
++
++use self::flushed_copy::copy_buf_flushed as copy_buf;
+ 
+ use self::write_pressure::WritePressureIo;
+ 
+--- /dev/null
++++ b/src/proxy/relay/adaptive_copy/flushed_copy.rs
+@@ -0,0 +1,37 @@
++use std::future::poll_fn;
++use std::io;
++use std::pin::Pin;
++use std::task::{Poll, ready};
++
++use tokio::io::{AsyncBufRead, AsyncWrite};
++
++/// Keeps buffered writers progressing while an open source has no new bytes.
++pub(super) async fn copy_buf_flushed<R, W>(reader: &mut R, writer: &mut W) -> io::Result<u64>
++where
++    R: AsyncBufRead + Unpin + ?Sized,
++    W: AsyncWrite + Unpin + ?Sized,
++{
++    let mut transferred = 0;
++    poll_fn(|cx| loop {
++        let data = match Pin::new(&mut *reader).poll_fill_buf(cx) {
++            Poll::Ready(result) => result?,
++            Poll::Pending => {
++                // CryptoWriter may accept plaintext before ciphertext reaches TCP.
++                // Retain the source's registered wakeup and also drive its writer.
++                ready!(Pin::new(&mut *writer).poll_flush(cx))?;
++                return Poll::Pending;
++            }
++        };
++        if data.is_empty() {
++            ready!(Pin::new(&mut *writer).poll_flush(cx))?;
++            return Poll::Ready(Ok(transferred));
++        }
++        let written = ready!(Pin::new(&mut *writer).poll_write(cx, data))?;
++        if written == 0 {
++            return Poll::Ready(Err(io::ErrorKind::WriteZero.into()));
++        }
++        transferred += written as u64;
++        Pin::new(&mut *reader).consume(written);
++    })
++    .await
++}
+--- a/src/transport/socket.rs
++++ b/src/transport/socket.rs
+@@ -67,9 +67,7 @@
+ 
+     socket.set_tcp_keepalive(&keepalive)?;
+ 
+-    // Keep explicit baseline buffers for predictable throughput across busy hosts.
+-    socket.set_recv_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;
+-    socket.set_send_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;
++    // Preserve bounded kernel TCP autotuning on high-RTT relay paths.
+ 
+     // Set TCP user timeout (Linux only)
+     // NOTE: iOS does not support TCP_USER_TIMEOUT - application-level timeout
+@@ -151,8 +149,7 @@
+ 
+     // Disable Nagle
+     socket.set_tcp_nodelay(true)?;
+-    socket.set_recv_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;
+-    socket.set_send_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;
++    // Preserve bounded kernel TCP autotuning on high-RTT relay paths.
+ 
+     if let Some(bind_ip) = bind_addr {
+         let bind_sock_addr = SocketAddr::new(bind_ip, 0);
+--- /dev/null
++++ b/AUDIT-MODIFICATIONS.md
+@@ -0,0 +1,7 @@
++Unofficial local experiment based on Telemt 3.5.5 (ac71d92ec41dea00a7eafd6b8d350c3486633500).
++
++Changes: flush pending relay output before waiting for further source input, preserving existing adaptive buffers, cryptography, wire formats, quotas and connection handling.
++
++No endorsement by Telemt maintainers. Original LICENSE and attribution are retained. This build is not a production release.
++
++Second experimental build also preserves kernel TCP automatic send/receive buffer selection on client-facing and Direct outgoing relay sockets. Fallback socket configuration is retained. This may increase kernel socket memory under load and requires separate pressure validation.

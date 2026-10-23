@@ -1,0 +1,48 @@
+{
+  "role": "backend2",
+  "kernel": "5.15.0-198-generic",
+  "capacity": {
+    "BACKEND_MAX_CONNECTIONS": 1912,
+    "BACKEND_BUFFER_BUDGET_BYTES": 250609664
+  },
+  "services": {
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "User": "",
+      "Group": "",
+      "ProtectHome": "no",
+      "ProtectSystem": "no",
+      "NoNewPrivileges": "no",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "User": "telemt",
+      "Group": "telemt",
+      "ProtectHome": "yes",
+      "ProtectSystem": "strict",
+      "NoNewPrivileges": "yes",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "telemt-dual-hop-health-agent.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "User": "telemt",
+      "Group": "telemt",
+      "ProtectHome": "yes",
+      "ProtectSystem": "strict",
+      "NoNewPrivileges": "yes",
+      "ActiveState": "active",
+      "SubState": "running"
+    }
+  },
+  "api_ready": true,
+  "agent_up": true,
+  "protected_files_recorded": 7,
+  "manager_sha256": "61757a1c5a555239e8ece62d9e29b0a89b323681fd64ecd22c3e35f626c795e7",
+  "default_cc": "bbr"
+}

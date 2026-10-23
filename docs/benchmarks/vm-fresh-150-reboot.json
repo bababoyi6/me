@@ -1,0 +1,22 @@
+{
+  "complete": true,
+  "normal_shutdown_all_three_guests": true,
+  "forced_power_cut_injected": false,
+  "all_node_protected_files": {
+    "entry": {
+      "protected_files_unchanged": true,
+      "file_count": 13
+    },
+    "backend1": {
+      "protected_files_unchanged": true,
+      "file_count": 16
+    },
+    "backend2": {
+      "protected_files_unchanged": true,
+      "file_count": 16
+    }
+  },
+  "all_three_diagnose_after_boot": true,
+  "post_boot_authenticated_real_dc_sni_cases": 2,
+  "capacity_benchmark": false
+}

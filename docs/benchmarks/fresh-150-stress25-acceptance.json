@@ -1,0 +1,13 @@
+{
+  "complete": true,
+  "profile": "stress25",
+  "link_budget_mbps": 1000,
+  "rtt_ms": 100,
+  "real_telegram_files": false,
+  "wireguard_in_bulk_path": false,
+  "three_physical_vps_capacity_test": false,
+  "owned_network_namespaces_remaining": 0,
+  "private_proxy_temp_directories_remaining": 0,
+  "production_accessed": false,
+  "github_written": false
+}

@@ -20,12 +20,13 @@ def main(args):
         return next(int(r.split()[1]) * 1024 for r in Path("/proc/meminfo").read_text().splitlines() if r.startswith("MemAvailable:"))
     if available() < 192 * 1024**2:
         raise SystemExit("Insufficient memory safety margin")
-    lab, snapshots = Lab(args.haproxy, master=True), []
+    lab, snapshots = Lab(args.haproxy, splice=args.splice, master=True), []
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
     try:
         started = time.monotonic()
         futures = [executor.submit(lab.transfer, "apple.com", direction, 375000000, 1250000) for direction in ("D", "U")]
         reloads, probes, last_probe = 0, 0, -10
+        pipes_allocated_max = 0
         while not all(f.done() for f in futures):
             elapsed = time.monotonic() - started
             if elapsed > 335:
@@ -38,6 +39,8 @@ def main(args):
                 probes += 1
                 last_probe = elapsed
                 memory = available()
+                pipe_info = dict(line.split(": ", 1) for line in lab.stat().splitlines() if ": " in line)
+                pipes_allocated_max = max(pipes_allocated_max, int(pipe_info.get("PipesUsed", 0)) + int(pipe_info.get("PipesFree", 0)))
                 snapshots.append({"elapsed_seconds": elapsed, "memory_available_bytes": memory})
                 if memory < 192 * 1024**2:
                     raise RuntimeError("Memory safety margin reached")
@@ -50,6 +53,7 @@ def main(args):
                   "rate_mbps_aggregate": 20, "verified_long_streams": 2,
                   "verified_short_probes": probes, "master_worker_reloads_during_transfer": reloads,
                   "sha256_all": True, "memory_snapshots": snapshots}
+        output.update(splice=args.splice, pipes_allocated_max=pipes_allocated_max)
         Path(args.output).write_text(json.dumps(output, indent=2) + "\n")
         print(json.dumps({k: v for k, v in output.items() if k != "memory_snapshots"}), flush=True)
     finally:
@@ -61,6 +65,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--haproxy", default="haproxy")
     parser.add_argument("--output", required=True)
+    parser.add_argument("--splice", action="store_true", help="explicit lab-only splice-auto long-transfer check")
     args = parser.parse_args()
     signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     main(args)

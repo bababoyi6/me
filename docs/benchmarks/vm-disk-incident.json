@@ -1,0 +1,34 @@
+{
+  "scope": "nested KVM test infrastructure incident; not a production test",
+  "host_filesystem_size_gib_approx": 15,
+  "host_space_exhausted": true,
+  "affected_fixture": "backend2",
+  "observed_file_bytes": {
+    "state": 1497,
+    "telemt_config": 1244,
+    "api_token_file": 65,
+    "wireguard_private_key": 0,
+    "wireguard_config": 0,
+    "telemt_unit": 0,
+    "health_agent_unit": 0
+  },
+  "first_three_match_preincident_private_digests": true,
+  "initial_service_snapshot_ready": true,
+  "empty_transferred_test_tools_invalidated_exit_code_only_checks": true,
+  "entry_health_gate_refused_activation": true,
+  "fixture_reenrollment_required": true,
+  "fixture_repair_is_not_identity_preserving_production_upgrade": true,
+  "recovery": [
+    "stop test guests",
+    "release private RAM files",
+    "clean only guest APT download caches",
+    "discard freed guest storage",
+    "add controller disk reserve guard",
+    "verify full tool archive checksum",
+    "reinstall only disposable B2 fixture"
+  ],
+  "production_accessed": false,
+  "used_as_throughput_result": false,
+  "corrupt_zero_byte_shortcut_guard_refused_overwrite": true,
+  "zero_byte_shortcut_explicitly_removed_only_in_disposable_guest": true
+}

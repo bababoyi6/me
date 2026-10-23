@@ -1,0 +1,25 @@
+{
+  "complete": true,
+  "nodes": {
+    "entry": {
+      "diagnose_passed": true,
+      "perf_passed": true,
+      "core_version": null
+    },
+    "backend1": {
+      "diagnose_passed": true,
+      "perf_passed": true,
+      "core_version": "3.5.5+tdh.audit2"
+    },
+    "backend2": {
+      "diagnose_passed": true,
+      "perf_passed": true,
+      "core_version": "3.5.5+tdh.audit2"
+    }
+  },
+  "actual_telemt_stop_and_failover": true,
+  "two_sni_real_dc_nonce_verified": true,
+  "unpublished_download_boundary": true,
+  "production_accessed": false,
+  "github_written": false
+}

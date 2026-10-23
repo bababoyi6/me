@@ -1,0 +1,397 @@
+{
+  "说明": "只读本机采样；无主动测速、无上传；null 表示不可用。TCP RTT 为当前连接分布，不是时间序列 P95。",
+  "schema": 1,
+  "role": "entry",
+  "kernel": "5.15.0-198-generic",
+  "sample_seconds": 3.378,
+  "timestamp_utc": "2026-10-23T09:23:35.006464+00:00",
+  "versions": {
+    "telemt": null,
+    "haproxy": "2.4.30-0ubuntu0.22.04.2"
+  },
+  "memory_kib": {
+    "MemTotal": 979296,
+    "MemAvailable": 642728,
+    "SwapTotal": 0,
+    "SwapFree": 0
+  },
+  "cpu": {
+    "cpu": {
+      "busy_percent": 64.73,
+      "steal_percent": 21.58
+    },
+    "cpu0": {
+      "busy_percent": 64.58,
+      "steal_percent": 21.67
+    }
+  },
+  "services": {
+    "haproxy": {
+      "running": true,
+      "rss_bytes": 18288640,
+      "fds": 18,
+      "fd_limit": 524288,
+      "tasks": 2,
+      "sample_seconds": 2.57,
+      "cpu_percent_one_core": 1.56
+    },
+    "telemt": {
+      "running": false,
+      "rss_bytes": 0,
+      "fds": 0,
+      "fd_limit": 1048576,
+      "tasks": null,
+      "sample_seconds": 2.573,
+      "cpu_percent_one_core": 0.0
+    },
+    "health-agent": {
+      "running": false,
+      "rss_bytes": 0,
+      "fds": 0,
+      "fd_limit": 1048576,
+      "tasks": null,
+      "sample_seconds": 2.475,
+      "cpu_percent_one_core": 0.0
+    }
+  },
+  "interfaces": {
+    "nic0": {
+      "mtu": 1500,
+      "rx_bytes": 10678234,
+      "tx_bytes": 306746,
+      "rx_dropped": 0,
+      "tx_dropped": 0,
+      "rx_errors": 0,
+      "tx_errors": 0,
+      "qdisc": [
+        {
+          "kind": "fq",
+          "drops": 0,
+          "overlimits": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      ],
+      "offload": {
+        "tcp-segmentation-offload": false,
+        "generic-segmentation-offload": false,
+        "generic-receive-offload": true,
+        "tx-udp-segmentation": false
+      },
+      "rx_bytes_delta": 116,
+      "tx_bytes_delta": 256,
+      "rx_dropped_delta": 0,
+      "tx_dropped_delta": 0,
+      "rx_errors_delta": 0,
+      "tx_errors_delta": 0
+    },
+    "nic1": {
+      "mtu": 1500,
+      "rx_bytes": 292944,
+      "tx_bytes": 456282,
+      "rx_dropped": 0,
+      "tx_dropped": 0,
+      "rx_errors": 0,
+      "tx_errors": 0,
+      "qdisc": [
+        {
+          "kind": "fq",
+          "drops": 0,
+          "overlimits": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      ],
+      "offload": {
+        "tcp-segmentation-offload": false,
+        "generic-segmentation-offload": false,
+        "generic-receive-offload": true,
+        "tx-udp-segmentation": false
+      },
+      "rx_bytes_delta": 3036,
+      "tx_bytes_delta": 5302,
+      "rx_dropped_delta": 0,
+      "tx_dropped_delta": 0,
+      "rx_errors_delta": 0,
+      "tx_errors_delta": 0
+    },
+    "tdh1": {
+      "mtu": 1420,
+      "rx_bytes": 31372,
+      "tx_bytes": 39236,
+      "rx_dropped": 0,
+      "tx_dropped": 0,
+      "rx_errors": 0,
+      "tx_errors": 0,
+      "qdisc": [
+        {
+          "kind": "noqueue",
+          "drops": 0,
+          "overlimits": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      ],
+      "offload": {
+        "tcp-segmentation-offload": true,
+        "generic-segmentation-offload": true,
+        "generic-receive-offload": true,
+        "tx-udp-segmentation": true
+      },
+      "rx_bytes_delta": 1152,
+      "tx_bytes_delta": 1968,
+      "rx_dropped_delta": 0,
+      "tx_dropped_delta": 0,
+      "rx_errors_delta": 0,
+      "tx_errors_delta": 0
+    },
+    "tdh2": {
+      "mtu": 1420,
+      "rx_bytes": 28500,
+      "tx_bytes": 41588,
+      "rx_dropped": 0,
+      "tx_dropped": 0,
+      "rx_errors": 0,
+      "tx_errors": 0,
+      "qdisc": [
+        {
+          "kind": "noqueue",
+          "drops": 0,
+          "overlimits": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      ],
+      "offload": {
+        "tcp-segmentation-offload": true,
+        "generic-segmentation-offload": true,
+        "generic-receive-offload": true,
+        "tx-udp-segmentation": true
+      },
+      "rx_bytes_delta": 960,
+      "tx_bytes_delta": 1696,
+      "rx_dropped_delta": 0,
+      "tx_dropped_delta": 0,
+      "rx_errors_delta": 0,
+      "tx_errors_delta": 0
+    }
+  },
+  "tcp": {},
+  "wireguard": {
+    "tdh1": {
+      "handshake_age_seconds": 62
+    },
+    "tdh2": {
+      "handshake_age_seconds": 62
+    }
+  },
+  "system_counters_delta": {
+    "Ip.ReasmFails": 0,
+    "Ip.FragFails": 0,
+    "Ip.FragCreates": 0,
+    "Icmp.InErrors": 0,
+    "Tcp.InSegs": 24,
+    "Tcp.OutSegs": 43,
+    "Tcp.RetransSegs": 0,
+    "Udp.InErrors": 0,
+    "Udp.RcvbufErrors": 0,
+    "Udp.SndbufErrors": 0,
+    "UdpLite.InErrors": 0,
+    "UdpLite.RcvbufErrors": 0,
+    "UdpLite.SndbufErrors": 0,
+    "TcpExt.ListenOverflows": 0,
+    "TcpExt.ListenDrops": 0,
+    "TcpExt.TCPLostRetransmit": 0,
+    "TcpExt.TCPTimeouts": 0,
+    "TcpExt.TCPMemoryPressures": 0,
+    "TcpExt.TCPBacklogDrop": 0,
+    "TcpExt.TCPRcvQDrop": 0,
+    "Vm.pswpin": 0,
+    "Vm.pswpout": 0,
+    "Vm.pgmajfault": 10,
+    "Vm.oom_kill": 0
+  },
+  "vm_counters_total": {
+    "Vm.pswpin": 0,
+    "Vm.pswpout": 0,
+    "Vm.pgmajfault": 1284,
+    "Vm.oom_kill": 0
+  },
+  "sysctl": {
+    "net.core.default_qdisc": "fq",
+    "net.ipv4.tcp_congestion_control": "bbr",
+    "net.ipv4.tcp_available_congestion_control": "reno cubic bbr",
+    "net.ipv4.tcp_rmem": "4096\t131072\t6291456",
+    "net.ipv4.tcp_wmem": "4096\t16384\t4194304",
+    "net.core.rmem_max": "212992",
+    "net.core.wmem_max": "212992",
+    "net.ipv4.tcp_mtu_probing": "0",
+    "net.core.somaxconn": "65535",
+    "net.ipv4.tcp_max_syn_backlog": "32768"
+  },
+  "haproxy": [
+    {
+      "pxname": "mtp_tls",
+      "svname": "FRONTEND",
+      "status": "OPEN",
+      "qcur": null,
+      "qmax": null,
+      "scur": 0,
+      "smax": 2,
+      "slim": 1912,
+      "bin": 3846,
+      "bout": 11228,
+      "econ": null,
+      "eresp": null,
+      "wretr": null,
+      "wredis": null,
+      "chkfail": null,
+      "chkdown": null,
+      "downtime": null,
+      "qtime": null,
+      "ctime": null,
+      "rtime": null,
+      "ttime": null
+    },
+    {
+      "pxname": "telemt_a",
+      "svname": "vps1",
+      "status": "UP",
+      "qcur": 0,
+      "qmax": 0,
+      "scur": 0,
+      "smax": 1,
+      "slim": null,
+      "bin": 1282,
+      "bout": 6861,
+      "econ": 0,
+      "eresp": 0,
+      "wretr": 0,
+      "wredis": 0,
+      "chkfail": 0,
+      "chkdown": 1,
+      "downtime": 20,
+      "qtime": 20,
+      "ctime": 18,
+      "rtime": 0,
+      "ttime": 314
+    },
+    {
+      "pxname": "telemt_a",
+      "svname": "vps2",
+      "status": "UP",
+      "qcur": 0,
+      "qmax": 0,
+      "scur": 0,
+      "smax": 1,
+      "slim": null,
+      "bin": 641,
+      "bout": 3433,
+      "econ": 0,
+      "eresp": 0,
+      "wretr": 0,
+      "wredis": 0,
+      "chkfail": 0,
+      "chkdown": 0,
+      "downtime": 0,
+      "qtime": 0,
+      "ctime": 38,
+      "rtime": 0,
+      "ttime": 319
+    },
+    {
+      "pxname": "telemt_a",
+      "svname": "BACKEND",
+      "status": "UP",
+      "qcur": 0,
+      "qmax": 0,
+      "scur": 0,
+      "smax": 1,
+      "slim": 192,
+      "bin": 1923,
+      "bout": 10294,
+      "econ": 0,
+      "eresp": 0,
+      "wretr": 0,
+      "wredis": 0,
+      "chkfail": null,
+      "chkdown": 0,
+      "downtime": 0,
+      "qtime": 13,
+      "ctime": 25,
+      "rtime": 0,
+      "ttime": 316
+    },
+    {
+      "pxname": "telemt_b",
+      "svname": "vps2",
+      "status": "UP",
+      "qcur": 0,
+      "qmax": 0,
+      "scur": 0,
+      "smax": 1,
+      "slim": null,
+      "bin": 1923,
+      "bout": 934,
+      "econ": 0,
+      "eresp": 0,
+      "wretr": 0,
+      "wredis": 0,
+      "chkfail": 0,
+      "chkdown": 0,
+      "downtime": 0,
+      "qtime": 11,
+      "ctime": 22,
+      "rtime": 0,
+      "ttime": 277
+    },
+    {
+      "pxname": "telemt_b",
+      "svname": "vps1",
+      "status": "UP",
+      "qcur": 0,
+      "qmax": 0,
+      "scur": 0,
+      "smax": 0,
+      "slim": null,
+      "bin": 0,
+      "bout": 0,
+      "econ": 0,
+      "eresp": 0,
+      "wretr": 0,
+      "wredis": 0,
+      "chkfail": 0,
+      "chkdown": 1,
+      "downtime": 23,
+      "qtime": 0,
+      "ctime": 0,
+      "rtime": 0,
+      "ttime": 0
+    },
+    {
+      "pxname": "telemt_b",
+      "svname": "BACKEND",
+      "status": "UP",
+      "qcur": 0,
+      "qmax": 0,
+      "scur": 0,
+      "smax": 1,
+      "slim": 192,
+      "bin": 1923,
+      "bout": 934,
+      "econ": 0,
+      "eresp": 0,
+      "wretr": 0,
+      "wredis": 0,
+      "chkfail": null,
+      "chkdown": 0,
+      "downtime": 0,
+      "qtime": 11,
+      "ctime": 22,
+      "rtime": 0,
+      "ttime": 277
+    }
+  ],
+  "telemt": null,
+  "direct_buffer_pressure": null
+}

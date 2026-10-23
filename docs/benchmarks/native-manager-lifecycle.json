@@ -1,0 +1,37 @@
+{
+  "scope": "private file lifecycle and isolated native HAProxy validation; not three fresh physical Ubuntu installs",
+  "test_os": "Ubuntu 22.04.5",
+  "source_archive_sha256": "5914410974b64544570b5b05ee6dd0eb8f0400ca2fea76d74fb694ee80050a9f",
+  "manager_sha256": "b58695e8eae1928be4e5960ebe58e37b542533bc10a765c8e96db29324bdc71c",
+  "python_regressions_passed": 64,
+  "new_install_update_regressions": 13,
+  "syntax_shellcheck_selftest_passed": true,
+  "actual_haproxy_sni_fragmentation_proxyv2_sha256_agent_failover_passed": true,
+  "host_account_files_unchanged": true,
+  "packages_and_service_operations_executed_for_lifecycle_tests": false,
+  "runtime_templates_match_baseline_commit": "452c50d268c8a95d68bdda0d27878f4e9ddcefb2",
+  "default_telemt": "official 3.5.5",
+  "experimental_core_in_default_install_or_update": false,
+  "production_target": [
+    {
+      "role": "entry",
+      "location": "Los Angeles",
+      "vcpus": 1,
+      "memory_gb": 1
+    },
+    {
+      "role": "backend1",
+      "location": "Los Angeles",
+      "vcpus": 1,
+      "memory_gb": 2
+    },
+    {
+      "role": "backend2",
+      "location": "New York",
+      "vcpus": 1,
+      "memory_gb": 1
+    }
+  ],
+  "production_os": "Ubuntu 22.04 LTS",
+  "production_network_or_real_telegram_files_measured": false
+}

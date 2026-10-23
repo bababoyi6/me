@@ -1,0 +1,16 @@
+{
+  "scope": "owned VM and native core experiment cleanup; private tools/artifacts retained",
+  "owned_lab_processes_remaining": 0,
+  "owned_vm_loopback_listeners_remaining": 0,
+  "owned_network_namespaces_remaining": 0,
+  "owned_vm_cgroup_remaining": false,
+  "e2e_temporary_directories_remaining": 0,
+  "synthetic_wireguard_key_files_remaining": 0,
+  "host_oom_kill_counter": 0,
+  "private_vm_disks_retained": 3,
+  "private_vm_ssh_key_retained": true,
+  "private_directory_mode": "0o700",
+  "private_key_mode": "0o600",
+  "production_accessed": false,
+  "github_written": false
+}

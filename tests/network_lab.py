@@ -37,6 +37,21 @@ def memory_available():
     return next(int(x.split()[1]) * 1024 for x in Path("/proc/meminfo").read_text().splitlines() if x.startswith("MemAvailable:"))
 
 
+def cpu_snapshot():
+    return list(map(int, Path('/proc/stat').read_text().splitlines()[0].split()[1:9]))
+
+
+def cpu_interval(before, after):
+    delta = [new-old for old,new in zip(before,after)]
+    if len(delta) != 8 or any(value < 0 for value in delta) or not sum(delta):
+        return None
+    total = sum(delta)
+    # guest time is already included in user/nice; steal is unavailable vCPU
+    # time and must not be misreported as the proxy consuming CPU.
+    return {'busy_percent':100*sum(delta[index] for index in (0,1,2,5,6))/total,
+            'steal_percent':100*delta[7]/total,'iowait_percent':100*delta[4]/total}
+
+
 class Network:
     def __init__(self, args):
         self.args = args
@@ -106,11 +121,12 @@ class Network:
                     "allowed-ips", peer + "/32", *peer_args)
             command("ip", "-n", ns, "link", "set", "wg-lab", "mtu", str(self.args.mtu), "up")
         command("ip", "netns", "exec", NAMES[0], "ping", "-n", "-c", "4", "-W", "3", "10.77.1.2", timeout=15)
-        for bind in ("198.51.100.2", "10.77.1.2"):
-            process = subprocess.Popen(["ip", "netns", "exec", NAMES[2], self.args.iperf,
-                                        "-s", "-B", bind, "-p", "5201"],
-                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            self.processes.append(process)
+        if getattr(self.args, "start_iperf", True):
+            for bind in ("198.51.100.2", "10.77.1.2"):
+                process = subprocess.Popen(["ip", "netns", "exec", NAMES[2], self.args.iperf,
+                                            "-s", "-B", bind, "-p", "5201"],
+                                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                self.processes.append(process)
         time.sleep(.4)
         if any(p.poll() is not None for p in self.processes):
             raise RuntimeError("private iperf server failed")

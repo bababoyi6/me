@@ -1,0 +1,25 @@
+{
+  "scope": "post-experiment inventory; no production access",
+  "lab_namespaces_remaining": 0,
+  "lab_processes_remaining": 0,
+  "temporary_directories_remaining": 0,
+  "private_key_files_remaining": 0,
+  "oom_kills_since_boot": 0,
+  "tcp_listeners": [
+    {
+      "port": 53,
+      "loopback": true
+    },
+    {
+      "port": 22,
+      "loopback": false
+    },
+    {
+      "port": 22,
+      "loopback": false
+    }
+  ],
+  "host_account_files_unchanged_by_validation": true,
+  "packages_installed": false,
+  "services_installed_or_reconfigured": false
+}

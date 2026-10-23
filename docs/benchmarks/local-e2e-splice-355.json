@@ -1,0 +1,121 @@
+{
+  "scope": "loopback authenticated FakeTLS/PROXYv2/AES-CTR/padded transport with synthetic mock DC, not Telegram files",
+  "kernel": "6.18.40.1-microsoft-standard-WSL2",
+  "telemt": "telemt 3.5.5",
+  "rows": [
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "telemt",
+      "bytes": 131072,
+      "elapsed_seconds": 0.15339694799999926,
+      "handshake_ms": 55.21478999999907,
+      "sha256_verified": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "telemt",
+      "bytes": 131072,
+      "elapsed_seconds": 0.12212051699999904,
+      "handshake_ms": 53.40670999999908,
+      "sha256_verified": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "telemt",
+      "bytes": 131072,
+      "elapsed_seconds": 0.14581233700000062,
+      "handshake_ms": 48.43400700000089,
+      "sha256_verified": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "telemt",
+      "bytes": 131072,
+      "elapsed_seconds": 0.11831672199999943,
+      "handshake_ms": 48.13322600000092,
+      "sha256_verified": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 131072,
+      "elapsed_seconds": 0.13786937099999896,
+      "handshake_ms": 43.5199329999989,
+      "sha256_verified": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 131072,
+      "elapsed_seconds": 0.09932391099999904,
+      "handshake_ms": 46.68373600000031,
+      "sha256_verified": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 131072,
+      "elapsed_seconds": 0.1405322139999985,
+      "handshake_ms": 46.58871799999886,
+      "sha256_verified": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 131072,
+      "elapsed_seconds": 0.10106110599999951,
+      "handshake_ms": 48.42643199999941,
+      "sha256_verified": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1048576,
+      "elapsed_seconds": 0.854334819,
+      "handshake_ms": 15.296827000000235,
+      "sha256_verified": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 1048576,
+      "elapsed_seconds": 0.9025581739999993,
+      "handshake_ms": 21.607325999999816,
+      "sha256_verified": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1048576,
+      "elapsed_seconds": 0.8560664840000012,
+      "handshake_ms": 17.061224000000763,
+      "sha256_verified": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 1048576,
+      "elapsed_seconds": 0.8988110880000004,
+      "handshake_ms": 17.600918999999493,
+      "sha256_verified": true
+    }
+  ],
+  "fast_mode": true,
+  "splice": true,
+  "haproxy": "HAProxy version 3.2.9-1ubuntu2.2 2026/06/19 - https://haproxy.org/",
+  "config_unchanged": true,
+  "mock_dc_completed": 12,
+  "mock_dc_connect_only_checks": 5
+}

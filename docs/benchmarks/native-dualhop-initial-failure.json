@@ -1,0 +1,12 @@
+{
+  "scope": "first high-RTT full-path soak attempt; test fixture only",
+  "telemt": "telemt 3.5.5+tdh.audit2",
+  "configured_rtt_ms": 100,
+  "test_agent_interval_ms": 100,
+  "production_agent_interval_ms": 2000,
+  "status": "failed before completing transitions",
+  "error": "agent state transition deadline",
+  "transfers_claimed_successful": 0,
+  "result_json_was_written": false,
+  "change_for_rerun": "use production 2-second checks and agent intervals, timeout check 3 seconds, 12-second state deadline; core unchanged"
+}

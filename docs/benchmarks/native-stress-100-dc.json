@@ -1,0 +1,10 @@
+{
+  "completed": 96,
+  "errors": [],
+  "connect_only": 10,
+  "tcp_listen_counters": {
+    "ListenOverflows": 0,
+    "ListenDrops": 0,
+    "TCPSynRetrans": 0
+  }
+}

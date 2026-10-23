@@ -1,0 +1,105 @@
+{
+  "entry": {
+    "node": "entry",
+    "complete": true,
+    "exit": 0,
+    "github_download_boundary": "local candidate; no publication",
+    "real_installed_command": true,
+    "checks": [
+      {
+        "phase": "before",
+        "protected_file_and_service_records": 19,
+        "unchanged": false
+      },
+      {
+        "phase": "updated",
+        "protected_file_and_service_records": 19,
+        "unchanged": true
+      },
+      {
+        "phase": "repeated_install",
+        "protected_file_and_service_records": 19,
+        "unchanged": true
+      },
+      {
+        "phase": "rollback",
+        "protected_file_and_service_records": 19,
+        "unchanged": true
+      },
+      {
+        "phase": "reupdated",
+        "protected_file_and_service_records": 19,
+        "unchanged": true
+      },
+      {
+        "manager_rollback_exercised": true
+      }
+    ]
+  },
+  "backend1": {
+    "node": "backend1",
+    "complete": true,
+    "exit": 0,
+    "github_download_boundary": "local candidate; no publication",
+    "real_installed_command": true,
+    "checks": [
+      {
+        "phase": "before",
+        "protected_file_and_service_records": 17,
+        "unchanged": false
+      },
+      {
+        "phase": "updated",
+        "protected_file_and_service_records": 17,
+        "unchanged": true
+      },
+      {
+        "phase": "repeated_install",
+        "protected_file_and_service_records": 17,
+        "unchanged": true
+      },
+      {
+        "manager_rollback_exercised": false,
+        "raw_fixture_reason": "original updater created no backup",
+        "reason": "already identical candidate; no distinct previous content was available; no rollback claimed"
+      }
+    ]
+  },
+  "backend2": {
+    "node": "backend2",
+    "complete": true,
+    "exit": 0,
+    "github_download_boundary": "local candidate; no publication",
+    "real_installed_command": true,
+    "checks": [
+      {
+        "phase": "before",
+        "protected_file_and_service_records": 17,
+        "unchanged": false
+      },
+      {
+        "phase": "updated",
+        "protected_file_and_service_records": 17,
+        "unchanged": true
+      },
+      {
+        "phase": "repeated_install",
+        "protected_file_and_service_records": 17,
+        "unchanged": true
+      },
+      {
+        "phase": "rollback",
+        "protected_file_and_service_records": 17,
+        "unchanged": true
+      },
+      {
+        "phase": "reupdated",
+        "protected_file_and_service_records": 17,
+        "unchanged": true
+      },
+      {
+        "manager_rollback_exercised": true
+      }
+    ]
+  }
+}

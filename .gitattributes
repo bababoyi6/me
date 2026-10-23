@@ -1,2 +1,8 @@
 *.sh text eol=lf
 *.py text eol=lf
+*.rs text eol=lf
+# Preserve context line endings from the pinned upstream source archive.
+# Unified-diff blank context lines and CRLF are intentional patch syntax.
+patches/*.patch -text -whitespace
+# Retain the upstream license bytes, including its original trailing space.
+patches/TELEMT-LICENSE.txt -text -whitespace

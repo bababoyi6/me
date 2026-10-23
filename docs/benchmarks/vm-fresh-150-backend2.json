@@ -1,0 +1,10 @@
+{
+  "node": "backend2",
+  "complete": true,
+  "exact_readme_one_line_command": true,
+  "bad_archive_rejected": false,
+  "failed_install_state_removed": null,
+  "default_core_verified": true,
+  "source_sha256": "2d1e6c59ef0ce69d0fd734d1d9a6cab89881ac92e26e54d38f4b2080bc16acc3",
+  "production_accessed": false
+}

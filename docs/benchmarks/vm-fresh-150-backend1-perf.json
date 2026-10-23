@@ -1,0 +1,220 @@
+{
+  "说明": "只读本机采样；无主动测速、无上传；null 表示不可用。TCP RTT 为当前连接分布，不是时间序列 P95。",
+  "schema": 1,
+  "role": "backend1",
+  "kernel": "5.15.0-198-generic",
+  "sample_seconds": 5.793,
+  "timestamp_utc": "2026-10-23T09:23:59.639859+00:00",
+  "versions": {
+    "telemt": "3.5.5+tdh.audit2",
+    "haproxy": null
+  },
+  "memory_kib": {
+    "MemTotal": 2009952,
+    "MemAvailable": 1718708,
+    "SwapTotal": 0,
+    "SwapFree": 0
+  },
+  "cpu": {
+    "cpu": {
+      "busy_percent": 18.58,
+      "steal_percent": 26.32
+    },
+    "cpu0": {
+      "busy_percent": 18.58,
+      "steal_percent": 26.32
+    }
+  },
+  "services": {
+    "haproxy": {
+      "running": false,
+      "rss_bytes": 0,
+      "fds": 0,
+      "fd_limit": 1048576,
+      "tasks": null,
+      "sample_seconds": 3.677,
+      "cpu_percent_one_core": 0.0
+    },
+    "telemt": {
+      "running": true,
+      "rss_bytes": 22175744,
+      "fds": 14,
+      "fd_limit": 262144,
+      "tasks": 11,
+      "sample_seconds": 3.91,
+      "cpu_percent_one_core": 5.11
+    },
+    "health-agent": {
+      "running": true,
+      "rss_bytes": 19034112,
+      "fds": 5,
+      "fd_limit": 524288,
+      "tasks": 3,
+      "sample_seconds": 3.966,
+      "cpu_percent_one_core": 4.03
+    }
+  },
+  "interfaces": {
+    "nic0": {
+      "mtu": 1500,
+      "rx_bytes": 29991969,
+      "tx_bytes": 391636,
+      "rx_dropped": 0,
+      "tx_dropped": 0,
+      "rx_errors": 0,
+      "tx_errors": 0,
+      "qdisc": [
+        {
+          "kind": "fq",
+          "drops": 0,
+          "overlimits": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      ],
+      "offload": {
+        "tcp-segmentation-offload": false,
+        "generic-segmentation-offload": false,
+        "generic-receive-offload": true,
+        "tx-udp-segmentation": false
+      },
+      "rx_bytes_delta": 0,
+      "tx_bytes_delta": 0,
+      "rx_dropped_delta": 0,
+      "tx_dropped_delta": 0,
+      "rx_errors_delta": 0,
+      "tx_errors_delta": 0
+    },
+    "nic1": {
+      "mtu": 1500,
+      "rx_bytes": 246416,
+      "tx_bytes": 160856,
+      "rx_dropped": 0,
+      "tx_dropped": 0,
+      "rx_errors": 0,
+      "tx_errors": 0,
+      "qdisc": [
+        {
+          "kind": "fq",
+          "drops": 0,
+          "overlimits": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      ],
+      "offload": {
+        "tcp-segmentation-offload": false,
+        "generic-segmentation-offload": false,
+        "generic-receive-offload": true,
+        "tx-udp-segmentation": false
+      },
+      "rx_bytes_delta": 3816,
+      "tx_bytes_delta": 2346,
+      "rx_dropped_delta": 0,
+      "tx_dropped_delta": 0,
+      "rx_errors_delta": 0,
+      "tx_errors_delta": 0
+    },
+    "tdh-b1": {
+      "mtu": 1420,
+      "rx_bytes": 54468,
+      "tx_bytes": 40588,
+      "rx_dropped": 0,
+      "tx_dropped": 0,
+      "rx_errors": 0,
+      "tx_errors": 0,
+      "qdisc": [
+        {
+          "kind": "noqueue",
+          "drops": 0,
+          "overlimits": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      ],
+      "offload": {
+        "tcp-segmentation-offload": true,
+        "generic-segmentation-offload": true,
+        "generic-receive-offload": true,
+        "tx-udp-segmentation": true
+      },
+      "rx_bytes_delta": 2928,
+      "tx_bytes_delta": 1920,
+      "rx_dropped_delta": 0,
+      "tx_dropped_delta": 0,
+      "rx_errors_delta": 0,
+      "tx_errors_delta": 0
+    }
+  },
+  "tcp": {},
+  "wireguard": {
+    "tdh-b1": {
+      "handshake_age_seconds": 87
+    }
+  },
+  "system_counters_delta": {
+    "Ip.ReasmFails": 0,
+    "Ip.FragFails": 0,
+    "Ip.FragCreates": 0,
+    "Icmp.InErrors": 0,
+    "Tcp.InSegs": 73,
+    "Tcp.OutSegs": 60,
+    "Tcp.RetransSegs": 0,
+    "Udp.InErrors": 0,
+    "Udp.RcvbufErrors": 0,
+    "Udp.SndbufErrors": 0,
+    "UdpLite.InErrors": 0,
+    "UdpLite.RcvbufErrors": 0,
+    "UdpLite.SndbufErrors": 0,
+    "TcpExt.ListenOverflows": 0,
+    "TcpExt.ListenDrops": 0,
+    "TcpExt.TCPLostRetransmit": 0,
+    "TcpExt.TCPTimeouts": 0,
+    "TcpExt.TCPMemoryPressures": 0,
+    "TcpExt.TCPBacklogDrop": 0,
+    "TcpExt.TCPRcvQDrop": 0,
+    "Vm.pswpin": 0,
+    "Vm.pswpout": 0,
+    "Vm.pgmajfault": 10,
+    "Vm.oom_kill": 0
+  },
+  "vm_counters_total": {
+    "Vm.pswpin": 0,
+    "Vm.pswpout": 0,
+    "Vm.pgmajfault": 1194,
+    "Vm.oom_kill": 0
+  },
+  "sysctl": {
+    "net.core.default_qdisc": "fq",
+    "net.ipv4.tcp_congestion_control": "bbr",
+    "net.ipv4.tcp_available_congestion_control": "reno cubic bbr",
+    "net.ipv4.tcp_rmem": "4096\t131072\t6291456",
+    "net.ipv4.tcp_wmem": "4096\t16384\t4194304",
+    "net.core.rmem_max": "212992",
+    "net.core.wmem_max": "212992",
+    "net.ipv4.tcp_mtu_probing": "0",
+    "net.core.somaxconn": "65535",
+    "net.ipv4.tcp_max_syn_backlog": "32768"
+  },
+  "haproxy": null,
+  "telemt": {
+    "core": {
+      "connections_total": 1,
+      "connections_bad_total": 0,
+      "handshake_timeouts_total": 0,
+      "accept_permit_timeout_total": 0,
+      "conntrack_pressure_active": false
+    },
+    "upstream": {
+      "connect_attempt_total": 5,
+      "connect_success_total": 5,
+      "connect_fail_total": 0,
+      "connect_failfast_hard_error_total": 0,
+      "connect_duration_success_bucket_le_100ms": 1,
+      "connect_duration_success_bucket_101_500ms": 4,
+      "connect_duration_success_bucket_501_1000ms": 0,
+      "connect_duration_success_bucket_gt_1000ms": 0
+    }
+  },
+  "direct_buffer_pressure": null
+}

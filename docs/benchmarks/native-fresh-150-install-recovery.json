@@ -1,0 +1,224 @@
+{
+  "scope": "real file deletion paths in isolated mount and network namespaces; host operations stubbed",
+  "manager_sha256": "2d1e6c59ef0ce69d0fd734d1d9a6cab89881ac92e26e54d38f4b2080bc16acc3",
+  "rows": [
+    {
+      "role": "entry",
+      "mode": "exit",
+      "exit": 7,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "entry",
+      "mode": "error",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "entry",
+      "mode": "term",
+      "exit": 143,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "entry",
+      "mode": "int",
+      "exit": 130,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "entry",
+      "mode": "hup",
+      "exit": 129,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "entry",
+      "mode": "cleanup_hup",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "entry",
+      "mode": "pending",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "entry",
+      "mode": "committed",
+      "exit": 0,
+      "recovered": false,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "entry",
+      "mode": "legacy",
+      "exit": 7,
+      "recovered": false,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "exit",
+      "exit": 7,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "error",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "term",
+      "exit": 143,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "int",
+      "exit": 130,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "hup",
+      "exit": 129,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "cleanup_hup",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "pending",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "committed",
+      "exit": 0,
+      "recovered": false,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend1",
+      "mode": "legacy",
+      "exit": 7,
+      "recovered": false,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "exit",
+      "exit": 7,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "error",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "term",
+      "exit": 143,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "int",
+      "exit": 130,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "hup",
+      "exit": 129,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "cleanup_hup",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "pending",
+      "exit": 1,
+      "recovered": true,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "committed",
+      "exit": 0,
+      "recovered": false,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    },
+    {
+      "role": "backend2",
+      "mode": "legacy",
+      "exit": 7,
+      "recovered": false,
+      "unrelated_file_preserved": true,
+      "host_service_firewall_tuning_account_operations": false
+    }
+  ],
+  "host_account_files_unchanged": true,
+  "fresh_three_vm_install": false
+}

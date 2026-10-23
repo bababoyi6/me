@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-23",
+  "scope": "manager rollback hardening after the three-guest functional snapshot; production transport templates unchanged",
+  "manager_sha256": "49b930433d2df3d2c18ca477f90dcc1e1439812f6b7a8c7bce0d8eb951642426",
+  "source_archive_sha256": "1788319e30b73ad542ef9b75739e48f3fa12cf394e5eb14fa9b8dc2c40ca17dc",
+  "source_archive_files": 45,
+  "counterexample_manager_sha256": "5d877748810c02dc7090eb5d3434789b4963633b5bdf9824d2bffc6cc8ebfff2",
+  "counterexample_failed_assertions": 4,
+  "counterexample_cases": [
+    "directory target falsely reported successful rollback",
+    "symlink target replaced instead of rejected",
+    "staging failure left adjacent temporary file",
+    "rename failure left adjacent temporary file"
+  ],
+  "new_python_test_methods": 3,
+  "manager_lifecycle_methods_passed": 13,
+  "full_python_regressions_passed": 88,
+  "bash_syntax_shellcheck_selftest_passed": true,
+  "real_haproxy_sni_fragmentation_proxyv2_checksum_and_failover_passed": true,
+  "environments": [
+    "local WSL Linux",
+    "temporary native Ubuntu 22.04"
+  ],
+  "production_accessed": false,
+  "github_written": false,
+  "three_guest_functional_snapshot_manager_sha256": "5d877748810c02dc7090eb5d3434789b4963633b5bdf9824d2bffc6cc8ebfff2",
+  "three_guest_test_repeated_after_rollback_hardening": false,
+  "core_rotation_exercised": false,
+  "isolated_install_recovery_cases_passed": 27,
+  "host_account_files_unchanged": true
+}

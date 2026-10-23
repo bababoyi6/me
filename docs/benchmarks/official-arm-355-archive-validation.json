@@ -1,0 +1,13 @@
+{
+  "scope": "official ARM archive checksum and safe-parser compatibility only",
+  "upstream_version": "3.5.5",
+  "url": "https://github.com/telemt/telemt/releases/download/3.5.5/telemt-aarch64-linux-gnu.tar.gz",
+  "archive_sha256": "075c9e2d3e86115af0bc47da881327375ef094c21fb6ed40bde41e4a77a261f3",
+  "archive_sha_verified": true,
+  "parser_passed": true,
+  "binary_bytes": 13931160,
+  "binary_sha256": "5f2031447df06a393af7e271a72c5553ea83bff9611d24c441b492236101f857",
+  "arm_execution_tested": false,
+  "arm_performance_core_built": false,
+  "production_accessed": false
+}

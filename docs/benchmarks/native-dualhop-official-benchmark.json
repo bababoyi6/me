@@ -1,0 +1,120 @@
+{
+  "scope": "single native VPS; real entry HAProxy, WG+PSK to two Telemt backends; local synthetic DC",
+  "telemt": "telemt 3.5.5",
+  "build": "official",
+  "rtt_ms_configured": 100,
+  "kernel": "5.15.0-161-generic",
+  "rate_mbps_per_direction": 100,
+  "wireguard_psk": true,
+  "wireguard_mtu": 1420,
+  "rows": [
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.8052110270000412,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.689765240998895,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 2,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.713276049000342,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 2,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7038512589988386,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 16777216,
+      "elapsed_seconds": 5.901034642000013,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 1,
+      "complete": true
+    },
+    {
+      "benchmark_round": 1,
+      "direction": "U",
+      "bytes": 16777216,
+      "complete": false,
+      "exception": "TimeoutError",
+      "phase": "digest",
+      "sha256_verified": false
+    },
+    {
+      "benchmark_round": 2,
+      "direction": "U",
+      "bytes": 16777216,
+      "complete": false,
+      "exception": "TimeoutError",
+      "phase": "digest",
+      "sha256_verified": false
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 16777216,
+      "elapsed_seconds": 5.758496874999764,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 2,
+      "complete": true
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 16777216,
+      "elapsed_seconds": 6.295479796999643,
+      "sha256_verified": true,
+      "backend_index": 1,
+      "benchmark_round": 3,
+      "complete": true
+    },
+    {
+      "benchmark_round": 3,
+      "direction": "U",
+      "bytes": 16777216,
+      "complete": false,
+      "exception": "TimeoutError",
+      "phase": "digest",
+      "sha256_verified": false
+    }
+  ],
+  "backend_dc_errors": [
+    [],
+    []
+  ],
+  "environment": {
+    "vcpus": 1,
+    "mem_total_kib": 979300,
+    "test_os": "Ubuntu 22.04.5",
+    "splicing_in_benchmark": false,
+    "one_physical_host_shared_cpu": true,
+    "telegram_real_files": false,
+    "samples_per_direction": 3,
+    "version_batch_order": [
+      "official",
+      "auto"
+    ],
+    "primary_backend_index": 1,
+    "backend_assignment_check": "HAProxy stot server assignment counters; independent of DC completion timing"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "scope": "single native VPS, private entry/two backends and router namespaces; actual HAProxy/WireGuard/Telemt, synthetic DC only",
+  "kernel": "5.15.0-161-generic",
+  "wireguard_psk": true,
+  "wireguard_mtu": 1420,
+  "rtt_ms_configured": 10,
+  "haproxy": "HAProxy version 2.4.30-0ubuntu0.22.04.2 2026/06/19 - https://haproxy.org/",
+  "telemt": "3.5.5",
+  "agent_failover_and_recovery": true,
+  "master_worker_reload_with_existing_transfer": true,
+  "splice_auto_pipes_allocated_observed": 0,
+  "forced_splice_test_pipes_allocated_observed": 1,
+  "master_worker_reload_count": 2,
+  "rows": [
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.20246706000034465,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.12055607400179724,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 2,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.18940944399946602,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 2,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.11756987999979174,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.13649013500253204,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 0.9314356980030425,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 0.930295558002399,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.11502699300035601,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 8.121487248998164,
+      "sha256_verified": true,
+      "backend_index_at_connection_start": 1
+    }
+  ]
+}
