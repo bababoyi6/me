@@ -1,0 +1,177 @@
+{
+  "scope": "native private-namespace high-RTT mock-DC experiment; no Telegram files",
+  "rows": [
+    {
+      "round": 1,
+      "build": "auto",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "streams": 32,
+      "direction": "U",
+      "link_rate_mbps": 100,
+      "mock_dc_socket_timeout_seconds": 25,
+      "direct_to_telemt": true,
+      "client_receive_buffer_requested_bytes": 32768,
+      "client_read_pause_seconds": 0,
+      "expected_payload_bytes": 16777216,
+      "sha256_verified_streams": 32,
+      "failed_streams": 0,
+      "failure_types": [],
+      "complete": true,
+      "elapsed_seconds": 1.9308433659898583,
+      "failure_details": [],
+      "small_probe_errors": [],
+      "mbps": 69.51248887617173,
+      "telemt_cpu_seconds": 0.06,
+      "haproxy_cpu_seconds": 0.0,
+      "host_cpu_interval": {
+        "busy_percent": 24.210526315789473,
+        "steal_percent": 0.0,
+        "iowait_percent": 0.0
+      },
+      "minimum_available_memory_sampled_bytes": 530186240,
+      "oom_delta": 0,
+      "maximum_telemt_rss_sampled_bytes": 27721728,
+      "socket_sample_interval_seconds": null,
+      "socket_observation": "off",
+      "small_probes": [
+        {
+          "direction": "D",
+          "domain_index": 2,
+          "path": "haproxy-telemt",
+          "bytes": 1024,
+          "elapsed_seconds": 0.25548581301700324,
+          "handshake_ms": 12.730293005006388,
+          "sha256_verified": true,
+          "persistent_dc": false
+        },
+        {
+          "direction": "D",
+          "domain_index": 2,
+          "path": "haproxy-telemt",
+          "bytes": 1024,
+          "elapsed_seconds": 0.4731217140215449,
+          "handshake_ms": 19.370062014786527,
+          "sha256_verified": true,
+          "persistent_dc": false
+        }
+      ],
+      "socket_samples": [],
+      "measurement_complete": true,
+      "telemetry_errors": [],
+      "network_counters_before": {
+        "client_namespace_tcp": {
+          "RetransSegs": 18,
+          "OutSegs": 15201,
+          "InSegs": 12686
+        },
+        "wan_netem": [
+          {
+            "dev": "tdh-la1",
+            "kind": "netem",
+            "bytes": 629184,
+            "packets": 9460,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 0,
+            "qlen": 0
+          },
+          {
+            "dev": "tdh-lb0",
+            "kind": "netem",
+            "bytes": 17571120,
+            "packets": 11951,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 66,
+            "qlen": 1
+          }
+        ],
+        "endpoint_fq": {
+          "tdh-audit-a": [
+            {
+              "dev": "tdh-la0",
+              "kind": "fq",
+              "bytes": 17573406,
+              "packets": 11982,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ],
+          "tdh-audit-b": [
+            {
+              "dev": "tdh-lb1",
+              "kind": "fq",
+              "bytes": 627870,
+              "packets": 9447,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ]
+        }
+      },
+      "network_counters_after": {
+        "client_namespace_tcp": {
+          "RetransSegs": 18,
+          "OutSegs": 29488,
+          "InSegs": 24583
+        },
+        "wan_netem": [
+          {
+            "dev": "tdh-la1",
+            "kind": "netem",
+            "bytes": 1261248,
+            "packets": 18980,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 198,
+            "qlen": 3
+          },
+          {
+            "dev": "tdh-lb0",
+            "kind": "netem",
+            "bytes": 35138706,
+            "packets": 23859,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 198,
+            "qlen": 3
+          }
+        ],
+        "endpoint_fq": {
+          "tdh-audit-a": [
+            {
+              "dev": "tdh-la0",
+              "kind": "fq",
+              "bytes": 35141124,
+              "packets": 23892,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ],
+          "tdh-audit-b": [
+            {
+              "dev": "tdh-lb1",
+              "kind": "fq",
+              "bytes": 1260132,
+              "packets": 18970,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

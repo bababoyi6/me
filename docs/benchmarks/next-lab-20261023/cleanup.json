@@ -1,0 +1,22 @@
+{
+  "date_utc": "2026-10-23T13:39:12.083086+00:00",
+  "export_sha256_verified_before_deletion": "6852e36fc87f22255aac3d730b5891ddaff47688ac3d88e03b3527ad6ac81a72",
+  "removed_paths": [
+    "/root/tdh-audit-20261021/tdh-audit-next-20261023",
+    "/root/tdh-audit-20261021/next-lab-20261023.tar.gz",
+    "/root/tdh-audit-20261021/next-preflight-20261023.py",
+    "/root/tdh-audit-20261021/next-results-20261023.tar.gz"
+  ],
+  "removed_lab_logical_bytes": 89093569,
+  "lab_namespaces_remaining": [],
+  "transient_lab_units_remaining": [],
+  "temporary_lab_directories_remaining": [],
+  "lab_key_files_remaining": [],
+  "listeners_unchanged": true,
+  "host_oom_kill_delta": 0,
+  "host_memory_available_bytes_after_tests": 631058432,
+  "global_zero_byte_coordination_lock_retained": "/run/lock/tdh-audit-network.lock",
+  "historical_project_assets_preserved": true,
+  "host_kernel_firewall_ssh_configuration_modified": false,
+  "production_nodes_accessed": false
+}

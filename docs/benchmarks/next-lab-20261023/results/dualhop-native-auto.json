@@ -1,0 +1,111 @@
+{
+  "scope": "single native VPS, private entry/two backends and router namespaces; actual HAProxy/WireGuard/Telemt, synthetic DC only",
+  "kernel": "5.15.0-161-generic",
+  "wireguard_psk": true,
+  "wireguard_mtu": 1420,
+  "rtt_ms_configured": 100,
+  "haproxy": "HAProxy version 2.4.30-0ubuntu0.22.04.2 2026/06/19 - https://haproxy.org/",
+  "telemt": "telemt 3.5.5+tdh.audit2",
+  "agent_failover_and_recovery": true,
+  "master_worker_reload_with_existing_transfer": true,
+  "reload_flow_active": [
+    true,
+    true
+  ],
+  "splice_auto_pipes_allocated_observed": 0,
+  "forced_splice_test_pipes_allocated_observed": 1,
+  "master_worker_reload_count": 2,
+  "rows": [
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7497600400092779,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7023328579962254,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 2,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7020548449945636,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 2,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7025381690036738,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6682014569960302,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 1.7152443990053143,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 1.7261457619897556,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6632802020030795,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 8.346642721007811,
+      "sha256_verified": true,
+      "backend_index_at_connection_start": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6696295439905953,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6706976360001136,
+      "sha256_verified": true,
+      "backend_index": 1
+    }
+  ],
+  "classification": "SINGLE_VPS_VIRTUAL_3NODE",
+  "separate_mock_dc_namespace": true,
+  "actual_backend_process_restart_verified": true
+}

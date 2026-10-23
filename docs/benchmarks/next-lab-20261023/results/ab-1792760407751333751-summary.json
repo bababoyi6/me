@@ -1,0 +1,66 @@
+{
+  "classification": "SINGLE_VPS_SYNTHETIC",
+  "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+  "complete": true,
+  "groups": [
+    {
+      "streams": 1,
+      "builds": {
+        "flush": {
+          "successful_trials": 2,
+          "failed_trials": 0,
+          "failed_probes": 0,
+          "median_mbps": 20.77798549977537,
+          "median_telemt_cpu_seconds": 0.049999999999999996,
+          "max_sampled_telemt_rss_bytes": 25452544,
+          "median_small_probe_ms": 262.5222339993343,
+          "median_namespace_retransmits": 9.0,
+          "max_sampled_dc_receive_limit_bytes": 425984.0
+        },
+        "auto": {
+          "successful_trials": 2,
+          "failed_trials": 0,
+          "failed_probes": 0,
+          "median_mbps": 57.42645705908658,
+          "median_telemt_cpu_seconds": 0.03,
+          "max_sampled_telemt_rss_bytes": 25268224,
+          "median_small_probe_ms": 423.36369750410086,
+          "median_namespace_retransmits": 1.5,
+          "max_sampled_dc_receive_limit_bytes": 131072.0
+        }
+      },
+      "complete_pairs": true,
+      "auto_change_percent": 176.38125486085943
+    },
+    {
+      "streams": 4,
+      "builds": {
+        "flush": {
+          "successful_trials": 2,
+          "failed_trials": 0,
+          "failed_probes": 0,
+          "median_mbps": 58.881725158548505,
+          "median_telemt_cpu_seconds": 0.045,
+          "max_sampled_telemt_rss_bytes": 27185152,
+          "median_small_probe_ms": 262.1439289941918,
+          "median_namespace_retransmits": 10.0,
+          "max_sampled_dc_receive_limit_bytes": 425984.0
+        },
+        "auto": {
+          "successful_trials": 2,
+          "failed_trials": 0,
+          "failed_probes": 0,
+          "median_mbps": 62.81209301345308,
+          "median_telemt_cpu_seconds": 0.04,
+          "max_sampled_telemt_rss_bytes": 26861568,
+          "median_small_probe_ms": 454.89790399733465,
+          "median_namespace_retransmits": 0.0,
+          "max_sampled_dc_receive_limit_bytes": 131072.0
+        }
+      },
+      "complete_pairs": true,
+      "auto_change_percent": 6.675021569632045
+    }
+  ],
+  "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+}

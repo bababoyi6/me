@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/dualhop_lab.py", line 403, in <module>
+    if args.role=='run': run()
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/dualhop_lab.py", line 395, in run
+    if result.returncode: raise RuntimeError('entry experiment failed: '+result.stderr[:3000])
+RuntimeError: entry experiment failed: Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/dualhop_lab.py", line 405, in <module>
+    else: entry()
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/dualhop_lab.py", line 308, in entry
+    bulk.result(timeout=2)
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/dualhop_lab.py", line 245, in routed
+    assert delta[expected-1]==1 and sum(delta)==1,('unexpected route',delta,expected)
+AssertionError: ('unexpected route', [1, 1], 2)
+

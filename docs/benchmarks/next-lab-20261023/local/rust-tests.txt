@@ -1,0 +1,25 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling bytes v1.12.1
+   Compiling pin-project-lite v0.2.17
+   Compiling syn v3.0.9
+   Compiling tokio-macros v2.7.2
+   Compiling tokio v1.52.3
+   Compiling relay-flush-probe v0.1.0 (/mnt/d/project/MTP脚本/telemt-dual-hop/tests/relay-flush-regression)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.28s
+     Running unittests src/lib.rs (/mnt/d/project/MTP脚本/lab-control/next-relay-target/debug/deps/relay_flush_probe-5395ec88c8688498)
+
+running 3 tests
+test tests::writer_error_is_preserved ... ok
+test tests::buffered_output_reaches_peer_while_source_remains_open ... ok
+test tests::backpressure_preserves_all_bytes_and_shutdown ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests relay_flush_probe
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
