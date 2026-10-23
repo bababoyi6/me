@@ -26,6 +26,7 @@ class UploadAnalysisTests(unittest.TestCase):
     def test_failed_or_duplicate_or_missing_pair_suppresses_ratio(self):
         mutations = (lambda rows: rows.pop(), lambda rows: rows[0].update(exit=124),
                      lambda rows: rows[0].update(pair_round=2),
+                     lambda rows: rows[0]["trial"]["rows"][0].update(measurement_complete=False),
                      lambda rows: rows[0]["trial"]["rows"][0].update(small_probe_errors=[{"type": "TimeoutError"}]))
         for mutate in mutations:
             data = self.sample()
@@ -41,3 +42,8 @@ class UploadAnalysisTests(unittest.TestCase):
             data["rows"][0]["trial"]["rows"][0][field] = value
             with self.assertRaises(ValueError):
                 analysis.summarize(data)
+
+    def test_incomplete_batch_does_not_publish_a_ratio_even_with_successful_rows(self):
+        data = self.sample()
+        data['complete'] = False
+        self.assertIsNone(analysis.summarize(data)['groups'][0]['auto_change_percent'])

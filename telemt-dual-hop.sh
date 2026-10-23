@@ -1596,9 +1596,12 @@ def monitor_dcs():
             DC_CHECKED = time.monotonic()
         time.sleep(10)
 
-def ready(now):
+def ready(now=None):
     # A stalled/crashed monitor must never leave a permanently healthy flag.
     with READY_LOCK:
+        # Read the clock after locking so a monitor cannot publish a newer timestamp.
+        if now is None:
+            now = time.monotonic()
         return (API_READY and DC_READY and API_CHECKED is not None and DC_CHECKED is not None
                 and 0 <= now - API_CHECKED <= API_MAX_AGE and 0 <= now - DC_CHECKED <= DC_MAX_AGE)
 
@@ -1616,7 +1619,7 @@ while True:
         with conn:
             try:
                 conn.settimeout(1)
-                current = ready(time.monotonic())
+                current = ready()
                 conn.sendall(b"up\n" if current else b"down\n")
             except OSError:
                 pass

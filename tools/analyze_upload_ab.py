@@ -18,7 +18,7 @@ def summarize(data):
             cpu, memory, probes, retransmits, windows = [], [], [], [], []
             for record in trials:
                 rows = record.get("trial", {}).get("rows", [])
-                if record.get("exit") != 0 or len(rows) != 1 or not rows[0].get("complete"):
+                if record.get("exit") != 0 or len(rows) != 1 or not rows[0].get("complete") or not rows[0].get("measurement_complete", True):
                     failed += 1
                     continue
                 trial = rows[0]
@@ -47,7 +47,7 @@ def summarize(data):
                              "median_namespace_retransmits": statistics.median(retransmits) if retransmits else None,
                              "max_sampled_dc_receive_limit_bytes": max(windows, default=None)}
         # Never publish a speed ratio if a pair is missing/failed or a probe failed.
-        paired = len(selected) == data["rounds"] * 2 and all(builds[b]["failed_trials"] == 0 and
+        paired = data["complete"] and len(selected) == data["rounds"] * 2 and all(builds[b]["failed_trials"] == 0 and
                  builds[b]["failed_probes"] == 0 and builds[b]["successful_trials"] == data["rounds"] and
                  {r["pair_round"] for r in selected if r["build"] == b} == set(range(1, data["rounds"]+1)) for b in builds)
         a, b = builds["flush"]["median_mbps"], builds["auto"]["median_mbps"]

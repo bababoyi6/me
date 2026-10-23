@@ -148,12 +148,20 @@ def trial(turn,streams,direction):
          'socket_sample_interval_seconds':1 if args.socket_observation=='detailed' else None,
          'socket_observation':args.socket_observation,
          'small_probes':probes,'socket_samples':samples}
+    row['measurement_complete']=True
+    row['telemetry_errors']=[]
     if args.observe_network:
         row['network_counters_before']=before_network
-        row['network_counters_after']=network_counters()
+        try:
+            row['network_counters_after']=network_counters()
+        except (OSError,subprocess.SubprocessError) as exc:
+            # Keep completed transfer evidence even if a post-load probe times out.
+            row['measurement_complete']=False
+            row['telemetry_errors'].append(type(exc).__name__)
     rows.append(row)
     Path(args.output).write_text(json.dumps({'scope':'native private-namespace high-RTT mock-DC experiment; no Telegram files','rows':rows},indent=2)+'\n')
     print(json.dumps({k:v for k,v in row.items() if k not in ('socket_samples','small_probes')}),flush=True)
+    if not row['measurement_complete']: raise RuntimeError('telemetry failed; transfer evidence retained')
     if args.build in ('flush','auto') and (not row['complete'] or probe_errors): raise RuntimeError('candidate transfer failed')
 try:
     stream_counts=(args.streams,) if args.streams else (1,4)
