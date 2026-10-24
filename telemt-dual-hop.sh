@@ -135,8 +135,8 @@ readonly STATE_VARS=(
 )
 
 usage() {
+  printf 'Telemt Dual-Hop %s\n' "$TDH_VERSION"
   cat <<'EOF'
-Telemt Dual-Hop 1.5.0
 
 用法：
   sudo bash telemt-dual-hop.sh              打开中文菜单

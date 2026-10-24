@@ -32,6 +32,7 @@ def download_fixture(arguments):
 
 def install_case(folder,channel,archive,*,existing=False,accepted=True):
     folder.mkdir(mode=0o755)
+    folder.chmod(0o755)  # umask 077 must not block the real service UID's traversal.
     config=folder/'config';config.mkdir(mode=0o700)
     target=folder/'bin/telemt';target.parent.mkdir(mode=0o755)
     if existing:
@@ -94,23 +95,30 @@ def main():
             parser.error('pinned existing archive mismatch')
     root.mkdir(mode=0o700);(root/'results').mkdir(mode=0o700)
     records=[]
-    with tempfile.TemporaryDirectory(prefix='tdh-delivery-install-',dir=os.environ['RUNNER_TEMP']) as folder:
-        stage=Path(folder);stage.chmod(0o755)  # Public binaries only; version checks run as telemt.
-        for channel,archive in archives.items():
-            installed,record=install_case(stage/channel,channel,archive)
-            records.append(record)
-            shutil.copyfile(installed,root/('telemt-'+channel))
-            (root/('telemt-'+channel)).chmod(0o755)
-            version,_,sha=PINS[channel]
-            (root/(channel+'-build.json')).write_text(json.dumps({'sha256':sha,'version':'telemt '+version})+'\n')
-        bad=stage/'corrupt.tar.gz'
-        content=bytearray(archives['balanced2'].read_bytes());content[-1]^=1;bad.write_bytes(content)
-        for name,archive,existing in (('corrupt',bad,False),('existing',archives['balanced2'],True)):
-            _,record=install_case(stage/name,'balanced2',archive,existing=existing,accepted=False)
-            records.append(record)
-    (root/'results/installer-delivery.json').write_text(json.dumps({'classification':'CI_PRODUCTION_INSTALL_FUNCTION',
-        'service_version_uid':identity.pw_uid,'cases':records,'network_boundary_substituted':True,
-        'published_release_download_tested':False,'host_configuration_modified':False},indent=2)+'\n')
+    report={'classification':'CI_PRODUCTION_INSTALL_FUNCTION',
+            'service_version_uid':identity.pw_uid,'cases':records,'network_boundary_substituted':True,
+            'published_release_download_tested':False,'host_configuration_modified':False,'accepted':False}
+    try:
+        with tempfile.TemporaryDirectory(prefix='tdh-delivery-install-',dir=os.environ['RUNNER_TEMP']) as folder:
+            stage=Path(folder);stage.chmod(0o755)  # Public binaries only; version checks run as telemt.
+            for channel,archive in archives.items():
+                installed,record=install_case(stage/channel,channel,archive)
+                records.append(record)
+                shutil.copyfile(installed,root/('telemt-'+channel))
+                (root/('telemt-'+channel)).chmod(0o755)
+                version,_,sha=PINS[channel]
+                (root/(channel+'-build.json')).write_text(json.dumps({'sha256':sha,'version':'telemt '+version})+'\n')
+            bad=stage/'corrupt.tar.gz'
+            content=bytearray(archives['balanced2'].read_bytes());content[-1]^=1;bad.write_bytes(content)
+            for name,archive,existing in (('corrupt',bad,False),('existing',archives['balanced2'],True)):
+                _,record=install_case(stage/name,'balanced2',archive,existing=existing,accepted=False)
+                records.append(record)
+        report['accepted']=True
+    except Exception as exc:
+        report['error_type']=type(exc).__name__
+        raise
+    finally:
+        (root/'results/installer-delivery.json').write_text(json.dumps(report,indent=2)+'\n')
     os.execv(sys.executable,[sys.executable,'-B',str(REPO/'tools/lab_runner.py'),'--root',str(root),
                             '--profile','delivery','--rtt','100','--execute'])
 
