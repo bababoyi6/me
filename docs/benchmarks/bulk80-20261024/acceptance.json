@@ -1,0 +1,22 @@
+{
+  "classification": "DERIVED_SINGLE_BATCH_ACCEPTANCE_NOT_PRODUCTION",
+  "source_export_sha256": "24a7ff5acbdd8f3fab1c899462d35769593ef062ecf3aaf466fd280371642ce0",
+  "control": "audit1 fixed buffers",
+  "candidate": "balanced2; unsent low-water256KiB",
+  "memory_high_percent": 80,
+  "required_min_ratio_per_round": 0.95,
+  "paired_ratios": [
+    {
+      "round": 1,
+      "candidate_over_control": 1.0432302575949537
+    },
+    {
+      "round": 2,
+      "candidate_over_control": 0.9501587454018177
+    }
+  ],
+  "verified_upload_streams": 128,
+  "successful_small_probes": 13,
+  "passes_current_batch": true,
+  "caution": "Round2 is only 95.0159% of reference. One paired batch does not establish stability or production capacity; no cross-policy speed ratio."
+}
