@@ -29,7 +29,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', required=True)
     parser.add_argument('--output', required=True)
-    parser.add_argument('--candidate', choices=('fair', 'queue'), default='fair')
+    parser.add_argument('--candidate', choices=('fair', 'queue', 'balanced'), default='fair')
+    parser.add_argument('--reference-archive')
     args = parser.parse_args()
     source = Path(args.source).resolve()
     output = Path(args.output).resolve()
@@ -54,14 +55,31 @@ def main():
                 'rust': rust, 'jobs': 2, 'lto': 'thin', 'codegen_units': 8,
                 'base_patch_sha256': digest(patch),
                 'candidate_kind': args.candidate,
-                'candidate_helper_sha256': digest(ROOT / ('patches/fair_copy.rs' if args.candidate == 'fair' else 'patches/unsent_queue.rs')),
+                'candidate_helper_sha256': digest(ROOT / {'fair':'patches/fair_copy.rs','queue':'patches/unsent_queue.rs','balanced':'patches/low_rtt_receive.rs'}[args.candidate]),
                 'builder_sha256': digest(Path(__file__)),
                 'normalized_patch_sha256': digest(normalized_patch),
                 'default_installer_changed': False, 'binaries': {}}
-    candidate_version = '3.5.5+tdh.fair1' if args.candidate == 'fair' else '3.5.5+tdh.queue1'
+    candidate_version = {'fair':'3.5.5+tdh.fair1','queue':'3.5.5+tdh.queue1','balanced':'3.5.5+tdh.balanced1'}[args.candidate]
     variants = [('control', '3.5.5+tdh.audit2'), (args.candidate, candidate_version)]
     if args.candidate == 'queue':
         variants.insert(0, ('fixed', '3.5.5+tdh.audit1'))
+    if args.reference_archive:
+        reference = Path(args.reference_archive).resolve()
+        assert digest(reference) == 'cc1881e3c5af3eef808650cce754f9bdcea6e2f6ffdb27a1e860aa5224be8b90'
+        with tarfile.open(reference) as archive:
+            old = json.load(archive.extractfile('manifest.json'))
+            assert old['project_commit'] == '38da0fbf5b8c24913be7bfb61922a2e80fc957e4'
+            assert old['rust'] == rust and old['lto'] == 'thin' and old['codegen_units'] == 8
+            for name in ('fixed','control','queue'):
+                target = output/('telemt-'+name)
+                with target.open('xb') as stream:
+                    shutil.copyfileobj(archive.extractfile('telemt-'+name), stream)
+                target.chmod(0o755)
+                assert digest(target) == old['binaries'][name]['sha256']
+                manifest['binaries'][name] = old['binaries'][name]
+        manifest['reference_archive_sha256'] = digest(reference)
+        manifest['reference_build_commit'] = old['project_commit']
+        variants = [(args.candidate, candidate_version)]
     socket_source = source / 'src/transport/socket.rs'
     automatic_socket_source = socket_source.read_text()
     previous_version = '3.5.5+tdh.audit2'
@@ -92,6 +110,18 @@ def main():
                 first_line, rest = combined.split('\n', 1)
                 assert first_line.startswith('//!')
                 socket_source.write_text(first_line + '\n#[cfg(target_os = "linux")]\nmod unsent_queue;\n' + rest)
+                if name == 'balanced':
+                    (source/'src/transport/socket/low_rtt_receive.rs').write_bytes((ROOT/'patches/low_rtt_receive.rs').read_bytes())
+                    text = socket_source.read_text()
+                    prefix, body = text.split('pub fn configure_client_socket(', 1)
+                    marker = '    // Preserve bounded kernel TCP autotuning on high-RTT relay paths.\n'
+                    assert marker in body
+                    body = body.replace(marker, marker + '    #[cfg(target_os = "linux")]\n'
+                        '    {\n        use std::os::fd::AsRawFd;\n'
+                        '        low_rtt_receive::configure_low_rtt_receive(socket.as_raw_fd())?;\n    }\n', 1)
+                    combined = prefix + 'pub fn configure_client_socket(' + body
+                    first, rest = combined.split('\n', 1)
+                    socket_source.write_text(first + '\n#[cfg(target_os = "linux")]\nmod low_rtt_receive;\n' + rest)
         for filename in ('Cargo.toml', 'Cargo.lock'):
             path = source / filename
             text = path.read_text()
@@ -115,6 +145,7 @@ def main():
     shutil.copyfile(patch, output / 'base.patch')
     shutil.copyfile(ROOT / 'patches/fair_copy.rs', output / 'fair_copy.rs')
     shutil.copyfile(ROOT / 'patches/unsent_queue.rs', output / 'unsent_queue.rs')
+    shutil.copyfile(ROOT / 'patches/low_rtt_receive.rs', output / 'low_rtt_receive.rs')
     shutil.copyfile(Path(__file__), output / 'build_relay_candidate.py')
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     archive = output.with_suffix('.tar.gz')

@@ -6,12 +6,14 @@ on:
     paths:
       - patches/fair_copy.rs
       - patches/unsent_queue.rs
+      - patches/low_rtt_receive.rs
       - tools/build_relay_candidate.py
       - tests/relay-flush-regression/**
       - .github/workflows/relay-candidate.yml
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: relay-candidate-${{ github.ref }}
@@ -41,8 +43,18 @@ jobs:
           key: relay-core-${{ runner.os }}-1.99.1-${{ hashFiles('upstream/Cargo.lock') }}
       - name: Verify flush, backpressure and bounded ready bursts
         run: cargo test --locked --manifest-path tests/relay-flush-regression/Cargo.toml
+      - name: Reuse verified reference cores
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 40066698486 --repo bababoyi6/me --name relay-candidate-pair --dir "$RUNNER_TEMP/reference"
       - name: Build control and candidate with the same toolchain
-        run: python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/relay-pair" --candidate queue
+        run: |
+          references=()
+          if [[ -f "$RUNNER_TEMP/reference/relay-pair.tar.gz" ]]; then
+            references=(--reference-archive "$RUNNER_TEMP/reference/relay-pair.tar.gz")
+          fi
+          python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/relay-pair" --candidate balanced "${references[@]}"
       - uses: actions/upload-artifact@v4
         with:
           name: relay-candidate-pair

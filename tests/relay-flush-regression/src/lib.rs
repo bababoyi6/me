@@ -10,6 +10,42 @@ mod fair_copy;
 mod unsent_queue;
 
 #[cfg(all(test, target_os = "linux"))]
+#[path = "../../../patches/low_rtt_receive.rs"]
+mod low_rtt_receive;
+
+#[cfg(all(test, target_os = "linux"))]
+#[test]
+fn receive_policy_preserves_unknown_and_long_rtt_links() {
+    assert_eq!(low_rtt_receive::receive_request(0), None);
+    assert_eq!(low_rtt_receive::receive_request(1), Some(262144));
+    assert_eq!(low_rtt_receive::receive_request(5000), Some(262144));
+    assert_eq!(low_rtt_receive::receive_request(5001), None);
+    assert_eq!(low_rtt_receive::receive_request(100000), None);
+    assert_eq!(low_rtt_receive::configure_low_rtt_receive(-1).unwrap(), None);
+}
+
+#[cfg(all(test, target_os = "linux"))]
+#[test]
+fn real_receive_policy_does_not_change_send_buffer() {
+    use std::os::fd::AsRawFd;
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let _client = std::net::TcpStream::connect(listener.local_addr().unwrap()).unwrap();
+    let stream = listener.accept().unwrap().0;
+    let fd = stream.as_raw_fd();
+    fn buffer(fd: i32, key: i32) -> i32 {
+        let mut value = 0i32;
+        let mut size = std::mem::size_of_val(&value) as libc::socklen_t;
+        assert_eq!(unsafe { libc::getsockopt(fd, libc::SOL_SOCKET, key, (&mut value as *mut i32).cast(), &mut size) }, 0);
+        value
+    }
+    let before = buffer(fd, libc::SO_SNDBUF);
+    if low_rtt_receive::configure_low_rtt_receive(fd).unwrap().is_some() {
+        assert!(buffer(fd, libc::SO_RCVBUF) <= 524288);
+    }
+    assert_eq!(buffer(fd, libc::SO_SNDBUF), before);
+}
+
+#[cfg(all(test, target_os = "linux"))]
 #[test]
 fn queue_policy_preserves_automatic_buffer_sizes() {
     use std::os::fd::AsRawFd;
