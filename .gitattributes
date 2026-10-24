@@ -6,3 +6,7 @@
 patches/*.patch -text -whitespace
 # Retain the upstream license bytes, including its original trailing space.
 patches/TELEMT-LICENSE.txt -text -whitespace
+# Keep exported laboratory evidence byte-for-byte across Windows checkouts.
+docs/benchmarks/next-lab-20261023/** -text -whitespace
+docs/benchmarks/next-continue-20261023/** -text -whitespace
+docs/benchmarks/next-causal-20261024/** -text -whitespace

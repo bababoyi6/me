@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/high_rtt_worker.py", line 162, in <module>
+    for streams,direction in cases[::1 if turn%2==0 else -1]: trial(turn,streams,direction)
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/high_rtt_worker.py", line 153, in trial
+    row['network_counters_after']=network_counters()
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/high_rtt_worker.py", line 66, in network_counters
+    qdiscs=json.loads(subprocess.check_output(['ip','netns','exec','tdh-audit-wan','tc','-j','-s','qdisc','show'],text=True,timeout=3))
+  File "/usr/lib/python3.10/subprocess.py", line 421, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+  File "/usr/lib/python3.10/subprocess.py", line 505, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 1154, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 2022, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/usr/lib/python3.10/subprocess.py", line 1198, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['ip', 'netns', 'exec', 'tdh-audit-wan', 'tc', '-j', '-s', 'qdisc', 'show']' timed out after 3 seconds

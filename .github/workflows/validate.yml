@@ -8,9 +8,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-22.04
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - name: Install local test dependencies
@@ -22,9 +27,13 @@ jobs:
       - name: Run built-in tests
         run: bash telemt-dual-hop.sh --self-test
       - name: Check Python tools
-        run: python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check
+        run: python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check
       - name: Test diagnostics, configuration and rollback
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Verify experimental socket policies on private loopback
+        run: |
+          cc -shared -fPIC -Wall -Wextra -Werror tests/socket_policy_lab.c -ldl -o "$RUNNER_TEMP/tdh-socket-policy.so"
+          timeout 20 python3 tests/policy_oracle.py --library "$RUNNER_TEMP/tdh-socket-policy.so"
       - name: Test real HAProxy SNI and failover on loopback
         run: timeout 60 python3 tests/lab.py
       - name: Test install interruption recovery in isolated filesystems
@@ -34,6 +43,7 @@ jobs:
 
   relay-regression:
     runs-on: ubuntu-22.04
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - name: Prepare pinned Rust test toolchain

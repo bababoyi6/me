@@ -1,0 +1,558 @@
+{
+  "scope": "native private-namespace high-RTT mock-DC experiment; no Telegram files",
+  "rows": [
+    {
+      "round": 1,
+      "build": "auto",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "streams": 4,
+      "direction": "U",
+      "link_rate_mbps": 100,
+      "mock_dc_socket_timeout_seconds": 25,
+      "direct_to_telemt": true,
+      "client_receive_buffer_requested_bytes": 32768,
+      "client_read_pause_seconds": 0,
+      "expected_payload_bytes": 16777216,
+      "sha256_verified_streams": 4,
+      "failed_streams": 0,
+      "failure_types": [],
+      "complete": true,
+      "elapsed_seconds": 2.1305071209935704,
+      "failure_details": [],
+      "small_probe_errors": [],
+      "mbps": 62.9980189587008,
+      "telemt_cpu_seconds": 0.04,
+      "haproxy_cpu_seconds": 0.0,
+      "host_cpu_interval": {
+        "busy_percent": 24.65753424657534,
+        "steal_percent": 0.0,
+        "iowait_percent": 0.0
+      },
+      "minimum_available_memory_sampled_bytes": 541970432,
+      "oom_delta": 0,
+      "maximum_telemt_rss_sampled_bytes": 26861568,
+      "small_probes": [
+        {
+          "direction": "D",
+          "domain_index": 2,
+          "path": "haproxy-telemt",
+          "bytes": 1024,
+          "elapsed_seconds": 0.2606376920011826,
+          "handshake_ms": 35.86202999576926,
+          "sha256_verified": true,
+          "persistent_dc": false
+        },
+        {
+          "direction": "D",
+          "domain_index": 2,
+          "path": "haproxy-telemt",
+          "bytes": 1024,
+          "elapsed_seconds": 0.647456250997493,
+          "handshake_ms": 10.7787580054719,
+          "sha256_verified": true,
+          "persistent_dc": false
+        }
+      ],
+      "socket_samples": [
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 395950.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.011
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 331656.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.012
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 395950.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 330385.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 261120.0,
+          "r_allocated": 0.0,
+          "w_queued": 242192.0,
+          "rtt_ms": 100.911
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 261120.0,
+          "r_allocated": 0.0,
+          "w_queued": 242192.0,
+          "rtt_ms": 100.446
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 261120.0,
+          "r_allocated": 0.0,
+          "w_queued": 242192.0,
+          "rtt_ms": 101.343
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 261120.0,
+          "r_allocated": 0.0,
+          "w_queued": 242192.0,
+          "rtt_ms": 100.436
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 790620.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.011
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 791818.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.012
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 790620.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 790620.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 705024.0,
+          "r_allocated": 0.0,
+          "w_queued": 551096.0,
+          "rtt_ms": 100.281
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 731136.0,
+          "r_allocated": 0.0,
+          "w_queued": 548200.0,
+          "rtt_ms": 100.257
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 705024.0,
+          "r_allocated": 0.0,
+          "w_queued": 549816.0,
+          "rtt_ms": 100.36
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 705024.0,
+          "r_allocated": 0.0,
+          "w_queued": 540960.0,
+          "rtt_ms": 100.337
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.011
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.012
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2480640.0,
+          "r_allocated": 0.0,
+          "w_queued": 1847152.0,
+          "rtt_ms": 100.505
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2506752.0,
+          "r_allocated": 0.0,
+          "w_queued": 1845536.0,
+          "rtt_ms": 100.397
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2480640.0,
+          "r_allocated": 0.0,
+          "w_queued": 1852944.0,
+          "rtt_ms": 100.664
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2454528.0,
+          "r_allocated": 0.0,
+          "w_queued": 1880792.0,
+          "rtt_ms": 100.236
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.011
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.012
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2741760.0,
+          "r_allocated": 0.0,
+          "w_queued": 2089404.0,
+          "rtt_ms": 139.401
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2741760.0,
+          "r_allocated": 0.0,
+          "w_queued": 2084896.0,
+          "rtt_ms": 138.861
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2754816.0,
+          "r_allocated": 0.0,
+          "w_queued": 2094860.0,
+          "rtt_ms": 139.134
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2793984.0,
+          "r_allocated": 0.0,
+          "w_queued": 2102272.0,
+          "rtt_ms": 139.51
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.011
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.012
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2741760.0,
+          "r_allocated": 0.0,
+          "w_queued": 2106844.0,
+          "rtt_ms": 249.86
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2741760.0,
+          "r_allocated": 0.0,
+          "w_queued": 2103280.0,
+          "rtt_ms": 248.842
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2754816.0,
+          "r_allocated": 0.0,
+          "w_queued": 2124492.0,
+          "rtt_ms": 249.515
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2793984.0,
+          "r_allocated": 0.0,
+          "w_queued": 2130016.0,
+          "rtt_ms": 249.222
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.011
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.012
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "client",
+          "rb": 6291456.0,
+          "tb": 3939840.0,
+          "r_allocated": 0.0,
+          "w_queued": 0.0,
+          "rtt_ms": 0.008
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2741760.0,
+          "r_allocated": 0.0,
+          "w_queued": 153224.0,
+          "rtt_ms": 298.214
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2741760.0,
+          "r_allocated": 0.0,
+          "w_queued": 110792.0,
+          "rtt_ms": 298.144
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2754816.0,
+          "r_allocated": 0.0,
+          "w_queued": 175552.0,
+          "rtt_ms": 298.198
+        },
+        {
+          "role": "dc",
+          "rb": 131072.0,
+          "tb": 2793984.0,
+          "r_allocated": 0.0,
+          "w_queued": 217984.0,
+          "rtt_ms": 298.368
+        }
+      ],
+      "network_counters_before": {
+        "client_namespace_tcp": {
+          "RetransSegs": 92,
+          "OutSegs": 77745,
+          "InSegs": 50366
+        },
+        "wan_netem": [
+          {
+            "dev": "tdh-la1",
+            "kind": "netem",
+            "bytes": 2843496,
+            "packets": 42746,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 0,
+            "qlen": 0
+          },
+          {
+            "dev": "tdh-lb0",
+            "kind": "netem",
+            "bytes": 105298142,
+            "packets": 70074,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 66,
+            "qlen": 1
+          }
+        ],
+        "endpoint_fq": {
+          "tdh-audit-a": [
+            {
+              "dev": "tdh-la0",
+              "kind": "fq",
+              "bytes": 105305974,
+              "packets": 70180,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ],
+          "tdh-audit-b": [
+            {
+              "dev": "tdh-lb1",
+              "kind": "fq",
+              "bytes": 2839192,
+              "packets": 42704,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ]
+        }
+      },
+      "network_counters_after": {
+        "client_namespace_tcp": {
+          "RetransSegs": 92,
+          "OutSegs": 90396,
+          "InSegs": 59891
+        },
+        "wan_netem": [
+          {
+            "dev": "tdh-la1",
+            "kind": "netem",
+            "bytes": 3407170,
+            "packets": 51251,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 264,
+            "qlen": 4
+          },
+          {
+            "dev": "tdh-lb0",
+            "kind": "netem",
+            "bytes": 122844750,
+            "packets": 81707,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 0,
+            "qlen": 0
+          }
+        ],
+        "endpoint_fq": {
+          "tdh-audit-a": [
+            {
+              "dev": "tdh-la0",
+              "kind": "fq",
+              "bytes": 122852516,
+              "packets": 81812,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ],
+          "tdh-audit-b": [
+            {
+              "dev": "tdh-lb1",
+              "kind": "fq",
+              "bytes": 3403130,
+              "packets": 51213,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

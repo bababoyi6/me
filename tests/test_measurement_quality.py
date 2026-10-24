@@ -11,6 +11,36 @@ spec.loader.exec_module(iperf)
 
 
 class MeasurementQualityTests(unittest.TestCase):
+    def test_binary_identity_hash_is_streamed_in_small_chunks(self):
+        import hashlib
+        import io
+        from unittest.mock import patch
+        from lab_files import file_sha256
+        payload=b'x'*(2*65536+19)
+        class BoundedReader(io.BytesIO):
+            def read(self,size=-1):
+                self_test.assertGreater(size,0)
+                self_test.assertLessEqual(size,65536)
+                return super().read(size)
+        self_test=self
+        with patch('lab_files.Path.open',return_value=BoundedReader(payload)),patch('pathlib.Path.read_bytes',side_effect=AssertionError('whole binary read')):
+            self.assertEqual(file_sha256('/synthetic-core'),hashlib.sha256(payload).hexdigest())
+
+    def test_mock_receiver_bound_is_inherited_before_accept_and_invalid_bounds_refused(self):
+        import socket
+        from unittest.mock import patch
+        from e2e_lab import MockDc
+        with self.assertRaisesRegex(ValueError,'receive buffer'):
+            MockDc(receive_buffer=999999999)
+        with patch('e2e_lab.threading.Thread.start'):
+            dc=MockDc(receive_buffer=262144)
+        try:
+            with socket.create_connection(dc.server_address,timeout=2) as client:
+                with dc.socket.accept()[0] as accepted:
+                    self.assertEqual(accepted.getsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF),dc.receive_buffer_actual)
+        finally:
+            dc.server_close()
+
     def test_memory_stop_closes_proxy_before_executor_waits(self):
         import concurrent.futures
         import threading
@@ -43,9 +73,13 @@ class MeasurementQualityTests(unittest.TestCase):
                 lab.transfer("apple.com", direction, 1024, 125000, read_pause=pause)
         with self.assertRaisesRegex(ValueError, "receive buffer"):
             lab.transfer("apple.com", "D", 1024, 125000, receive_buffer=999999999)
+        with self.assertRaisesRegex(ValueError,'send buffer'):
+            lab.transfer('apple.com','U',1024,125000,send_buffer=999999999)
 
     def test_high_rtt_lab_cli_is_bounded_before_resource_creation(self):
         cases = (("high_rtt_matrix.py", ["--help"], 0),
+                 ('mixed_clients.py',['--help'],0),
+                 ('mixed_clients.py',['--root','/never-create','--clients','101'],2),
                  ("dualhop_lab.py", ["--help"], 0),
                  ("persistent_relay_lab.py", ["--help"], 0),
                  ("install_recovery_lab.py", ["--help"], 0),

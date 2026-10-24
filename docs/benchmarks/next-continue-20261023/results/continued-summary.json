@@ -1,0 +1,1867 @@
+{
+  "classification": "SINGLE_VPS_SYNTHETIC",
+  "batches": [
+    {
+      "file": "ab-1792765888321915984.json",
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": true,
+        "groups": [
+          {
+            "streams": 32,
+            "builds": {
+              "flush": {
+                "successful_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 69.93638417965595,
+                "median_telemt_cpu_seconds": 0.060000000000000005,
+                "max_sampled_telemt_rss_bytes": 27406336,
+                "median_small_probe_ms": 336.8499945063377,
+                "median_namespace_retransmits": 0,
+                "max_sampled_dc_receive_limit_bytes": 425984
+              },
+              "auto": {
+                "successful_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 70.47845618672233,
+                "median_telemt_cpu_seconds": 0.05,
+                "max_sampled_telemt_rss_bytes": 27463680,
+                "median_small_probe_ms": 363.6435869993875,
+                "median_namespace_retransmits": 0,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              }
+            },
+            "complete_pairs": true,
+            "auto_change_percent": 0.7750929840380172
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      },
+      "payload_mib": 16,
+      "rate_mbps": 100,
+      "rounds": 1,
+      "trials": [
+        {
+          "build": "flush",
+          "streams": 32,
+          "complete": true,
+          "measurement_complete": true,
+          "mbps": 69.93638417965595,
+          "telemetry_errors": [],
+          "failed_streams": 0,
+          "failure_details": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 28.571428571428573,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "maximum_telemt_rss_sampled_bytes": 27406336,
+          "telemt_cpu_seconds": 0.060000000000000005,
+          "expected_payload_bytes": 16777216,
+          "observer_implementation": "bounded-netlink-v1",
+          "sha256_verified_streams": 32,
+          "pair_round": 1,
+          "observer_seconds_total": 0.003625155979534611,
+          "observer_seconds_max": 0.0026928369770757854,
+          "observer_batches": 2,
+          "roles": {
+            "client": {
+              "sample_rows": 48,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984.0
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984.0
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rtt_ms": {
+                  "min": 0.008,
+                  "max": 0.121,
+                  "median": 0.010499999999999999
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 47,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 8352,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 14448,
+                  "max": 137912,
+                  "median": 137912
+                },
+                "rtt_ms": {
+                  "min": 100.421,
+                  "max": 130.625,
+                  "median": 105.701
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 136.0,
+                  "max": 1588.0,
+                  "median": 172.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 93928,
+                  "median": 91032
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 0,
+            "OutSegs": 14545,
+            "InSegs": 12177
+          },
+          "wan_netem_drops_delta": 0
+        },
+        {
+          "build": "auto",
+          "streams": 32,
+          "complete": true,
+          "measurement_complete": true,
+          "mbps": 70.47845618672233,
+          "telemetry_errors": [],
+          "failed_streams": 0,
+          "failure_details": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 27.63819095477387,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "maximum_telemt_rss_sampled_bytes": 27463680,
+          "telemt_cpu_seconds": 0.05,
+          "expected_payload_bytes": 16777216,
+          "observer_implementation": "bounded-netlink-v1",
+          "sha256_verified_streams": 32,
+          "pair_round": 1,
+          "observer_seconds_total": 0.0033790800080168992,
+          "observer_seconds_max": 0.0022218000085558742,
+          "observer_batches": 2,
+          "roles": {
+            "client": {
+              "sample_rows": 53,
+              "fields": {
+                "rb": {
+                  "min": 131072,
+                  "max": 2358342,
+                  "median": 2358342
+                },
+                "tb": {
+                  "min": 3939840,
+                  "max": 3939840,
+                  "median": 3939840
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rtt_ms": {
+                  "min": 0.007,
+                  "max": 0.11,
+                  "median": 0.009
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 4.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 52,
+              "fields": {
+                "rb": {
+                  "min": 131072,
+                  "max": 131072,
+                  "median": 131072.0
+                },
+                "tb": {
+                  "min": 130560,
+                  "max": 417792,
+                  "median": 130560.0
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 8352,
+                  "median": 0.0
+                },
+                "w_queued": {
+                  "min": 1288,
+                  "max": 137912,
+                  "median": 137912.0
+                },
+                "rtt_ms": {
+                  "min": 100.437,
+                  "max": 314.056,
+                  "median": 108.8825
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 152.0,
+                  "max": 1640.0,
+                  "median": 176.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 91032,
+                  "median": 91032.0
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 0,
+            "OutSegs": 14269,
+            "InSegs": 11805
+          },
+          "wan_netem_drops_delta": 0
+        }
+      ]
+    },
+    {
+      "file": "ab-1792765993499279855.json",
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": true,
+        "groups": [
+          {
+            "streams": 32,
+            "builds": {
+              "flush": {
+                "successful_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 81.36213283136424,
+                "median_telemt_cpu_seconds": 0.18000000000000002,
+                "max_sampled_telemt_rss_bytes": 29237248,
+                "median_small_probe_ms": 658.2027080003172,
+                "median_namespace_retransmits": 0,
+                "max_sampled_dc_receive_limit_bytes": 425984
+              },
+              "auto": {
+                "successful_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 81.02520542093498,
+                "median_telemt_cpu_seconds": 0.19999999999999998,
+                "max_sampled_telemt_rss_bytes": 27754496,
+                "median_small_probe_ms": 651.6475300013553,
+                "median_namespace_retransmits": 0,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              }
+            },
+            "complete_pairs": true,
+            "auto_change_percent": -0.4141083802800316
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      },
+      "payload_mib": 64,
+      "rate_mbps": 100,
+      "rounds": 1,
+      "trials": [
+        {
+          "build": "flush",
+          "streams": 32,
+          "complete": true,
+          "measurement_complete": true,
+          "mbps": 81.36213283136424,
+          "telemetry_errors": [],
+          "failed_streams": 0,
+          "failure_details": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 27.80269058295964,
+            "steal_percent": 0.14947683109118087,
+            "iowait_percent": 0.0
+          },
+          "maximum_telemt_rss_sampled_bytes": 29237248,
+          "telemt_cpu_seconds": 0.18000000000000002,
+          "expected_payload_bytes": 67108864,
+          "observer_implementation": "bounded-netlink-v1",
+          "sha256_verified_streams": 32,
+          "pair_round": 1,
+          "observer_seconds_total": 0.009901740995701402,
+          "observer_seconds_max": 0.003169920004438609,
+          "observer_batches": 5,
+          "roles": {
+            "client": {
+              "sample_rows": 131,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 2349,
+                  "median": 0
+                },
+                "rtt_ms": {
+                  "min": 0.007,
+                  "max": 0.365,
+                  "median": 0.009
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 4.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 128,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984.0
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984.0
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 10832,
+                  "median": 4176.0
+                },
+                "w_queued": {
+                  "min": 96260,
+                  "max": 455464,
+                  "median": 146192.0
+                },
+                "rtt_ms": {
+                  "min": 100.421,
+                  "max": 344.719,
+                  "median": 297.42650000000003
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 152.0,
+                  "max": 5356.0,
+                  "median": 2708.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 279632,
+                  "median": 55652.0
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 0,
+            "OutSegs": 55090,
+            "InSegs": 35147
+          },
+          "wan_netem_drops_delta": 0
+        },
+        {
+          "build": "auto",
+          "streams": 32,
+          "complete": true,
+          "measurement_complete": true,
+          "mbps": 81.02520542093498,
+          "telemetry_errors": [],
+          "failed_streams": 0,
+          "failure_details": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 26.299212598425196,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "maximum_telemt_rss_sampled_bytes": 27754496,
+          "telemt_cpu_seconds": 0.19999999999999998,
+          "expected_payload_bytes": 67108864,
+          "observer_implementation": "bounded-netlink-v1",
+          "sha256_verified_streams": 32,
+          "pair_round": 1,
+          "observer_seconds_total": 0.011402903008274734,
+          "observer_seconds_max": 0.0034112379944417626,
+          "observer_batches": 5,
+          "roles": {
+            "client": {
+              "sample_rows": 131,
+              "fields": {
+                "rb": {
+                  "min": 131072,
+                  "max": 2358342,
+                  "median": 2358342
+                },
+                "tb": {
+                  "min": 3939840,
+                  "max": 3939840,
+                  "median": 3939840
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rtt_ms": {
+                  "min": 0.007,
+                  "max": 0.103,
+                  "median": 0.009
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 129,
+              "fields": {
+                "rb": {
+                  "min": 131072,
+                  "max": 131072,
+                  "median": 131072
+                },
+                "tb": {
+                  "min": 130560,
+                  "max": 1122816,
+                  "median": 417792
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 11080,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 1288,
+                  "max": 585576,
+                  "median": 192520
+                },
+                "rtt_ms": {
+                  "min": 100.416,
+                  "max": 343.051,
+                  "median": 314.084
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 144.0,
+                  "max": 6444.0,
+                  "median": 3472.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 419544,
+                  "median": 91032
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 0,
+            "OutSegs": 52287,
+            "InSegs": 32772
+          },
+          "wan_netem_drops_delta": 0
+        }
+      ]
+    },
+    {
+      "file": "ab-1792766090033708741.json",
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": false,
+        "groups": [
+          {
+            "streams": 32,
+            "builds": {
+              "flush": {
+                "successful_trials": 0,
+                "failed_trials": 1,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_telemt_cpu_seconds": null,
+                "max_sampled_telemt_rss_bytes": null,
+                "median_small_probe_ms": null,
+                "median_namespace_retransmits": null,
+                "max_sampled_dc_receive_limit_bytes": null
+              },
+              "auto": {
+                "successful_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_telemt_cpu_seconds": null,
+                "max_sampled_telemt_rss_bytes": null,
+                "median_small_probe_ms": null,
+                "median_namespace_retransmits": null,
+                "max_sampled_dc_receive_limit_bytes": null
+              }
+            },
+            "complete_pairs": false,
+            "auto_change_percent": null
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      },
+      "payload_mib": 256,
+      "rate_mbps": 100,
+      "rounds": 2,
+      "trials": [
+        {
+          "build": "flush",
+          "streams": 32,
+          "complete": false,
+          "measurement_complete": true,
+          "mbps": null,
+          "telemetry_errors": [],
+          "failed_streams": 32,
+          "failure_details": [
+            {
+              "type": "TimeoutError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest",
+              "received_bytes": null
+            }
+          ],
+          "small_probe_errors": [
+            {
+              "type": "TimeoutError",
+              "phase": "payload",
+              "received_bytes": 0
+            },
+            {
+              "type": "TimeoutError",
+              "phase": "handshake",
+              "received_bytes": null
+            },
+            {
+              "type": "TimeoutError",
+              "phase": "handshake",
+              "received_bytes": null
+            }
+          ],
+          "host_cpu_interval": {
+            "busy_percent": 15.938419741906271,
+            "steal_percent": 0.022639800769753225,
+            "iowait_percent": 2.4677382839031017
+          },
+          "maximum_telemt_rss_sampled_bytes": 29564928,
+          "telemt_cpu_seconds": 1.76,
+          "expected_payload_bytes": 268435456,
+          "observer_implementation": "bounded-netlink-v1",
+          "sha256_verified_streams": 0,
+          "pair_round": 1,
+          "observer_seconds_total": 8.160992272984004,
+          "observer_seconds_max": 5.496979846997419,
+          "observer_batches": 16,
+          "roles": {
+            "client": {
+              "sample_rows": 493,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 387734,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rtt_ms": {
+                  "min": 0.007,
+                  "max": 0.613,
+                  "median": 0.009
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 4.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 464,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984.0
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984.0
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 11080,
+                  "median": 0.0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 479304,
+                  "median": 192520.0
+                },
+                "rtt_ms": {
+                  "min": 100.325,
+                  "max": 353.908,
+                  "median": 322.4435
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 21444.0,
+                  "median": 12062.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 421368,
+                  "median": 0.0
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 46,
+            "OutSegs": 197228,
+            "InSegs": 119876
+          },
+          "wan_netem_drops_delta": 0
+        }
+      ]
+    },
+    {
+      "file": "ab-1792766533928541527.json",
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": true,
+        "groups": [
+          {
+            "streams": 32,
+            "builds": {
+              "flush": {
+                "successful_trials": 2,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 81.7328742993201,
+                "median_telemt_cpu_seconds": 0.19,
+                "max_sampled_telemt_rss_bytes": 29028352,
+                "median_small_probe_ms": 644.7464765078621,
+                "median_namespace_retransmits": 0.0,
+                "max_sampled_dc_receive_limit_bytes": 425984
+              },
+              "auto": {
+                "successful_trials": 2,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 83.92133166042836,
+                "median_telemt_cpu_seconds": 0.19,
+                "max_sampled_telemt_rss_bytes": 27983872,
+                "median_small_probe_ms": 585.9566694853129,
+                "median_namespace_retransmits": 5.0,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              }
+            },
+            "complete_pairs": true,
+            "auto_change_percent": 2.677572983783416
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      },
+      "payload_mib": 64,
+      "rate_mbps": 100,
+      "rounds": 2,
+      "trials": [
+        {
+          "build": "flush",
+          "streams": 32,
+          "complete": true,
+          "measurement_complete": true,
+          "mbps": 81.93920939075018,
+          "telemetry_errors": [],
+          "failed_streams": 0,
+          "failure_details": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 27.328244274809162,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "maximum_telemt_rss_sampled_bytes": 29028352,
+          "telemt_cpu_seconds": 0.19,
+          "expected_payload_bytes": 67108864,
+          "observer_implementation": "bounded-netlink-v2",
+          "sha256_verified_streams": 32,
+          "pair_round": 1,
+          "observer_seconds_total": 0.010737262025941163,
+          "observer_seconds_max": 0.0034478710149414837,
+          "observer_batches": 5,
+          "roles": {
+            "client": {
+              "sample_rows": 132,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984.0
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984.0
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rtt_ms": {
+                  "min": 0.007,
+                  "max": 0.126,
+                  "median": 0.008
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 129,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 11080,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 1288,
+                  "max": 451624,
+                  "median": 192520
+                },
+                "rtt_ms": {
+                  "min": 100.399,
+                  "max": 336.022,
+                  "median": 278.649
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 128.0,
+                  "max": 6412.0,
+                  "median": 3436.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 285256,
+                  "median": 91032
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 0,
+            "OutSegs": 54989,
+            "InSegs": 35568
+          },
+          "wan_netem_drops_delta": 0
+        },
+        {
+          "build": "auto",
+          "streams": 32,
+          "complete": true,
+          "measurement_complete": true,
+          "mbps": 81.84979640188531,
+          "telemetry_errors": [],
+          "failed_streams": 0,
+          "failure_details": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 26.905132192846033,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "maximum_telemt_rss_sampled_bytes": 27983872,
+          "telemt_cpu_seconds": 0.19,
+          "expected_payload_bytes": 67108864,
+          "observer_implementation": "bounded-netlink-v2",
+          "sha256_verified_streams": 32,
+          "pair_round": 1,
+          "observer_seconds_total": 0.010909277043538168,
+          "observer_seconds_max": 0.00291166701936163,
+          "observer_batches": 5,
+          "roles": {
+            "client": {
+              "sample_rows": 132,
+              "fields": {
+                "rb": {
+                  "min": 131072,
+                  "max": 2358342,
+                  "median": 2358342.0
+                },
+                "tb": {
+                  "min": 3939840,
+                  "max": 3939840,
+                  "median": 3939840.0
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rtt_ms": {
+                  "min": 0.007,
+                  "max": 0.109,
+                  "median": 0.008
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 129,
+              "fields": {
+                "rb": {
+                  "min": 131072,
+                  "max": 131072,
+                  "median": 131072
+                },
+                "tb": {
+                  "min": 130560,
+                  "max": 1044480,
+                  "median": 391680
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 11080,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 1288,
+                  "max": 552272,
+                  "median": 192520
+                },
+                "rtt_ms": {
+                  "min": 100.421,
+                  "max": 325.249,
+                  "median": 306.317
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 152.0,
+                  "max": 6424.0,
+                  "median": 3464.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 383344,
+                  "median": 91032
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 0,
+            "OutSegs": 52228,
+            "InSegs": 32632
+          },
+          "wan_netem_drops_delta": 0
+        },
+        {
+          "build": "auto",
+          "streams": 32,
+          "complete": true,
+          "measurement_complete": true,
+          "mbps": 85.9928669189714,
+          "telemetry_errors": [],
+          "failed_streams": 0,
+          "failure_details": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 27.444794952681388,
+            "steal_percent": 0.15772870662460567,
+            "iowait_percent": 0.0
+          },
+          "maximum_telemt_rss_sampled_bytes": 27820032,
+          "telemt_cpu_seconds": 0.19,
+          "expected_payload_bytes": 67108864,
+          "observer_implementation": "bounded-netlink-v2",
+          "sha256_verified_streams": 32,
+          "pair_round": 2,
+          "observer_seconds_total": 0.01089079599478282,
+          "observer_seconds_max": 0.0033168329973705113,
+          "observer_batches": 5,
+          "roles": {
+            "client": {
+              "sample_rows": 131,
+              "fields": {
+                "rb": {
+                  "min": 131072,
+                  "max": 2358342,
+                  "median": 2358342
+                },
+                "tb": {
+                  "min": 3939840,
+                  "max": 3939840,
+                  "median": 3939840
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rtt_ms": {
+                  "min": 0.007,
+                  "max": 0.13,
+                  "median": 0.008
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 4.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 128,
+              "fields": {
+                "rb": {
+                  "min": 131072,
+                  "max": 131072,
+                  "median": 131072.0
+                },
+                "tb": {
+                  "min": 130560,
+                  "max": 1070592,
+                  "median": 365568.0
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 11080,
+                  "median": 8352.0
+                },
+                "w_queued": {
+                  "min": 96260,
+                  "max": 447972,
+                  "median": 192520.0
+                },
+                "rtt_ms": {
+                  "min": 100.422,
+                  "max": 323.11,
+                  "median": 252.9325
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0.0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 136.0,
+                  "max": 5008.0,
+                  "median": 2528.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 284500,
+                  "median": 91032.0
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 10,
+            "OutSegs": 52315,
+            "InSegs": 33053
+          },
+          "wan_netem_drops_delta": 0
+        },
+        {
+          "build": "flush",
+          "streams": 32,
+          "complete": true,
+          "measurement_complete": true,
+          "mbps": 81.52653920789002,
+          "telemetry_errors": [],
+          "failed_streams": 0,
+          "failure_details": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 26.934984520123837,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "maximum_telemt_rss_sampled_bytes": 27426816,
+          "telemt_cpu_seconds": 0.19,
+          "expected_payload_bytes": 67108864,
+          "observer_implementation": "bounded-netlink-v2",
+          "sha256_verified_streams": 32,
+          "pair_round": 2,
+          "observer_seconds_total": 0.009980492992326617,
+          "observer_seconds_max": 0.002654023002833128,
+          "observer_batches": 5,
+          "roles": {
+            "client": {
+              "sample_rows": 131,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 50456,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rtt_ms": {
+                  "min": 0.007,
+                  "max": 0.118,
+                  "median": 0.008
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                }
+              }
+            },
+            "dc": {
+              "sample_rows": 129,
+              "fields": {
+                "rb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "tb": {
+                  "min": 425984,
+                  "max": 425984,
+                  "median": 425984
+                },
+                "r_allocated": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "w_allocated": {
+                  "min": 0,
+                  "max": 11080,
+                  "median": 0
+                },
+                "w_queued": {
+                  "min": 1288,
+                  "max": 466104,
+                  "median": 192520
+                },
+                "rtt_ms": {
+                  "min": 100.363,
+                  "max": 337.147,
+                  "median": 298.89
+                },
+                "total_retrans": {
+                  "min": 0,
+                  "max": 0,
+                  "median": 0
+                },
+                "rwnd_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "sndbuf_limited_ms": {
+                  "min": 0.0,
+                  "max": 0.0,
+                  "median": 0.0
+                },
+                "busy_ms": {
+                  "min": 104.0,
+                  "max": 6412.0,
+                  "median": 3456.0
+                },
+                "notsent_bytes": {
+                  "min": 0,
+                  "max": 302632,
+                  "median": 13660
+                }
+              }
+            }
+          },
+          "namespace_tcp_delta": {
+            "RetransSegs": 0,
+            "OutSegs": 55019,
+            "InSegs": 35600
+          },
+          "wan_netem_drops_delta": 0
+        }
+      ]
+    }
+  ],
+  "supervisors": [
+    {
+      "run": "run-tdh-audit-0624575557c9",
+      "profile": "ab",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 222301184,
+        "memory_high_bytes": 166725888,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "memory_current_sampled_max": 166547456,
+      "memory_high_event_max": 138
+    },
+    {
+      "run": "run-tdh-audit-82a17d7d8014",
+      "profile": "ab",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 222952448,
+        "memory_high_bytes": 167214336,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "memory_current_sampled_max": 167112704,
+      "memory_high_event_max": 312
+    },
+    {
+      "run": "run-tdh-audit-a046734678b1",
+      "profile": "observer",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 226746368,
+        "memory_high_bytes": 170059776,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "memory_current_sampled_max": 7643136,
+      "memory_high_event_max": 0
+    },
+    {
+      "run": "run-tdh-audit-d3fc9075f973",
+      "profile": "ab",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 223643648,
+        "memory_high_bytes": 167732736,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "memory_current_sampled_max": 174206976,
+      "memory_high_event_max": 40544
+    },
+    {
+      "run": "run-tdh-audit-e0f2b6df874c",
+      "profile": "observer",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 222838784,
+        "memory_high_bytes": 167129088,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "memory_current_sampled_max": 7647232,
+      "memory_high_event_max": 0
+    },
+    {
+      "run": "run-tdh-audit-f4193ecfbf92",
+      "profile": "ab",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 226878464,
+        "memory_high_bytes": 170158848,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "memory_current_sampled_max": 169578496,
+      "memory_high_event_max": 16
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "classification": "SINGLE_VPS_SYNTHETIC_LOOPBACK_MIXED",
+  "logical_clients": 30,
+  "mock_dc_socket_timeout_seconds": 25,
+  "client_socket_buffers_requested": 32768,
+  "scope": "idle authenticated synthetic requests waiting for final ACK; two active file flows; not Telegram users",
+  "complete": true,
+  "idle_digest_verified": 30,
+  "bulk": [
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1048576,
+      "elapsed_seconds": 4.253553256014129,
+      "handshake_ms": 13.619378005387262,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 1048576,
+      "elapsed_seconds": 4.211975610000081,
+      "handshake_ms": 16.828191990498453,
+      "sha256_verified": true,
+      "persistent_dc": true
+    }
+  ],
+  "small_probes": [
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.07771029198192991,
+      "handshake_ms": 24.9730939976871,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.06759182998212054,
+      "handshake_ms": 14.398910978343338,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.0676176690030843,
+      "handshake_ms": 15.470768994418904,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.06751135998638347,
+      "handshake_ms": 17.32513797469437,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.07107260799966753,
+      "handshake_ms": 17.69959498778917,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.06769553900812753,
+      "handshake_ms": 16.63931499933824,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.06330907499068417,
+      "handshake_ms": 13.303237006766722,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.06743283101241104,
+      "handshake_ms": 17.240809014765546,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.07992207101779059,
+      "handshake_ms": 27.37570201861672,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.07163162701181136,
+      "handshake_ms": 19.04846401885152,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.06755356400390156,
+      "handshake_ms": 14.326411997899413,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.06733149601495825,
+      "handshake_ms": 16.80572802433744,
+      "sha256_verified": true,
+      "persistent_dc": false
+    }
+  ],
+  "small_probe_errors": [],
+  "idle_setup_seconds": 1.7951064820226748,
+  "elapsed_seconds": 6.255898942996282
+}

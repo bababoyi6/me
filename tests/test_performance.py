@@ -240,6 +240,23 @@ if [[ ${1:-} == --self-test ]]; then exit 0; fi
             self.assertEqual(manager.read_bytes(), SCRIPT.read_bytes())
             self.assertEqual(self.config.read_bytes(), self.original)
 
+    def test_oversized_manager_download_is_stopped_and_cleaned_before_execution(self):
+        manager = self.base / "manager"
+        manager.write_bytes(b"existing-manager-must-survive\n")
+        before = manager.read_bytes()
+        (self.base / "download").write_bytes(SCRIPT.read_bytes() + b'\n#' + b'x' * 1048576 + b'\n')
+        self.bash("update_manager", success=False, prelude='''
+curl() {
+  printf '%s' "${@: -1}" >"$TDH_BASE/partial-path"
+  cp "$TDH_BASE/download" "${@: -1}"
+}
+install_shortcut() { printf 'unexpected' >"$TDH_BASE/activated"; }
+''')
+        self.assertEqual(manager.read_bytes(), before)
+        self.assertFalse((self.base / "activated").exists())
+        self.assertFalse(Path((self.base / "partial-path").read_text()).exists())
+        self.assertFalse((self.base / "systemctl.log").exists())
+
     def test_real_legacy_updater_preserves_all_connection_information(self):
         legacy = ROOT / "tests/fixtures/manager-1.3.1-updater.sh"
         previous_state = self.state.read_bytes()

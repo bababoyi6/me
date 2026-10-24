@@ -12,10 +12,28 @@ import os
 from pathlib import Path
 import signal
 import statistics
+import stat
 import subprocess
 import time
 
 NAMES = ("tdh-audit-a", "tdh-audit-wan", "tdh-audit-b")
+RESERVED_NAMES = (*NAMES, "tdh-audit-b2", "tdh-audit-dc")
+GLOBAL_LOCK = Path("/run/lock/tdh-audit-network.lock")
+ROOT_UID = 0
+
+
+def exclusive_lock(path):
+    """Do not follow a pre-existing symlink or open/truncate an unrelated file."""
+    fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != ROOT_UID or info.st_nlink != 1 or info.st_mode & 0o077:
+            raise RuntimeError("lab lock must be a private root-owned regular file")
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return os.fdopen(fd, "r+")
+    except BaseException:
+        os.close(fd)
+        raise
 
 
 def command(*args, timeout=10, input=None):
@@ -58,17 +76,28 @@ class Network:
         self.processes = []
         self.created = []
         self.key_paths = []
-        self.root = Path(args.root).resolve()
+        supplied = Path(args.root)
+        self.root = supplied.resolve()
         if os.geteuid() != 0 or not self.root.name.startswith("tdh-audit-"):
             raise RuntimeError("requires root and a dedicated tdh-audit-* directory")
+        if supplied.is_symlink():
+            raise RuntimeError("lab directory must not be a symlink")
         self.root.mkdir(mode=0o700, parents=True, exist_ok=True)
-        if self.root.stat().st_mode & 0o077:
-            raise RuntimeError("lab directory must be private (0700)")
-        self.lock = (self.root / "network-lab.lock").open("w")
-        fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        existing = {line.split()[0] for line in command("ip", "netns", "list").splitlines()}
-        if existing.intersection(NAMES):
-            raise RuntimeError("refusing to reuse existing namespaces")
+        if self.root.stat().st_mode & 0o077 or self.root.stat().st_uid != ROOT_UID:
+            raise RuntimeError("lab directory must be root-owned and private (0700)")
+        self.global_lock = exclusive_lock(GLOBAL_LOCK)
+        try:
+            self.lock = exclusive_lock(self.root / "network-lab.lock")
+            try:
+                existing = {line.split()[0] for line in command("ip", "netns", "list").splitlines()}
+                if existing.intersection(RESERVED_NAMES):
+                    raise RuntimeError("refusing to reuse existing namespaces")
+            except BaseException:
+                self.lock.close()
+                raise
+        except BaseException:
+            self.global_lock.close()
+            raise
 
     def setup(self):
         for name in NAMES:
@@ -193,6 +222,7 @@ class Network:
         print(json.dumps({"result": destination.name, "completed": len(rows), "summary": grouped}), flush=True)
 
     def close(self):
+        failures = []
         for process in self.processes:
             if process.poll() is None:
                 process.terminate()
@@ -203,10 +233,19 @@ class Network:
                 process.kill()
                 process.wait(timeout=1)
         for name in reversed(self.created):
-            subprocess.run(["ip", "netns", "del", name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3)
+            try:
+                result = subprocess.run(["ip", "netns", "del", name], stdout=subprocess.DEVNULL,
+                                        stderr=subprocess.DEVNULL, timeout=3)
+                if result.returncode != 0:
+                    failures.append(name)
+            except (OSError, subprocess.SubprocessError):
+                failures.append(name)
         for path in self.key_paths:
             path.unlink(missing_ok=True)
         self.lock.close()
+        self.global_lock.close()
+        if failures:
+            raise RuntimeError("namespace cleanup incomplete: " + ", ".join(failures))
 
 
 if __name__ == "__main__":

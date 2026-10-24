@@ -1,0 +1,31 @@
+{
+  "unit": "tdh-audit-policy-build-ef275f3e52f9",
+  "exit": 0,
+  "command": [
+    "systemd-run",
+    "--quiet",
+    "--wait",
+    "--pipe",
+    "--service-type=exec",
+    "--unit=tdh-audit-policy-build-ef275f3e52f9",
+    "--property=MemoryMax=244127744",
+    "--property=MemoryHigh=183095808",
+    "--property=MemorySwapMax=0",
+    "--property=CPUQuota=60%",
+    "--property=TasksMax=192",
+    "--property=RuntimeMaxSec=30",
+    "--property=TimeoutStopSec=20",
+    "--property=KillMode=control-group",
+    "--property=OOMPolicy=stop",
+    "--property=LimitFSIZE=33554432",
+    "--property=UMask=0077",
+    "--property=WorkingDirectory=/root/tdh-audit-20261021/tdh-audit-causal-20261023/project",
+    "--setenv=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+    "--setenv=LD_LIBRARY_PATH=",
+    "--property=PrivateNetwork=yes",
+    "--",
+    "python3",
+    "/root/tdh-audit-20261021/causal_build.py",
+    "--worker"
+  ]
+}

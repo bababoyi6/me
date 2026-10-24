@@ -1,0 +1,37 @@
+{
+  "classification": "SINGLE_VPS_SYNTHETIC",
+  "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+  "complete": true,
+  "groups": [
+    {
+      "streams": 32,
+      "builds": {
+        "flush": {
+          "successful_trials": 1,
+          "failed_trials": 0,
+          "failed_probes": 0,
+          "median_mbps": 71.17131082092513,
+          "median_telemt_cpu_seconds": 0.049999999999999996,
+          "max_sampled_telemt_rss_bytes": 27258880,
+          "median_small_probe_ms": 361.4965649903752,
+          "median_namespace_retransmits": 0,
+          "max_sampled_dc_receive_limit_bytes": null
+        },
+        "auto": {
+          "successful_trials": 1,
+          "failed_trials": 0,
+          "failed_probes": 0,
+          "median_mbps": 69.51248887617173,
+          "median_telemt_cpu_seconds": 0.06,
+          "max_sampled_telemt_rss_bytes": 27721728,
+          "median_small_probe_ms": 364.30376351927407,
+          "median_namespace_retransmits": 0,
+          "max_sampled_dc_receive_limit_bytes": null
+        }
+      },
+      "complete_pairs": true,
+      "auto_change_percent": -2.330745247796795
+    }
+  ],
+  "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+}

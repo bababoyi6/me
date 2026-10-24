@@ -1,0 +1,177 @@
+test_authentication_header_never_appears_in_curl_arguments (test_api_privacy.ApiPrivacyTests) ... ok
+test_current_helper_bypasses_proxies_and_ignores_curlrc (test_api_privacy.ApiPrivacyTests) ... ok
+test_header_control_characters_are_rejected_before_network (test_api_privacy.ApiPrivacyTests) ... ok
+test_invalid_port_is_rejected_before_network (test_api_privacy.ApiPrivacyTests) ... ok
+test_legacy_counterexample_reaches_environment_proxy (test_api_privacy.ApiPrivacyTests) ... ok
+test_link_readiness_failure_never_dumps_service_logs (test_api_privacy.ApiPrivacyTests) ... ok
+test_quotes_and_backslashes_preserve_the_exact_header (test_api_privacy.ApiPrivacyTests) ... ok
+test_changed_patch_or_provenance_rejected (test_core_bundle.CoreBundleTests) ... ok
+test_deterministic_archive_integrity_and_license (test_core_bundle.CoreBundleTests) ... ok
+test_exact_binary_gate_before_output (test_core_bundle.CoreBundleTests) ... ok
+test_existing_output_and_symlink_inputs_are_not_followed (test_core_bundle.CoreBundleTests) ... ok
+test_wrong_architecture_rejected_even_with_fixture_digest (test_core_bundle.CoreBundleTests) ... ok
+test_binary_hash_and_elf_architecture_are_bound (test_core_install.CoreInstallTests) ... ok
+test_embedded_source_matches_tested_module (test_core_install.CoreInstallTests) ... ok
+test_existing_core_and_symlinks_are_preserved (test_core_install.CoreInstallTests) ... ok
+test_fresh_install_runs_as_telemt_and_retains_license (test_core_install.CoreInstallTests) ... ok
+test_manifest_version_architecture_and_member_hash_are_bound (test_core_install.CoreInstallTests) ... ok
+test_member_count_and_size_are_bounded (test_core_install.CoreInstallTests) ... ok
+test_missing_duplicate_or_extra_members_rejected (test_core_install.CoreInstallTests) ... ok
+test_traversal_symlink_and_hardlink_rejected (test_core_install.CoreInstallTests) ... ok
+test_untrusted_archive_checksum_stops_before_tar_parsing (test_core_install.CoreInstallTests) ... ok
+test_valid_bundle_returns_binary_and_original_notices (test_core_install.CoreInstallTests) ... ok
+test_wrong_runtime_version_leaves_no_installed_core (test_core_install.CoreInstallTests) ... ok
+test_patch_helper_matches_rust_regression_source (test_core_patch.CorePatchTests) ... ok
+test_patch_scope_and_unofficial_marking (test_core_patch.CorePatchTests) ... ok
+test_atomic_rename_failure_restores_and_cleans_staging (test_core_transaction.CoreTransactionTests) ... ok
+test_backup_and_prepared_journal_exist_before_stop (test_core_transaction.CoreTransactionTests) ... ok
+test_checksum_version_and_baseline_fail_before_service_change (test_core_transaction.CoreTransactionTests) ... ok
+test_commit_and_explicit_rollback_keep_configuration (test_core_transaction.CoreTransactionTests) ... ok
+test_corrupt_previous_binary_is_rejected_before_stopping (test_core_transaction.CoreTransactionTests) ... ok
+test_failed_later_upgrade_preserves_successful_rollback_history (test_core_transaction.CoreTransactionTests) ... ok
+test_foreign_binary_change_is_not_overwritten_on_recovery (test_core_transaction.CoreTransactionTests) ... ok
+test_incomplete_backup_copy_cannot_replace_a_valid_previous_file (test_core_transaction.CoreTransactionTests) ... ok
+test_journal_target_and_backup_traversal_are_rejected (test_core_transaction.CoreTransactionTests) ... ok
+test_pending_transaction_recovers_after_process_loss (test_core_transaction.CoreTransactionTests) ... ok
+test_readiness_failure_restores_previous_binary_and_service (test_core_transaction.CoreTransactionTests) ... ok
+test_same_content_does_not_replace_history_or_restart (test_core_transaction.CoreTransactionTests) ... ok
+test_second_operator_is_rejected_without_service_calls (test_core_transaction.CoreTransactionTests) ... ok
+test_start_failure_restores_previous_binary (test_core_transaction.CoreTransactionTests) ... ok
+test_symlink_candidate_and_binary_are_rejected (test_core_transaction.CoreTransactionTests) ... ok
+test_symlink_lock_cannot_modify_unrelated_file (test_core_transaction.CoreTransactionTests) ... ok
+test_clean_preflight_creates_nothing (test_fresh_paths.FreshPathTests) ... ok
+test_existing_directory_and_customer_data_preserved_for_all_roles (test_fresh_paths.FreshPathTests) ... ok
+test_existing_unit_wireguard_and_tuning_files_preserved (test_fresh_paths.FreshPathTests) ... ok
+test_foreign_core_manager_and_broken_symlink_are_preserved (test_fresh_paths.FreshPathTests) ... ok
+test_all_dc_policy_and_two_round_recovery_hysteresis (test_health_agent.HealthAgentTests) ... ok
+test_bad_health_payloads_fail_without_killing_monitor (test_health_agent.HealthAgentTests) ... ok
+test_dead_monitor_exits_agent_for_systemd_recovery (test_health_agent.HealthAgentTests) ... ok
+test_embedded_agent_is_exact_reviewed_source (test_health_agent.HealthAgentTests) ... ok
+test_oversized_response_is_bounded_and_rejected (test_health_agent.HealthAgentTests) ... ok
+test_redirect_cannot_forward_readiness_bearer_token (test_health_agent.HealthAgentTests) ... ok
+test_stale_or_missing_monitors_cannot_admit_connections (test_health_agent.HealthAgentTests) ... ok
+test_download_and_launch_then_clean_private_temporary_file (test_install_command.InstallCommandTests) ... ok
+test_download_failure_never_launches_or_leaves_partial_file (test_install_command.InstallCommandTests) ... ok
+test_empty_wrong_project_and_invalid_shell_never_launch (test_install_command.InstallCommandTests) ... ok
+test_nonroot_install_uses_sudo_boundary (test_install_command.InstallCommandTests) ... ok
+test_command_substitution_failure_is_recovered_by_parent_once (test_install_exit.InstallExitTests) ... ok
+test_committed_install_is_not_rolled_back (test_install_exit.InstallExitTests) ... ok
+test_disconnected_panel_waits_for_active_install_cleanup (test_install_exit.InstallExitTests) ... ok
+test_existing_node_error_is_not_install_cleanup (test_install_exit.InstallExitTests) ... ok
+test_explicit_exit_rolls_back_once_preserving_failure_code (test_install_exit.InstallExitTests) ... ok
+test_inherited_panel_pid_cannot_terminate_an_unrelated_process (test_install_exit.InstallExitTests) ... ok
+test_menu_action_subshell_rolls_back_without_ending_panel (test_install_exit.InstallExitTests) ... ok
+test_normal_command_error_does_not_double_rollback (test_install_exit.InstallExitTests) ... ok
+test_successful_subshell_and_pipeline_do_not_own_parent_transaction (test_install_exit.InstallExitTests) ... ok
+test_terminated_install_rolls_back (test_install_exit.InstallExitTests) ... ok
+test_terminating_panel_waits_for_active_install_cleanup (test_install_exit.InstallExitTests) ... ok
+test_uncommitted_success_exit_is_failure_and_rolls_back (test_install_exit.InstallExitTests) ... ok
+test_ab_order_is_paired_and_reversed_each_round (test_lab_runner.LabRunnerTests) ... ok
+test_low_memory_or_disk_refuses_instead_of_enlarging_limits (test_lab_runner.LabRunnerTests) ... ok
+test_small_vps_reserves_host_memory_and_disables_experiment_swap (test_lab_runner.LabRunnerTests) ... ok
+test_systemd_owns_all_descendants_with_finite_resource_limits (test_lab_runner.LabRunnerTests) ... ok
+test_creates_private_regular_lock_and_no_temporary_residue (test_lock_safety.LockSafetyTests) ... ok
+test_legacy_counterexample_truncates_symlink_target (test_lock_safety.LockSafetyTests) ... ok
+test_legacy_holder_blocks_new_manager_until_release (test_lock_safety.LockSafetyTests) ... ok
+test_preserves_legacy_inode_and_contents (test_lock_safety.LockSafetyTests) ... ok
+test_rejects_fifo_and_hardlinked_file_without_blocking (test_lock_safety.LockSafetyTests) ... ok
+test_rejects_symlink_without_touching_target (test_lock_safety.LockSafetyTests) ... ok
+test_rejects_writable_file_or_unsafe_shared_directory (test_lock_safety.LockSafetyTests) ... ok
+test_failed_final_rename_keeps_old_executable_and_backup (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_failed_first_replacement_does_not_invent_previous_backup (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_first_install_creates_working_shortcut (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_legacy_fixed_backup_temporary_path_is_never_used (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_real_shortcut_permission_failure_is_not_masked (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_refuses_manager_and_backup_symlinks_without_touching_target (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_rejects_downloaded_downgrade_and_protocol_change (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_repeat_install_and_rollback_preserve_three_role_identities (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_rollback_rejects_directory_target_without_copying_inside_it (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_rollback_rejects_symlink_target_without_replacing_it (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_rollback_stage_and_rename_failures_preserve_both_versions (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_selftest_deadline_failure_keeps_existing_manager (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_shortcut_failure_keeps_manager_and_removes_staged_file (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+test_high_rtt_lab_cli_is_bounded_before_resource_creation (test_measurement_quality.MeasurementQualityTests) ... ok
+test_lab_cpu_interval_separates_steal_and_rejects_resets (test_measurement_quality.MeasurementQualityTests) ... ok
+test_memory_stop_closes_proxy_before_executor_waits (test_measurement_quality.MeasurementQualityTests) ... ok
+test_nonfinite_and_nonpositive_values_are_rejected (test_measurement_quality.MeasurementQualityTests) ... ok
+test_real_duration_mismatch_is_not_accepted_as_path_throughput (test_measurement_quality.MeasurementQualityTests) ... ok
+test_small_receiver_timing_difference_is_expected (test_measurement_quality.MeasurementQualityTests) ... ok
+test_stream_probe_cli_is_bounded_before_network_setup (test_measurement_quality.MeasurementQualityTests) ... ok
+test_synthetic_reader_pause_is_bounded_before_connection (test_measurement_quality.MeasurementQualityTests) ... ok
+test_crypto_stream_keeps_counter_across_fragmented_reads (test_mtproto_transport.TransportTests) ... ok
+test_experimental_policy_is_confined_before_any_resource_creation (test_mtproto_transport.TransportTests) ... ok
+test_invalid_nonce_is_rejected (test_mtproto_transport.TransportTests) ... ok
+test_nist_aes256_ctr_vector_and_partial_updates (test_mtproto_transport.TransportTests) ... ok
+test_packet_stream_preserves_boundaries_and_partial_reads (test_mtproto_transport.TransportTests) ... ok
+test_packet_stream_rejects_unbounded_frames_before_body_read (test_mtproto_transport.TransportTests) ... ok
+test_synthetic_transfer_cannot_use_public_dc_mode (test_mtproto_transport.TransportTests) ... ok
+test_tls_stream_handles_ccs_and_partial_records (test_mtproto_transport.TransportTests) ... ok
+test_tls_stream_rejects_bad_type_version_or_oversized_record (test_mtproto_transport.TransportTests) ... ok
+test_truncated_packet_is_an_error (test_mtproto_transport.TransportTests) ... ok
+test_unknown_binary_is_rejected_before_any_process_or_temp_resource (test_mtproto_transport.TransportTests) ... ok
+test_cleanup_only_removes_created_resources (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_different_roots_cannot_race_fixed_namespace_names (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_lock_symlink_never_truncates_target (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_namespace_delete_failure_does_not_skip_keys_or_locks (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_secondary_backend_collision_refuses_and_releases_locks (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_unprivileged_run_is_refused_before_any_command (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_world_accessible_directory_is_refused (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+test_installer_does_not_repeat_failed_package_configuration (test_package_recovery.PackageRecoveryTests) ... ok
+test_invalid_signature_and_unknown_key_fail_without_retry (test_package_recovery.PackageRecoveryTests) ... ok
+test_lock_wait_and_mirror_retry_both_obey_deadline (test_package_recovery.PackageRecoveryTests) ... ok
+test_persistent_checksum_mismatch_stops_after_three_attempts (test_package_recovery.PackageRecoveryTests) ... ok
+test_real_mirror_size_error_retries_with_full_apt_validation (test_package_recovery.PackageRecoveryTests) ... ok
+test_transient_resolution_failure_is_bounded (test_package_recovery.PackageRecoveryTests) ... ok
+test_api_sampling_uses_fixed_loopback_and_numeric_allowlist (test_performance.PerformanceTests) ... ok
+test_iperf_aggregate_cap_and_no_raw_error_output (test_performance.PerformanceTests) ... ok
+test_manager_rollback_preserves_state (test_performance.PerformanceTests) ... ok
+test_manager_update_and_failure_preserve_running_configuration (test_performance.PerformanceTests) ... ok
+test_real_generated_config_and_telemt_security (test_performance.PerformanceTests) ... FAIL
+test_real_legacy_updater_preserves_all_connection_information (test_performance.PerformanceTests) ... ok
+test_release_has_no_production_performance_apply_path (test_performance.PerformanceTests) ... ok
+test_report_command_timeout_and_output_limit (test_performance.PerformanceTests) ... ok
+test_report_distinguishes_cpu_steal_and_memory_pressure (test_performance.PerformanceTests) ... ok
+test_report_has_no_state_evaluation_or_secret_output (test_performance.PerformanceTests) ... ok
+test_report_preserves_unofficial_core_label_and_rejects_unbounded_output (test_performance.PerformanceTests) ... ok
+test_report_rejects_unbounded_load (test_performance.PerformanceTests) ... ok
+test_resources_and_legacy_schema (test_performance.PerformanceTests) ... ok
+test_runtime_templates_match_production_baseline (test_performance.PerformanceTests) ... ok
+test_shortcut_failure_does_not_replace_manager (test_performance.PerformanceTests) ... ok
+test_socket_summary_aggregates_without_endpoint_disclosure (test_performance.PerformanceTests) ... ok
+test_stalled_selftest_cannot_replace_manager_or_rollback (test_performance.PerformanceTests) ... ok
+test_dump_completion_errors_sender_and_truncation (test_socket_observer.SocketObserverTests) ... ok
+test_malformed_attributes_and_messages_rejected (test_socket_observer.SocketObserverTests) ... ok
+test_namespace_allowlist_and_thread_rejection_before_open (test_socket_observer.SocketObserverTests) ... ok
+test_qdisc_nested_statistics_match_tc_fields (test_socket_observer.SocketObserverTests) ... ok
+test_socket_memory_tcp_units_and_inode_ownership (test_socket_observer.SocketObserverTests) ... ok
+test_worker_delegates_process_scope_without_subprocess (test_socket_observer.SocketObserverTests) ... ok
+test_post_load_timeout_preserves_transfer_and_marks_measurement_invalid (test_trial_retention.TrialRetentionTests) ... ok
+test_supported_kernel_passes_readiness_without_applying_tuning (test_tuning_preflight.TuningPreflightTests) ... ok
+test_trimmed_or_missing_modules_reject_before_state_is_changed (test_tuning_preflight.TuningPreflightTests) ... ok
+test_unregistered_bbr_is_not_silently_accepted (test_tuning_preflight.TuningPreflightTests) ... ok
+test_failed_or_duplicate_or_missing_pair_suppresses_ratio (test_upload_analysis.UploadAnalysisTests) ... ok
+test_incomplete_batch_does_not_publish_a_ratio_even_with_successful_rows (test_upload_analysis.UploadAnalysisTests) ... ok
+test_negative_results_are_preserved (test_upload_analysis.UploadAnalysisTests) ... ok
+test_unlike_workloads_and_nonfinite_values_are_rejected (test_upload_analysis.UploadAnalysisTests) ... ok
+
+======================================================================
+FAIL: test_real_generated_config_and_telemt_security (test_performance.PerformanceTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-continue-20261023/project/tests/test_performance.py", line 348, in test_real_generated_config_and_telemt_security
+    self.bash('''
+  File "/root/tdh-audit-20261021/tdh-audit-continue-20261023/project/tests/test_performance.py", line 72, in bash
+    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+AssertionError: 1 != 0 : [WARNING]  (131449) : parsing [/tmp/tdh-test-ok10wast/haproxy.cfg.k9Nn6F:42] : 'server apple_a' : could not resolve address 'apple.com', disabling server.
+[WARNING]  (131449) : parsing [/tmp/tdh-test-ok10wast/haproxy.cfg.k9Nn6F:47] : 'server apple_b' : could not resolve address 'gs.apple.com', disabling server.
+[WARNING]  (131449) : parsing [/tmp/tdh-test-ok10wast/haproxy.cfg.k9Nn6F:50] : 'server apple_unknown' : could not resolve address 'apple.com', disabling server.
+[NOTICE]   (131449) : haproxy version is 2.4.30-0ubuntu0.22.04.2
+[NOTICE]   (131449) : path to executable is /root/tdh-audit-20261021/runtime/usr/sbin/haproxy
+[ALERT]    (131449) : Some warnings were found and 'zero-warning' is set. Aborting.
+[失败] HAProxy 配置校验失败；保留原有有效配置。
+
+
+----------------------------------------------------------------------
+Ran 155 tests in 22.189s
+
+FAILED (failures=1)

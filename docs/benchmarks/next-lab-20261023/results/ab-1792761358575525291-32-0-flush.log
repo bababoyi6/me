@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/high_rtt_worker.py", line 154, in <module>
+    for streams,direction in cases[::1 if turn%2==0 else -1]: trial(turn,streams,direction)
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/high_rtt_worker.py", line 120, in trial
+    samples.extend(observe())
+  File "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/high_rtt_worker.py", line 75, in observe
+    lines=subprocess.check_output(['ss','-Htinmp','state','established'],text=True,timeout=3).splitlines()
+  File "/usr/lib/python3.10/subprocess.py", line 421, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+  File "/usr/lib/python3.10/subprocess.py", line 505, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 1154, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 2022, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/usr/lib/python3.10/subprocess.py", line 1198, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['ss', '-Htinmp', 'state', 'established']' timed out after 3 seconds

@@ -1,0 +1,32 @@
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/upload_ab.py", line 119, in main
+    code = worker.wait(timeout=100)
+  File "/usr/lib/python3.10/subprocess.py", line 1209, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 1951, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['ip', 'netns', 'exec', 'tdh-audit-a', '/usr/bin/python3', '/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/high_rtt_worker.py', '--root', '/root/tdh-audit-20261021/tdh-audit-causal-20261023', '--haproxy', '/root/tdh-audit-20261021/runtime/usr/sbin/haproxy', '--build', 'flush', '--output', '/root/tdh-audit-20261021/tdh-audit-causal-20261023/results/ab-1792772866700968677-8-0-auto.json', '--rounds', '1', '--streams', '8', '--bytes', '67108864', '--direction', 'U', '--slow-readers', '--dc-timeout', '25', '--rate-mbps', '1000', '--small-probes', '--observe-network', '--socket-observation', 'detailed', '--socket-library', '/root/tdh-audit-20261021/tdh-audit-causal-20261023/socket-policy.so', '--socket-policy', 'auto']' timed out after 100 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/upload_ab.py", line 122, in main
+    worker.wait(timeout=10)
+  File "/usr/lib/python3.10/subprocess.py", line 1209, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 1951, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['ip', 'netns', 'exec', 'tdh-audit-a', '/usr/bin/python3', '/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/high_rtt_worker.py', '--root', '/root/tdh-audit-20261021/tdh-audit-causal-20261023', '--haproxy', '/root/tdh-audit-20261021/runtime/usr/sbin/haproxy', '--build', 'flush', '--output', '/root/tdh-audit-20261021/tdh-audit-causal-20261023/results/ab-1792772866700968677-8-0-auto.json', '--rounds', '1', '--streams', '8', '--bytes', '67108864', '--direction', 'U', '--slow-readers', '--dc-timeout', '25', '--rate-mbps', '1000', '--small-probes', '--observe-network', '--socket-observation', 'detailed', '--socket-library', '/root/tdh-audit-20261021/tdh-audit-causal-20261023/socket-policy.so', '--socket-policy', 'auto']' timed out after 10 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/upload_ab.py", line 153, in <module>
+    main()
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/upload_ab.py", line 140, in main
+    dc.wait(timeout=5)
+  File "/usr/lib/python3.10/subprocess.py", line 1209, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 1951, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['ip', 'netns', 'exec', 'tdh-audit-b', '/usr/bin/python3', '/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/mock_dc_worker.py', '--output', '/tmp/tdh-audit-ab-ic6i6qxb/dc.json', '--socket-timeout', '25']' timed out after 5 seconds

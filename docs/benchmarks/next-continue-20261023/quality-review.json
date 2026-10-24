@@ -1,0 +1,15 @@
+{
+  "classification": "POST_RUN_MEASUREMENT_QUALITY_REVIEW",
+  "run": "run-tdh-audit-d3fc9075f973",
+  "trial": "results/ab-1792766090033708741-32-0-flush.json",
+  "observer_implementation": "bounded-netlink-v1",
+  "raw_measurement_complete": true,
+  "review_measurement_complete": false,
+  "payload_complete": false,
+  "reason": "Two socket observations exceeded the intended 2-second whole-observation deadline; v1 checked receive timeouts only.",
+  "late_observation_seconds": [5.496979846997419, 2.6250112320121843],
+  "raw_files_modified": false,
+  "speed_ratio_permitted": false,
+  "fix": "v2 checks elapsed time after descriptor scanning, replies, decoding and namespace restoration; late and failed observations invalidate measurement while retaining transfer evidence.",
+  "v2_large_payload_retest": "NOT_TESTED"
+}

@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/high_rtt_worker.py", line 181, in <module>
+    for streams,direction in cases[::1 if turn%2==0 else -1]: trial(turn,streams,direction)
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/high_rtt_worker.py", line 118, in trial
+    probes.append(lab.transfer('gs.apple.com','D',1024,1250000,io_timeout=5))
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/e2e_lab.py", line 290, in transfer
+    stream = mtproxy_connect(sock, domain, SECRETS[domain], proxy_v2=direct, fragment=fragment)
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/mtproto_transport.py", line 153, in mtproxy_connect
+    tls = faketls_handshake(sock, domain, secret, proxy_v2, fragment)
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/mtproto_transport.py", line 123, in faketls_handshake
+    digest = bytearray(hmac.digest(secret, hello, "sha256"))
+  File "/usr/lib/python3.10/hmac.py", line 198, in digest
+    return _hashopenssl.hmac_digest(key, msg, digest)
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/high_rtt_worker.py", line 50, in <lambda>
+    signal.signal(signal.SIGTERM,lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
+  File "/root/tdh-audit-20261021/tdh-audit-causal-20261023/project/tests/high_rtt_worker.py", line 50, in <genexpr>
+    signal.signal(signal.SIGTERM,lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
+KeyboardInterrupt

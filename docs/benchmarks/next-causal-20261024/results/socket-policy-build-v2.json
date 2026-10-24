@@ -1,0 +1,7 @@
+{
+  "sha256": "25e956698622758b3afacb2c739edaa09fd55ced7f57daac66253ea6aedf95eb",
+  "source_sha256": "6eedbc25668d7c10ac7f6a365734fafef90f600f0e72e850862f2bd9387eebf9",
+  "compiler_sha256": "fb07d3c3d5d2ee7fbc5821dbe870c7651aea8f41dc38c089c5dcbb266f62ba89",
+  "scope": "lab-only dynamic interposer; no Rust core changes",
+  "oracle_complete": true
+}

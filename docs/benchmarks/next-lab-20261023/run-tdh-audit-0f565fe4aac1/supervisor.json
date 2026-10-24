@@ -1,0 +1,1555 @@
+{
+  "finished_utc": "2026-10-23T12:55:32.607467+00:00",
+  "stop_reason": null,
+  "exit": 1,
+  "samples": [
+    {
+      "elapsed_seconds": 0.01710492599522695,
+      "host_memory_available_bytes": 674189312
+    },
+    {
+      "memory.current": 15429632,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 142164,
+        "user_usec": 81224,
+        "system_usec": 60939,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 0.5296069460018771,
+      "host_memory_available_bytes": 660021248
+    },
+    {
+      "memory.current": 15429632,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 142164,
+        "user_usec": 81224,
+        "system_usec": 60939,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 1.0308366550016217,
+      "host_memory_available_bytes": 660021248
+    },
+    {
+      "memory.current": 15429632,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 142364,
+        "user_usec": 81338,
+        "system_usec": 61025,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 1.5320628089975799,
+      "host_memory_available_bytes": 660021248
+    },
+    {
+      "memory.current": 15429632,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 142364,
+        "user_usec": 81338,
+        "system_usec": 61025,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 2.033218903990928,
+      "host_memory_available_bytes": 660021248
+    },
+    {
+      "memory.current": 15429632,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 142543,
+        "user_usec": 81441,
+        "system_usec": 61102,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 2.5344855139992433,
+      "host_memory_available_bytes": 660021248
+    },
+    {
+      "memory.current": 15429632,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 142543,
+        "user_usec": 81441,
+        "system_usec": 61102,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 3.0357535499933874,
+      "host_memory_available_bytes": 660021248
+    },
+    {
+      "memory.current": 15081472,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 1,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 143291,
+        "user_usec": 81868,
+        "system_usec": 61422,
+        "nr_periods": 6,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 3.5368696929945145,
+      "host_memory_available_bytes": 660045824
+    },
+    {
+      "memory.current": 15536128,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 198863,
+        "user_usec": 97389,
+        "system_usec": 101474,
+        "nr_periods": 9,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 4.038308880990371,
+      "host_memory_available_bytes": 659808256
+    },
+    {
+      "memory.current": 15536128,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 198863,
+        "user_usec": 97389,
+        "system_usec": 101474,
+        "nr_periods": 9,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 4.539629695995245,
+      "host_memory_available_bytes": 659808256
+    },
+    {
+      "memory.current": 15536128,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 199035,
+        "user_usec": 97473,
+        "system_usec": 101562,
+        "nr_periods": 9,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 5.040996002993779,
+      "host_memory_available_bytes": 659808256
+    },
+    {
+      "memory.current": 15536128,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 199035,
+        "user_usec": 97473,
+        "system_usec": 101562,
+        "nr_periods": 9,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 5.542146178995608,
+      "host_memory_available_bytes": 657743872
+    },
+    {
+      "memory.current": 15527936,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 211177,
+        "user_usec": 107569,
+        "system_usec": 103608,
+        "nr_periods": 10,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 6.043285016989103,
+      "host_memory_available_bytes": 657747968
+    },
+    {
+      "memory.current": 15536128,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 211291,
+        "user_usec": 107627,
+        "system_usec": 103664,
+        "nr_periods": 11,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 6.544381843996234,
+      "host_memory_available_bytes": 657747968
+    },
+    {
+      "memory.current": 15536128,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 211364,
+        "user_usec": 107664,
+        "system_usec": 103699,
+        "nr_periods": 11,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 7.045669398998143,
+      "host_memory_available_bytes": 657747968
+    },
+    {
+      "memory.current": 15536128,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 211465,
+        "user_usec": 107716,
+        "system_usec": 103749,
+        "nr_periods": 11,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 7.547002203995362,
+      "host_memory_available_bytes": 657747968
+    },
+    {
+      "memory.current": 15536128,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 211525,
+        "user_usec": 107746,
+        "system_usec": 103779,
+        "nr_periods": 11,
+        "nr_throttled": 1,
+        "throttled_usec": 3995
+      },
+      "elapsed_seconds": 8.048183692997554,
+      "host_memory_available_bytes": 657747968
+    },
+    {
+      "memory.current": 59936768,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 6,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 491307,
+        "user_usec": 272922,
+        "system_usec": 218384,
+        "nr_periods": 16,
+        "nr_throttled": 4,
+        "throttled_usec": 100017
+      },
+      "elapsed_seconds": 8.549224189002416,
+      "host_memory_available_bytes": 575270912
+    },
+    {
+      "memory.current": 168755200,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 655412,
+        "user_usec": 355326,
+        "system_usec": 300086,
+        "nr_periods": 21,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 9.050759537989506,
+      "host_memory_available_bytes": 554221568
+    },
+    {
+      "memory.current": 168759296,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 665835,
+        "user_usec": 358815,
+        "system_usec": 307020,
+        "nr_periods": 26,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 9.552023922995431,
+      "host_memory_available_bytes": 552386560
+    },
+    {
+      "memory.current": 168751104,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 673479,
+        "user_usec": 360773,
+        "system_usec": 312705,
+        "nr_periods": 31,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 10.053531548997853,
+      "host_memory_available_bytes": 551321600
+    },
+    {
+      "memory.current": 168755200,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 680517,
+        "user_usec": 367811,
+        "system_usec": 312705,
+        "nr_periods": 36,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 10.554806310989079,
+      "host_memory_available_bytes": 550383616
+    },
+    {
+      "memory.current": 168755200,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 686538,
+        "user_usec": 369347,
+        "system_usec": 317191,
+        "nr_periods": 41,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 11.055654506999417,
+      "host_memory_available_bytes": 548835328
+    },
+    {
+      "memory.current": 168755200,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 692594,
+        "user_usec": 374465,
+        "system_usec": 318128,
+        "nr_periods": 46,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 11.556654790998437,
+      "host_memory_available_bytes": 548835328
+    },
+    {
+      "memory.current": 168759296,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 698995,
+        "user_usec": 379783,
+        "system_usec": 319212,
+        "nr_periods": 51,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 12.057691741996678,
+      "host_memory_available_bytes": 548450304
+    },
+    {
+      "memory.current": 168759296,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 705376,
+        "user_usec": 386164,
+        "system_usec": 319212,
+        "nr_periods": 56,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 12.558739337997395,
+      "host_memory_available_bytes": 548450304
+    },
+    {
+      "memory.current": 168759296,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 712740,
+        "user_usec": 393528,
+        "system_usec": 319212,
+        "nr_periods": 61,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 13.059776159992907,
+      "host_memory_available_bytes": 548450304
+    },
+    {
+      "memory.current": 168759296,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 719600,
+        "user_usec": 400388,
+        "system_usec": 319212,
+        "nr_periods": 66,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 13.560842145001516,
+      "host_memory_available_bytes": 548454400
+    },
+    {
+      "memory.current": 168763392,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 725954,
+        "user_usec": 405075,
+        "system_usec": 320879,
+        "nr_periods": 71,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 14.06186638699728,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168763392,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 732685,
+        "user_usec": 410129,
+        "system_usec": 322555,
+        "nr_periods": 76,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 14.562917788993218,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168767488,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 739055,
+        "user_usec": 411458,
+        "system_usec": 327596,
+        "nr_periods": 81,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 15.063708898000186,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168763392,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 745491,
+        "user_usec": 414589,
+        "system_usec": 330902,
+        "nr_periods": 86,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 15.564426764991367,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168759296,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 751875,
+        "user_usec": 415915,
+        "system_usec": 335960,
+        "nr_periods": 91,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 16.06563160099904,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168763392,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 758892,
+        "user_usec": 421149,
+        "system_usec": 337742,
+        "nr_periods": 96,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 16.56670775199018,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168763392,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 765115,
+        "user_usec": 421149,
+        "system_usec": 343966,
+        "nr_periods": 101,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 17.067679813990253,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168759296,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 771099,
+        "user_usec": 421305,
+        "system_usec": 349794,
+        "nr_periods": 106,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 17.56870160299877,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168759296,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 777608,
+        "user_usec": 426671,
+        "system_usec": 350937,
+        "nr_periods": 111,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 18.06975095398957,
+      "host_memory_available_bytes": 548462592
+    },
+    {
+      "memory.current": 168833024,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 786876,
+        "user_usec": 431367,
+        "system_usec": 355509,
+        "nr_periods": 116,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 18.57119654500275,
+      "host_memory_available_bytes": 548466688
+    },
+    {
+      "memory.current": 168226816,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 10,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 795664,
+        "user_usec": 440155,
+        "system_usec": 355509,
+        "nr_periods": 121,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 19.072501963994,
+      "host_memory_available_bytes": 548474880
+    },
+    {
+      "memory.current": 168230912,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 10,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 802718,
+        "user_usec": 445056,
+        "system_usec": 357662,
+        "nr_periods": 126,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 19.573638656002004,
+      "host_memory_available_bytes": 548474880
+    },
+    {
+      "memory.current": 168230912,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 10,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 809191,
+        "user_usec": 448213,
+        "system_usec": 360978,
+        "nr_periods": 131,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 20.07473995500186,
+      "host_memory_available_bytes": 548474880
+    },
+    {
+      "memory.current": 168230912,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 10,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 817157,
+        "user_usec": 452197,
+        "system_usec": 364960,
+        "nr_periods": 136,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 20.575880231990595,
+      "host_memory_available_bytes": 548474880
+    },
+    {
+      "memory.current": 168226816,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 10,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 823402,
+        "user_usec": 455230,
+        "system_usec": 368171,
+        "nr_periods": 141,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 21.07713703600166,
+      "host_memory_available_bytes": 548474880
+    },
+    {
+      "memory.current": 186552320,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 32,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 985959,
+        "user_usec": 546418,
+        "system_usec": 439541,
+        "nr_periods": 146,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 21.578485022997484,
+      "host_memory_available_bytes": 536281088
+    },
+    {
+      "memory.current": 187400192,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 32,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 999269,
+        "user_usec": 553363,
+        "system_usec": 445906,
+        "nr_periods": 151,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 22.079688946992974,
+      "host_memory_available_bytes": 534827008
+    },
+    {
+      "memory.current": 192786432,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 32,
+      "memory.events": {
+        "low": 0,
+        "high": 10,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1061950,
+        "user_usec": 600046,
+        "system_usec": 461904,
+        "nr_periods": 156,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 22.580676924000727,
+      "host_memory_available_bytes": 530395136
+    },
+    {
+      "memory.current": 192802816,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 33,
+      "memory.events": {
+        "low": 0,
+        "high": 12,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1077105,
+        "user_usec": 609817,
+        "system_usec": 467288,
+        "nr_periods": 161,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 23.08158890499908,
+      "host_memory_available_bytes": 528601088
+    },
+    {
+      "memory.current": 192446464,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 32,
+      "memory.events": {
+        "low": 0,
+        "high": 13,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1091377,
+        "user_usec": 611155,
+        "system_usec": 480222,
+        "nr_periods": 166,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 23.582776333001675,
+      "host_memory_available_bytes": 528465920
+    },
+    {
+      "memory.current": 192659456,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 32,
+      "memory.events": {
+        "low": 0,
+        "high": 14,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1108704,
+        "user_usec": 614157,
+        "system_usec": 494547,
+        "nr_periods": 172,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 24.08393588400213,
+      "host_memory_available_bytes": 528330752
+    },
+    {
+      "memory.current": 192663552,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 33,
+      "memory.events": {
+        "low": 0,
+        "high": 15,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1125167,
+        "user_usec": 628169,
+        "system_usec": 496998,
+        "nr_periods": 177,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 24.58509195499937,
+      "host_memory_available_bytes": 528199680
+    },
+    {
+      "memory.current": 192696320,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 33,
+      "memory.events": {
+        "low": 0,
+        "high": 15,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1140022,
+        "user_usec": 639509,
+        "system_usec": 500513,
+        "nr_periods": 182,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 25.086171461996855,
+      "host_memory_available_bytes": 528199680
+    },
+    {
+      "memory.current": 192651264,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 19,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1166134,
+        "user_usec": 650942,
+        "system_usec": 515192,
+        "nr_periods": 187,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 25.587146969992318,
+      "host_memory_available_bytes": 527175680
+    },
+    {
+      "memory.current": 192638976,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 21,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1230250,
+        "user_usec": 681246,
+        "system_usec": 549004,
+        "nr_periods": 192,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 26.088383523994708,
+      "host_memory_available_bytes": 526532608
+    },
+    {
+      "memory.current": 192430080,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 22,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1274469,
+        "user_usec": 705787,
+        "system_usec": 568682,
+        "nr_periods": 197,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 26.589386733001447,
+      "host_memory_available_bytes": 526258176
+    },
+    {
+      "memory.current": 192638976,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 35,
+      "memory.events": {
+        "low": 0,
+        "high": 36,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1328037,
+        "user_usec": 724739,
+        "system_usec": 603298,
+        "nr_periods": 202,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 27.09017513699655,
+      "host_memory_available_bytes": 523239424
+    },
+    {
+      "memory.current": 192647168,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 36,
+      "memory.events": {
+        "low": 0,
+        "high": 37,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1364747,
+        "user_usec": 753223,
+        "system_usec": 611523,
+        "nr_periods": 207,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 27.59085248199699,
+      "host_memory_available_bytes": 522985472
+    },
+    {
+      "memory.current": 192589824,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 49,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1427487,
+        "user_usec": 795331,
+        "system_usec": 632155,
+        "nr_periods": 212,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 28.091768999991473,
+      "host_memory_available_bytes": 518844416
+    },
+    {
+      "memory.current": 192815104,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 50,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1482804,
+        "user_usec": 825617,
+        "system_usec": 657187,
+        "nr_periods": 217,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 28.59257194699603,
+      "host_memory_available_bytes": 518672384
+    },
+    {
+      "memory.current": 192544768,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 51,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1520205,
+        "user_usec": 840405,
+        "system_usec": 679799,
+        "nr_periods": 222,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 29.093531570993946,
+      "host_memory_available_bytes": 518438912
+    },
+    {
+      "memory.current": 192770048,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 53,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1557698,
+        "user_usec": 853383,
+        "system_usec": 704315,
+        "nr_periods": 227,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 29.59422471000289,
+      "host_memory_available_bytes": 517468160
+    },
+    {
+      "memory.current": 192454656,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 54,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1594200,
+        "user_usec": 865740,
+        "system_usec": 728460,
+        "nr_periods": 232,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 30.094921586001874,
+      "host_memory_available_bytes": 517287936
+    },
+    {
+      "memory.current": 192356352,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 55,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1634172,
+        "user_usec": 885648,
+        "system_usec": 748523,
+        "nr_periods": 237,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 30.59595473999798,
+      "host_memory_available_bytes": 516907008
+    },
+    {
+      "memory.current": 192684032,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 55,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1670071,
+        "user_usec": 888722,
+        "system_usec": 781348,
+        "nr_periods": 242,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 31.09701931499876,
+      "host_memory_available_bytes": 516907008
+    },
+    {
+      "memory.current": 192692224,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 57,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1717328,
+        "user_usec": 907911,
+        "system_usec": 809417,
+        "nr_periods": 247,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 31.597980049002217,
+      "host_memory_available_bytes": 516358144
+    },
+    {
+      "memory.current": 192532480,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 59,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1789718,
+        "user_usec": 944271,
+        "system_usec": 845446,
+        "nr_periods": 252,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 32.099097822996555,
+      "host_memory_available_bytes": 515727360
+    },
+    {
+      "memory.current": 192466944,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 37,
+      "memory.events": {
+        "low": 0,
+        "high": 59,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1868647,
+        "user_usec": 992909,
+        "system_usec": 875737,
+        "nr_periods": 257,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 32.60007274999225,
+      "host_memory_available_bytes": 515481600
+    },
+    {
+      "memory.current": 191713280,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 36,
+      "memory.events": {
+        "low": 0,
+        "high": 62,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 1951197,
+        "user_usec": 1038333,
+        "system_usec": 912864,
+        "nr_periods": 262,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 33.10081758799788,
+      "host_memory_available_bytes": 514158592
+    },
+    {
+      "memory.current": 186339328,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 34,
+      "memory.events": {
+        "low": 0,
+        "high": 62,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 2030976,
+        "user_usec": 1072175,
+        "system_usec": 958800,
+        "nr_periods": 267,
+        "nr_throttled": 7,
+        "throttled_usec": 193102
+      },
+      "elapsed_seconds": 33.60194145099376,
+      "host_memory_available_bytes": 514179072
+    }
+  ],
+  "remaining_lab_namespaces": [],
+  "cleanup_verified": true,
+  "warning": "Existing connections cannot migrate on failover; no real Telegram capacity claim."
+}

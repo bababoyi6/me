@@ -1,0 +1,214 @@
+{
+  "finished_utc": "2026-10-23T14:28:38.010871+00:00",
+  "stop_reason": null,
+  "unit_result": "success",
+  "unit_exec_main_status": "0",
+  "host_oom_kill_delta": 0,
+  "exit": 0,
+  "samples": [
+    {
+      "memory.current": 1376256,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 1,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 3241,
+        "user_usec": 2871,
+        "system_usec": 370,
+        "nr_periods": 0,
+        "nr_throttled": 0,
+        "throttled_usec": 0
+      },
+      "elapsed_seconds": 0.01625542200054042,
+      "host_memory_available_bytes": 636596224,
+      "new_output_bytes": 0
+    },
+    {
+      "memory.current": 7643136,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 114976,
+        "user_usec": 41844,
+        "system_usec": 73131,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 3977
+      },
+      "elapsed_seconds": 0.5176068000146188,
+      "host_memory_available_bytes": 636227584,
+      "new_output_bytes": 0
+    },
+    {
+      "memory.current": 7643136,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 114976,
+        "user_usec": 41844,
+        "system_usec": 73131,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 3977
+      },
+      "elapsed_seconds": 1.0190755470248405,
+      "host_memory_available_bytes": 636227584,
+      "new_output_bytes": 0
+    },
+    {
+      "memory.current": 7643136,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 115156,
+        "user_usec": 41910,
+        "system_usec": 73246,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 3977
+      },
+      "elapsed_seconds": 1.5204844860127196,
+      "host_memory_available_bytes": 636227584,
+      "new_output_bytes": 0
+    },
+    {
+      "memory.current": 7643136,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 115156,
+        "user_usec": 41910,
+        "system_usec": 73246,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 3977
+      },
+      "elapsed_seconds": 2.0219026310078334,
+      "host_memory_available_bytes": 636227584,
+      "new_output_bytes": 0
+    },
+    {
+      "memory.current": 7643136,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 115361,
+        "user_usec": 41984,
+        "system_usec": 73376,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 3977
+      },
+      "elapsed_seconds": 2.5232282430224586,
+      "host_memory_available_bytes": 636227584,
+      "new_output_bytes": 0
+    },
+    {
+      "memory.current": 7643136,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 2,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 115361,
+        "user_usec": 41984,
+        "system_usec": 73376,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 3977
+      },
+      "elapsed_seconds": 3.024674414016772,
+      "host_memory_available_bytes": 636227584,
+      "new_output_bytes": 0
+    },
+    {
+      "memory.current": 7303168,
+      "memory.peak": null,
+      "memory.swap.current": 0,
+      "pids.current": 1,
+      "memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu.stat": {
+        "usage_usec": 116071,
+        "user_usec": 42243,
+        "system_usec": 73828,
+        "nr_periods": 5,
+        "nr_throttled": 1,
+        "throttled_usec": 3977
+      },
+      "elapsed_seconds": 3.5261431580001954,
+      "host_memory_available_bytes": 636227584,
+      "new_output_bytes": 0
+    }
+  ],
+  "remaining_lab_namespaces": [],
+  "remaining_lab_key_files": [],
+  "final_cgroup_sample": {
+    "memory.current": null,
+    "memory.peak": null,
+    "memory.swap.current": null,
+    "pids.current": null,
+    "memory.events": {},
+    "cpu.stat": {}
+  },
+  "cleanup_verified": true,
+  "warning": "Existing connections cannot migrate on failover; no real Telegram capacity claim."
+}

@@ -1,0 +1,92 @@
+{
+  "classification": "SINGLE_VPS_SYNTHETIC",
+  "date_utc": "2026-10-23T13:15:58.575543+00:00",
+  "control": "3.5.5+tdh.audit1 flush-only; not unmodified 1.5.0",
+  "candidate": "3.5.5+tdh.audit2; identical to 1.5.0 default core",
+  "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+  "rtt_ms_configured": 100,
+  "rate_mbps_per_direction": 1000,
+  "payload_bytes_total_per_trial": 268435456,
+  "direction": "U",
+  "kernel": "5.15.0-161-generic",
+  "command": [
+    "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/upload_ab.py",
+    "--root",
+    "/root/tdh-audit-20261021/tdh-audit-next-20261023",
+    "--haproxy",
+    "/root/tdh-audit-20261021/runtime/usr/sbin/haproxy",
+    "--wg",
+    "/root/tdh-audit-20261021/runtime/usr/bin/wg",
+    "--rtt",
+    "100",
+    "--max-streams",
+    "32",
+    "--min-streams",
+    "32",
+    "--payload-mib",
+    "256",
+    "--rounds",
+    "3",
+    "--rate-mbps",
+    "1000"
+  ],
+  "rounds": 3,
+  "rows": [
+    {
+      "pair_round": 1,
+      "streams": 32,
+      "build": "flush",
+      "exit": 1,
+      "result_file": "ab-1792761358575525291-32-0-flush.json",
+      "worker_log": "ab-1792761358575525291-32-0-flush.log",
+      "command": [
+        "ip",
+        "netns",
+        "exec",
+        "tdh-audit-a",
+        "/usr/bin/python3",
+        "/root/tdh-audit-20261021/tdh-audit-next-20261023/project/tests/high_rtt_worker.py",
+        "--root",
+        "/root/tdh-audit-20261021/tdh-audit-next-20261023",
+        "--haproxy",
+        "/root/tdh-audit-20261021/runtime/usr/sbin/haproxy",
+        "--build",
+        "flush",
+        "--output",
+        "/root/tdh-audit-20261021/tdh-audit-next-20261023/results/ab-1792761358575525291-32-0-flush.json",
+        "--rounds",
+        "1",
+        "--streams",
+        "32",
+        "--bytes",
+        "268435456",
+        "--direction",
+        "U",
+        "--slow-readers",
+        "--dc-timeout",
+        "25",
+        "--rate-mbps",
+        "1000",
+        "--small-probes",
+        "--observe-network"
+      ]
+    }
+  ],
+  "complete": false,
+  "binary_sha256": {
+    "flush": "e0aa14b4032bbfa32fd5389e815371008a78aeae39ec099f9b850e2db3160582",
+    "auto": "2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1"
+  },
+  "mock_dc": {
+    "completed": 0,
+    "errors": [],
+    "socket_timeout_seconds": 25,
+    "connect_only": 5,
+    "tcp_listen_counters": {
+      "ListenOverflows": 0,
+      "ListenDrops": 0,
+      "TCPSynRetrans": 0
+    }
+  },
+  "failure": "RuntimeError"
+}
