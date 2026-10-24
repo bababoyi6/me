@@ -35,18 +35,21 @@ def run_checked(*argv):
         raise RuntimeError('safety inspection failed: ' + Path(argv[0]).name) from None
 
 
-def budget(total, available, disk_free):
+def budget(total, available, disk_free, memory_high_percent=75):
     """Reserve host headroom; reject rather than expand swap or overcommit memory."""
+    if type(memory_high_percent) is not int or memory_high_percent not in (75, 80):
+        raise ValueError('memory.high percentage must be the explicit 75 or 80 policy')
     reserve = max(256 * MIB, total // 3)
     memory = min(384 * MIB, (available - reserve) * 3 // 4)
     allowed = total >= 768 * MIB and memory >= 192 * MIB and disk_free >= 1024 * MIB
     return {"eligible": allowed, "host_reserve_bytes": reserve,
-            "memory_max_bytes": max(0, memory), "memory_high_bytes": max(0, memory * 3 // 4),
+            "memory_max_bytes": max(0, memory), "memory_high_bytes": max(0, memory * memory_high_percent // 100),
+            "memory_high_percent": memory_high_percent,
             "cpu_quota_percent": 60, "tasks_max": 192, "runtime_max_seconds": 600,
             "output_max_bytes": 32 * MIB, "swap_max_bytes": 0}
 
 
-def inventory():
+def inventory(memory_high_percent=75):
     memory = {line.split(":")[0]: int(line.split()[1]) * 1024
               for line in read("/proc/meminfo").splitlines()
               if line.split(":")[0] in ("MemTotal", "MemAvailable", "SwapTotal", "SwapFree")}
@@ -59,7 +62,7 @@ def inventory():
     namespaces = [line.split()[0] for line in run_checked("ip", "netns", "list").splitlines()]
     disk = shutil.disk_usage("/tmp")
     controllers = read("/sys/fs/cgroup/cgroup.controllers").split()
-    resources = budget(memory.get("MemTotal", 0), memory.get("MemAvailable", 0), disk.free)
+    resources = budget(memory.get("MemTotal", 0), memory.get("MemAvailable", 0), disk.free, memory_high_percent)
     return {"scope": "READ_ONLY_PREFLIGHT", "date_utc": datetime.now(timezone.utc).isoformat(),
             "os": release.get("PRETTY_NAME", "").strip('"'), "kernel": os.uname().release,
             "architecture": os.uname().machine, "cpus": os.cpu_count(), "euid": os.geteuid(),

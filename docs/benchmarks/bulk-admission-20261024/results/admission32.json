@@ -1,0 +1,7 @@
+{
+  "eligible": false,
+  "previous_peak_bytes": 174264320,
+  "required_memory_high_bytes": 191690752,
+  "current_memory_high_bytes": 189634560,
+  "reason": "prior tier unsuccessful, unmeasured, or insufficient memory.high headroom"
+}

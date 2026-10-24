@@ -91,13 +91,17 @@ def main():
     parser.add_argument('--candidate-only',action='store_true')
     parser.add_argument('--share-core-file',action='store_true',help='ab only: share the verified private core inode')
     parser.add_argument('--previous-run', help='owned run-tdh-audit-* directory name; require prior measured memory headroom')
+    parser.add_argument('--memory-high-percent', type=int, choices=(75, 80), default=75,
+                        help='ab only: explicit soft-throttling policy; hard memory/host reserve remain unchanged')
     parser.add_argument("--execute", action="store_true", help="without this flag only prints preflight/plan")
     args = parser.parse_args()
     if args.min_streams > args.max_streams:
         parser.error("minimum stream tier exceeds maximum")
     if sys.platform != "linux":
         parser.error("Linux is required")
-    report = inventory()
+    if args.memory_high_percent != 75 and args.profile != 'ab':
+        parser.error('non-default soft memory policy requires the private ab profile')
+    report = inventory(memory_high_percent=args.memory_high_percent)
     before_temp_names={p.name for p in Path('/tmp').glob('tdh-e2e-*') if p.is_dir()}
     root = Path(args.root).absolute()
     if root.is_symlink() or not root.name.startswith("tdh-audit-"):

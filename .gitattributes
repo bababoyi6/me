@@ -15,3 +15,4 @@ docs/benchmarks/queue-20261024/** -text -whitespace
 docs/benchmarks/balanced-20261024/** -text -whitespace
 docs/benchmarks/graded-20261024/** -text -whitespace
 docs/benchmarks/shared-core-20261024/** -text -whitespace
+docs/benchmarks/bulk-admission-20261024/** -text -whitespace

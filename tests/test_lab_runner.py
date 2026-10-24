@@ -17,6 +17,20 @@ sys.path.remove(str(TOOLS))
 
 
 class LabRunnerTests(unittest.TestCase):
+    def test_explicit_soft_policy_keeps_all_hard_limits_and_reserves(self):
+        standard = budget(956*MIB, 640*MIB, 4096*MIB)
+        alternative = budget(956*MIB, 640*MIB, 4096*MIB, memory_high_percent=80)
+        for key in standard:
+            if key not in ('memory_high_bytes', 'memory_high_percent'):
+                self.assertEqual(standard[key], alternative[key], key)
+        self.assertEqual(standard['memory_high_percent'], 75)
+        self.assertEqual(standard['memory_high_bytes'], standard['memory_max_bytes']*3//4)
+        self.assertEqual(alternative['memory_high_bytes'], alternative['memory_max_bytes']*80//100)
+        self.assertLess(alternative['memory_high_bytes'], alternative['memory_max_bytes'])
+        for invalid in (0, 100, -1, True, 75.0):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                budget(956*MIB, 640*MIB, 4096*MIB, memory_high_percent=invalid)
+
     @unittest.skipUnless(os.name == 'posix', 'POSIX report permissions')
     def test_reports_are_private_with_shell_umask_and_never_overwrite_evidence(self):
         with tempfile.TemporaryDirectory() as folder:
