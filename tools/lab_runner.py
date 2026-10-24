@@ -13,7 +13,7 @@ import sys
 import time
 import uuid
 
-from lab_preflight import inventory, MIB, read, run
+from lab_preflight import inventory, MIB, read, run, run_checked
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(REPO/'tests'))
@@ -51,6 +51,15 @@ def cgroup_sample(group):
 def output_bytes(root):
     return sum(path.stat().st_size for folder in (root / "results", *root.glob("run-tdh-audit-*"))
                if folder.is_dir() for path in folder.rglob("*") if path.is_file() and not path.is_symlink())
+
+
+def namespace_cleanup_status():
+    try:
+        remaining = [line.split()[0] for line in run_checked("ip", "netns", "list").splitlines()
+                     if line.startswith("tdh-audit-")]
+        return remaining, []
+    except RuntimeError:
+        return None, ["namespace_inspection_failed"]
 
 
 def main():
@@ -130,6 +139,8 @@ def main():
         parser.error("cgroup v2 memory/cpu/pids controllers are required; no unbounded fallback")
     if report["existing_lab_namespaces"]:
         parser.error("existing lab namespaces require ownership review before a new run")
+    if report["kernel_oom_kill_count"] is None:
+        parser.error("host OOM counter is unavailable; no load permitted")
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     if root.stat().st_uid != 0 or root.stat().st_mode & 0o077:
         parser.error("lab root must be private and root-owned")
@@ -197,8 +208,7 @@ def main():
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait(timeout=5)
-        remaining = [line.split()[0] for line in run("ip", "netns", "list").splitlines()
-                     if line.startswith("tdh-audit-")]
+        remaining, inspection_errors = namespace_cleanup_status()
         key_files = [path.name for path in root.glob("*.key")]
         final_cgroup = cgroup_sample(group)
         unit_state=run('systemctl','show',unit,'--property=ActiveState','--value')
@@ -220,7 +230,8 @@ def main():
                   "final_cgroup_sample": final_cgroup,
                   'temporary_artifact_cleanup':artifact_cleanup,
                   'unattributed_temporary_directories':unattributed_temporaries,
-                  "cleanup_verified": not remaining and not key_files and stopped and not artifact_cleanup['errors'] and not unattributed_temporaries,
+                  'cleanup_inspection_errors':inspection_errors,
+                  "cleanup_verified": not inspection_errors and not remaining and not key_files and stopped and not artifact_cleanup['errors'] and not unattributed_temporaries,
                   "warning": "Existing connections cannot migrate on failover; no real Telegram capacity claim."}
         (results / "supervisor.json").write_text(json.dumps(result, indent=2) + "\n")
         # Retain failed unit diagnostics until captured, then release only our unit.

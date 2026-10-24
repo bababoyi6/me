@@ -26,6 +26,15 @@ def run(*argv):
         return ""
 
 
+def run_checked(*argv):
+    """An empty successful query differs from a failed safety inspection."""
+    try:
+        result = subprocess.run(argv, capture_output=True, text=True, timeout=5, check=True)
+        return result.stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        raise RuntimeError('safety inspection failed: ' + Path(argv[0]).name) from None
+
+
 def budget(total, available, disk_free):
     """Reserve host headroom; reject rather than expand swap or overcommit memory."""
     reserve = max(256 * MIB, total // 3)
@@ -43,11 +52,11 @@ def inventory():
               if line.split(":")[0] in ("MemTotal", "MemAvailable", "SwapTotal", "SwapFree")}
     release = dict(line.split("=", 1) for line in read("/etc/os-release").splitlines() if "=" in line)
     listeners = []
-    for line in run("ss", "-Hlntu").splitlines():
+    for line in run_checked("ss", "-Hlntu").splitlines():
         fields = line.split()
         if len(fields) >= 5:
             listeners.append({"protocol": fields[0], "port": fields[4].rsplit(":", 1)[-1]})
-    namespaces = [line.split()[0] for line in run("ip", "netns", "list").splitlines()]
+    namespaces = [line.split()[0] for line in run_checked("ip", "netns", "list").splitlines()]
     disk = shutil.disk_usage("/tmp")
     controllers = read("/sys/fs/cgroup/cgroup.controllers").split()
     resources = budget(memory.get("MemTotal", 0), memory.get("MemAvailable", 0), disk.free)

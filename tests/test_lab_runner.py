@@ -8,12 +8,24 @@ from unittest.mock import Mock, patch
 
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
-from lab_preflight import budget, MIB
-from lab_runner import systemd_command, cgroup_sample
+from lab_preflight import budget, MIB, run_checked
+from lab_runner import systemd_command, cgroup_sample, namespace_cleanup_status
 sys.path.remove(str(TOOLS))
 
 
 class LabRunnerTests(unittest.TestCase):
+    def test_failed_safety_queries_are_not_empty_successes(self):
+        for failure in (FileNotFoundError(), subprocess.CalledProcessError(1, 'ip'),
+                        subprocess.TimeoutExpired('ip', 5)):
+            with self.subTest(failure=type(failure).__name__), patch('lab_preflight.subprocess.run', side_effect=failure):
+                with self.assertRaisesRegex(RuntimeError, 'safety inspection failed'):
+                    run_checked('ip', 'netns', 'list')
+                remaining, errors = namespace_cleanup_status()
+                self.assertIsNone(remaining)
+                self.assertEqual(errors, ['namespace_inspection_failed'])
+        with patch('lab_preflight.subprocess.run', return_value=Mock(stdout='')):
+            self.assertEqual(namespace_cleanup_status(), ([], []))
+
     def test_small_vps_reserves_host_memory_and_disables_experiment_swap(self):
         limits = budget(956 * MIB, 616 * MIB, 4 * 1024 * MIB)
         self.assertTrue(limits["eligible"])
