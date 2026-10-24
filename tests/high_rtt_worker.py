@@ -176,7 +176,7 @@ def trial(turn,streams,direction):
     Path(args.output).write_text(json.dumps({'scope':'native private-namespace high-RTT mock-DC experiment; no Telegram files','rows':rows},indent=2)+'\n')
     print(json.dumps({k:v for k,v in row.items() if k not in ('socket_samples','small_probes')}),flush=True)
     if not row['measurement_complete']: raise RuntimeError('telemetry failed; transfer evidence retained')
-    if args.build in ('flush','auto') and (not row['complete'] or probe_errors): raise RuntimeError('candidate transfer failed')
+    if args.build in ('flush','auto','control','fair') and (not row['complete'] or probe_errors): raise RuntimeError('candidate transfer failed')
 try:
     stream_counts=(args.streams,) if args.streams else (1,4)
     for turn in range(args.rounds):
