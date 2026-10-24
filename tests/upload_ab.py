@@ -60,7 +60,7 @@ def main():
     parser.add_argument("--rounds", type=int, choices=(1, 2, 3), default=3)
     parser.add_argument("--socket-details", action="store_true")
     parser.add_argument("--socket-library", help="compare same-binary socket policies, private mock DC only")
-    parser.add_argument('--core-pair', choices=('historical', 'fairness'), default='historical')
+    parser.add_argument('--core-pair', choices=('historical', 'fairness', 'queue'), default='historical')
     parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
@@ -88,12 +88,15 @@ def main():
                 "payload_bytes_total_per_trial": args.payload_mib * 1024**2, "direction": "U", "kernel": os.uname().release,
                 "command": sys.argv, "rounds": args.rounds, "rows": rows, "complete": False}
     manifest["socket_observation"] = "detailed" if args.socket_details else "off"
-    builds = ('control', 'fair') if args.core_pair == 'fairness' else ('flush', 'auto')
+    builds = {'fairness': ('control', 'fair'), 'queue': ('control', 'queue'), 'historical': ('flush', 'auto')}[args.core_pair]
     manifest.update(control_build=builds[0], candidate_build=builds[1])
     if args.core_pair == 'fairness':
         manifest.update(control='CI audit2 control with automatic socket buffers',
                         candidate='same-toolchain fair1 with 64KiB ready-poll quantum',
                         core_pair='fairness')
+    if args.core_pair == 'queue':
+        manifest.update(control='CI audit2 control with automatic socket buffers',
+                        candidate='same-toolchain queue1; outgoing TCP_NOTSENT_LOWAT=64KiB', core_pair='queue')
     manifest['mock_dc_receive_buffer_requested']=args.mock_receive_buffer
     manifest['client_send_buffer_requested']=args.client_send_buffer
     if args.socket_library:

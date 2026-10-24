@@ -5,6 +5,30 @@ mod flushed_copy;
 #[path = "../../../patches/fair_copy.rs"]
 mod fair_copy;
 
+#[cfg(all(test, target_os = "linux"))]
+#[path = "../../../patches/unsent_queue.rs"]
+mod unsent_queue;
+
+#[cfg(all(test, target_os = "linux"))]
+#[test]
+fn queue_policy_preserves_automatic_buffer_sizes() {
+    use std::os::fd::AsRawFd;
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let stream = std::net::TcpStream::connect(listener.local_addr().unwrap()).unwrap();
+    let _peer = listener.accept().unwrap();
+    fn option(fd: i32, level: i32, key: i32) -> u32 {
+        let mut value = 0u32;
+        let mut size = std::mem::size_of_val(&value) as libc::socklen_t;
+        assert_eq!(unsafe { libc::getsockopt(fd, level, key, (&mut value as *mut u32).cast(), &mut size) }, 0);
+        value
+    }
+    let fd = stream.as_raw_fd();
+    let before = (option(fd, libc::SOL_SOCKET, libc::SO_RCVBUF), option(fd, libc::SOL_SOCKET, libc::SO_SNDBUF));
+    unsent_queue::configure_unsent_queue(fd).unwrap();
+    assert_eq!(option(fd, libc::IPPROTO_TCP, libc::TCP_NOTSENT_LOWAT), 65536);
+    assert_eq!(before, (option(fd, libc::SOL_SOCKET, libc::SO_RCVBUF), option(fd, libc::SOL_SOCKET, libc::SO_SNDBUF)));
+}
+
 macro_rules! relay_contract_tests {
     ($name:ident, $copy:path) => {
 #[cfg(test)]

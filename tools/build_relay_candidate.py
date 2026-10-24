@@ -29,6 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', required=True)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--candidate', choices=('fair', 'queue'), default='fair')
     args = parser.parse_args()
     source = Path(args.source).resolve()
     output = Path(args.output).resolve()
@@ -51,12 +52,30 @@ def main():
     manifest = {'classification': 'CI_EXPERIMENTAL_CORE_PAIR', 'source_commit': SOURCE_COMMIT,
                 'project_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                 'rust': rust, 'jobs': 2, 'lto': 'thin', 'codegen_units': 8,
-                'base_patch_sha256': digest(patch), 'candidate_helper_sha256': digest(ROOT / 'patches/fair_copy.rs'),
+                'base_patch_sha256': digest(patch),
+                'candidate_kind': args.candidate,
+                'candidate_helper_sha256': digest(ROOT / ('patches/fair_copy.rs' if args.candidate == 'fair' else 'patches/unsent_queue.rs')),
+                'builder_sha256': digest(Path(__file__)),
                 'normalized_patch_sha256': digest(normalized_patch),
                 'default_installer_changed': False, 'binaries': {}}
-    for name, version in (('control', '3.5.5+tdh.audit2'), ('fair', '3.5.5+tdh.fair1')):
-        if name == 'fair':
-            helper.write_bytes((ROOT / 'patches/fair_copy.rs').read_bytes())
+    candidate_version = '3.5.5+tdh.fair1' if args.candidate == 'fair' else '3.5.5+tdh.queue1'
+    for name, version in (('control', '3.5.5+tdh.audit2'), (args.candidate, candidate_version)):
+        if name != 'control':
+            if name == 'fair':
+                helper.write_bytes((ROOT / 'patches/fair_copy.rs').read_bytes())
+            else:
+                target = source / 'src/transport/socket/unsent_queue.rs'
+                target.write_bytes((ROOT / 'patches/unsent_queue.rs').read_bytes())
+                socket_source = source / 'src/transport/socket.rs'
+                text = socket_source.read_text()
+                prefix, body = text.split('pub fn create_outgoing_socket_bound(', 1)
+                marker = '    socket.set_tcp_nodelay(true)?;\n'
+                assert marker in body
+                body = body.replace(marker, marker + '    #[cfg(target_os = "linux")]\n'
+                    '    {\n        use std::os::fd::AsRawFd;\n'
+                    '        unsent_queue::configure_unsent_queue(socket.as_raw_fd())?;\n    }\n', 1)
+                socket_source.write_text('#[cfg(target_os = "linux")]\nmod unsent_queue;\n' + prefix +
+                                         'pub fn create_outgoing_socket_bound(' + body)
             for filename in ('Cargo.toml', 'Cargo.lock'):
                 path = source / filename
                 text = path.read_text()
@@ -74,10 +93,12 @@ def main():
     for filename in ('LICENSE',):
         shutil.copyfile(source / filename, output / filename)
     (output / 'NOTICE.txt').write_text('Unofficial experimental builds of Telemt 3.5.5. Original license retained.\n'
-        'Control applies the repository audit2 patch. fair adds the tracked fair_copy.rs helper and version marking.\n'
+        'Control applies audit2. Candidate changes only the declared relay or outgoing unsent-queue policy and version marking.\n'
         'No endorsement by Telemt maintainers. Not a production release.\n')
     shutil.copyfile(patch, output / 'base.patch')
     shutil.copyfile(ROOT / 'patches/fair_copy.rs', output / 'fair_copy.rs')
+    shutil.copyfile(ROOT / 'patches/unsent_queue.rs', output / 'unsent_queue.rs')
+    shutil.copyfile(Path(__file__), output / 'build_relay_candidate.py')
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     archive = output.with_suffix('.tar.gz')
     with tarfile.open(archive, 'x:gz') as stream:

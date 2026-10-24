@@ -79,7 +79,7 @@ def main():
     parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
-    parser.add_argument('--core-pair',choices=('historical','fairness'),default='historical')
+    parser.add_argument('--core-pair',choices=('historical','fairness','queue'),default='historical')
     parser.add_argument("--execute", action="store_true", help="without this flag only prints preflight/plan")
     args = parser.parse_args()
     if args.min_streams > args.max_streams:

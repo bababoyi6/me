@@ -16,7 +16,7 @@ from kernel_observer import observe_sockets, qdiscs_in_namespace
 parser=argparse.ArgumentParser()
 parser.add_argument('--root',required=True)
 parser.add_argument('--haproxy',default='haproxy')
-parser.add_argument('--build',choices=('official','baseline','flush','auto','control','fair'),required=True)
+parser.add_argument('--build',choices=('official','baseline','flush','auto','control','fair','queue'),required=True)
 parser.add_argument('--output',required=True)
 parser.add_argument('--rounds',type=int,choices=(1,2,3),default=3)
 parser.add_argument('--streams',type=int,choices=(1,4,8,16,32))
@@ -176,7 +176,7 @@ def trial(turn,streams,direction):
     Path(args.output).write_text(json.dumps({'scope':'native private-namespace high-RTT mock-DC experiment; no Telegram files','rows':rows},indent=2)+'\n')
     print(json.dumps({k:v for k,v in row.items() if k not in ('socket_samples','small_probes')}),flush=True)
     if not row['measurement_complete']: raise RuntimeError('telemetry failed; transfer evidence retained')
-    if args.build in ('flush','auto','control','fair') and (not row['complete'] or probe_errors): raise RuntimeError('candidate transfer failed')
+    if args.build in ('flush','auto','control','fair','queue') and (not row['complete'] or probe_errors): raise RuntimeError('candidate transfer failed')
 try:
     stream_counts=(args.streams,) if args.streams else (1,4)
     for turn in range(args.rounds):

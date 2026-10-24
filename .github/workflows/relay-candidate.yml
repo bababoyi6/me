@@ -5,6 +5,7 @@ on:
     branches: [dev/upload-fairness-20261024]
     paths:
       - patches/fair_copy.rs
+      - patches/unsent_queue.rs
       - tools/build_relay_candidate.py
       - tests/relay-flush-regression/**
       - .github/workflows/relay-candidate.yml
@@ -33,7 +34,7 @@ jobs:
       - name: Verify flush, backpressure and bounded ready bursts
         run: cargo test --locked --manifest-path tests/relay-flush-regression/Cargo.toml
       - name: Build control and candidate with the same toolchain
-        run: python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/relay-pair"
+        run: python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/relay-pair" --candidate queue
       - uses: actions/upload-artifact@v4
         with:
           name: relay-candidate-pair
