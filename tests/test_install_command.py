@@ -66,7 +66,7 @@ exec /bin/bash "$@"
             self.assertIn("--proto", arguments)
             self.assertIn("=https", arguments)
             if expected_success:
-                self.assertIn("Telemt Dual-Hop 1.5.0", result.stdout)
+                self.assertIn("Telemt Dual-Hop 1.6.0", result.stdout)
 
     def test_download_and_launch_then_clean_private_temporary_file(self):
         self.invoke(True)

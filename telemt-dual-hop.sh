@@ -6,15 +6,19 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.5.0"
+readonly TDH_VERSION="1.6.0"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.5"
 readonly TELEMT_SHA256_ARM64="075c9e2d3e86115af0bc47da881327375ef094c21fb6ed40bde41e4a77a261f3"
-readonly TELEMT_CORE_VERSION_AMD64="3.5.5+tdh.audit2"
-readonly TELEMT_CORE_ARCHIVE_SHA256_AMD64="c205183e479716f015378e4e2241103ae8d488e06f6ef65946be0bd94624f356"
-readonly TELEMT_CORE_BINARY_SHA256_AMD64="2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1"
-readonly TELEMT_CORE_URL_AMD64="https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.audit2/telemt-3.5.5-tdh.audit2-x86_64-linux-gnu.tar.gz"
+readonly TELEMT_CORE_VERSION_AMD64="3.5.5+tdh.balanced2"
+readonly TELEMT_CORE_ARCHIVE_SHA256_AMD64="b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5"
+readonly TELEMT_CORE_BINARY_SHA256_AMD64="5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100"
+readonly TELEMT_CORE_URL_AMD64="https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz"
+readonly TELEMT_AUDIT2_VERSION="3.5.5+tdh.audit2"
+readonly TELEMT_AUDIT2_ARCHIVE_SHA256="c205183e479716f015378e4e2241103ae8d488e06f6ef65946be0bd94624f356"
+readonly TELEMT_AUDIT2_BINARY_SHA256="2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1"
+readonly TELEMT_AUDIT2_URL="https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.audit2/telemt-3.5.5-tdh.audit2-x86_64-linux-gnu.tar.gz"
 readonly TDH_BASE="${TDH_BASE:-/etc/telemt-dual-hop}"
 readonly TDH_STATE="${TDH_STATE:-${TDH_BASE}/state.env}"
 readonly TDH_KEY_DIR="${TDH_KEY_DIR:-${TDH_BASE}/keys}"
@@ -1170,16 +1174,31 @@ print("https://t.me/proxy?" + urllib.parse.urlencode({
 PY
 }
 
+select_amd64_core() {
+  local version expected binary_sha url
+  case ${TDH_NEW_INSTALL_CORE:-balanced2} in
+    balanced2)
+      version=$TELEMT_CORE_VERSION_AMD64 expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64
+      binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 url=$TELEMT_CORE_URL_AMD64 ;;
+    audit2)
+      version=$TELEMT_AUDIT2_VERSION expected=$TELEMT_AUDIT2_ARCHIVE_SHA256
+      binary_sha=$TELEMT_AUDIT2_BINARY_SHA256 url=$TELEMT_AUDIT2_URL ;;
+    *) die "新安装核心选择无效；仅支持 balanced2 或 audit2。" ;;
+  esac
+  printf '%s\t%s\t%s\t%s\t%s\n' "${url##*/}" "$version" "$expected" "$binary_sha" "$url"
+}
+
 download_telemt() {
-  local asset expected url tmp version binary_sha="" mode
+  local asset expected url tmp version binary_sha="" mode selected
   case $(uname -m) in
     x86_64|amd64)
-      asset="telemt-3.5.5-tdh.audit2-x86_64-linux-gnu.tar.gz"
-      expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64 url=$TELEMT_CORE_URL_AMD64
-      version=$TELEMT_CORE_VERSION_AMD64 binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 mode=audited
-      info "安装经受控测试的非官方 Telemt ${version}（转发修复 / TCP 自动缓冲）。"
+      selected=$(select_amd64_core) || return 1
+      IFS=$'\t' read -r asset version expected binary_sha url <<<"$selected"
+      mode=audited
+      info "安装经受控测试的非官方 Telemt ${version}。"
       ;;
     aarch64|arm64)
+      [[ -z ${TDH_NEW_INSTALL_CORE:-} ]] || die "自选核心仅支持 x86_64；ARM 使用官方核心。"
       asset="telemt-aarch64-linux-gnu.tar.gz" expected=$TELEMT_SHA256_ARM64
       url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
       version=$TELEMT_VERSION mode=official
@@ -1840,12 +1859,16 @@ wireguard_handshake_is_fresh() {
 }
 
 telemt_binary_is_expected() {
-  local version
+  local version expected
   [[ -x $TDH_BIN ]] || return 1
   version=$(timeout 5 "$TDH_BIN" --version 2>/dev/null) || return 1
   if [[ $version == "telemt ${TELEMT_VERSION}" ]]; then return 0; fi
-  [[ $version == "telemt ${TELEMT_CORE_VERSION_AMD64}" && \
-     $(sha256sum "$TDH_BIN" | awk '{print $1}') == "$TELEMT_CORE_BINARY_SHA256_AMD64" ]]
+  case $version in
+    "telemt ${TELEMT_CORE_VERSION_AMD64}") expected=$TELEMT_CORE_BINARY_SHA256_AMD64 ;;
+    "telemt ${TELEMT_AUDIT2_VERSION}") expected=$TELEMT_AUDIT2_BINARY_SHA256 ;;
+    *) return 1 ;;
+  esac
+  [[ $(sha256sum "$TDH_BIN" | awk '{print $1}') == "$expected" ]]
 }
 
 write_haproxy_config() {

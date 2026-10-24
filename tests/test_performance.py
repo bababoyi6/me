@@ -220,7 +220,7 @@ if [[ ${1:-} == --self-test ]]; then exit 0; fi
 
     def test_manager_update_and_failure_preserve_running_configuration(self):
         manager = self.base / "manager"
-        manager.write_text(SCRIPT.read_text().replace('TDH_VERSION="1.5.0"', 'TDH_VERSION="1.3.1"'))
+        manager.write_text(SCRIPT.read_text().replace('TDH_VERSION="1.6.0"', 'TDH_VERSION="1.3.1"'))
         old_manager = manager.read_bytes()
         old_state = self.state.read_bytes()
         download = self.base / "download"
