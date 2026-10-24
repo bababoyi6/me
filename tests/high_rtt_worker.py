@@ -31,6 +31,7 @@ parser.add_argument('--socket-observation',choices=('detailed','off'),default='d
 parser.add_argument('--socket-library')
 parser.add_argument('--socket-policy',choices=('pass','auto','client-auto','dc-auto','auto-lowat'),default='pass')
 parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
+parser.add_argument('--share-core-file',action='store_true')
 args=parser.parse_args()
 if not 0<args.bytes<=256*1024**2 or args.bytes//(args.streams or 1)>128*1024**2:
     parser.error('payload must be bounded to 128 MiB per stream and 256 MiB total')
@@ -57,7 +58,8 @@ if args.build!='official':
     binary=ROOT/f'telemt-{args.build}'
     experimental=(metadata['sha256'],metadata['version'])
 lab=FullLab(binary,args.haproxy,dc_endpoint=('198.51.100.2',26000),experimental_binary=experimental,
-            socket_library=args.socket_library,socket_mode=args.socket_policy,artifact_registry=ROOT/'artifact-registry')
+            socket_library=args.socket_library,socket_mode=args.socket_policy,artifact_registry=ROOT/'artifact-registry',
+            shared_binary_root=ROOT if args.share_core_file else None)
 rows=[]
 def ticks(pid=None):
     fields=Path(f'/proc/{pid or lab.telemt.pid}/stat').read_text().rsplit(')',1)[1].split()
@@ -144,6 +146,7 @@ def trial(turn,streams,direction):
     wall_elapsed=time.monotonic()-started
     elapsed=wall_elapsed if errors else max((r['elapsed_seconds'] for r in success),default=wall_elapsed)
     row={'round':turn+1,'build':args.build,'telemt':lab.version,'streams':streams,'direction':direction,
+         'core_file_staging':lab.binary_staging,
          'link_rate_mbps':args.rate_mbps,'mock_dc_socket_timeout_seconds':args.dc_timeout,
          'direct_to_telemt':args.slow_readers,'client_receive_buffer_requested_bytes':32768 if args.slow_readers else None,
          'client_send_buffer_requested_bytes':getattr(args,'client_send_buffer',0),

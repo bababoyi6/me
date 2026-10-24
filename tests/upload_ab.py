@@ -62,6 +62,7 @@ def main():
     parser.add_argument("--socket-library", help="compare same-binary socket policies, private mock DC only")
     parser.add_argument('--core-pair', choices=('historical', 'fairness', 'queue', 'queue-fixed', 'balanced', 'balanced-fixed'), default='historical')
     parser.add_argument('--candidate-only', action='store_true', help='one native candidate trial; no comparison ratio')
+    parser.add_argument('--share-core-file',action='store_true',help='share the verified private core inode; no per-trial copy')
     parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
@@ -92,6 +93,7 @@ def main():
                 "payload_bytes_total_per_trial": args.payload_mib * 1024**2, "direction": "U", "kernel": os.uname().release,
                 "command": sys.argv, "rounds": args.rounds, "rows": rows, "complete": False}
     manifest["socket_observation"] = "detailed" if args.socket_details else "off"
+    manifest['core_file_staging']='private-shared-inode' if args.share_core_file else 'private-copy'
     builds = {'fairness': ('control', 'fair'), 'queue': ('control', 'queue'),
               'queue-fixed': ('fixed', 'queue'), 'balanced': ('queue','balanced'),
               'balanced-fixed': ('fixed','balanced'), 'historical': ('flush', 'auto')}[args.core_pair]
@@ -164,6 +166,8 @@ def main():
                                     "--small-probes", "--observe-network", "--socket-observation",
                                     "detailed" if args.socket_details else "off"]
                             argv += ['--client-send-buffer',str(args.client_send_buffer)]
+                            if args.share_core_file:
+                                argv.append('--share-core-file')
                             if args.socket_library:
                                 argv += ['--socket-library',args.socket_library,'--socket-policy',mode]
                             log_name = name.removesuffix('.json') + '.log'

@@ -82,6 +82,7 @@ def main():
     parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
     parser.add_argument('--core-pair',choices=('historical','fairness','queue','queue-fixed','balanced','balanced-fixed'),default='historical')
     parser.add_argument('--candidate-only',action='store_true')
+    parser.add_argument('--share-core-file',action='store_true',help='ab only: share the verified private core inode')
     parser.add_argument('--previous-run', help='owned run-tdh-audit-* directory name; require prior measured memory headroom')
     parser.add_argument("--execute", action="store_true", help="without this flag only prints preflight/plan")
     args = parser.parse_args()
@@ -100,6 +101,8 @@ def main():
         parser.error('policy families only apply to the socket profile')
     if args.core_pair!='historical' and args.profile!='ab':
         parser.error('native core comparison requires the ab profile')
+    if args.share_core_file and args.profile!='ab':
+        parser.error('shared core file is confined to the private ab profile')
     if args.candidate_only and (args.profile!='ab' or args.core_pair=='historical' or args.rounds!=1 or args.min_streams!=args.max_streams):
         parser.error('candidate-only requires ab, one round, one tier and a named candidate')
     admission = None
@@ -139,6 +142,8 @@ def main():
         worker += ['--core-pair',args.core_pair]
         if args.candidate_only:
             worker.append('--candidate-only')
+        if args.share_core_file:
+            worker.append('--share-core-file')
         if args.socket_details:
             worker.append("--socket-details")
         if args.profile == "socket":
