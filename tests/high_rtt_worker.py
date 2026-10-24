@@ -16,7 +16,7 @@ from kernel_observer import observe_sockets, qdiscs_in_namespace
 parser=argparse.ArgumentParser()
 parser.add_argument('--root',required=True)
 parser.add_argument('--haproxy',default='haproxy')
-parser.add_argument('--build',choices=('official','baseline','flush','auto'),required=True)
+parser.add_argument('--build',choices=('official','baseline','flush','auto','control','fair'),required=True)
 parser.add_argument('--output',required=True)
 parser.add_argument('--rounds',type=int,choices=(1,2,3),default=3)
 parser.add_argument('--streams',type=int,choices=(1,4,8,16,32))

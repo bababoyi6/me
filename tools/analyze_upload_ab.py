@@ -8,11 +8,15 @@ import statistics
 
 
 def summarize(data):
+    control = data.get('control_build', 'flush')
+    candidate = data.get('candidate_build', 'auto')
+    if (control, candidate) not in (('flush', 'auto'), ('control', 'fair')):
+        raise ValueError('unknown native core pair')
     groups = []
     for streams in sorted({row["streams"] for row in data["rows"]}):
         selected = [row for row in data["rows"] if row["streams"] == streams]
         builds = {}
-        for build in ("flush", "auto"):
+        for build in (control, candidate):
             trials = [row for row in selected if row["build"] == build]
             valid, failed, failed_probes = [], 0, 0
             cpu, memory, probes, retransmits, windows = [], [], [], [], []
@@ -22,6 +26,8 @@ def summarize(data):
                     failed += 1
                     continue
                 trial = rows[0]
+                if trial.get('build', build) != build:
+                    raise ValueError('core identity mismatch within one A/B experiment')
                 failed_probes += len(trial.get("small_probe_errors", []))
                 if trial["streams"] != streams or trial["direction"] != "U" or trial["expected_payload_bytes"] != data["payload_bytes_total_per_trial"]:
                     raise ValueError("workload mismatch within one A/B experiment")
@@ -50,9 +56,11 @@ def summarize(data):
         paired = data["complete"] and len(selected) == data["rounds"] * 2 and all(builds[b]["failed_trials"] == 0 and
                  builds[b]["failed_probes"] == 0 and builds[b]["successful_trials"] == data["rounds"] and
                  {r["pair_round"] for r in selected if r["build"] == b} == set(range(1, data["rounds"]+1)) for b in builds)
-        a, b = builds["flush"]["median_mbps"], builds["auto"]["median_mbps"]
+        a, b = builds[control]["median_mbps"], builds[candidate]["median_mbps"]
+        change = 100*(b/a-1) if paired and a and b else None
         groups.append({"streams": streams, "builds": builds, "complete_pairs": paired,
-                       "auto_change_percent": 100*(b/a-1) if paired and a and b else None})
+                       "candidate_change_percent": change,
+                       "auto_change_percent": change if candidate == 'auto' else None})
     return {"classification": data["classification"], "scope": data["scope"],
             "complete": data["complete"], "groups": groups,
             "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."}

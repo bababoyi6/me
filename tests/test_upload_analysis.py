@@ -23,6 +23,19 @@ class UploadAnalysisTests(unittest.TestCase):
     def test_negative_results_are_preserved(self):
         self.assertEqual(analysis.summarize(self.sample())["groups"][0]["auto_change_percent"], -25)
 
+    def test_same_toolchain_pair_is_named_without_relabeling_as_historical_core(self):
+        data = self.sample()
+        data.update(control_build='control', candidate_build='fair')
+        for row in data['rows']:
+            row['build'] = 'control' if row['build'] == 'flush' else 'fair'
+            row['trial']['rows'][0]['build'] = row['build']
+        group = analysis.summarize(data)['groups'][0]
+        self.assertEqual(group['candidate_change_percent'], -25)
+        self.assertIsNone(group['auto_change_percent'])
+        data['rows'][0]['trial']['rows'][0]['build'] = 'auto'
+        with self.assertRaisesRegex(ValueError, 'core identity mismatch'):
+            analysis.summarize(data)
+
     def test_failed_or_duplicate_or_missing_pair_suppresses_ratio(self):
         mutations = (lambda rows: rows.pop(), lambda rows: rows[0].update(exit=124),
                      lambda rows: rows[0].update(pair_round=2),

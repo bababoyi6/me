@@ -79,6 +79,7 @@ def main():
     parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
+    parser.add_argument('--core-pair',choices=('historical','fairness'),default='historical')
     parser.add_argument("--execute", action="store_true", help="without this flag only prints preflight/plan")
     args = parser.parse_args()
     if args.min_streams > args.max_streams:
@@ -94,6 +95,8 @@ def main():
         parser.error("load options only apply to ab/socket profiles")
     if args.profile!='socket' and args.policy_family!='all':
         parser.error('policy families only apply to the socket profile')
+    if args.core_pair!='historical' and args.profile!='ab':
+        parser.error('native core comparison requires the ab profile')
     if args.profile!='mixed' and args.logical_clients!=30:
         parser.error('logical client counts only apply to mixed profile')
     if args.profile in ("ab","socket"):
@@ -103,6 +106,7 @@ def main():
                   "--payload-mib", str(args.payload_mib), "--rounds", str(args.rounds), "--rate-mbps", str(args.rate_mbps)]
         worker += ['--mock-receive-buffer',str(args.mock_receive_buffer)]
         worker += ['--client-send-buffer',str(args.client_send_buffer)]
+        worker += ['--core-pair',args.core_pair]
         if args.socket_details:
             worker.append("--socket-details")
         if args.profile == "socket":

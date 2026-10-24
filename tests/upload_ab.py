@@ -19,8 +19,8 @@ from lab_files import file_sha256
 HERE = Path(__file__).resolve().parent
 
 
-def paired_order(round_index):
-    return ("flush", "auto") if round_index % 2 == 0 else ("auto", "flush")
+def paired_order(round_index, builds=("flush", "auto")):
+    return builds if round_index % 2 == 0 else builds[::-1]
 
 
 def policy_order(round_index,family='all'):
@@ -60,6 +60,7 @@ def main():
     parser.add_argument("--rounds", type=int, choices=(1, 2, 3), default=3)
     parser.add_argument("--socket-details", action="store_true")
     parser.add_argument("--socket-library", help="compare same-binary socket policies, private mock DC only")
+    parser.add_argument('--core-pair', choices=('historical', 'fairness'), default='historical')
     parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
@@ -68,6 +69,8 @@ def main():
         parser.error("minimum stream tier exceeds maximum")
     if args.policy_family!='all' and not args.socket_library:
         parser.error('policy family requires the private lab library')
+    if args.core_pair != 'historical' and args.socket_library:
+        parser.error('native core comparison cannot preload a socket policy')
     if args.payload_mib > 128 and args.max_streams < 4:
         parser.error("per-stream payload cannot exceed 128 MiB")
     root = Path(args.root).resolve()
@@ -85,6 +88,12 @@ def main():
                 "payload_bytes_total_per_trial": args.payload_mib * 1024**2, "direction": "U", "kernel": os.uname().release,
                 "command": sys.argv, "rounds": args.rounds, "rows": rows, "complete": False}
     manifest["socket_observation"] = "detailed" if args.socket_details else "off"
+    builds = ('control', 'fair') if args.core_pair == 'fairness' else ('flush', 'auto')
+    manifest.update(control_build=builds[0], candidate_build=builds[1])
+    if args.core_pair == 'fairness':
+        manifest.update(control='CI audit2 control with automatic socket buffers',
+                        candidate='same-toolchain fair1 with 64KiB ready-poll quantum',
+                        core_pair='fairness')
     manifest['mock_dc_receive_buffer_requested']=args.mock_receive_buffer
     manifest['client_send_buffer_requested']=args.client_send_buffer
     if args.socket_library:
@@ -98,7 +107,7 @@ def main():
     try:
         destination.parent.mkdir(mode=0o700, exist_ok=True)
         manifest["binary_sha256"] = {build: file_sha256(root / ("telemt-" + build))
-                                     for build in ("flush", "auto")}
+                                     for build in builds}
         save()
         net.setup()
         with tempfile.TemporaryDirectory(prefix="tdh-audit-ab-") as folder:
@@ -122,7 +131,7 @@ def main():
                     if args.payload_mib * 1024**2 // streams > 128 * 1024**2:
                         continue
                     for turn in range(args.rounds):
-                        cases=[('flush',mode) for mode in policy_order(turn,args.policy_family)] if args.socket_library else [(b,'pass') for b in paired_order(turn)]
+                        cases=[('flush',mode) for mode in policy_order(turn,args.policy_family)] if args.socket_library else [(b,'pass') for b in paired_order(turn, builds)]
                         for build,mode in cases:
                             if memory_available() < 256 * 1024**2:
                                 raise RuntimeError("host memory margin before next load")
