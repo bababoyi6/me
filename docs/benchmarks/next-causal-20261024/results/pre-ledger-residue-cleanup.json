@@ -1,0 +1,13 @@
+{
+  "scope": "manual attribution of pre-ledger SIGKILL residue",
+  "path": "/tmp/tdh-e2e-uqh6krc0",
+  "uid": 65534,
+  "verified_binary_sha256": {
+    "telemt": "e0aa14b4032bbfa32fd5389e815371008a78aeae39ec099f9b850e2db3160582",
+    "socket-policy.so": "9a190499f16eb81182ad83cdac2b22579feab67c60c4afc02481cb3be7b9c90a"
+  },
+  "test_timestamp_verified": true,
+  "symlinks_found": false,
+  "process_cwd_or_exe_references_found": false,
+  "removed": true
+}

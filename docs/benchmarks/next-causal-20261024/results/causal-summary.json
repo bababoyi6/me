@@ -1,0 +1,1253 @@
+{
+  "batches": [
+    {
+      "file": "ab-1792772866700968677.json",
+      "payload_mib": 64,
+      "rate_mbps": 1000,
+      "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+      "summary": {
+        "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+        "complete": false,
+        "groups": [
+          {
+            "streams": 8,
+            "complete_counterbalanced_cases": false,
+            "cases": {
+              "pass": {
+                "valid_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 97.74714298031576,
+                "median_small_probe_ms": 264.20104200951755
+              },
+              "auto": {
+                "valid_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              },
+              "client-auto": {
+                "valid_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              },
+              "dc-auto": {
+                "valid_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              }
+            },
+            "change_percent_vs_pass": {
+              "pass": null,
+              "auto": null,
+              "client-auto": null,
+              "dc-auto": null
+            }
+          }
+        ],
+        "interpretation": "Synthetic DC segment, one shared host; not a production capacity or Telegram file-speed result."
+      },
+      "trials": [
+        {
+          "build": "flush",
+          "socket_policy": "pass",
+          "mbps": 97.74714298031576,
+          "streams": 8,
+          "expected_payload_bytes": 67108864,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 29.174664107485604,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.19193857965451055
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 364288,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 11080,
+              "w_queued": 443568,
+              "rwnd_limited_ms": 848.0,
+              "sndbuf_limited_ms": 1000.0
+            }
+          },
+          "observer_seconds_max": 0.0009489519870840013
+        }
+      ]
+    },
+    {
+      "file": "ab-1792773359888424064.json",
+      "payload_mib": 64,
+      "rate_mbps": 1000,
+      "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+      "summary": {
+        "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+        "complete": false,
+        "groups": [
+          {
+            "streams": 8,
+            "complete_counterbalanced_cases": false,
+            "cases": {
+              "pass": {
+                "valid_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 96.24825992224032,
+                "median_small_probe_ms": 266.2855499947909
+              },
+              "auto": {
+                "valid_trials": 0,
+                "failed_trials": 1,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              },
+              "client-auto": {
+                "valid_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              },
+              "dc-auto": {
+                "valid_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              }
+            },
+            "change_percent_vs_pass": {
+              "pass": null,
+              "auto": null,
+              "client-auto": null,
+              "dc-auto": null
+            }
+          }
+        ],
+        "interpretation": "Synthetic DC segment, one shared host; not a production capacity or Telegram file-speed result."
+      },
+      "trials": [
+        {
+          "build": "flush",
+          "socket_policy": "pass",
+          "mbps": 96.24825992224032,
+          "streams": 8,
+          "expected_payload_bytes": 67108864,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 32.194244604316545,
+            "steal_percent": 0.17985611510791366,
+            "iowait_percent": 0.17985611510791366
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 363008,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 8352,
+              "w_queued": 443568,
+              "rwnd_limited_ms": 3220.0,
+              "sndbuf_limited_ms": 268.0
+            }
+          },
+          "observer_seconds_max": 0.0018753199838101864
+        }
+      ]
+    },
+    {
+      "file": "ab-1792773538158270655.json",
+      "payload_mib": 16,
+      "rate_mbps": 1000,
+      "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+      "summary": {
+        "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+        "complete": true,
+        "groups": [
+          {
+            "streams": 4,
+            "complete_counterbalanced_cases": true,
+            "cases": {
+              "pass": {
+                "valid_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 49.564992690305736,
+                "median_small_probe_ms": 260.62128000194207
+              },
+              "client-auto": {
+                "valid_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 49.87370255769152,
+                "median_small_probe_ms": 256.8294710072223
+              }
+            },
+            "change_percent_vs_pass": {
+              "pass": 0.0,
+              "client-auto": 0.6228385209591014
+            }
+          }
+        ],
+        "interpretation": "Synthetic DC segment, one shared host; not a production capacity or Telegram file-speed result."
+      },
+      "trials": [
+        {
+          "build": "flush",
+          "socket_policy": "pass",
+          "mbps": 49.564992690305736,
+          "streams": 4,
+          "expected_payload_bytes": 16777216,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 18.43003412969283,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.3412969283276451
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 363008,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 8352,
+              "w_queued": 441008,
+              "rwnd_limited_ms": 768.0,
+              "sndbuf_limited_ms": 20.0
+            }
+          },
+          "observer_seconds_max": 0.0005625949997920543
+        },
+        {
+          "build": "flush",
+          "socket_policy": "client-auto",
+          "mbps": 49.87370255769152,
+          "streams": 4,
+          "expected_payload_bytes": 16777216,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 13.240418118466899,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 6291456,
+              "tb": 3939840,
+              "r_allocated": 2662981,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 8352,
+              "w_queued": 439728,
+              "rwnd_limited_ms": 740.0,
+              "sndbuf_limited_ms": 20.0
+            }
+          },
+          "observer_seconds_max": 0.0007189220050349832
+        }
+      ]
+    },
+    {
+      "file": "ab-1792773869553227836.json",
+      "payload_mib": 64,
+      "rate_mbps": 1000,
+      "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+      "summary": {
+        "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+        "complete": false,
+        "groups": [
+          {
+            "streams": 8,
+            "complete_counterbalanced_cases": false,
+            "cases": {
+              "pass": {
+                "valid_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 93.08067250051913,
+                "median_small_probe_ms": 263.0075110064354
+              },
+              "auto-lowat": {
+                "valid_trials": 0,
+                "failed_trials": 1,
+                "failed_probes": 1,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              }
+            },
+            "change_percent_vs_pass": {
+              "pass": null,
+              "auto-lowat": null
+            }
+          }
+        ],
+        "interpretation": "Synthetic DC segment, one shared host; not a production capacity or Telegram file-speed result."
+      },
+      "trials": [
+        {
+          "build": "flush",
+          "socket_policy": "pass",
+          "mbps": 93.08067250051913,
+          "streams": 8,
+          "expected_payload_bytes": 67108864,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 28.747795414462082,
+            "steal_percent": 0.1763668430335097,
+            "iowait_percent": 0.3527336860670194
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 378112,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 8352,
+              "w_queued": 442288,
+              "rwnd_limited_ms": 3032.0,
+              "sndbuf_limited_ms": 292.0
+            }
+          },
+          "observer_seconds_max": 0.001265414000954479
+        },
+        {
+          "build": "flush",
+          "socket_policy": "auto-lowat",
+          "mbps": null,
+          "streams": 8,
+          "expected_payload_bytes": 67108864,
+          "complete": false,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [
+            {
+              "type": "TimeoutError",
+              "phase": "handshake",
+              "received_bytes": null
+            }
+          ],
+          "host_cpu_interval": {
+            "busy_percent": 46.568794810515534,
+            "steal_percent": 0.03414134516899966,
+            "iowait_percent": 24.06964834414476
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 6291456,
+              "tb": 3939840,
+              "r_allocated": 6097408,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 131072,
+              "tb": 2350080,
+              "r_allocated": 0,
+              "w_allocated": 0,
+              "w_queued": 392232,
+              "rwnd_limited_ms": 588.0,
+              "sndbuf_limited_ms": 200.0
+            }
+          },
+          "observer_seconds_max": 0.021768186008557677
+        }
+      ]
+    },
+    {
+      "file": "ab-1792774030094310993.json",
+      "payload_mib": 16,
+      "rate_mbps": 1000,
+      "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+      "summary": {
+        "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+        "complete": true,
+        "groups": [
+          {
+            "streams": 4,
+            "complete_counterbalanced_cases": true,
+            "cases": {
+              "pass": {
+                "valid_trials": 2,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 49.492440529066336,
+                "median_small_probe_ms": 262.85764201020356
+              },
+              "auto-lowat": {
+                "valid_trials": 2,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 49.93259010349725,
+                "median_small_probe_ms": 260.11859950085636
+              }
+            },
+            "change_percent_vs_pass": {
+              "pass": 0.0,
+              "auto-lowat": 0.8893268744191607
+            }
+          }
+        ],
+        "interpretation": "Synthetic DC segment, one shared host; not a production capacity or Telegram file-speed result."
+      },
+      "trials": [
+        {
+          "build": "flush",
+          "socket_policy": "pass",
+          "mbps": 49.32822566404354,
+          "streams": 4,
+          "expected_payload_bytes": 16777216,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 16.554054054054053,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.6756756756756757
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 364404,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 8352,
+              "w_queued": 441008,
+              "rwnd_limited_ms": 796.0,
+              "sndbuf_limited_ms": 16.0
+            }
+          },
+          "observer_seconds_max": 0.000563134002732113
+        },
+        {
+          "build": "flush",
+          "socket_policy": "auto-lowat",
+          "mbps": 50.27926745525898,
+          "streams": 4,
+          "expected_payload_bytes": 16777216,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 14.982578397212544,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 6291456,
+              "tb": 3939840,
+              "r_allocated": 2581481,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 131072,
+              "tb": 4194304,
+              "r_allocated": 0,
+              "w_allocated": 8352,
+              "w_queued": 409544,
+              "rwnd_limited_ms": 872.0,
+              "sndbuf_limited_ms": 0.0
+            }
+          },
+          "observer_seconds_max": 0.0009672989835962653
+        },
+        {
+          "build": "flush",
+          "socket_policy": "auto-lowat",
+          "mbps": 49.585912751735506,
+          "streams": 4,
+          "expected_payload_bytes": 16777216,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 12.67605633802817,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "pair_round": 2,
+          "socket_roles": {
+            "client": {
+              "rb": 6291456,
+              "tb": 3939840,
+              "r_allocated": 2414685,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 131072,
+              "tb": 4194304,
+              "r_allocated": 0,
+              "w_allocated": 8352,
+              "w_queued": 391392,
+              "rwnd_limited_ms": 852.0,
+              "sndbuf_limited_ms": 0.0
+            }
+          },
+          "observer_seconds_max": 0.0006406730099115521
+        },
+        {
+          "build": "flush",
+          "socket_policy": "pass",
+          "mbps": 49.65665539408913,
+          "streams": 4,
+          "expected_payload_bytes": 16777216,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 17.346938775510203,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0
+          },
+          "pair_round": 2,
+          "socket_roles": {
+            "client": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 364520,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 8352,
+              "w_queued": 441008,
+              "rwnd_limited_ms": 820.0,
+              "sndbuf_limited_ms": 24.0
+            }
+          },
+          "observer_seconds_max": 0.0005757750186603516
+        }
+      ]
+    },
+    {
+      "file": "ab-1792776540644063048.json",
+      "payload_mib": 64,
+      "rate_mbps": 1000,
+      "classification": "SINGLE_VPS_SYNTHETIC",
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": true,
+        "groups": [
+          {
+            "streams": 8,
+            "builds": {
+              "flush": {
+                "successful_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 148.72212606350075,
+                "median_telemt_cpu_seconds": 0.13999999999999999,
+                "max_sampled_telemt_rss_bytes": 29319168,
+                "median_small_probe_ms": 266.9556520122569,
+                "median_namespace_retransmits": 35,
+                "max_sampled_dc_receive_limit_bytes": 425984
+              },
+              "auto": {
+                "successful_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 75.73597640315022,
+                "median_telemt_cpu_seconds": 0.16,
+                "max_sampled_telemt_rss_bytes": 25403392,
+                "median_small_probe_ms": 262.8636685112724,
+                "median_namespace_retransmits": 233,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              }
+            },
+            "complete_pairs": true,
+            "auto_change_percent": -49.07551525264453
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      },
+      "trials": [
+        {
+          "build": "flush",
+          "socket_policy": "pass",
+          "mbps": 148.72212606350075,
+          "streams": 8,
+          "expected_payload_bytes": 67108864,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 34.51086956521739,
+            "steal_percent": 0.2717391304347826,
+            "iowait_percent": 0.0
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 364288,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 19936,
+              "w_queued": 442288,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 1392.0
+            }
+          },
+          "observer_seconds_max": 0.0010404800123069435
+        },
+        {
+          "build": "auto",
+          "socket_policy": "pass",
+          "mbps": 75.73597640315022,
+          "streams": 8,
+          "expected_payload_bytes": 67108864,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 23.099415204678362,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.29239766081871343
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 6291456,
+              "tb": 3939840,
+              "r_allocated": 4762141,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 131072,
+              "tb": 4194304,
+              "r_allocated": 0,
+              "w_allocated": 14144,
+              "w_queued": 2389864,
+              "rwnd_limited_ms": 4196.0,
+              "sndbuf_limited_ms": 164.0
+            }
+          },
+          "observer_seconds_max": 0.002170515013858676
+        }
+      ]
+    },
+    {
+      "file": "ab-1792776682265240237.json",
+      "payload_mib": 64,
+      "rate_mbps": 1000,
+      "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+      "summary": {
+        "classification": "SINGLE_VPS_SOCKET_POLICY_CAUSAL",
+        "complete": false,
+        "groups": [
+          {
+            "streams": 8,
+            "complete_counterbalanced_cases": false,
+            "cases": {
+              "pass": {
+                "valid_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 148.2377173650258,
+                "median_small_probe_ms": 260.42063199565746
+              },
+              "auto": {
+                "valid_trials": 0,
+                "failed_trials": 1,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              },
+              "auto-lowat": {
+                "valid_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_small_probe_ms": null
+              }
+            },
+            "change_percent_vs_pass": {
+              "pass": null,
+              "auto": null,
+              "auto-lowat": null
+            }
+          }
+        ],
+        "interpretation": "Synthetic DC segment, one shared host; not a production capacity or Telegram file-speed result."
+      },
+      "trials": [
+        {
+          "build": "flush",
+          "socket_policy": "pass",
+          "mbps": 148.2377173650258,
+          "streams": 8,
+          "expected_payload_bytes": 67108864,
+          "complete": true,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 34.065934065934066,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.27472527472527475
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 364288,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 425984,
+              "tb": 425984,
+              "r_allocated": 0,
+              "w_allocated": 25560,
+              "w_queued": 442288,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 1388.0
+            }
+          },
+          "observer_seconds_max": 0.0009103719785343856
+        },
+        {
+          "build": "flush",
+          "socket_policy": "auto",
+          "mbps": null,
+          "streams": 8,
+          "expected_payload_bytes": 67108864,
+          "complete": false,
+          "measurement_complete": true,
+          "telemetry_errors": [],
+          "small_probe_errors": [],
+          "host_cpu_interval": {
+            "busy_percent": 6.60347551342812,
+            "steal_percent": 0.0,
+            "iowait_percent": 0.0947867298578199
+          },
+          "pair_round": 1,
+          "socket_roles": {
+            "client": {
+              "rb": 6291456,
+              "tb": 3939840,
+              "r_allocated": 4701696,
+              "w_allocated": 0,
+              "w_queued": 0,
+              "rwnd_limited_ms": 0.0,
+              "sndbuf_limited_ms": 0.0
+            },
+            "dc": {
+              "rb": 131072,
+              "tb": 4194304,
+              "r_allocated": 0,
+              "w_allocated": 16872,
+              "w_queued": 1631952,
+              "rwnd_limited_ms": 3976.0,
+              "sndbuf_limited_ms": 184.0
+            }
+          },
+          "observer_seconds_max": 0.0015054749965202063
+        }
+      ]
+    }
+  ],
+  "supervisors": [
+    {
+      "run": "run-tdh-audit-029fe1faaa82",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 221646848,
+        "memory_high_bytes": 166235136,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 166154240,
+      "max_memory_high_events": 196,
+      "max_memory_stat": {
+        "anon": 100450304,
+        "file": 31891456,
+        "sock": 58392576,
+        "slab": 1748424,
+        "kernel_stack": 491520,
+        "pagetables": 819200,
+        "pgscan": 14081,
+        "pgsteal": 8682
+      }
+    },
+    {
+      "run": "run-tdh-audit-075bb4604ea0",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 221020160,
+        "memory_high_bytes": 165765120,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 180576256,
+      "max_memory_high_events": 28730,
+      "max_memory_stat": {
+        "anon": 122789888,
+        "file": 27308032,
+        "sock": 57487360,
+        "slab": 1427656,
+        "kernel_stack": 409600,
+        "pagetables": 880640,
+        "pgscan": 74942,
+        "pgsteal": 42539
+      }
+    },
+    {
+      "run": "run-tdh-audit-3c4abd38a3cf",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 226798592,
+        "memory_high_bytes": 170098944,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 170000384,
+      "max_memory_high_events": 329,
+      "max_memory_stat": {
+        "anon": 147156992,
+        "file": 48615424,
+        "sock": 8306688,
+        "slab": 2454344,
+        "kernel_stack": 638976,
+        "pagetables": 1347584,
+        "pgscan": 22590,
+        "pgsteal": 15013
+      }
+    },
+    {
+      "run": "run-tdh-audit-43cbd6f9ad48",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 230340608,
+        "memory_high_bytes": 172755456,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 132927488,
+      "max_memory_high_events": 0,
+      "max_memory_stat": {
+        "anon": 98226176,
+        "file": 27197440,
+        "sock": 503808,
+        "slab": 3975072,
+        "kernel_stack": 2015232,
+        "pagetables": 1011712,
+        "pgscan": 0,
+        "pgsteal": 0
+      }
+    },
+    {
+      "run": "run-tdh-audit-5587cfb91212",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 221517824,
+        "memory_high_bytes": 166138368,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 123064320,
+      "max_memory_high_events": 0,
+      "max_memory_stat": {
+        "anon": 90157056,
+        "file": 28737536,
+        "sock": 454656,
+        "slab": 2112720,
+        "kernel_stack": 868352,
+        "pagetables": 712704,
+        "pgscan": 0,
+        "pgsteal": 0
+      }
+    },
+    {
+      "run": "run-tdh-audit-8322ab4abcf4",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 233071616,
+        "memory_high_bytes": 174803712,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 126021632,
+      "max_memory_high_events": 0,
+      "max_memory_stat": {
+        "anon": 93257728,
+        "file": 27201536,
+        "sock": 450560,
+        "slab": 2884512,
+        "kernel_stack": 1359872,
+        "pagetables": 835584,
+        "pgscan": 0,
+        "pgsteal": 0
+      }
+    },
+    {
+      "run": "run-tdh-audit-9072b4f5a7be",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 225723392,
+        "memory_high_bytes": 169292544,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 171687936,
+      "max_memory_high_events": 204070,
+      "max_memory_stat": {
+        "anon": 124076032,
+        "file": 48553984,
+        "sock": 45551616,
+        "slab": 1516336,
+        "kernel_stack": 491520,
+        "pagetables": 860160,
+        "pgscan": 9717443,
+        "pgsteal": 1899088
+      }
+    },
+    {
+      "run": "run-tdh-audit-9116aef46407",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 250492928,
+        "memory_high_bytes": 187869696,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 187678720,
+      "max_memory_high_events": 8,
+      "max_memory_stat": {
+        "anon": 116547584,
+        "file": 51589120,
+        "sock": 17469440,
+        "slab": 1606400,
+        "kernel_stack": 360448,
+        "pagetables": 794624,
+        "pgscan": 421,
+        "pgsteal": 421
+      }
+    },
+    {
+      "run": "run-tdh-audit-9d587f2ccb93",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 224427008,
+        "memory_high_bytes": 168320256,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 168062976,
+      "max_memory_high_events": 191,
+      "max_memory_stat": {
+        "anon": 100536320,
+        "file": 31371264,
+        "sock": 60239872,
+        "slab": 1749304,
+        "kernel_stack": 491520,
+        "pagetables": 811008,
+        "pgscan": 13950,
+        "pgsteal": 8459
+      }
+    },
+    {
+      "run": "run-tdh-audit-a166eb207626",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 223013888,
+        "memory_high_bytes": 167260416,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 185356288,
+      "max_memory_high_events": 32052,
+      "max_memory_stat": {
+        "anon": 123146240,
+        "file": 27398144,
+        "sock": 62541824,
+        "slab": 1476664,
+        "kernel_stack": 491520,
+        "pagetables": 868352,
+        "pgscan": 96513,
+        "pgsteal": 42331
+      }
+    },
+    {
+      "run": "run-tdh-audit-bd1f281a1c8d",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 221118464,
+        "memory_high_bytes": 165838848,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 165736448,
+      "max_memory_high_events": 400,
+      "max_memory_stat": {
+        "anon": 147095552,
+        "file": 45973504,
+        "sock": 8134656,
+        "slab": 2416808,
+        "kernel_stack": 589824,
+        "pagetables": 1331200,
+        "pgscan": 31346,
+        "pgsteal": 20890
+      }
+    },
+    {
+      "run": "run-tdh-audit-e28de6f69582",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 223827968,
+        "memory_high_bytes": 167870976,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 123039744,
+      "max_memory_high_events": 0,
+      "max_memory_stat": {
+        "anon": 90062848,
+        "file": 28803072,
+        "sock": 466944,
+        "slab": 2093216,
+        "kernel_stack": 884736,
+        "pagetables": 716800,
+        "pgscan": 0,
+        "pgsteal": 0
+      }
+    },
+    {
+      "run": "run-tdh-audit-ebdc07bad4b6",
+      "budget": {
+        "eligible": true,
+        "host_reserve_bytes": 334267733,
+        "memory_max_bytes": 221520896,
+        "memory_high_bytes": 166140672,
+        "cpu_quota_percent": 60,
+        "tasks_max": 192,
+        "runtime_max_seconds": 600,
+        "output_max_bytes": 33554432,
+        "swap_max_bytes": 0
+      },
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 163549184,
+      "max_memory_high_events": 0,
+      "max_memory_stat": {
+        "anon": 116166656,
+        "file": 28061696,
+        "sock": 16588800,
+        "slab": 1621192,
+        "kernel_stack": 360448,
+        "pagetables": 798720,
+        "pgscan": 8,
+        "pgsteal": 8
+      }
+    }
+  ]
+}

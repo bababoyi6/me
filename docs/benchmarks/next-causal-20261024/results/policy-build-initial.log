@@ -1,0 +1,4 @@
+Oct 23 16:25:22 boyi systemd[1]: Starting /usr/bin/python3 /root/tdh-audit-20261021/causal_build.py --worker...
+Oct 23 16:25:22 boyi systemd[1]: Started /usr/bin/python3 /root/tdh-audit-20261021/causal_build.py --worker.
+Oct 23 16:25:22 boyi systemd[1]: tdh-audit-policy-build-6b7a067e1862.service: Main process exited, code=exited, status=1/FAILURE
+Oct 23 16:25:22 boyi systemd[1]: tdh-audit-policy-build-6b7a067e1862.service: Failed with result 'exit-code'.

@@ -1,0 +1,31 @@
+{
+  "date_utc": "2026-10-24T04:19:52.789527+00:00",
+  "export_sha256": "18f3a4feed95f9c4164422ea8d3e8d4463d0eb5ed8caa9288109d5ef41f31037",
+  "removed_paths": [
+    "/root/tdh-audit-20261021/tdh-audit-causal-20261023",
+    "/root/tdh-audit-20261021/causal-source-20261023.tar.gz",
+    "/root/tdh-audit-20261021/causal-results-20261023.tar.gz",
+    "/root/tdh-audit-20261021/causal-preflight.py",
+    "/root/tdh-audit-20261021/causal_setup.py",
+    "/root/tdh-audit-20261021/causal_checks.py",
+    "/root/tdh-audit-20261021/causal_run.py",
+    "/root/tdh-audit-20261021/causal_report.py",
+    "/root/tdh-audit-20261021/causal_export.py",
+    "/root/tdh-audit-20261021/causal_cleanup.py",
+    "/root/tdh-audit-20261021/causal_build.py",
+    "/root/tdh-audit-20261021/causal_cleanup_legacy.py",
+    "/root/tdh-audit-20261021/causal-results-preledger-20261023.tar.gz"
+  ],
+  "removed_lab_logical_bytes": 81070870,
+  "lab_namespaces_remaining": [],
+  "transient_lab_units_remaining": [],
+  "temporary_lab_directories_remaining": [],
+  "lab_key_files_remaining": [],
+  "listeners_unchanged": true,
+  "host_oom_kill_delta": 0,
+  "historical_binaries_sha256_unchanged": true,
+  "host_memory_available_bytes_after": 656310272,
+  "global_zero_byte_coordination_lock_retained": "/run/lock/tdh-audit-network.lock",
+  "host_kernel_firewall_ssh_configuration_modified": false,
+  "production_nodes_accessed": false
+}
