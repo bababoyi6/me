@@ -35,7 +35,7 @@ def child(root):
             metadata=json.loads((root/(channel+'-build.json')).read_text())
             lab=FullLab(root/('telemt-'+channel),dc_endpoint=('198.51.100.2',26000),
                         experimental_binary=(metadata['sha256'],metadata['version']),
-                        artifact_registry=root/'artifact-registry')
+                        artifact_registry=root/'artifact-registry',startup_report=root/f'results/startup-{channel}.json')
             try:
                 for domain,direction in (('apple.com','D'),('gs.apple.com','U'),('gs.apple.com','D'),('apple.com','U')):
                     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool,close_on_error(lab):

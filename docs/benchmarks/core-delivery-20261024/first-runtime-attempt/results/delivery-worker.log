@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/runner/work/me/me/tests/core_delivery_lab.py", line 123, in <module>
+    main()
+  File "/home/runner/work/me/me/tests/core_delivery_lab.py", line 119, in main
+    child(root) if args.child else run(root)
+  File "/home/runner/work/me/me/tests/core_delivery_lab.py", line 36, in child
+    lab=FullLab(root/('telemt-'+channel),dc_endpoint=('198.51.100.2',26000),
+  File "/home/runner/work/me/me/tests/e2e_lab.py", line 233, in __init__
+    raise RuntimeError("Telemt startup failed; raw logs withheld")
+RuntimeError: Telemt startup failed; raw logs withheld
