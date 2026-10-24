@@ -22,6 +22,13 @@ from lab_artifacts import cleanup_artifacts
 sys.path.pop(0)
 
 
+def write_private_report(path, value):
+    """Create owner-only evidence regardless of the invoking shell's umask."""
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(descriptor, 'w', encoding='utf-8') as output:
+        output.write(json.dumps(value, indent=2) + '\n')
+
+
 def systemd_command(unit, limits, worker, seconds):
     properties = {"MemoryMax": limits["memory_max_bytes"], "MemoryHigh": limits["memory_high_bytes"],
                   "MemorySwapMax": 0, "CPUQuota": "60%", "TasksMax": limits["tasks_max"],
@@ -200,7 +207,7 @@ def main():
     plan["source_sha256"] = {str(path.relative_to(REPO)): hashlib.sha256(path.read_bytes()).hexdigest()
                             for path in [REPO / "telemt-dual-hop.sh", *sorted((REPO / "tests").glob("*.py")),
                                          *sorted((REPO / "tools").glob("*.py"))]}
-    (results / "manifest.json").write_text(json.dumps(plan, indent=2) + "\n")
+    write_private_report(results / "manifest.json", plan)
     samples, reason, group = [], None, ""
     initial_output_bytes = output_bytes(root)
     def stop(signum, frame):
@@ -279,7 +286,7 @@ def main():
                   'cleanup_inspection_errors':inspection_errors,
                   "cleanup_verified": not inspection_errors and not remaining and not key_files and stopped and not artifact_cleanup['errors'] and not unattributed_temporaries,
                   "warning": "Existing connections cannot migrate on failover; no real Telegram capacity claim."}
-        (results / "supervisor.json").write_text(json.dumps(result, indent=2) + "\n")
+        write_private_report(results / "supervisor.json", result)
         # Retain failed unit diagnostics until captured, then release only our unit.
         run("systemctl", "reset-failed", unit)
     print(json.dumps({"results": str(results), "exit": result["exit"], "stop_reason": reason,

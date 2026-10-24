@@ -1,6 +1,9 @@
 """Resource plans and executable arguments must fail closed before privileged setup."""
 import importlib.util
+import json
+import os
 from pathlib import Path
+import tempfile
 import sys
 import subprocess
 import unittest
@@ -9,11 +12,26 @@ from unittest.mock import Mock, patch
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 from lab_preflight import budget, MIB, run_checked, escalation_budget
-from lab_runner import systemd_command, cgroup_sample, namespace_cleanup_status
+from lab_runner import systemd_command, cgroup_sample, namespace_cleanup_status, write_private_report
 sys.path.remove(str(TOOLS))
 
 
 class LabRunnerTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == 'posix', 'POSIX report permissions')
+    def test_reports_are_private_with_shell_umask_and_never_overwrite_evidence(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)/'supervisor.json'
+            previous = os.umask(0o022)
+            try:
+                write_private_report(path, {'cleanup_verified': True})
+            finally:
+                os.umask(previous)
+            self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+            self.assertEqual(json.loads(path.read_text()), {'cleanup_verified': True})
+            with self.assertRaises(FileExistsError):
+                write_private_report(path, {'cleanup_verified': False})
+            self.assertEqual(json.loads(path.read_text()), {'cleanup_verified': True})
+
     def test_escalation_rejects_actual_16_to_32_memory_high_shortfall(self):
         previous = {'exit': 0, 'stop_reason': None, 'cleanup_verified': True,
                     'host_oom_kill_delta': 0, 'samples': [{'memory.current': 188809216}]}
