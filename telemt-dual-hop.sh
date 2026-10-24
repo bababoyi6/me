@@ -424,8 +424,10 @@ update_manager() {
 
   download_tmp=$(mktemp)
   info "正在从 GitHub 获取最新管理脚本……"
-  if ! curl -fL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 \
-      --proto '=https' --tlsv1.2 "$TDH_UPDATE_URL" -o "$download_tmp"; then
+  # Match bootstrap protections, including responses without Content-Length.
+  if ! (ulimit -f 1024 || exit 1
+    curl -q -fL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 --max-filesize 1048576 \
+      --proto '=https' --tlsv1.2 "$TDH_UPDATE_URL" -o "$download_tmp"); then
     rm -f "$download_tmp"
     die "下载失败；当前版本未作任何修改。"
   fi
