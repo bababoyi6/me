@@ -1,0 +1,51 @@
+name: Validate candidate core installation
+
+on:
+  push:
+    branches: [dev/candidate-install-20261024]
+    paths:
+      - tools/core_bundle.py
+      - tools/candidate_bundle.py
+      - tests/candidate_install_lab.py
+      - tests/test_candidate_bundle.py
+      - .github/workflows/candidate-install.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: candidate-install-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bounded loopback dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends haproxy python3-cryptography
+      - name: Download the pinned existing candidate build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 40085411204 --repo bababoyi6/me --name relay-candidate-pair --dir "$RUNNER_TEMP/native"
+      - name: Package the exact candidate without recompiling
+        run: python3 tools/candidate_bundle.py --pair-archive "$RUNNER_TEMP/native/relay-pair.tar.gz" --output "$RUNNER_TEMP/telemt-balanced2.tar.gz" > "$RUNNER_TEMP/bundle.json"
+      - name: Prepare unprivileged ephemeral CI account
+        run: |
+          if ! id telemt >/dev/null 2>&1; then
+            sudo useradd --system --no-create-home --shell /usr/sbin/nologin telemt
+          fi
+          test "$(id -u telemt)" -ne 0
+      - name: Verify real installation, integrity rejection and tiny dual-SNI transfers
+        run: sudo --preserve-env=GITHUB_ACTIONS timeout --kill-after=5 75 python3 tests/candidate_install_lab.py --bundle "$RUNNER_TEMP/telemt-balanced2.tar.gz" --metadata "$RUNNER_TEMP/bundle.json" --output "$RUNNER_TEMP/install-check.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: balanced2-install-candidate
+          path: |
+            ${{ runner.temp }}/telemt-balanced2.tar.gz
+            ${{ runner.temp }}/bundle.json
+            ${{ runner.temp }}/install-check.json
+          retention-days: 7
+          if-no-files-found: error

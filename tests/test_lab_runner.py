@@ -1,5 +1,7 @@
 """Resource plans and executable arguments must fail closed before privileged setup."""
 import importlib.util
+import contextlib
+import io
 import json
 import os
 from pathlib import Path
@@ -12,11 +14,28 @@ from unittest.mock import Mock, patch
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 from lab_preflight import budget, MIB, run_checked, escalation_budget
-from lab_runner import systemd_command, cgroup_sample, namespace_cleanup_status, write_private_report
+from lab_runner import systemd_command, cgroup_sample, namespace_cleanup_status, write_private_report, main as runner_main
 sys.path.remove(str(TOOLS))
 
 
 class LabRunnerTests(unittest.TestCase):
+    @unittest.skipUnless(sys.platform=='linux','Linux-only runner plan')
+    def test_candidate_plan_is_tiny_high_rtt_private_and_time_bounded(self):
+        output=io.StringIO()
+        limits=budget(956*MIB,640*MIB,4096*MIB,memory_high_percent=80)
+        argv=['lab_runner.py','--root','/tmp/tdh-audit-candidate-plan','--profile','candidate',
+              '--rtt','100','--memory-high-percent','80']
+        with patch('sys.argv',argv), patch('lab_runner.inventory',return_value={'budget':limits}), contextlib.redirect_stdout(output):
+            runner_main()
+        plan=json.loads(output.getvalue())
+        self.assertEqual(plan['classification'],'SINGLE_VPS_CANDIDATE_PATH')
+        self.assertEqual(plan['payload_max_bytes'],2*1024**2)
+        self.assertEqual(plan['preflight']['budget']['runtime_max_seconds'],180)
+        for value in ('--property=RuntimeMaxSec=180','--property=CPUQuota=60%',
+                      '--build','bulk','--separate-dc','--candidate-check'):
+            self.assertIn(value,plan['command'])
+        self.assertNotIn('--benchmark',plan['command'])
+
     def test_explicit_soft_policy_keeps_all_hard_limits_and_reserves(self):
         standard = budget(956*MIB, 640*MIB, 4096*MIB)
         alternative = budget(956*MIB, 640*MIB, 4096*MIB, memory_high_percent=80)
