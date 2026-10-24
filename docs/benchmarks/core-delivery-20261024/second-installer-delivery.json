@@ -1,0 +1,10 @@
+{
+  "classification": "CI_PRODUCTION_INSTALL_FUNCTION",
+  "service_version_uid": 997,
+  "cases": [],
+  "network_boundary_substituted": true,
+  "published_release_download_tested": false,
+  "host_configuration_modified": false,
+  "accepted": false,
+  "error_type": "RuntimeError"
+}

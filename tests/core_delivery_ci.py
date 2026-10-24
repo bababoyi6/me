@@ -35,6 +35,10 @@ def install_case(folder,channel,archive,*,existing=False,accepted=True):
     folder.chmod(0o755)  # umask 077 must not block the real service UID's traversal.
     config=folder/'config';config.mkdir(mode=0o700)
     target=folder/'bin/telemt';target.parent.mkdir(mode=0o755)
+    target.parent.chmod(0o755)
+    identity=pwd.getpwnam('telemt')
+    subprocess.run(['test','-x',str(target.parent)],user=identity.pw_uid,group=identity.pw_gid,
+                   extra_groups=[],check=True,timeout=3)
     if existing:
         target.write_bytes(b'EXISTING_CORE_MUST_REMAIN')
     version,archive_sha,core_sha=PINS[channel]
@@ -99,7 +103,8 @@ def main():
             'service_version_uid':identity.pw_uid,'cases':records,'network_boundary_substituted':True,
             'published_release_download_tested':False,'host_configuration_modified':False,'accepted':False}
     try:
-        with tempfile.TemporaryDirectory(prefix='tdh-delivery-install-',dir=os.environ['RUNNER_TEMP']) as folder:
+        # RUNNER_TEMP itself may have private ancestors; never chmod runner-owned directories.
+        with tempfile.TemporaryDirectory(prefix='tdh-delivery-install-',dir='/tmp') as folder:
             stage=Path(folder);stage.chmod(0o755)  # Public binaries only; version checks run as telemt.
             for channel,archive in archives.items():
                 installed,record=install_case(stage/channel,channel,archive)
