@@ -158,7 +158,7 @@ class FullLab:
         expected = BINARIES.get(binary_hash)
         if experimental_binary is not None:
             checksum, version = experimental_binary
-            if checksum != binary_hash or version not in ("telemt 3.5.5", "telemt 3.5.5+tdh.audit1", "telemt 3.5.5+tdh.audit2", "telemt 3.5.5+tdh.fair1", "telemt 3.5.5+tdh.queue1", "telemt 3.5.5+tdh.balanced1"):
+            if checksum != binary_hash or version not in ("telemt 3.5.5", "telemt 3.5.5+tdh.audit1", "telemt 3.5.5+tdh.audit2", "telemt 3.5.5+tdh.fair1", "telemt 3.5.5+tdh.queue1", "telemt 3.5.5+tdh.balanced1", "telemt 3.5.5+tdh.balanced2"):
                 raise ValueError("explicit experimental build checksum/version mismatch")
             expected = version
         if expected is None:

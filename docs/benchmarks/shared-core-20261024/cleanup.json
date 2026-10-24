@@ -1,0 +1,14 @@
+{
+  "date_utc": "2026-10-24T10:12:04.088796+00:00",
+  "export_sha256": "40f34099f45a79845635084bdc678729c538ad70fb6894e15fe6652e4febcb03",
+  "removed_owned_root": "/root/tdh-audit-20261021/tdh-audit-share-20261024",
+  "lab_namespaces_remaining": [],
+  "lab_units_remaining": [],
+  "lab_temporary_directories_remaining": [],
+  "lab_keys_remaining": [],
+  "listeners_unchanged": true,
+  "host_oom_kill_delta": 0,
+  "historical_binaries_unchanged": true,
+  "host_kernel_firewall_ssh_configuration_modified": false,
+  "production_nodes_accessed": false
+}

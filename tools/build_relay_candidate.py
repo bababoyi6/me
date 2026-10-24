@@ -29,7 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', required=True)
     parser.add_argument('--output', required=True)
-    parser.add_argument('--candidate', choices=('fair', 'queue', 'balanced'), default='fair')
+    parser.add_argument('--candidate', choices=('fair', 'queue', 'balanced', 'bulk'), default='fair')
     parser.add_argument('--reference-archive')
     args = parser.parse_args()
     source = Path(args.source).resolve()
@@ -55,22 +55,34 @@ def main():
                 'rust': rust, 'jobs': 2, 'lto': 'thin', 'codegen_units': 8,
                 'base_patch_sha256': digest(patch),
                 'candidate_kind': args.candidate,
-                'candidate_helper_sha256': digest(ROOT / {'fair':'patches/fair_copy.rs','queue':'patches/unsent_queue.rs','balanced':'patches/low_rtt_receive.rs'}[args.candidate]),
+                'candidate_helper_sha256': digest(ROOT / {'fair':'patches/fair_copy.rs','queue':'patches/unsent_queue.rs','balanced':'patches/low_rtt_receive.rs','bulk':'patches/unsent_queue_bulk.rs'}[args.candidate]),
                 'builder_sha256': digest(Path(__file__)),
                 'normalized_patch_sha256': digest(normalized_patch),
                 'default_installer_changed': False, 'binaries': {}}
-    candidate_version = {'fair':'3.5.5+tdh.fair1','queue':'3.5.5+tdh.queue1','balanced':'3.5.5+tdh.balanced1'}[args.candidate]
+    candidate_version = {'fair':'3.5.5+tdh.fair1','queue':'3.5.5+tdh.queue1','balanced':'3.5.5+tdh.balanced1','bulk':'3.5.5+tdh.balanced2'}[args.candidate]
     variants = [('control', '3.5.5+tdh.audit2'), (args.candidate, candidate_version)]
     if args.candidate == 'queue':
         variants.insert(0, ('fixed', '3.5.5+tdh.audit1'))
+    if args.candidate == 'bulk':
+        variants = [('fixed','3.5.5+tdh.audit1'), ('control','3.5.5+tdh.audit2'),
+                    ('balanced','3.5.5+tdh.balanced1'), ('bulk',candidate_version)]
+    if args.candidate in ('balanced','bulk'):
+        manifest.update(receive_helper_sha256=digest(ROOT/'patches/low_rtt_receive.rs'),
+                        outgoing_queue_helper_sha256=digest(ROOT/('patches/unsent_queue_bulk.rs' if args.candidate=='bulk' else 'patches/unsent_queue.rs')),
+                        outgoing_unsent_low_water_bytes=262144 if args.candidate=='bulk' else 65536)
     if args.reference_archive:
         reference = Path(args.reference_archive).resolve()
-        assert digest(reference) == 'cc1881e3c5af3eef808650cce754f9bdcea6e2f6ffdb27a1e860aa5224be8b90'
+        reference_commits = {
+            'cc1881e3c5af3eef808650cce754f9bdcea6e2f6ffdb27a1e860aa5224be8b90':'38da0fbf5b8c24913be7bfb61922a2e80fc957e4',
+            'c1329c82aa1b51153213e72cfdd7b652468e7b6f298d9dd023456b8c1dcdd15b':'f6156a9ba3242215b4df60d118f28f53ee73fb8a'}
+        assert digest(reference) in reference_commits
         with tarfile.open(reference) as archive:
             old = json.load(archive.extractfile('manifest.json'))
-            assert old['project_commit'] == '38da0fbf5b8c24913be7bfb61922a2e80fc957e4'
+            assert old['project_commit'] == reference_commits[digest(reference)] and old['source_commit'] == SOURCE_COMMIT
             assert old['rust'] == rust and old['lto'] == 'thin' and old['codegen_units'] == 8
-            for name in ('fixed','control','queue'):
+            for name in ('fixed','control','queue','balanced'):
+                if name not in old['binaries'] or name == args.candidate or (args.candidate=='bulk' and name=='queue'):
+                    continue
                 target = output/('telemt-'+name)
                 with target.open('xb') as stream:
                     shutil.copyfileobj(archive.extractfile('telemt-'+name), stream)
@@ -79,7 +91,7 @@ def main():
                 manifest['binaries'][name] = old['binaries'][name]
         manifest['reference_archive_sha256'] = digest(reference)
         manifest['reference_build_commit'] = old['project_commit']
-        variants = [(args.candidate, candidate_version)]
+        variants = [(name,version) for name,version in variants if name not in manifest['binaries']]
     socket_source = source / 'src/transport/socket.rs'
     automatic_socket_source = socket_source.read_text()
     previous_version = '3.5.5+tdh.audit2'
@@ -93,11 +105,12 @@ def main():
         elif name == 'control':
             socket_source.write_text(automatic_socket_source)
         else:
+            socket_source.write_text(automatic_socket_source)
             if name == 'fair':
                 helper.write_bytes((ROOT / 'patches/fair_copy.rs').read_bytes())
             else:
                 target = source / 'src/transport/socket/unsent_queue.rs'
-                target.write_bytes((ROOT / 'patches/unsent_queue.rs').read_bytes())
+                target.write_bytes((ROOT / ('patches/unsent_queue_bulk.rs' if name=='bulk' else 'patches/unsent_queue.rs')).read_bytes())
                 socket_source = source / 'src/transport/socket.rs'
                 text = socket_source.read_text()
                 prefix, body = text.split('pub fn create_outgoing_socket_bound(', 1)
@@ -110,7 +123,7 @@ def main():
                 first_line, rest = combined.split('\n', 1)
                 assert first_line.startswith('//!')
                 socket_source.write_text(first_line + '\n#[cfg(target_os = "linux")]\nmod unsent_queue;\n' + rest)
-                if name == 'balanced':
+                if name in ('balanced','bulk'):
                     (source/'src/transport/socket/low_rtt_receive.rs').write_bytes((ROOT/'patches/low_rtt_receive.rs').read_bytes())
                     text = socket_source.read_text()
                     prefix, body = text.split('pub fn configure_client_socket(', 1)
@@ -140,11 +153,12 @@ def main():
     for filename in ('LICENSE',):
         shutil.copyfile(source / filename, output / filename)
     (output / 'NOTICE.txt').write_text('Unofficial experimental builds of Telemt 3.5.5. Original license retained.\n'
-        'Control applies audit2. Candidate changes only the declared relay or outgoing unsent-queue policy and version marking.\n'
+        'Reference and candidate roles, relay/socket policies and version marking are declared in manifest.json.\n'
         'No endorsement by Telemt maintainers. Not a production release.\n')
     shutil.copyfile(patch, output / 'base.patch')
     shutil.copyfile(ROOT / 'patches/fair_copy.rs', output / 'fair_copy.rs')
     shutil.copyfile(ROOT / 'patches/unsent_queue.rs', output / 'unsent_queue.rs')
+    shutil.copyfile(ROOT / 'patches/unsent_queue_bulk.rs', output / 'unsent_queue_bulk.rs')
     shutil.copyfile(ROOT / 'patches/low_rtt_receive.rs', output / 'low_rtt_receive.rs')
     shutil.copyfile(Path(__file__), output / 'build_relay_candidate.py')
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')

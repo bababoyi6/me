@@ -60,7 +60,7 @@ def main():
     parser.add_argument("--rounds", type=int, choices=(1, 2, 3), default=3)
     parser.add_argument("--socket-details", action="store_true")
     parser.add_argument("--socket-library", help="compare same-binary socket policies, private mock DC only")
-    parser.add_argument('--core-pair', choices=('historical', 'fairness', 'queue', 'queue-fixed', 'balanced', 'balanced-fixed'), default='historical')
+    parser.add_argument('--core-pair', choices=('historical', 'fairness', 'queue', 'queue-fixed', 'balanced', 'balanced-fixed', 'bulk', 'bulk-fixed'), default='historical')
     parser.add_argument('--candidate-only', action='store_true', help='one native candidate trial; no comparison ratio')
     parser.add_argument('--share-core-file',action='store_true',help='share the verified private core inode; no per-trial copy')
     parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
@@ -96,7 +96,7 @@ def main():
     manifest['core_file_staging']='private-shared-inode' if args.share_core_file else 'private-copy'
     builds = {'fairness': ('control', 'fair'), 'queue': ('control', 'queue'),
               'queue-fixed': ('fixed', 'queue'), 'balanced': ('queue','balanced'),
-              'balanced-fixed': ('fixed','balanced'), 'historical': ('flush', 'auto')}[args.core_pair]
+              'balanced-fixed': ('fixed','balanced'), 'bulk': ('balanced','bulk'), 'bulk-fixed': ('fixed','bulk'), 'historical': ('flush', 'auto')}[args.core_pair]
     manifest.update(control_build=builds[0], candidate_build=builds[1])
     if args.core_pair == 'fairness':
         manifest.update(control='CI audit2 control with automatic socket buffers',
@@ -111,6 +111,9 @@ def main():
     if args.core_pair in ('balanced','balanced-fixed'):
         manifest.update(control='verified queue1 reference' if args.core_pair=='balanced' else 'verified audit1 fixed-buffer reference',
                         candidate='balanced1; queue1 plus receive-buffer request only on measured RTT 1..5000us', core_pair=args.core_pair)
+    if args.core_pair in ('bulk','bulk-fixed'):
+        manifest.update(control='verified balanced1 reference' if args.core_pair=='bulk' else 'verified audit1 fixed-buffer reference',
+                        candidate='balanced2; same low-RTT receive policy with outgoing unsent threshold 256KiB', core_pair=args.core_pair)
     if args.candidate_only:
         manifest.update(classification='SINGLE_VPS_CANDIDATE_SMOKE', candidate_only=True,
                         scope='one private native candidate trial; no paired comparison or speed ratio')

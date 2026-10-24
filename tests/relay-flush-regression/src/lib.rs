@@ -10,6 +10,10 @@ mod fair_copy;
 mod unsent_queue;
 
 #[cfg(all(test, target_os = "linux"))]
+#[path = "../../../patches/unsent_queue_bulk.rs"]
+mod unsent_queue_bulk;
+
+#[cfg(all(test, target_os = "linux"))]
 #[path = "../../../patches/low_rtt_receive.rs"]
 mod low_rtt_receive;
 
@@ -48,6 +52,17 @@ fn real_receive_policy_does_not_change_send_buffer() {
 #[cfg(all(test, target_os = "linux"))]
 #[test]
 fn queue_policy_preserves_automatic_buffer_sizes() {
+    assert_queue_policy(unsent_queue::configure_unsent_queue, 65536);
+}
+
+#[cfg(all(test, target_os = "linux"))]
+#[test]
+fn bulk_queue_policy_preserves_automatic_buffer_sizes() {
+    assert_queue_policy(unsent_queue_bulk::configure_unsent_queue, 262144);
+}
+
+#[cfg(all(test, target_os = "linux"))]
+fn assert_queue_policy(configure: fn(i32) -> std::io::Result<()>, expected: u32) {
     use std::os::fd::AsRawFd;
     let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
     let stream = std::net::TcpStream::connect(listener.local_addr().unwrap()).unwrap();
@@ -60,8 +75,8 @@ fn queue_policy_preserves_automatic_buffer_sizes() {
     }
     let fd = stream.as_raw_fd();
     let before = (option(fd, libc::SOL_SOCKET, libc::SO_RCVBUF), option(fd, libc::SOL_SOCKET, libc::SO_SNDBUF));
-    unsent_queue::configure_unsent_queue(fd).unwrap();
-    assert_eq!(option(fd, libc::IPPROTO_TCP, libc::TCP_NOTSENT_LOWAT), 65536);
+    configure(fd).unwrap();
+    assert_eq!(option(fd, libc::IPPROTO_TCP, libc::TCP_NOTSENT_LOWAT), expected);
     assert_eq!(before, (option(fd, libc::SOL_SOCKET, libc::SO_RCVBUF), option(fd, libc::SOL_SOCKET, libc::SO_SNDBUF)));
 }
 

@@ -1,0 +1,15 @@
+{
+  "scope": "post-export cleanup confirmations from SSH transport; locally assembled record",
+  "primary_cleanup_sha256": "618d0a093ba267d7f4ab4552aa7953e942ddfc1761a73e9c68522e46a00861ad",
+  "primary_cleanup_remote_copy_removed_after_hash_verification": true,
+  "removed_additional_owned_files": [
+    "repair_share_permissions.py",
+    "__pycache__/share_lab.cpython-310.pyc",
+    "__pycache__/grade_lab.cpython-310.pyc",
+    "__pycache__/balanced_lab.cpython-310.pyc",
+    "__pycache__/queue_lab.cpython-310.pyc",
+    "__pycache__/fair_lab.cpython-310.pyc"
+  ],
+  "historical_vm_lab_and_vm_ssh_cache_preserved": true,
+  "transport_closed": true
+}

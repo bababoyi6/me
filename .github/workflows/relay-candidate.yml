@@ -6,6 +6,7 @@ on:
     paths:
       - patches/fair_copy.rs
       - patches/unsent_queue.rs
+      - patches/unsent_queue_bulk.rs
       - patches/low_rtt_receive.rs
       - tools/build_relay_candidate.py
       - tests/relay-flush-regression/**
@@ -47,14 +48,14 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh run download 40066698486 --repo bababoyi6/me --name relay-candidate-pair --dir "$RUNNER_TEMP/reference"
+        run: gh run download 40070623674 --repo bababoyi6/me --name relay-candidate-pair --dir "$RUNNER_TEMP/reference"
       - name: Build control and candidate with the same toolchain
         run: |
           references=()
           if [[ -f "$RUNNER_TEMP/reference/relay-pair.tar.gz" ]]; then
             references=(--reference-archive "$RUNNER_TEMP/reference/relay-pair.tar.gz")
           fi
-          python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/relay-pair" --candidate balanced "${references[@]}"
+          python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/relay-pair" --candidate bulk "${references[@]}"
       - uses: actions/upload-artifact@v4
         with:
           name: relay-candidate-pair
