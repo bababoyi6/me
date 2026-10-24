@@ -70,6 +70,31 @@ python3 tools/analyze_upload_ab.py /root/tdh-audit-lab/results/ab-实际编号.j
 
 每轮 worker 有有限超时。失败会保留结果并停止后续负载；缺失、重复或失败的配对不产生提速比例，不同数据量/带宽/环境的结果不能混算。RTT 可选 20/50/100/200ms。已有 `tests/high_rtt_matrix.py` 保留受控丢包测试，但老入口不自动获得新 supervisor 的资源保护，不应直接在唯一测试机上运行高负载。
 
+### 单侧缓冲与未发送队列实验
+
+`--profile socket` 在同一audit1二进制上加载实验库，比较固定缓冲、全自动、仅client自动、仅DC自动；`--policy-family client|dc|lowat` 可做两策略交换顺序对照，`queue`比较pass/auto/auto-lowat三种策略。`lowat`保留自动缓冲并设置64KiB的`TCP_NOTSENT_LOWAT`，只用于实验，不更换安装器核心。该选项限制未发数据的排队与可写通知，语义见[Linux内核说明](https://www.kernel.org/doc/html/latest/networking/ip-sysctl.html)。
+
+实验库由可信源码 `tests/socket_policy_lab.c` 编译到专用目录的 `socket-policy.so`，并保存 `socket-policy-build.json` 的SHA256；必须先执行 `tests/policy_oracle.py --library ...`，核对策略作用于正确一侧、其他选项继续透传。不能为未知外来库自行计算摘要后当作可信构建。CI会用独立编译器复验策略。实验库与定制二进制禁止用于公开DC探测。
+
+```bash
+sudo python3 tools/lab_runner.py --root /root/tdh-audit-lab --profile socket \
+  --min-streams 4 --max-streams 4 --payload-mib 16 --rounds 2 \
+  --rate-mbps 1000 --policy-family lowat --socket-details \
+  --mock-receive-buffer 262144 --client-send-buffer 262144 --execute
+python3 tools/analyze_socket_policy.py /root/tdh-audit-lab/results/ab-实际编号.json
+```
+
+两个fixture缓冲参数约束模拟DC和模拟客户端，默认0仍使用原来的自动策略。内核可能裁剪请求值，DC实际监听缓冲随记录保存。它们改变模拟端点的窗口/排队条件，可能成为共同瓶颈；不能与未设置的历史结果直接计算提速。全部比较必须保持相同fixture条件。失败/超时保留工作进程日志并停止升级负载；TERM不退出时有限等待后KILL，失败行仍会保存。资源采样新增独立的anon/file/sock等内核记账及PSI；不同字段的采样最大值不能相加当作同一时刻峰值。
+
+### 逻辑空闲连接与混合业务
+
+```bash
+# 顺序验证30、60、100；前级失败或资源不足就停止。
+sudo python3 tools/lab_runner.py --root /root/tdh-audit-lab --profile mixed --logical-clients 30 --execute
+```
+
+该profile额外使用临时unit的私有网络，仅在loopback运行真实HAProxy/Telemt及模拟DC。每个逻辑连接完成FakeTLS、传输认证和1字节摘要核对，再等待最终ACK；同时进行两条1MiB文件流和小文件探测，最后逐一确认ACK并核对DC完成次数。它不是官方Telegram会话、全速100条大流或WG三机容量测试。模拟端点缓冲、20秒场景期限及25秒模拟DC期限都有记录，生产服务期限不变。完整WG故障/重载另用smoke/soak验证。
+
 ## 资源与清理
 
 预检为宿主保留 `max(256MiB, 总内存/3)`；实验内存上限为 `min(384MiB, (可用内存−预留)×3/4)`，不足 192MiB 则拒绝。还要求至少 768MiB 总内存、1GiB 剩余磁盘。内存高水位取上限的 3/4，实验禁用 Swap，CPUQuota 为整颗 CPU 的 60%，TasksMax=192，单次运行最长 600 秒。它们是**实验进程组预算**，不是生产 Telemt 容量推荐，也不能完全限制内核后台线程的 CPU。
@@ -77,6 +102,8 @@ python3 tools/analyze_upload_ab.py /root/tdh-audit-lab/results/ab-实际编号.j
 每 0.5 秒检查宿主可用内存、OOM 计数、cgroup 事件和新增输出；跌破预留、OOM、输出约 32MiB 或磁盘低于 512MiB 时停止本次 unit。采样不是连续的绝对峰值证明；Ubuntu 5.15 缺少 `memory.peak` 时，报告只给采样最大值。输出阈值存在一次采样间隔的超量可能，单文件另有硬限制。
 
 每次生成独立 `run-tdh-audit-*` 目录，保存命令、源码摘要、源码基准提交/dirty 标识、资源预算、原始日志、采样和清理核查。systemd 只停止本次随机生成的 unit，并回收其整个进程组。没有新增常驻维护服务。
+
+监督运行的FullLab会在私有ledger中登记临时目录的设备号、inode、UID和随机归属标记。只有在确认本次unit进程已经停止、这些身份及私有标记均匹配时，才回收强制终止遗留的目录；身份不符或进程状态不明会拒绝删除并判清理未通过。新出现但没有登记的临时目录同样会被列为待核查，不能因namespace已清除就宣称全部干净。创建与登记之间仍有很短的异常窗口，断电或损坏ledger时可能需要人工核对，不能自动删除所有同名前缀目录。
 
 ```bash
 # 受限约5分钟低速长流；通过 smoke 后再执行

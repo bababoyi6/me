@@ -72,7 +72,7 @@ def backend():
     def create_lab():
         endpoint=(f'198.18.0.{1 if args.index==1 else 5}',26000) if args.separate_dc else None
         return FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,
-                       experimental_binary=experimental,dc_endpoint=endpoint)
+                       experimental_binary=experimental,dc_endpoint=endpoint,artifact_registry=ROOT/'artifact-registry')
     lab=create_lab()
     agent=None
     try:

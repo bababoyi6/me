@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--output", required=True)
 parser.add_argument("--socket-timeout", type=int, choices=(8, 25), default=8)
 parser.add_argument("--topology", choices=("high-rtt", "dualhop"), default="high-rtt")
+parser.add_argument('--receive-buffer',type=int,choices=(0,262144),default=0)
 args = parser.parse_args()
 expected = "tdh-audit-dc" if args.topology == "dualhop" else "tdh-audit-b"
 if subprocess.check_output(["ip", "netns", "identify"], text=True, timeout=3).strip() != expected:
@@ -22,7 +23,7 @@ if os.geteuid() == 0:
     os.setgroups([])
     os.setgid(65534)
     os.setuid(65534)
-dcs = [MockDc(address, 26000, socket_timeout=args.socket_timeout) for address in
+dcs = [MockDc(address, 26000, socket_timeout=args.socket_timeout,receive_buffer=args.receive_buffer) for address in
        (("198.18.0.1", "198.18.0.5") if args.topology == "dualhop" else ("198.51.100.2",))]
 def listen_counters():
     lines = Path('/proc/net/netstat').read_text().splitlines()
@@ -34,6 +35,8 @@ def listen_counters():
 try:
     while True:
         records = [{"completed": dc.completed, "errors": dc.errors,
+                                                'receive_buffer_requested':args.receive_buffer,
+                                                'listener_receive_buffer_actual':dc.receive_buffer_actual,
                                                 "socket_timeout_seconds": args.socket_timeout,
                                                 "connect_only": dc.connect_only_checks,
                                                 "tcp_listen_counters": listen_counters()} for dc in dcs]

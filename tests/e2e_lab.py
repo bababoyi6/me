@@ -26,6 +26,8 @@ from lab import exact, receive_payload, send_payload
 from lab_config import generate_telemt
 from mtproto_transport import CryptoStream, PacketStream, dc_ciphers, mtproxy_connect, req_pq
 from telemt_probe import SECRETS, port, request
+from lab_artifacts import register_artifact
+from lab_files import file_sha256
 
 # Extracted x86_64 binaries from the checksum-verified official GNU archives.
 BINARIES = {
@@ -112,20 +114,31 @@ class MockDc(socketserver.ThreadingTCPServer):
     # Accommodate 16-stream bursts plus probes without a five-slot lab bottleneck.
     request_queue_size = 64
 
-    def __init__(self, bind="127.0.0.1", listen=0, *, socket_timeout=8):
+    def __init__(self, bind="127.0.0.1", listen=0, *, socket_timeout=8, receive_buffer=0):
         if socket_timeout not in (8, 25):
             raise ValueError("mock DC socket timeout must be bounded")
+        if receive_buffer not in (0,262144):
+            raise ValueError('bounded mock DC receive buffer required')
         self.socket_timeout = socket_timeout
         self.errors, self.error_lock = [], threading.Lock()
         self.connect_only_checks, self.completed = 0, 0
-        super().__init__((bind, listen), DcHandler)
+        super().__init__((bind, listen), DcHandler, bind_and_activate=False)
+        try:
+            if receive_buffer:
+                self.socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,receive_buffer)
+            self.receive_buffer_actual=self.socket.getsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF)
+            self.server_bind()
+            self.server_activate()
+        except BaseException:
+            self.server_close()
+            raise
         threading.Thread(target=self.serve_forever, daemon=True).start()
 
 
 class FullLab:
     def __init__(self, binary, haproxy="haproxy", fast=True, real_dc=False, splice=False,
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
-                 listen_endpoint=None, start_haproxy=True, experimental_binary=None):
+                 listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None):
         if listen_endpoint is not None and (listen_endpoint not in (("10.77.1.2", 24431), ("10.77.2.2", 24431))
                                             or real_dc or start_haproxy):
             raise ValueError("private namespace backend requires a fixed WG bind and no local frontend")
@@ -134,13 +147,13 @@ class FullLab:
             raise ValueError("external mock DC must be the fixed private namespace endpoint")
         if real_dc and (dc_endpoint or socket_library or experimental_binary):
             raise ValueError("experimental socket policies are forbidden for public DC probes")
-        if socket_mode not in ("pass", "auto", "1m", "4m") or (socket_mode != "pass" and socket_library is None):
+        if socket_mode not in ("pass", "auto", "1m", "4m", "client-auto", "dc-auto", "auto-lowat") or (socket_mode != "pass" and socket_library is None):
             raise ValueError("explicit lab socket library required for experimental policy")
         binary = Path(binary)
         info = binary.stat()
         if not stat.S_ISREG(info.st_mode) or not 0 < info.st_size <= 64 * 1024**2:
             raise ValueError("bounded regular Telemt binary required")
-        binary_hash = hashlib.sha256(binary.read_bytes()).hexdigest()
+        binary_hash = file_sha256(binary)
         expected = BINARIES.get(binary_hash)
         if experimental_binary is not None:
             checksum, version = experimental_binary
@@ -149,7 +162,7 @@ class FullLab:
             expected = version
         if expected is None:
             raise ValueError("lab requires a pinned official x86_64 GNU binary")
-        self.temp = tempfile.TemporaryDirectory(prefix="tdh-e2e-")
+        self.temp = tempfile.TemporaryDirectory(prefix="tdh-e2e-",dir='/tmp' if artifact_registry is not None else None)
         self.root = Path(self.temp.name)
         self.processes, self.dc = [], None
         self.real_dc = real_dc
@@ -158,9 +171,11 @@ class FullLab:
             self.gid = 65534 if os.geteuid() == 0 else os.getegid()
             if os.geteuid() == 0:
                 os.chown(self.root, self.uid, self.gid)
+            if artifact_registry is not None:
+                register_artifact(artifact_registry,self.root)
             target = self.root / "telemt"
             shutil.copyfile(binary, target)
-            if hashlib.sha256(target.read_bytes()).hexdigest() != binary_hash:
+            if file_sha256(target) != binary_hash:
                 raise ValueError("Telemt binary changed during private copy")
             target.chmod(0o755)
             self.version = subprocess.check_output([str(target), "--version"], text=True, timeout=5,
@@ -196,7 +211,8 @@ class FullLab:
                 library = self.root / "socket-policy.so"
                 shutil.copyfile(socket_library, library)
                 library.chmod(0o644)
-                environment.update(LD_PRELOAD=str(library), TDH_LAB_SOCKET_MODE=socket_mode)
+                environment.update(LD_PRELOAD=str(library), TDH_LAB_SOCKET_MODE=socket_mode,
+                                   TDH_LAB_CLIENT_PORT=str(self.listen))
             self.telemt = subprocess.Popen([str(target), str(config)], cwd=work / "telemt", env=environment, **self.identity(),
                                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             self.processes.append(self.telemt)
@@ -269,7 +285,7 @@ backend telemt
     def identity(self):
         return {"user": self.uid, "group": self.gid, "extra_groups": []} if os.geteuid() == 0 else {}
 
-    def transfer(self, domain, direction, size, rate, direct=False, fragment=False, io_timeout=8, persistent=False, read_pause=0, receive_buffer=0):
+    def transfer(self, domain, direction, size, rate, direct=False, fragment=False, io_timeout=8, persistent=False, read_pause=0, receive_buffer=0, send_buffer=0):
         if self.real_dc:
             raise ValueError("synthetic file operations are confined to the mock DC")
         if not 2 <= io_timeout <= 30:
@@ -278,12 +294,16 @@ backend telemt
             raise ValueError("bounded download reader pause required")
         if receive_buffer not in (0, 32768):
             raise ValueError("bounded lab receive buffer required")
+        if send_buffer not in (0,262144):
+            raise ValueError('bounded lab send buffer required')
         started = time.monotonic()
         phase, observed = "connect", None
         try:
             with socket.create_connection(("127.0.0.1", self.listen if direct else self.front), timeout=8) as sock:
                 if receive_buffer:
                     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, receive_buffer)
+                if send_buffer:
+                    sock.setsockopt(socket.SOL_SOCKET,socket.SO_SNDBUF,send_buffer)
                 sock.settimeout(io_timeout)
                 phase = "handshake"
                 stream = mtproxy_connect(sock, domain, SECRETS[domain], proxy_v2=direct, fragment=fragment)

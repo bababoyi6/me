@@ -2,12 +2,14 @@
 import importlib.util
 from pathlib import Path
 import sys
+import subprocess
 import unittest
+from unittest.mock import Mock, patch
 
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 from lab_preflight import budget, MIB
-from lab_runner import systemd_command
+from lab_runner import systemd_command, cgroup_sample
 sys.path.remove(str(TOOLS))
 
 
@@ -34,6 +36,14 @@ class LabRunnerTests(unittest.TestCase):
         self.assertNotIn("--collect", argv)
         self.assertEqual(argv[-3:], ["--", "python3", "synthetic-lab.py"])
 
+    def test_memory_accounting_keeps_socket_cache_and_anonymous_pages_separate(self):
+        values={'memory.current':'100','memory.stat':'anon 30\nfile 40\nsock 20\n',
+                'memory.pressure':'some avg10=1.00 avg60=0.00 avg300=0.00 total=1234'}
+        with patch('lab_runner.read',side_effect=lambda p:values.get(p.name,'')):
+            sample=cgroup_sample('/system.slice/tdh-audit-test.service')
+        self.assertEqual(sample['memory.stat'],{'anon':30,'file':40,'sock':20})
+        self.assertIn('total=1234',sample['memory.pressure'])
+
     @unittest.skipUnless(sys.platform == "linux", "namespace tool is Linux only")
     def test_ab_order_is_paired_and_reversed_each_round(self):
         spec = importlib.util.spec_from_file_location("upload_ab", Path(__file__).with_name("upload_ab.py"))
@@ -42,3 +52,16 @@ class LabRunnerTests(unittest.TestCase):
         self.assertEqual(module.paired_order(0), ("flush", "auto"))
         self.assertEqual(module.paired_order(1), ("auto", "flush"))
         self.assertEqual(module.paired_order(2), ("flush", "auto"))
+        self.assertEqual(module.policy_order(0),('pass','auto','client-auto','dc-auto'))
+        self.assertEqual(module.policy_order(1),module.policy_order(0)[::-1])
+
+    @unittest.skipUnless(sys.platform=='linux','Linux namespace harness')
+    def test_stalled_worker_termination_still_returns_failure_for_retention(self):
+        spec=importlib.util.spec_from_file_location('upload_ab_stop',Path(__file__).with_name('upload_ab.py'))
+        module=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        worker=Mock()
+        worker.wait.side_effect=[subprocess.TimeoutExpired('worker',100),subprocess.TimeoutExpired('worker',10),0]
+        self.assertEqual(module.wait_worker(worker),124)
+        worker.terminate.assert_called_once()
+        worker.kill.assert_called_once()

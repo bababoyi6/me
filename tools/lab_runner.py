@@ -16,6 +16,9 @@ import uuid
 from lab_preflight import inventory, MIB, read, run
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(REPO/'tests'))
+from lab_artifacts import cleanup_artifacts
+sys.path.pop(0)
 
 
 def systemd_command(unit, limits, worker, seconds):
@@ -38,9 +41,10 @@ def cgroup_sample(group):
     for name in ("memory.current", "memory.peak", "memory.swap.current", "pids.current"):
         value = read(base / name).strip()
         result[name] = int(value) if value.isdigit() else None
-    for name in ("memory.events", "cpu.stat"):
+    for name in ("memory.events", "memory.stat", "cpu.stat"):
         result[name] = dict((parts[0], int(parts[1])) for line in read(base / name).splitlines()
                             if len(parts := line.split()) == 2 and parts[1].isdigit())
+    result["memory.pressure"] = read(base / "memory.pressure").strip()
     return result
 
 
@@ -54,14 +58,18 @@ def main():
     parser.add_argument("--root", required=True)
     parser.add_argument("--haproxy", default="haproxy")
     parser.add_argument("--wg", default="wg")
-    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer"), default="smoke")
+    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed"), default="smoke")
+    parser.add_argument('--logical-clients',type=int,choices=(30,60,100),default=30)
     parser.add_argument("--rtt", type=int, choices=(20, 50, 100, 200), default=100)
     parser.add_argument("--max-streams", type=int, choices=(1, 4, 8, 16, 32), default=4)
     parser.add_argument("--min-streams", type=int, choices=(1, 4, 8, 16, 32), default=1)
-    parser.add_argument("--payload-mib", type=int, choices=(8, 16, 64, 256), default=16)
+    parser.add_argument("--payload-mib", type=int, choices=(8, 16, 64, 128, 256), default=16)
     parser.add_argument("--rate-mbps", type=int, choices=(100, 1000), default=100)
     parser.add_argument("--rounds", type=int, choices=(1, 2, 3), default=3)
     parser.add_argument("--socket-details", action="store_true")
+    parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
+    parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
+    parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
     parser.add_argument("--execute", action="store_true", help="without this flag only prints preflight/plan")
     args = parser.parse_args()
     if args.min_streams > args.max_streams:
@@ -69,18 +77,31 @@ def main():
     if sys.platform != "linux":
         parser.error("Linux is required")
     report = inventory()
+    before_temp_names={p.name for p in Path('/tmp').glob('tdh-e2e-*') if p.is_dir()}
     root = Path(args.root).absolute()
     if root.is_symlink() or not root.name.startswith("tdh-audit-"):
         parser.error("use a dedicated non-symlink tdh-audit-* directory")
-    if args.profile != "ab" and (args.max_streams != 4 or args.min_streams != 1 or args.payload_mib != 16 or args.rounds != 3 or args.rate_mbps != 100 or args.socket_details):
-        parser.error("load options only apply to the ab profile")
-    if args.profile == "ab":
+    if args.profile not in ("ab","socket") and (args.max_streams != 4 or args.min_streams != 1 or args.payload_mib != 16 or args.rounds != 3 or args.rate_mbps != 100 or args.socket_details or args.mock_receive_buffer or args.client_send_buffer):
+        parser.error("load options only apply to ab/socket profiles")
+    if args.profile!='socket' and args.policy_family!='all':
+        parser.error('policy families only apply to the socket profile')
+    if args.profile!='mixed' and args.logical_clients!=30:
+        parser.error('logical client counts only apply to mixed profile')
+    if args.profile in ("ab","socket"):
         worker = [sys.executable, str(REPO / "tests/upload_ab.py"), "--root", str(root), "--haproxy", args.haproxy,
                   "--wg", args.wg, "--rtt", str(args.rtt), "--max-streams", str(args.max_streams),
                   "--min-streams", str(args.min_streams),
                   "--payload-mib", str(args.payload_mib), "--rounds", str(args.rounds), "--rate-mbps", str(args.rate_mbps)]
+        worker += ['--mock-receive-buffer',str(args.mock_receive_buffer)]
+        worker += ['--client-send-buffer',str(args.client_send_buffer)]
         if args.socket_details:
             worker.append("--socket-details")
+        if args.profile == "socket":
+            worker += ["--socket-library",str(root/"socket-policy.so")]
+            worker += ['--policy-family',args.policy_family]
+    elif args.profile == 'mixed':
+        worker=[sys.executable,str(REPO/'tests/mixed_clients.py'),'--root',str(root),
+                '--haproxy',args.haproxy,'--clients',str(args.logical_clients)]
     elif args.profile == "observer":
         worker = [sys.executable, str(REPO / "tests/observer_oracle.py"), "--root", str(root), "--wg", args.wg]
     else:
@@ -89,10 +110,17 @@ def main():
                   *(["--soak"] if args.profile == "soak" else []), "run"]
     unit = "tdh-audit-" + uuid.uuid4().hex[:12]
     command = systemd_command(unit, report["budget"], worker, 600)
+    if args.profile=='mixed':
+        command.insert(command.index('--'),'--property=PrivateNetwork=yes')
     plan = {"preflight": report, "command": command, "profile": args.profile,
+            'temporary_directories_before':sorted(before_temp_names),
             "classification": "SINGLE_VPS_VIRTUAL_3NODE" if args.profile != "ab" else "SINGLE_VPS_SYNTHETIC"}
     if args.profile == "observer":
         plan["classification"] = "SINGLE_VPS_OBSERVER_ORACLE"
+    if args.profile == "socket":
+        plan["classification"] = "SINGLE_VPS_SOCKET_POLICY_CAUSAL"
+    if args.profile=='mixed':
+        plan['classification']='SINGLE_VPS_SYNTHETIC_LOOPBACK_MIXED'
     if not args.execute:
         print(json.dumps(plan, indent=2))
         return 0
@@ -173,6 +201,12 @@ def main():
                      if line.startswith("tdh-audit-")]
         key_files = [path.name for path in root.glob("*.key")]
         final_cgroup = cgroup_sample(group)
+        unit_state=run('systemctl','show',unit,'--property=ActiveState','--value')
+        known_group_absent=bool(group) and not (Path('/sys/fs/cgroup')/group.lstrip('/')).exists()
+        stopped=(unit_state in ('inactive','failed') or known_group_absent) and (final_cgroup.get('pids.current')==0 or known_group_absent)
+        artifact_cleanup=cleanup_artifacts(root/'artifact-registry',stopped)
+        unattributed_temporaries=sorted(p.name for p in Path('/tmp').glob('tdh-e2e-*')
+                                       if p.is_dir() and p.name not in before_temp_names)
         final_oom = next((int(line.split()[1]) for line in read("/proc/vmstat").splitlines()
                           if line.startswith("oom_kill ")), None)
         oom_delta = final_oom - report["kernel_oom_kill_count"] if final_oom is not None and report["kernel_oom_kill_count"] is not None else None
@@ -184,7 +218,9 @@ def main():
                   "exit": process.returncode if process else None, "samples": samples,
                   "remaining_lab_namespaces": remaining, "remaining_lab_key_files": key_files,
                   "final_cgroup_sample": final_cgroup,
-                  "cleanup_verified": not remaining and not key_files and not final_cgroup.get("pids.current"),
+                  'temporary_artifact_cleanup':artifact_cleanup,
+                  'unattributed_temporary_directories':unattributed_temporaries,
+                  "cleanup_verified": not remaining and not key_files and stopped and not artifact_cleanup['errors'] and not unattributed_temporaries,
                   "warning": "Existing connections cannot migrate on failover; no real Telegram capacity claim."}
         (results / "supervisor.json").write_text(json.dumps(result, indent=2) + "\n")
         # Retain failed unit diagnostics until captured, then release only our unit.

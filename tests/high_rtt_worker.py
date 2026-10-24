@@ -28,10 +28,22 @@ parser.add_argument('--rate-mbps',type=int,choices=(100,1000),default=100)
 parser.add_argument('--dc-timeout',type=int,choices=(8,25),default=8)
 parser.add_argument('--observe-network',action='store_true')
 parser.add_argument('--socket-observation',choices=('detailed','off'),default='detailed')
+parser.add_argument('--socket-library')
+parser.add_argument('--socket-policy',choices=('pass','auto','client-auto','dc-auto','auto-lowat'),default='pass')
+parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
 args=parser.parse_args()
 if not 0<args.bytes<=256*1024**2 or args.bytes//(args.streams or 1)>128*1024**2:
     parser.error('payload must be bounded to 128 MiB per stream and 256 MiB total')
 ROOT=Path(args.root).resolve()
+if args.socket_policy!='pass' and not args.socket_library:
+    parser.error('experimental socket policy requires an explicit private lab library')
+if args.socket_library:
+    import hashlib
+    library=Path(args.socket_library)
+    metadata=json.loads((ROOT/'socket-policy-build.json').read_text())
+    if (library.is_symlink() or library.resolve()!=ROOT/'socket-policy.so' or library.stat().st_uid!=0 or
+            not 0<library.stat().st_size<=1024**2 or hashlib.sha256(library.read_bytes()).hexdigest()!=metadata['sha256']):
+        parser.error('private lab socket library identity mismatch')
 if subprocess.check_output(["ip","netns","identify"],text=True,timeout=3).strip()!="tdh-audit-a":
     parser.error("worker must run in its private client namespace")
 if os.geteuid()!=0 or not ROOT.name.startswith("tdh-audit-") or ROOT.stat().st_mode & 0o077 or ROOT.stat().st_uid!=0:
@@ -44,7 +56,8 @@ if args.build!='official':
     metadata=json.loads((ROOT/f'{args.build}-build.json').read_text())
     binary=ROOT/f'telemt-{args.build}'
     experimental=(metadata['sha256'],metadata['version'])
-lab=FullLab(binary,args.haproxy,dc_endpoint=('198.51.100.2',26000),experimental_binary=experimental)
+lab=FullLab(binary,args.haproxy,dc_endpoint=('198.51.100.2',26000),experimental_binary=experimental,
+            socket_library=args.socket_library,socket_mode=args.socket_policy,artifact_registry=ROOT/'artifact-registry')
 rows=[]
 def ticks(pid=None):
     fields=Path(f'/proc/{pid or lab.telemt.pid}/stat').read_text().rsplit(')',1)[1].split()
@@ -95,7 +108,8 @@ def trial(turn,streams,direction):
         futures=[pool.submit(lab.transfer,'apple.com',direction,size,args.rate_mbps*125000//streams,io_timeout=25,
                              direct=args.slow_readers, persistent=args.slow_readers,
                              read_pause=5 if args.slow_readers and direction=='D' else 0,
-                             receive_buffer=32768 if args.slow_readers else 0) for _ in range(streams)]
+                             receive_buffer=32768 if args.slow_readers else 0,
+                             send_buffer=getattr(args,'client_send_buffer',0)) for _ in range(streams)]
         while not all(f.done() for f in futures):
             mem=min(mem,memory_available())
             maximum_rss=max(maximum_rss,rss())
@@ -131,6 +145,7 @@ def trial(turn,streams,direction):
     row={'round':turn+1,'build':args.build,'telemt':lab.version,'streams':streams,'direction':direction,
          'link_rate_mbps':args.rate_mbps,'mock_dc_socket_timeout_seconds':args.dc_timeout,
          'direct_to_telemt':args.slow_readers,'client_receive_buffer_requested_bytes':32768 if args.slow_readers else None,
+         'client_send_buffer_requested_bytes':getattr(args,'client_send_buffer',0),
          'client_read_pause_seconds':5 if args.slow_readers and direction=='D' else 0,
          'expected_payload_bytes':size*streams,'sha256_verified_streams':len(success),'failed_streams':len(errors),
          'failure_types':errors,'complete':not errors and len(success)==streams,'elapsed_seconds':elapsed,
@@ -143,6 +158,7 @@ def trial(turn,streams,direction):
          'socket_sample_interval_seconds':1 if args.socket_observation=='detailed' else None,
          'socket_observation':args.socket_observation,
          'observer_implementation':'bounded-netlink-v2',
+         'socket_policy':getattr(args,'socket_policy','pass'),
          'socket_observer_batch_seconds':observer_durations,
          'socket_observer_errors':observer_errors,
          'small_probes':probes,'socket_samples':samples}

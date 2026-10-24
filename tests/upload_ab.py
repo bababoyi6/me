@@ -14,12 +14,37 @@ import time
 from types import SimpleNamespace
 
 from network_lab import Network, NAMES, memory_available
+from lab_files import file_sha256
 
 HERE = Path(__file__).resolve().parent
 
 
 def paired_order(round_index):
     return ("flush", "auto") if round_index % 2 == 0 else ("auto", "flush")
+
+
+def policy_order(round_index,family='all'):
+    modes={'all':("pass","auto","client-auto","dc-auto"),
+           'client':('pass','client-auto'),'dc':('pass','dc-auto'),
+           'lowat':('pass','auto-lowat'),'queue':('pass','auto','auto-lowat')}[family]
+    return modes if round_index % 2 == 0 else modes[::-1]
+
+
+def wait_worker(worker):
+    """Always return a recorded failure even if graceful termination stalls."""
+    try:
+        return worker.wait(timeout=100)
+    except subprocess.TimeoutExpired:
+        worker.terminate()
+        try:
+            worker.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            worker.kill()
+            try:
+                worker.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                pass  # supervisor still owns the entire process group
+        return 124
 
 
 def main():
@@ -30,13 +55,19 @@ def main():
     parser.add_argument("--rtt", type=int, choices=(20, 50, 100, 200), default=100)
     parser.add_argument("--max-streams", type=int, choices=(1, 4, 8, 16, 32), default=4)
     parser.add_argument("--min-streams", type=int, choices=(1, 4, 8, 16, 32), default=1)
-    parser.add_argument("--payload-mib", type=int, choices=(8, 16, 64, 256), default=16)
+    parser.add_argument("--payload-mib", type=int, choices=(8, 16, 64, 128, 256), default=16)
     parser.add_argument("--rate-mbps", type=int, choices=(100, 1000), default=100)
     parser.add_argument("--rounds", type=int, choices=(1, 2, 3), default=3)
     parser.add_argument("--socket-details", action="store_true")
+    parser.add_argument("--socket-library", help="compare same-binary socket policies, private mock DC only")
+    parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
+    parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
+    parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
     args = parser.parse_args()
     if args.min_streams > args.max_streams:
         parser.error("minimum stream tier exceeds maximum")
+    if args.policy_family!='all' and not args.socket_library:
+        parser.error('policy family requires the private lab library')
     if args.payload_mib > 128 and args.max_streams < 4:
         parser.error("per-stream payload cannot exceed 128 MiB")
     root = Path(args.root).resolve()
@@ -54,11 +85,19 @@ def main():
                 "payload_bytes_total_per_trial": args.payload_mib * 1024**2, "direction": "U", "kernel": os.uname().release,
                 "command": sys.argv, "rounds": args.rounds, "rows": rows, "complete": False}
     manifest["socket_observation"] = "detailed" if args.socket_details else "off"
+    manifest['mock_dc_receive_buffer_requested']=args.mock_receive_buffer
+    manifest['client_send_buffer_requested']=args.client_send_buffer
+    if args.socket_library:
+        manifest['socket_policy_cases']=list(policy_order(0,args.policy_family))
+        manifest['classification']='SINGLE_VPS_SOCKET_POLICY_CAUSAL'
+        manifest['control']='same audit1 flush-only binary with pass-through interposer'
+        manifest['candidate']='same audit1 binary; only socket buffer policy changed'
+        manifest['socket_library_sha256']=hashlib.sha256(Path(args.socket_library).read_bytes()).hexdigest()
     def save():
         destination.write_text(json.dumps(manifest, indent=2) + "\n")
     try:
         destination.parent.mkdir(mode=0o700, exist_ok=True)
-        manifest["binary_sha256"] = {build: hashlib.sha256((root / ("telemt-" + build)).read_bytes()).hexdigest()
+        manifest["binary_sha256"] = {build: file_sha256(root / ("telemt-" + build))
                                      for build in ("flush", "auto")}
         save()
         net.setup()
@@ -67,7 +106,8 @@ def main():
             os.chown(shared, 65534, 65534)
             status = shared / "dc.json"
             dc = subprocess.Popen(["ip", "netns", "exec", NAMES[2], sys.executable,
-                                   str(HERE / "mock_dc_worker.py"), "--output", str(status), "--socket-timeout", "25"],
+                                   str(HERE / "mock_dc_worker.py"), "--output", str(status), "--socket-timeout", "25",
+                                   '--receive-buffer',str(args.mock_receive_buffer)],
                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             net.processes.append(dc)
             try:
@@ -82,10 +122,12 @@ def main():
                     if args.payload_mib * 1024**2 // streams > 128 * 1024**2:
                         continue
                     for turn in range(args.rounds):
-                        for build in paired_order(turn):
+                        cases=[('flush',mode) for mode in policy_order(turn,args.policy_family)] if args.socket_library else [(b,'pass') for b in paired_order(turn)]
+                        for build,mode in cases:
                             if memory_available() < 256 * 1024**2:
                                 raise RuntimeError("host memory margin before next load")
-                            name = f"{run_id}-{streams}-{turn}-{build}.json"
+                            variant=mode if args.socket_library else build
+                            name = f"{run_id}-{streams}-{turn}-{variant}.json"
                             output = destination.parent / name
                             argv = ["ip", "netns", "exec", NAMES[0], sys.executable, str(HERE / "high_rtt_worker.py"),
                                     "--root", str(root), "--haproxy", args.haproxy, "--build", build,
@@ -94,20 +136,19 @@ def main():
                                     "--slow-readers", "--dc-timeout", "25", "--rate-mbps", str(args.rate_mbps),
                                     "--small-probes", "--observe-network", "--socket-observation",
                                     "detailed" if args.socket_details else "off"]
+                            argv += ['--client-send-buffer',str(args.client_send_buffer)]
+                            if args.socket_library:
+                                argv += ['--socket-library',args.socket_library,'--socket-policy',mode]
                             log_name = name.removesuffix('.json') + '.log'
                             log_file = (destination.parent / log_name).open('xb')
                             worker = subprocess.Popen(argv, stdout=log_file, stderr=subprocess.STDOUT)
                             net.processes.append(worker)
                             try:
-                                try:
-                                    code = worker.wait(timeout=100)
-                                except subprocess.TimeoutExpired:
-                                    worker.terminate()
-                                    worker.wait(timeout=10)
-                                    code = 124
+                                code = wait_worker(worker)
                             finally:
                                 log_file.close()
                             row = {"pair_round": turn + 1, "streams": streams, "build": build,
+                                   "socket_policy":mode,
                                    "exit": code, "result_file": name, "worker_log": log_name, "command": argv}
                             if output.exists():
                                 row["trial"] = json.loads(output.read_text())
@@ -120,7 +161,11 @@ def main():
                 if status.exists():
                     manifest["mock_dc"] = json.loads(status.read_text())
                 dc.terminate()
-                dc.wait(timeout=5)
+                try:
+                    dc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    dc.kill()
+                    dc.wait(timeout=5)
     except BaseException as exc:
         manifest["failure"] = type(exc).__name__
         raise
