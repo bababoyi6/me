@@ -1,0 +1,47 @@
+name: Validate bounded candidate tunnel path
+
+on:
+  push:
+    branches: [dev/candidate-install-20261024]
+    paths:
+      - tests/candidate_path_ci.py
+      - tests/dualhop_lab.py
+      - tests/kernel_observer.py
+      - tests/candidate_contract.py
+      - .github/workflows/candidate-path.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: candidate-path-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  path:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install private tunnel dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends haproxy python3-cryptography iproute2 wireguard-tools
+      - name: Download the already validated candidate install package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 40094092301 --repo bababoyi6/me --name balanced2-install-candidate --dir "$RUNNER_TEMP/candidate"
+      - name: Verify one small high-RTT encrypted path with resource and time limits
+        run: sudo --preserve-env=GITHUB_ACTIONS,RUNNER_TEMP timeout --kill-after=10 210 python3 tests/candidate_path_ci.py --root "$RUNNER_TEMP/tdh-audit-candidate-path" --bundle "$RUNNER_TEMP/candidate/telemt-balanced2.tar.gz"
+      - name: Collect bounded reports without configs or keys
+        if: always()
+        run: |
+          sudo install -d -o "$(id -u)" -g "$(id -g)" "$RUNNER_TEMP/path-evidence"
+          sudo find "$RUNNER_TEMP/tdh-audit-candidate-path" -maxdepth 3 -type f \( -path '*/results/*.json' -o -path '*/run-tdh-audit-*/*.json' -o -path '*/run-tdh-audit-*/*.log' \) -exec cp --parents '{}' "$RUNNER_TEMP/path-evidence/" \;
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/path-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: balanced2-candidate-path-evidence
+          path: ${{ runner.temp }}/path-evidence/
+          retention-days: 7
+          if-no-files-found: error

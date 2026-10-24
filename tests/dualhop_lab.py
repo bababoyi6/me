@@ -103,12 +103,12 @@ def backend():
             if args.candidate_check and not observation_errors and time.monotonic()-last_observation>=.5:
                 from kernel_observer import observe_sockets
                 try:
-                    observed=observe_sockets(lab.telemt.pid,lab.listen)
+                    observed=observe_sockets(lab.telemt.pid,lab.listen,namespace=f'tdh-audit-b{2 if args.index==2 else ""}')
                     client_sockets.extend({'rtt_ms':p.get('rtt_ms'),'rb':p.get('rb')}
                                           for p in observed if p['role']=='client')
                     client_sockets=client_sockets[-32:]
                 except OSError as exc:
-                    observation_errors.append(type(exc).__name__)
+                    observation_errors.append({'type':type(exc).__name__,'reason':str(exc)[:160]})
                 last_observation=time.monotonic()
             save(shared/f'backend{args.index}.json',{'ready':lab.telemt.poll() is None,'completed':state['completed'],
                                                    'errors':state['errors'],'telemt':lab.version,
@@ -290,36 +290,54 @@ frontend mtp_tls
                         raise RuntimeError('private WireGuard transfer counters unavailable')
                     totals[device]={'rx':sum(int(row[1]) for row in records),'tx':sum(int(row[2]) for row in records)}
                 return totals
-            before_wg=wg_totals()
-            for domain,expected in (('apple.com',1),('gs.apple.com',2)):
-                for direction in ('D','U'):
-                    routed(domain,direction,expected,262144,131072,True)
-            down=shared/'backend1.down'
-            down.write_text('synthetic candidate agent gate')
+            before_wg={}
             try:
-                wait_state(False)
-                for direction in ('D','U'):
-                    routed('apple.com',direction,2,4096)
-            finally:
-                down.unlink(missing_ok=True)
-            wait_state(True)
-            routed('apple.com','U',1,4096)
-            states=[json.loads((shared/f'backend{i}.json').read_text()) for i in (1,2)]
-            observed=validate(rows,states)
-            after_wg=wg_totals()
-            wireguard={name:{key:after_wg[name][key]-before_wg[name][key] for key in ('rx','tx')} for name in before_wg}
-            validate_wireguard(rows,wireguard)
-            result={'classification':'SINGLE_VPS_CANDIDATE_PATH','scope':'actual HAProxy/WG+PSK/two candidate backends and separate synthetic DC; no public or production route',
-                    'telemt':states[0]['telemt'],'rtt_ms_configured':args.rtt,'observed_client_tcp':observed,
-                    'wireguard_psk':True,'wireguard_mtu':1420,'dual_sni_and_directions':True,
-                    'wireguard_transfer_delta_bytes':wireguard,
-                    'agent_failover_and_recovery':True,'source_core_staging':'private-shared-inode',
-                    'payload_bytes':sum(r['bytes'] for r in rows),'rows':rows,
-                    'backend_errors':[s['errors'] for s in states],
-                    'existing_connection_migration_claimed':False,'throughput_or_production_capacity_claimed':False}
-            save(ROOT/'results/candidate-path-bulk.json',result)
-            print(json.dumps({k:v for k,v in result.items() if k!='rows'}),flush=True)
-            return
+                before_wg=wg_totals()
+                for domain,expected in (('apple.com',1),('gs.apple.com',2)):
+                    for direction in ('D','U'):
+                        routed(domain,direction,expected,262144,131072,True)
+                down=shared/'backend1.down'
+                down.write_text('synthetic candidate agent gate')
+                try:
+                    wait_state(False)
+                    for direction in ('D','U'):
+                        routed('apple.com',direction,2,4096)
+                finally:
+                    down.unlink(missing_ok=True)
+                wait_state(True)
+                routed('apple.com','U',1,4096)
+                states=[json.loads((shared/f'backend{i}.json').read_text()) for i in (1,2)]
+                observed=validate(rows,states)
+                after_wg=wg_totals()
+                wireguard={name:{key:after_wg[name][key]-before_wg[name][key] for key in ('rx','tx')} for name in before_wg}
+                validate_wireguard(rows,wireguard)
+                result={'classification':'SINGLE_VPS_CANDIDATE_PATH','scope':'actual HAProxy/WG+PSK/two candidate backends and separate synthetic DC; no public or production route',
+                        'telemt':states[0]['telemt'],'rtt_ms_configured':args.rtt,'observed_client_tcp':observed,
+                        'wireguard_psk':True,'wireguard_mtu':1420,'dual_sni_and_directions':True,
+                        'wireguard_transfer_delta_bytes':wireguard,
+                        'agent_failover_and_recovery':True,'source_core_staging':'private-shared-inode',
+                        'payload_bytes':sum(r['bytes'] for r in rows),'rows':rows,
+                        'backend_errors':[s['errors'] for s in states],
+                        'existing_connection_migration_claimed':False,'throughput_or_production_capacity_claimed':False}
+                save(ROOT/'results/candidate-path-bulk.json',result)
+                print(json.dumps({k:v for k,v in result.items() if k!='rows'}),flush=True)
+                return
+            except Exception as exc:
+                states=[]
+                for index in (1,2):
+                    path=shared/f'backend{index}.json'
+                    try:
+                        raw=json.loads(path.read_text())
+                        states.append({key:raw.get(key) for key in ('ready','completed','errors','telemt','client_sockets','socket_observation_errors')})
+                    except (OSError,ValueError) as state_error:
+                        states.append({'state_read_error':type(state_error).__name__})
+                save(ROOT/'results/candidate-path-failure.json',{
+                    'classification':'SINGLE_VPS_CANDIDATE_PATH_FAILED',
+                    'error':{'type':type(exc).__name__,'reason':str(exc)[:300]},
+                    'rows':rows,'payload_bytes':sum(r['bytes'] for r in rows),
+                    'backend_states':states,'wireguard_before_bytes':before_wg,
+                    'accepted':False,'retry_performed':False})
+                raise
         for domain,expected in (('apple.com',1),('gs.apple.com',2)):
             for direction in ('D','U'): routed(domain,direction,expected,fragment=True)
         if args.benchmark:
