@@ -66,7 +66,7 @@ apt_get_with_lock_wait() { return 99; }
         return result
 
     def old_manager(self, version="1.3.1"):
-        data = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.5.0"', f'TDH_VERSION="{version}"'.encode())
+        data = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.6.0"', f'TDH_VERSION="{version}"'.encode())
         self.manager.write_bytes(data)
         self.manager.chmod(0o755)
         return data
@@ -80,7 +80,7 @@ apt_get_with_lock_wait() { return 99; }
         result = subprocess.run(["bash", str(self.shortcut), "--help"], env=self.env,
                                 capture_output=True, text=True, timeout=5)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Telemt Dual-Hop 1.5.0", result.stdout)
+        self.assertIn("Telemt Dual-Hop 1.6.0", result.stdout)
 
     def test_repeat_install_and_rollback_preserve_three_role_identities(self):
         for role in ("entry", "backend1", "backend2"):
@@ -195,7 +195,7 @@ apt_get_with_lock_wait() { return 99; }
     def test_rollback_stage_and_rename_failures_preserve_both_versions(self):
         old = self.old_manager("1.4.1")
         previous = self.base / "manager.previous"
-        expected = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.5.0"', b'TDH_VERSION="1.3.1"')
+        expected = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.6.0"', b'TDH_VERSION="1.3.1"')
         previous.write_bytes(expected)
         for prelude in ("install() { return 74; }", "mv() { return 73; }"):
             with self.subTest(failure=prelude):

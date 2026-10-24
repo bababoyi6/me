@@ -1,0 +1,42 @@
+{
+  "classification": "CI_PRODUCTION_INSTALL_FUNCTION",
+  "service_version_uid": 997,
+  "cases": [
+    {
+      "channel": "balanced2",
+      "accepted": true,
+      "existing_preserved": false,
+      "archive_sha256": "b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5",
+      "binary_sha256": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+      "url": "https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz"
+    },
+    {
+      "channel": "audit2",
+      "accepted": true,
+      "existing_preserved": false,
+      "archive_sha256": "c205183e479716f015378e4e2241103ae8d488e06f6ef65946be0bd94624f356",
+      "binary_sha256": "2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1",
+      "url": "https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.audit2/telemt-3.5.5-tdh.audit2-x86_64-linux-gnu.tar.gz"
+    },
+    {
+      "channel": "balanced2",
+      "accepted": false,
+      "existing_preserved": false,
+      "archive_sha256": "b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5",
+      "binary_sha256": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+      "url": "https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz"
+    },
+    {
+      "channel": "balanced2",
+      "accepted": false,
+      "existing_preserved": true,
+      "archive_sha256": "b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5",
+      "binary_sha256": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+      "url": "https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz"
+    }
+  ],
+  "network_boundary_substituted": true,
+  "published_release_download_tested": false,
+  "host_configuration_modified": false,
+  "accepted": true
+}

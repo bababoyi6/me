@@ -1,0 +1,28 @@
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	﻿2026-10-24T15:07:49.8760136Z ##[group]Run sudo --preserve-env=GITHUB_ACTIONS,RUNNER_TEMP timeout --kill-after=10 240 python3 tests/core_delivery_ci.py --root "$RUNNER_TEMP/tdh-audit-core-delivery" --balanced2-archive "$RUNNER_TEMP/candidate/telemt-balanced2.tar.gz" --audit2-archive "$RUNNER_TEMP/audit2.tar.gz"
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:49.8762142Z ^[[36;1msudo --preserve-env=GITHUB_ACTIONS,RUNNER_TEMP timeout --kill-after=10 240 python3 tests/core_delivery_ci.py --root "$RUNNER_TEMP/tdh-audit-core-delivery" --balanced2-archive "$RUNNER_TEMP/candidate/telemt-balanced2.tar.gz" --audit2-archive "$RUNNER_TEMP/audit2.tar.gz"^[[0m
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:49.8834847Z shell: /usr/bin/bash -e {0}
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:49.8835117Z ##[endgroup]
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5019572Z Traceback (most recent call last):
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5020417Z   File "/home/runner/work/me/me/tests/core_delivery_ci.py", line 122, in <module>
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5021075Z     main()
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5021435Z   File "/home/runner/work/me/me/tests/core_delivery_ci.py", line 100, in main
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5022063Z     installed,record=install_case(stage/channel,channel,archive)
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5022618Z   File "/home/runner/work/me/me/tests/core_delivery_ci.py", line 56, in install_case
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5024147Z     raise RuntimeError('production installer result mismatch: '+result.stderr[-1000:])
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5025950Z RuntimeError: production installer result mismatch: 核心安装验证失败：PermissionError
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5026506Z [失败] 核心未通过完整性、架构、许可清单或运行校验；安装已取消。
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5026687Z 
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:07:50.5176194Z ##[error]Process completed with exit code 1.
+qualify	Run actions/upload-artifact@v4	﻿2026-10-24T15:07:50.5806856Z ##[group]Run actions/upload-artifact@v4
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5807187Z with:
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5807396Z   name: balanced2-delivery-evidence
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5807722Z   path: /home/runner/work/_temp/delivery-evidence/
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5808033Z   retention-days: 7
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5808246Z   if-no-files-found: error
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5808480Z   compression-level: 6
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5808685Z   overwrite: false
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5808889Z   include-hidden-files: false
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.5809125Z ##[endgroup]
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.7599435Z (node:2803) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.7600754Z (Use `node --trace-deprecation ...` to show where the warning was created)
+qualify	Run actions/upload-artifact@v4	2026-10-24T15:07:50.7674496Z ##[error]No files were found with the provided path: /home/runner/work/_temp/delivery-evidence/. No artifacts will be uploaded.

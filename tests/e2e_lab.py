@@ -10,6 +10,7 @@ from contextlib import contextmanager
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import signal
@@ -25,7 +26,7 @@ import time
 from lab import exact, receive_payload, send_payload
 from lab_config import generate_telemt
 from mtproto_transport import CryptoStream, PacketStream, dc_ciphers, mtproxy_connect, req_pq
-from telemt_probe import SECRETS, port, request
+from telemt_probe import SECRETS, TOKEN, port, request
 from lab_artifacts import register_artifact
 from lab_files import file_sha256, link_private_binary
 
@@ -34,6 +35,15 @@ BINARIES = {
     "cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd": "telemt 3.5.5",
     "feb1d8779de0b86c6c43d1b871020ec94b11fad9fec5612b07b278edfd2181ff": "telemt 3.5.14",
 }
+
+
+def sanitize_startup_log(text):
+    text=re.sub(r'\x1b\[[0-9;]*m','',text)
+    for value in (TOKEN,*(secret.hex() for secret in SECRETS.values())):
+        text=text.replace(value,'[REDACTED]')
+    text=re.sub(r'(?i)\b(?:secret|token|auth_header|private_key|preshared_key)\s*[:=]\s*[^\s,]+',
+                '[REDACTED_FIELD]',text)
+    return re.sub(r'(?i)\b[0-9a-f]{32,}\b','[REDACTED_HEX]',text)[-6000:]
 
 
 @contextmanager
@@ -139,7 +149,9 @@ class FullLab:
     def __init__(self, binary, haproxy="haproxy", fast=True, real_dc=False, splice=False,
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
                  listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None,
-                 shared_binary_root=None):
+                 shared_binary_root=None,startup_report=None):
+        if startup_report is not None and (real_dc or experimental_binary is None or artifact_registry is None):
+            raise ValueError('startup diagnostics require a private synthetic experimental lab')
         if listen_endpoint is not None and (listen_endpoint not in (("10.77.1.2", 24431), ("10.77.2.2", 24431))
                                             or real_dc or start_haproxy):
             raise ValueError("private namespace backend requires a fixed WG bind and no local frontend")
@@ -218,18 +230,30 @@ class FullLab:
                 library.chmod(0o644)
                 environment.update(LD_PRELOAD=str(library), TDH_LAB_SOCKET_MODE=socket_mode,
                                    TDH_LAB_CLIENT_PORT=str(self.listen))
-            self.telemt = subprocess.Popen([str(target), str(config)], cwd=work / "telemt", env=environment, **self.identity(),
-                                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            startup_log=self.root/'startup.log'
+            with startup_log.open('xb') if startup_report is not None else open(os.devnull,'wb') as startup_output:
+                self.telemt = subprocess.Popen([str(target), str(config)], cwd=work / "telemt", env=environment, **self.identity(),
+                                               stdout=startup_output, stderr=startup_output)
             self.processes.append(self.telemt)
             deadline = time.monotonic() + 35
+            last_status,last_error=None,None
             while time.monotonic() < deadline and self.telemt.poll() is None:
                 try:
-                    if request(self.api, "GET", "/v1/health")[0] == 200:
+                    last_status=request(self.api, "GET", "/v1/health")[0]
+                    if last_status == 200:
                         break
-                except (OSError, ValueError):
-                    pass
+                except (OSError, ValueError) as exc:
+                    last_error=type(exc).__name__
                 time.sleep(.1)
             else:
+                if startup_report is not None:
+                    with startup_log.open('rb') as stream:
+                        stream.seek(max(0,startup_log.stat().st_size-8192))
+                        tail=sanitize_startup_log(stream.read(8192).decode(errors='replace'))
+                    descriptor=os.open(startup_report,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+                    with os.fdopen(descriptor,'w') as output:
+                        json.dump({'version':self.version,'process_exit':self.telemt.poll(),
+                            'last_api_status':last_status,'last_api_error':last_error,'sanitized_log_tail':tail},output,indent=2)
                 raise RuntimeError("Telemt startup failed; raw logs withheld")
             if not start_haproxy:
                 return

@@ -1,0 +1,18 @@
+{
+  "classification": "CI_CORE_DELIVERY",
+  "accepted": true,
+  "dc": {
+    "completed": 34,
+    "errors": [],
+    "receive_buffer_requested": 0,
+    "listener_receive_buffer_actual": 131072,
+    "socket_timeout_seconds": 25,
+    "connect_only": 12,
+    "tcp_listen_counters": {
+      "ListenOverflows": 0,
+      "ListenDrops": 0,
+      "TCPSynRetrans": 0
+    }
+  },
+  "network_cleanup_verified": true
+}

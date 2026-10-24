@@ -1,0 +1,12 @@
+{
+  "classification": "CI_INSTALLED_CORE_LARGE_TRANSFER_CORRECTNESS",
+  "scope": "actual installed cores; HAProxy/Telemt to 100ms synthetic DC; payload does not traverse WG",
+  "performance_comparison_claimed": false,
+  "rows": [],
+  "small_probes": [],
+  "accepted": false,
+  "error": {
+    "type": "RuntimeError",
+    "phase": null
+  }
+}

@@ -1,0 +1,15 @@
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	﻿2026-10-24T15:10:20.8177473Z ##[group]Run sudo --preserve-env=GITHUB_ACTIONS,RUNNER_TEMP timeout --kill-after=10 240 python3 tests/core_delivery_ci.py --root "$RUNNER_TEMP/tdh-audit-core-delivery" --balanced2-archive "$RUNNER_TEMP/candidate/telemt-balanced2.tar.gz" --audit2-archive "$RUNNER_TEMP/audit2.tar.gz"
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:20.8179480Z ^[[36;1msudo --preserve-env=GITHUB_ACTIONS,RUNNER_TEMP timeout --kill-after=10 240 python3 tests/core_delivery_ci.py --root "$RUNNER_TEMP/tdh-audit-core-delivery" --balanced2-archive "$RUNNER_TEMP/candidate/telemt-balanced2.tar.gz" --audit2-archive "$RUNNER_TEMP/audit2.tar.gz"^[[0m
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:20.8247272Z shell: /usr/bin/bash -e {0}
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:20.8247539Z ##[endgroup]
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4760703Z Traceback (most recent call last):
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4761468Z   File "/home/runner/work/me/me/tests/core_delivery_ci.py", line 130, in <module>
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4762267Z     main()
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4762654Z   File "/home/runner/work/me/me/tests/core_delivery_ci.py", line 105, in main
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4763310Z     installed,record=install_case(stage/channel,channel,archive)
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4763893Z   File "/home/runner/work/me/me/tests/core_delivery_ci.py", line 57, in install_case
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4765256Z     raise RuntimeError('production installer result mismatch: '+result.stderr[-1000:])
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4766353Z RuntimeError: production installer result mismatch: 核心安装验证失败：PermissionError
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4766903Z [失败] 核心未通过完整性、架构、许可清单或运行校验；安装已取消。
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4767088Z 
+qualify	Verify production install functions, fallback, refusal and bounded large transfers	2026-10-24T15:10:21.4911028Z ##[error]Process completed with exit code 1.

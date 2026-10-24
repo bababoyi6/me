@@ -1,14 +1,12 @@
 # Telemt Dual-Hop 一键安装
 
-最新实验候选见[原生背压候选与逐轮结果](docs/UPLOAD-CANDIDATES-20261024.md)：balanced2在明确采用80%软节流线的32×8MiB两轮对照中达到约定门槛，速度为旧固定核心的104.32%/95.016%，128条上传全部校验成功。第二轮贴近边界，仍为测试候选；默认安装核心保持audit2，未发布正式版本或宣称完整生产验收。前阶段交付见[2026-10-24候选报告](docs/NEXT-CAUSAL-20261024.md)。
+**1.6.0**：x86_64 新后端默认使用非官方核心 `3.5.5+tdh.balanced2`，并保留明确选择 audit2 新装的退路。配套核心已获授权发布，并通过无认证公开下载的归档/二进制摘要核对。 发布条件、原始证据与退路见[1.6.0 交付说明](docs/RELEASE-1.6.0.md)。
 
-候选还通过了真实核心安装链CI，以及100ms入口下的双SNI、双向传输、两条加密隧道和主备恢复功能CI。荷兰机同项首轮因观测器接线错误未通过，修正后未在VPS重跑；两种环境的结果分别记录于[安装与路径验收](docs/CANDIDATE-PATH-20261024.md)，不能用CI功能结果代替小内存VPS容量或生产验收。
+balanced2 在明确采用80%软节流线的32×8MiB两轮对照中达到约定门槛，速度为旧固定核心的104.32%/95.016%，128条上传全部校验成功。第二轮贴近边界，不宣称稳定提速。候选已通过真实核心安装链与100ms完整加密隧道功能CI；荷兰首轮观测器接线失败及修复记录分别保留，详见[候选结果](docs/UPLOAD-CANDIDATES-20261024.md)和[安装/路径验收](docs/CANDIDATE-PATH-20261024.md)。
 
-合并前补充修复与边界见[合并复核](docs/MERGE-REVIEW-20261024.md)。
+新核心增加发送队列背压，并仅对测得的低延迟客户端连接请求较小接收缓冲；高延迟或无法测得延迟时继续保留接收自动调节。双SNI、WireGuard+PSK、双后端主备、Direct-DC与现有用户态复制预算保留。ARM继续使用原官方核心，没有ARM提速声明。
 
-> 本轮优化基于 1.5.0，新增健康状态过期保护、恢复滞回、更新下载保护及有资源上限的单 VPS 实验室；没有新的已验证吞吐补丁。合并 main 不代表完整生产验收或正式 Release。下方安装命令下载 main 的最新脚本。结果与未完成项见 [本轮验收](docs/NEXT-VALIDATION.md)，代码审计见 [后续审计](docs/NEXT-AUDIT.md)，复验方法见 [单 VPS 实验室](docs/SINGLE-VPS-LAB.md)。
-
-**1.5.0** 面向首次一键部署。Ubuntu 22.04 x86_64 新后端默认安装已测的非官方核心 `3.5.5+tdh.audit2`，修复一类转发尾部停滞，并解除固定 TCP 缓冲对高延迟单连接的限制；保留双 SNI、WireGuard 加密、Direct-DC、BBR/fq 和双后端主备。ARM 继续使用官方核心，不宣称获得相同提速。
+下面命令下载 **main 当前版本**。已有节点的 `a update` 只维护管理器，不替换核心；新管理器能识别两个已核验的定制核心。
 
 ```bash
 bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
@@ -18,9 +16,13 @@ bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL -
 
 安装器会检查归档与核心摘要、架构、构建标识及运行结果，x86_64 提速核心的原许可和源码变更说明随安装保留；校验或下载失败会停止安装并执行安装事务清理，不悄悄切换其他核心。不会在 1GB 后端现场编译，也不安装新的常驻升级服务。
 
-本轮新安装、损坏归档拒绝、主备及重启的具体范围见[1.5.0 新安装验收](docs/FRESH-INSTALL-1.5.0.md)。
+如需在新安装时明确采用原 audit2 核心，以 root 运行同一命令前设置 `export TDH_NEW_INSTALL_CORE=audit2`。未指定时使用当前版本默认值；不接受任意下载地址，不覆盖已有核心，也不会在失败时自动改用其他版本。1.6.0 的选择只面向新装，不是已有服务的核心升级/回退命令。
+
+此前三节点新装、主备及重启的历史范围见[1.5.0 验收](docs/FRESH-INSTALL-1.5.0.md)；不能把旧核心记录当作 balanced2 的重复验收。
 
 # 做了什么，实际快了多少
+
+以下数值属于1.5.0/audit2历史实验，不能标为balanced2的同条件收益。1.6.0新增的实际安装、大文件与慢读检查属于正确性验收，见[交付证据](docs/RELEASE-1.6.0.md)。
 
 突破来自后端源码修复：补齐等待新输入时的加密写入 flush；取消 client 和 Direct outgoing socket 的固定256KiB收发请求，让Linux自动调节TCP缓冲。没有关闭加密、减少认证或扩大用户态复制预算，也没有通过换入口、端口或绕过WireGuard换取数字。
 

@@ -1,0 +1,52 @@
+name: Qualify balanced2 installer delivery
+
+on:
+  push:
+    branches: [dev/balanced2-delivery-20261024]
+    paths:
+      - telemt-dual-hop.sh
+      - tests/core_delivery_ci.py
+      - tests/core_delivery_lab.py
+      - tests/test_core_selection.py
+      - tools/lab_runner.py
+      - .github/workflows/core-delivery.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: core-delivery-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bounded private lab dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends haproxy python3-cryptography iproute2 wireguard-tools ethtool iputils-ping
+      - name: Reuse the exact candidate install archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 40094092301 --repo bababoyi6/me --name balanced2-install-candidate --dir "$RUNNER_TEMP/candidate"
+      - name: Fetch the current public audit2 archive for fallback compatibility
+        run: curl -q -fL --connect-timeout 10 --max-time 90 --max-filesize 67108864 --proto '=https' --tlsv1.2 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.audit2/telemt-3.5.5-tdh.audit2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/audit2.tar.gz"
+      - name: Prepare ephemeral unprivileged service identity
+        run: if ! id telemt >/dev/null 2>&1; then sudo useradd --system --no-create-home --shell /usr/sbin/nologin telemt; fi
+      - name: Verify production install functions, fallback, refusal and bounded large transfers
+        run: sudo --preserve-env=GITHUB_ACTIONS,RUNNER_TEMP timeout --kill-after=10 240 python3 tests/core_delivery_ci.py --root "$RUNNER_TEMP/tdh-audit-core-delivery" --balanced2-archive "$RUNNER_TEMP/candidate/telemt-balanced2.tar.gz" --audit2-archive "$RUNNER_TEMP/audit2.tar.gz"
+      - name: Collect bounded evidence only
+        if: always()
+        run: |
+          sudo install -d -o "$(id -u)" -g "$(id -g)" "$RUNNER_TEMP/delivery-evidence"
+          sudo find "$RUNNER_TEMP/tdh-audit-core-delivery" -maxdepth 3 -type f \( -path '*/results/*.json' -o -path '*/results/*.log' -o -path '*/run-tdh-audit-*/*.json' -o -path '*/run-tdh-audit-*/*.log' \) -exec cp --parents '{}' "$RUNNER_TEMP/delivery-evidence/" \;
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/delivery-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: balanced2-delivery-evidence
+          path: ${{ runner.temp }}/delivery-evidence/
+          retention-days: 7
+          if-no-files-found: error

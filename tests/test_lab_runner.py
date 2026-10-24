@@ -20,6 +20,26 @@ sys.path.remove(str(TOOLS))
 
 class LabRunnerTests(unittest.TestCase):
     @unittest.skipUnless(sys.platform=='linux','Linux-only runner plan')
+    def test_delivery_plan_is_ci_only_and_keeps_standard_memory_policy(self):
+        argv=['lab_runner.py','--root','/tmp/tdh-audit-core-delivery','--profile','delivery']
+        with patch('sys.argv',argv),patch.dict(os.environ,{'GITHUB_ACTIONS':'false'}), \
+                patch('lab_runner.inventory') as inspect,contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                runner_main()
+            inspect.assert_not_called()
+        output=io.StringIO()
+        limits=budget(956*MIB,640*MIB,4096*MIB)
+        with patch('sys.argv',argv),patch.dict(os.environ,{'GITHUB_ACTIONS':'true'}), \
+                patch('lab_runner.inventory',return_value={'budget':limits}),contextlib.redirect_stdout(output):
+            runner_main()
+        plan=json.loads(output.getvalue())
+        self.assertEqual(plan['classification'],'CI_CORE_DELIVERY')
+        self.assertEqual(plan['payload_max_bytes'],72*MIB)
+        self.assertEqual(plan['preflight']['budget']['memory_high_percent'],75)
+        self.assertIn('--property=RuntimeMaxSec=180',plan['command'])
+        self.assertIn('--property=CPUQuota=60%',plan['command'])
+
+    @unittest.skipUnless(sys.platform=='linux','Linux-only runner plan')
     def test_candidate_plan_is_tiny_high_rtt_private_and_time_bounded(self):
         output=io.StringIO()
         limits=budget(956*MIB,640*MIB,4096*MIB,memory_high_percent=80)

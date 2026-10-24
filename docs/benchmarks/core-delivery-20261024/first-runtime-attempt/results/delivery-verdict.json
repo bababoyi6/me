@@ -1,0 +1,19 @@
+{
+  "classification": "CI_CORE_DELIVERY",
+  "accepted": false,
+  "dc": {
+    "completed": 0,
+    "errors": [],
+    "receive_buffer_requested": 0,
+    "listener_receive_buffer_actual": 131072,
+    "socket_timeout_seconds": 25,
+    "connect_only": 0,
+    "tcp_listen_counters": {
+      "ListenOverflows": 0,
+      "ListenDrops": 0,
+      "TCPSynRetrans": 0
+    }
+  },
+  "network_cleanup_verified": true,
+  "error_type": "RuntimeError"
+}

@@ -75,7 +75,7 @@ def main():
     parser.add_argument("--root", required=True)
     parser.add_argument("--haproxy", default="haproxy")
     parser.add_argument("--wg", default="wg")
-    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed", "candidate"), default="smoke")
+    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed", "candidate", "delivery"), default="smoke")
     parser.add_argument('--logical-clients',type=int,choices=(30,60,100),default=30)
     parser.add_argument("--rtt", type=int, choices=(20, 50, 100, 200), default=100)
     parser.add_argument("--max-streams", type=int, choices=(1, 4, 8, 16, 32), default=4)
@@ -103,6 +103,8 @@ def main():
         parser.error('non-default soft memory policy requires the private ab/candidate profile')
     if args.profile=='candidate' and args.rtt not in (100,200):
         parser.error('candidate path check requires a high-RTT entry link')
+    if args.profile=='delivery' and (os.environ.get('GITHUB_ACTIONS')!='true' or args.rtt!=100):
+        parser.error('delivery qualification is confined to the ephemeral CI runner at 100ms')
     report = inventory(memory_high_percent=args.memory_high_percent)
     before_temp_names={p.name for p in Path('/tmp').glob('tdh-e2e-*') if p.is_dir()}
     root = Path(args.root).absolute()
@@ -167,6 +169,8 @@ def main():
                 '--haproxy',args.haproxy,'--clients',str(args.logical_clients)]
     elif args.profile == "observer":
         worker = [sys.executable, str(REPO / "tests/observer_oracle.py"), "--root", str(root), "--wg", args.wg]
+    elif args.profile == 'delivery':
+        worker=[sys.executable,str(REPO/'tests/core_delivery_lab.py'),'--root',str(root)]
     elif args.profile == 'candidate':
         worker = [sys.executable, str(REPO/'tests/dualhop_lab.py'), '--root', str(root),
                   '--build','bulk','--haproxy',args.haproxy,'--wg',args.wg,'--rtt',str(args.rtt),
@@ -176,7 +180,7 @@ def main():
                   "--haproxy", args.haproxy, "--wg", args.wg, "--rtt", str(args.rtt), "--separate-dc",
                   *(["--soak"] if args.profile == "soak" else []), "run"]
     unit = "tdh-audit-" + uuid.uuid4().hex[:12]
-    if args.profile=='candidate':
+    if args.profile in ('candidate','delivery'):
         report['budget']['runtime_max_seconds']=180
     command = systemd_command(unit, report["budget"], worker, report['budget']['runtime_max_seconds'])
     if args.profile=='mixed':
@@ -196,6 +200,9 @@ def main():
     if args.profile=='candidate':
         plan['classification']='SINGLE_VPS_CANDIDATE_PATH'
         plan['payload_max_bytes']=2*1024**2
+    if args.profile=='delivery':
+        plan['classification']='CI_CORE_DELIVERY'
+        plan['payload_max_bytes']=72*1024**2
     if args.candidate_only:
         plan['classification']='SINGLE_VPS_CANDIDATE_SMOKE'
     if not args.execute:
