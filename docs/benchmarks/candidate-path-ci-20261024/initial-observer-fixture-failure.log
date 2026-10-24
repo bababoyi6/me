@@ -1,0 +1,31 @@
+validate	Verify real backend socket observations in private namespaces	﻿2026-10-24T14:51:11.1003679Z ##[group]Run sudo timeout --kill-after=5 20 python3 -m unittest discover -s tests -p 'test_backend_observer.py' -v
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.1004513Z ^[[36;1msudo timeout --kill-after=5 20 python3 -m unittest discover -s tests -p 'test_backend_observer.py' -v^[[0m
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.1073680Z shell: /usr/bin/bash -e {0}
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.1073950Z ##[endgroup]
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.2873520Z test_actual_backend_namespace_sockets_and_legacy_scope_rejection (test_backend_observer.BackendObserverTests) ... Traceback (most recent call last):
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.2875124Z   File "/home/runner/work/me/me/tests/test_backend_observer.py", line 63, in <module>
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.2875694Z     print(json.dumps(child(sys.argv[2])))
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.2876206Z   File "/home/runner/work/me/me/tests/test_backend_observer.py", line 25, in child
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.2876784Z     observe_sockets(os.getpid(),port)
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.2877313Z   File "/home/runner/work/me/me/tests/kernel_observer.py", line 162, in observe_sockets
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.2877973Z     if (current != os.stat('/run/netns/'+namespace).st_ino or
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.2880174Z FileNotFoundError: [Errno 2] No such file or directory: '/run/netns/tdh-audit-a'
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3051250Z ERROR
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3051510Z 
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3051718Z ======================================================================
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3052762Z ERROR: test_actual_backend_namespace_sockets_and_legacy_scope_rejection (test_backend_observer.BackendObserverTests)
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3053395Z ----------------------------------------------------------------------
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3053801Z Traceback (most recent call last):
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3054818Z   File "/home/runner/work/me/me/tests/test_backend_observer.py", line 53, in test_actual_backend_namespace_sockets_and_legacy_scope_rejection
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3056161Z     result=json.loads(subprocess.check_output(['ip','netns','exec',namespace,sys.executable,
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3057075Z   File "/usr/lib/python3.10/subprocess.py", line 421, in check_output
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3057847Z     return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3058555Z   File "/usr/lib/python3.10/subprocess.py", line 526, in run
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3059453Z     raise CalledProcessError(retcode, process.args,
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3061232Z subprocess.CalledProcessError: Command '['ip', 'netns', 'exec', 'tdh-audit-b', '/usr/bin/python3', '/home/runner/work/me/me/tests/test_backend_observer.py', '--child', 'tdh-audit-b']' returned non-zero exit status 1.
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3061983Z 
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3062129Z ----------------------------------------------------------------------
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3062463Z Ran 1 test in 0.138s
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3062603Z 
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3062690Z FAILED (errors=1)
+validate	Verify real backend socket observations in private namespaces	2026-10-24T14:51:11.3159338Z ##[error]Process completed with exit code 1.

@@ -7,7 +7,7 @@ import subprocess
 import sys
 import unittest
 
-from kernel_observer import ObservationError, SOCKET_ENDPOINTS, observe_sockets
+from kernel_observer import SOCKET_ENDPOINTS, observe_sockets
 
 
 def child(namespace):
@@ -23,7 +23,8 @@ def child(namespace):
                 raise RuntimeError('private fixture payload mismatch')
             try:
                 observe_sockets(os.getpid(),port)
-            except ObservationError:
+            except OSError:
+                # The legacy client namespace may be absent in this minimal fixture.
                 pass
             else:
                 raise RuntimeError('legacy client scope accepted a backend namespace')

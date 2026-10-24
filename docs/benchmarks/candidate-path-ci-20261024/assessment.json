@@ -1,0 +1,28 @@
+{
+  "environment": "EPHEMERAL_GITHUB_ACTIONS_NOT_NL_VPS",
+  "source_commit": "3a6476b6acf832397b9441f014e7cbbe0c1c877c",
+  "run_id": 40104281556,
+  "files": {
+    "results/candidate-path-bulk.json": {
+      "bytes": 2309,
+      "sha256": "9269c3ff0001268944bf2cead05d9d70e4e7b9494523bb0b5d7f0519d0f1f17a"
+    },
+    "run-tdh-audit-85b49f99a24c/manifest.json": {
+      "bytes": 13081,
+      "sha256": "315c153cdf356dbd9a1a89596b55409f4b147f7817e7b1ae1a0008a17b336dd5"
+    },
+    "run-tdh-audit-85b49f99a24c/supervisor.json": {
+      "bytes": 217076,
+      "sha256": "bcd1a4f560afc746f5346b5eb7f3954694e2e8dbbce6a9d20a5a55512189e3fb"
+    },
+    "run-tdh-audit-85b49f99a24c/worker.log": {
+      "bytes": 844,
+      "sha256": "b7d9fb932d05268c58dde4ecbc63886946071621e69a2b4a9f8e796b1aa90b34"
+    }
+  },
+  "max_memory_sampled": 103727104,
+  "memory_high_events": 0,
+  "host_oom_kill_delta": 0,
+  "cleanup_verified": true,
+  "capacity_or_production_claim": false
+}
