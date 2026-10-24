@@ -22,6 +22,8 @@ bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL -
 
 # 做了什么，实际快了多少
 
+以下数值属于1.5.0/audit2历史实验，不能标为balanced2的同条件收益。1.6.0新增的实际安装、大文件与慢读检查属于正确性验收，见[交付证据](docs/RELEASE-1.6.0.md)。
+
 突破来自后端源码修复：补齐等待新输入时的加密写入 flush；取消 client 和 Direct outgoing socket 的固定256KiB收发请求，让Linux自动调节TCP缓冲。没有关闭加密、减少认证或扩大用户态复制预算，也没有通过换入口、端口或绕过WireGuard换取数字。
 
 下表是同一台荷兰1核1GB测试机的**合成路径实测**，不是Telegram文件或美国三台VPS的测速。不同测试条件不可互相比大小。

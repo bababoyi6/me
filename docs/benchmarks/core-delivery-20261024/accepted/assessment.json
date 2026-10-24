@@ -1,0 +1,59 @@
+{
+  "classification": "CI_CORE_DELIVERY_ACCEPTANCE",
+  "source_commit": "b929e58e8ac68b5bbc178f09b5b86fb2a73f59ad",
+  "delivery_run_id": 40106320866,
+  "source_run_id": 40106323717,
+  "install_cases_passed": 4,
+  "service_version_uid": 997,
+  "large_and_slow_transfers_verified": 10,
+  "in_flow_probes_verified": 24,
+  "payload_bytes": 71327744,
+  "budget": {
+    "eligible": true,
+    "host_reserve_bytes": 5588469077,
+    "memory_max_bytes": 402653184,
+    "memory_high_bytes": 301989888,
+    "memory_high_percent": 75,
+    "cpu_quota_percent": 60,
+    "tasks_max": 192,
+    "runtime_max_seconds": 180,
+    "output_max_bytes": 33554432,
+    "swap_max_bytes": 0
+  },
+  "memory_sample_peak": 102772736,
+  "memory_high_events": 0,
+  "host_oom_kill_delta": 0,
+  "cleanup_verified": true,
+  "performance_comparison_claimed": false,
+  "previous_audit2_startup_failure_root_cause_proven": false,
+  "files": {
+    "results/delivery-transfers.json": {
+      "sha256": "0f7332aa6fb537ee46e993f4713cbc960f53aaf8363978c7ecaf816c907d1b54",
+      "bytes": 12126
+    },
+    "results/delivery-verdict.json": {
+      "sha256": "31656da52fb247d9e0a1bc04ea31e4ba1f734f4863363f9198cea2e24a5f4dc7",
+      "bytes": 404
+    },
+    "results/delivery-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/installer-delivery.json": {
+      "sha256": "f509eca711c1875cc5ae8d916a1a3390921b240218b2e590e473fb6d4b525e65",
+      "bytes": 1974
+    },
+    "run-tdh-audit-90a1e16bd661/manifest.json": {
+      "sha256": "46d08cf984852115d0d7e898df87194be9fcc1cad007a7e2ba1803e57e5ace86",
+      "bytes": 13330
+    },
+    "run-tdh-audit-90a1e16bd661/supervisor.json": {
+      "sha256": "6a72a1785ea3437d2510aa66851be3fcb60f1efcfa2b2e1d8173eccd7b16f0ef",
+      "bytes": 577578
+    },
+    "run-tdh-audit-90a1e16bd661/worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}
