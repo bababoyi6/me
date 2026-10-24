@@ -1,6 +1,9 @@
 """Resource plans and executable arguments must fail closed before privileged setup."""
 import importlib.util
+import json
+import os
 from pathlib import Path
+import tempfile
 import sys
 import subprocess
 import unittest
@@ -8,12 +11,59 @@ from unittest.mock import Mock, patch
 
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
-from lab_preflight import budget, MIB, run_checked
-from lab_runner import systemd_command, cgroup_sample, namespace_cleanup_status
+from lab_preflight import budget, MIB, run_checked, escalation_budget
+from lab_runner import systemd_command, cgroup_sample, namespace_cleanup_status, write_private_report
 sys.path.remove(str(TOOLS))
 
 
 class LabRunnerTests(unittest.TestCase):
+    def test_explicit_soft_policy_keeps_all_hard_limits_and_reserves(self):
+        standard = budget(956*MIB, 640*MIB, 4096*MIB)
+        alternative = budget(956*MIB, 640*MIB, 4096*MIB, memory_high_percent=80)
+        for key in standard:
+            if key not in ('memory_high_bytes', 'memory_high_percent'):
+                self.assertEqual(standard[key], alternative[key], key)
+        self.assertEqual(standard['memory_high_percent'], 75)
+        self.assertEqual(standard['memory_high_bytes'], standard['memory_max_bytes']*3//4)
+        self.assertEqual(alternative['memory_high_bytes'], alternative['memory_max_bytes']*80//100)
+        self.assertLess(alternative['memory_high_bytes'], alternative['memory_max_bytes'])
+        for invalid in (0, 100, -1, True, 75.0):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                budget(956*MIB, 640*MIB, 4096*MIB, memory_high_percent=invalid)
+
+    @unittest.skipUnless(os.name == 'posix', 'POSIX report permissions')
+    def test_reports_are_private_with_shell_umask_and_never_overwrite_evidence(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)/'supervisor.json'
+            previous = os.umask(0o022)
+            try:
+                write_private_report(path, {'cleanup_verified': True})
+            finally:
+                os.umask(previous)
+            self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+            self.assertEqual(json.loads(path.read_text()), {'cleanup_verified': True})
+            with self.assertRaises(FileExistsError):
+                write_private_report(path, {'cleanup_verified': False})
+            self.assertEqual(json.loads(path.read_text()), {'cleanup_verified': True})
+
+    def test_escalation_rejects_actual_16_to_32_memory_high_shortfall(self):
+        previous = {'exit': 0, 'stop_reason': None, 'cleanup_verified': True,
+                    'host_oom_kill_delta': 0, 'samples': [{'memory.current': 188809216}]}
+        result = escalation_budget(previous, {'eligible': True, 'memory_high_bytes': 169903104})
+        self.assertFalse(result['eligible'])
+        self.assertEqual(result['required_memory_high_bytes'], 207690138)
+        self.assertTrue(escalation_budget(previous, {'eligible': True, 'memory_high_bytes': 208000000})['eligible'])
+
+    def test_escalation_requires_measured_success_and_cleanup(self):
+        previous = {'exit': 0, 'stop_reason': None, 'cleanup_verified': True,
+                    'host_oom_kill_delta': 0, 'samples': [{'memory.current': 100}]}
+        limits = {'eligible': True, 'memory_high_bytes': 110}
+        for field, value in [('exit', 1), ('stop_reason', 'deadline'), ('cleanup_verified', False),
+                             ('host_oom_kill_delta', 1), ('samples', []), ('samples', [{'memory.current': True}])]:
+            with self.subTest(field=field, value=value):
+                self.assertFalse(escalation_budget(dict(previous, **{field: value}), limits)['eligible'])
+        self.assertFalse(escalation_budget(previous, {'eligible': False, 'memory_high_bytes': 1000})['eligible'])
+
     def test_failed_safety_queries_are_not_empty_successes(self):
         for failure in (FileNotFoundError(), subprocess.CalledProcessError(1, 'ip'),
                         subprocess.TimeoutExpired('ip', 5)):

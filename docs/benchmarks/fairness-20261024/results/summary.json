@@ -1,0 +1,159 @@
+{
+  "batches": [
+    {
+      "file": "ab-1792818715215328283.json",
+      "payload_mib": 16,
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": false,
+        "groups": [
+          {
+            "streams": 4,
+            "builds": {
+              "control": {
+                "successful_trials": 1,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 109.12243751034212,
+                "median_telemt_cpu_seconds": 0.049999999999999996,
+                "max_sampled_telemt_rss_bytes": 22749184,
+                "median_small_probe_ms": 307.4710810033139,
+                "median_namespace_retransmits": 0,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              },
+              "fair": {
+                "successful_trials": 0,
+                "failed_trials": 1,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_telemt_cpu_seconds": null,
+                "max_sampled_telemt_rss_bytes": null,
+                "median_small_probe_ms": null,
+                "median_namespace_retransmits": null,
+                "max_sampled_dc_receive_limit_bytes": null
+              }
+            },
+            "complete_pairs": false,
+            "candidate_change_percent": null,
+            "auto_change_percent": null
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      }
+    },
+    {
+      "file": "ab-1792818857224134592.json",
+      "payload_mib": 16,
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": true,
+        "groups": [
+          {
+            "streams": 4,
+            "builds": {
+              "control": {
+                "successful_trials": 2,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 110.24083862048357,
+                "median_telemt_cpu_seconds": 0.039999999999999994,
+                "max_sampled_telemt_rss_bytes": 22929408,
+                "median_small_probe_ms": 262.76727800723165,
+                "median_namespace_retransmits": 2.0,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              },
+              "fair": {
+                "successful_trials": 2,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 110.16469979606082,
+                "median_telemt_cpu_seconds": 0.045,
+                "max_sampled_telemt_rss_bytes": 21065728,
+                "median_small_probe_ms": 269.2923600116046,
+                "median_namespace_retransmits": 3.0,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              }
+            },
+            "complete_pairs": true,
+            "candidate_change_percent": -0.06906589733489676,
+            "auto_change_percent": null
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      }
+    },
+    {
+      "file": "ab-1792819113194358426.json",
+      "payload_mib": 64,
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": true,
+        "groups": [
+          {
+            "streams": 8,
+            "builds": {
+              "control": {
+                "successful_trials": 2,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 45.29561766476684,
+                "median_telemt_cpu_seconds": 0.185,
+                "max_sampled_telemt_rss_bytes": 24039424,
+                "median_small_probe_ms": 263.39696200739127,
+                "median_namespace_retransmits": 285.5,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              },
+              "fair": {
+                "successful_trials": 2,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": 58.38708982849508,
+                "median_telemt_cpu_seconds": 0.15499999999999997,
+                "max_sampled_telemt_rss_bytes": 21725184,
+                "median_small_probe_ms": 260.8527230040636,
+                "median_namespace_retransmits": 285.0,
+                "max_sampled_dc_receive_limit_bytes": 131072
+              }
+            },
+            "complete_pairs": true,
+            "candidate_change_percent": 28.902293066446983,
+            "auto_change_percent": null
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      }
+    }
+  ],
+  "supervisors": [
+    {
+      "run": "run-tdh-audit-6cbbde1584ff",
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 157921280,
+      "memory_high_events": 0
+    },
+    {
+      "run": "run-tdh-audit-8f286701b608",
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 166563840,
+      "memory_high_events": 505
+    },
+    {
+      "run": "run-tdh-audit-cae10fb843fa",
+      "exit": 0,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 151351296,
+      "memory_high_events": 0
+    }
+  ]
+}

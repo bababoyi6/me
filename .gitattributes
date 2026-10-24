@@ -10,3 +10,10 @@ patches/TELEMT-LICENSE.txt -text -whitespace
 docs/benchmarks/next-lab-20261023/** -text -whitespace
 docs/benchmarks/next-continue-20261023/** -text -whitespace
 docs/benchmarks/next-causal-20261024/** -text -whitespace
+docs/benchmarks/fairness-20261024/** -text -whitespace
+docs/benchmarks/queue-20261024/** -text -whitespace
+docs/benchmarks/balanced-20261024/** -text -whitespace
+docs/benchmarks/graded-20261024/** -text -whitespace
+docs/benchmarks/shared-core-20261024/** -text -whitespace
+docs/benchmarks/bulk-admission-20261024/** -text -whitespace
+docs/benchmarks/bulk80-20261024/** -text -whitespace

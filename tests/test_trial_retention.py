@@ -31,7 +31,7 @@ class TrialRetentionTests(unittest.TestCase):
             args=SimpleNamespace(bytes=1024,observe_network=True,rate_mbps=100,slow_readers=False,
                                  small_probes=False,socket_observation='detailed',build='auto',dc_timeout=25,output=str(output))
             lab=SimpleNamespace(telemt=SimpleNamespace(pid=1),haproxy=SimpleNamespace(pid=2),version='synthetic',close=lambda:None,
-                                transfer=lambda *a,**k:None)
+                                transfer=lambda *a,**k:None,binary_staging='private-copy')
             query=Mock(side_effect=OSError('synthetic netlink failure'))
             env=dict(args=args,lab=lab,time=SimpleNamespace(monotonic=time.monotonic,sleep=lambda _:None),
                      concurrent=SimpleNamespace(futures=SimpleNamespace(ThreadPoolExecutor=lambda **k:pool)),
@@ -45,6 +45,7 @@ class TrialRetentionTests(unittest.TestCase):
             self.assertTrue(row['complete'])
             self.assertFalse(row['measurement_complete'])
             self.assertEqual(row['sha256_verified_streams'],1)
+            self.assertEqual(row['core_file_staging'],'private-copy')
             self.assertEqual(row['telemetry_errors'],['OSError'])
             query.assert_called_once()
 
@@ -56,7 +57,7 @@ class TrialRetentionTests(unittest.TestCase):
             args=SimpleNamespace(bytes=1024,observe_network=True,rate_mbps=100,slow_readers=False,
                                  small_probes=False,socket_observation='off',build='auto',dc_timeout=25,output=str(output))
             lab=SimpleNamespace(telemt=SimpleNamespace(pid=1),haproxy=SimpleNamespace(pid=2),version='synthetic',
-                                transfer=lambda *a,**k:{'elapsed_seconds':.1},close=lambda:None)
+                                transfer=lambda *a,**k:{'elapsed_seconds':.1},close=lambda:None,binary_staging='private-shared-inode')
             env=dict(args=args,lab=lab,time=time,concurrent=concurrent,close_on_error=close_on_error,
                      ticks=lambda *a:1,rss=lambda:1024,oom=lambda:0,memory_available=lambda:1024**3,
                      cpu_snapshot=lambda:[],cpu_interval=lambda *a:None,observe=lambda:[],
@@ -69,4 +70,5 @@ class TrialRetentionTests(unittest.TestCase):
             self.assertTrue(row['complete'])
             self.assertFalse(row['measurement_complete'])
             self.assertEqual(row['sha256_verified_streams'],1)
+            self.assertEqual(row['core_file_staging'],'private-shared-inode')
             self.assertEqual(row['telemetry_errors'],['TimeoutExpired'])

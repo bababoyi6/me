@@ -27,7 +27,7 @@ from lab_config import generate_telemt
 from mtproto_transport import CryptoStream, PacketStream, dc_ciphers, mtproxy_connect, req_pq
 from telemt_probe import SECRETS, port, request
 from lab_artifacts import register_artifact
-from lab_files import file_sha256
+from lab_files import file_sha256, link_private_binary
 
 # Extracted x86_64 binaries from the checksum-verified official GNU archives.
 BINARIES = {
@@ -138,14 +138,15 @@ class MockDc(socketserver.ThreadingTCPServer):
 class FullLab:
     def __init__(self, binary, haproxy="haproxy", fast=True, real_dc=False, splice=False,
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
-                 listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None):
+                 listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None,
+                 shared_binary_root=None):
         if listen_endpoint is not None and (listen_endpoint not in (("10.77.1.2", 24431), ("10.77.2.2", 24431))
                                             or real_dc or start_haproxy):
             raise ValueError("private namespace backend requires a fixed WG bind and no local frontend")
         if dc_endpoint is not None and dc_endpoint not in (("198.51.100.2", 26000),
                                                           ("198.18.0.1", 26000), ("198.18.0.5", 26000)):
             raise ValueError("external mock DC must be the fixed private namespace endpoint")
-        if real_dc and (dc_endpoint or socket_library or experimental_binary):
+        if real_dc and (dc_endpoint or socket_library or experimental_binary or shared_binary_root is not None):
             raise ValueError("experimental socket policies are forbidden for public DC probes")
         if socket_mode not in ("pass", "auto", "1m", "4m", "client-auto", "dc-auto", "auto-lowat") or (socket_mode != "pass" and socket_library is None):
             raise ValueError("explicit lab socket library required for experimental policy")
@@ -157,7 +158,7 @@ class FullLab:
         expected = BINARIES.get(binary_hash)
         if experimental_binary is not None:
             checksum, version = experimental_binary
-            if checksum != binary_hash or version not in ("telemt 3.5.5", "telemt 3.5.5+tdh.audit1", "telemt 3.5.5+tdh.audit2"):
+            if checksum != binary_hash or version not in ("telemt 3.5.5", "telemt 3.5.5+tdh.audit1", "telemt 3.5.5+tdh.audit2", "telemt 3.5.5+tdh.fair1", "telemt 3.5.5+tdh.queue1", "telemt 3.5.5+tdh.balanced1", "telemt 3.5.5+tdh.balanced2"):
                 raise ValueError("explicit experimental build checksum/version mismatch")
             expected = version
         if expected is None:
@@ -174,10 +175,14 @@ class FullLab:
             if artifact_registry is not None:
                 register_artifact(artifact_registry,self.root)
             target = self.root / "telemt"
-            shutil.copyfile(binary, target)
+            self.binary_staging = 'private-shared-inode' if shared_binary_root is not None else 'private-copy'
+            if shared_binary_root is not None:
+                link_private_binary(binary, target, shared_binary_root, binary_hash)
+            else:
+                shutil.copyfile(binary, target)
+                target.chmod(0o755)
             if file_sha256(target) != binary_hash:
                 raise ValueError("Telemt binary changed during private copy")
-            target.chmod(0o755)
             self.version = subprocess.check_output([str(target), "--version"], text=True, timeout=5,
                                                    **self.identity()).strip()
             if self.version != expected:

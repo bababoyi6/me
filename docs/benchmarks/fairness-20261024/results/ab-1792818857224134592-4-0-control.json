@@ -1,0 +1,327 @@
+{
+  "scope": "native private-namespace high-RTT mock-DC experiment; no Telegram files",
+  "rows": [
+    {
+      "round": 1,
+      "build": "control",
+      "telemt": "telemt 3.5.5+tdh.audit2",
+      "streams": 4,
+      "direction": "U",
+      "link_rate_mbps": 1000,
+      "mock_dc_socket_timeout_seconds": 25,
+      "direct_to_telemt": true,
+      "client_receive_buffer_requested_bytes": 32768,
+      "client_send_buffer_requested_bytes": 0,
+      "client_read_pause_seconds": 0,
+      "expected_payload_bytes": 16777216,
+      "sha256_verified_streams": 4,
+      "failed_streams": 0,
+      "failure_types": [],
+      "complete": true,
+      "elapsed_seconds": 1.242623261990957,
+      "failure_details": [],
+      "small_probe_errors": [],
+      "mbps": 108.01160102616585,
+      "telemt_cpu_seconds": 0.049999999999999996,
+      "haproxy_cpu_seconds": 0.0,
+      "host_cpu_interval": {
+        "busy_percent": 31.496062992125985,
+        "steal_percent": 0.0,
+        "iowait_percent": 0.0
+      },
+      "minimum_available_memory_sampled_bytes": 560500736,
+      "oom_delta": 0,
+      "maximum_telemt_rss_sampled_bytes": 22929408,
+      "socket_sample_interval_seconds": 1,
+      "socket_observation": "detailed",
+      "observer_implementation": "bounded-netlink-v2",
+      "socket_policy": "pass",
+      "socket_observer_batch_seconds": [
+        0.0004981559759471565
+      ],
+      "socket_observer_errors": [],
+      "small_probes": [
+        {
+          "direction": "D",
+          "domain_index": 2,
+          "path": "haproxy-telemt",
+          "bytes": 1024,
+          "elapsed_seconds": 0.26293671698658727,
+          "handshake_ms": 39.18467400944792,
+          "sha256_verified": true,
+          "persistent_dc": false
+        }
+      ],
+      "socket_samples": [
+        {
+          "role": "client",
+          "r_allocated": 3812899,
+          "rb": 6291456,
+          "w_allocated": 0,
+          "tb": 3939840,
+          "w_queued": 0,
+          "socket_drops": 0,
+          "rtt_ms": 0.012,
+          "total_retrans": 0,
+          "bytes_acked": 2155,
+          "bytes_received": 4196806,
+          "notsent_bytes": 0,
+          "busy_ms": 0.0,
+          "rwnd_limited_ms": 0.0,
+          "sndbuf_limited_ms": 0.0,
+          "sample_index": 1,
+          "sampled_elapsed_seconds": 0.306810919981217
+        },
+        {
+          "role": "client",
+          "r_allocated": 3776310,
+          "rb": 5633817,
+          "w_allocated": 0,
+          "tb": 3939840,
+          "w_queued": 0,
+          "socket_drops": 1,
+          "rtt_ms": 0.01,
+          "total_retrans": 0,
+          "bytes_acked": 2162,
+          "bytes_received": 4196806,
+          "notsent_bytes": 0,
+          "busy_ms": 0.0,
+          "rwnd_limited_ms": 0.0,
+          "sndbuf_limited_ms": 0.0,
+          "sample_index": 1,
+          "sampled_elapsed_seconds": 0.3068120119860396
+        },
+        {
+          "role": "dc",
+          "r_allocated": 0,
+          "rb": 131072,
+          "w_allocated": 8352,
+          "tb": 261120,
+          "w_queued": 240912,
+          "socket_drops": 0,
+          "rtt_ms": 100.063,
+          "total_retrans": 0,
+          "bytes_acked": 11174,
+          "bytes_received": 0,
+          "notsent_bytes": 205616,
+          "busy_ms": 124.0,
+          "rwnd_limited_ms": 0.0,
+          "sndbuf_limited_ms": 0.0,
+          "sample_index": 1,
+          "sampled_elapsed_seconds": 0.30681246297899634
+        },
+        {
+          "role": "client",
+          "r_allocated": 3818019,
+          "rb": 6291456,
+          "w_allocated": 0,
+          "tb": 3939840,
+          "w_queued": 0,
+          "socket_drops": 1,
+          "rtt_ms": 0.016,
+          "total_retrans": 0,
+          "bytes_acked": 2158,
+          "bytes_received": 4196806,
+          "notsent_bytes": 0,
+          "busy_ms": 0.0,
+          "rwnd_limited_ms": 0.0,
+          "sndbuf_limited_ms": 0.0,
+          "sample_index": 1,
+          "sampled_elapsed_seconds": 0.30681271298089996
+        },
+        {
+          "role": "dc",
+          "r_allocated": 0,
+          "rb": 131072,
+          "w_allocated": 8352,
+          "tb": 261120,
+          "w_queued": 240912,
+          "socket_drops": 0,
+          "rtt_ms": 100.062,
+          "total_retrans": 0,
+          "bytes_acked": 11174,
+          "bytes_received": 0,
+          "notsent_bytes": 205616,
+          "busy_ms": 124.0,
+          "rwnd_limited_ms": 0.0,
+          "sndbuf_limited_ms": 0.0,
+          "sample_index": 1,
+          "sampled_elapsed_seconds": 0.30681292299414054
+        },
+        {
+          "role": "dc",
+          "r_allocated": 0,
+          "rb": 131072,
+          "w_allocated": 8352,
+          "tb": 261120,
+          "w_queued": 240912,
+          "socket_drops": 0,
+          "rtt_ms": 100.058,
+          "total_retrans": 0,
+          "bytes_acked": 11174,
+          "bytes_received": 0,
+          "notsent_bytes": 205616,
+          "busy_ms": 124.0,
+          "rwnd_limited_ms": 0.0,
+          "sndbuf_limited_ms": 0.0,
+          "sample_index": 1,
+          "sampled_elapsed_seconds": 0.3068131439795252
+        },
+        {
+          "role": "client",
+          "r_allocated": 3811619,
+          "rb": 6291456,
+          "w_allocated": 0,
+          "tb": 3939840,
+          "w_queued": 0,
+          "socket_drops": 1,
+          "rtt_ms": 0.017,
+          "total_retrans": 0,
+          "bytes_acked": 2141,
+          "bytes_received": 4196806,
+          "notsent_bytes": 0,
+          "busy_ms": 0.0,
+          "rwnd_limited_ms": 0.0,
+          "sndbuf_limited_ms": 0.0,
+          "sample_index": 1,
+          "sampled_elapsed_seconds": 0.30681338399881497
+        },
+        {
+          "role": "dc",
+          "r_allocated": 0,
+          "rb": 131072,
+          "w_allocated": 8352,
+          "tb": 261120,
+          "w_queued": 240912,
+          "socket_drops": 0,
+          "rtt_ms": 100.076,
+          "total_retrans": 0,
+          "bytes_acked": 11174,
+          "bytes_received": 0,
+          "notsent_bytes": 205616,
+          "busy_ms": 124.0,
+          "rwnd_limited_ms": 0.0,
+          "sndbuf_limited_ms": 0.0,
+          "sample_index": 1,
+          "sampled_elapsed_seconds": 0.3068136539950501
+        }
+      ],
+      "measurement_complete": true,
+      "telemetry_errors": [],
+      "network_counters_before": {
+        "client_namespace_tcp": {
+          "RetransSegs": 8,
+          "OutSegs": 299,
+          "InSegs": 283
+        },
+        "wan_netem": [
+          {
+            "dev": "tdh-la1",
+            "kind": "netem",
+            "bytes": 2800,
+            "packets": 30,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 132,
+            "qlen": 2
+          },
+          {
+            "dev": "tdh-lb0",
+            "kind": "netem",
+            "bytes": 2962,
+            "packets": 35,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 0,
+            "qlen": 0
+          }
+        ],
+        "endpoint_fq": {
+          "tdh-audit-a": [
+            {
+              "dev": "tdh-la0",
+              "kind": "fq",
+              "bytes": 3998,
+              "packets": 49,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ],
+          "tdh-audit-b": [
+            {
+              "dev": "tdh-lb1",
+              "kind": "fq",
+              "bytes": 2230,
+              "packets": 25,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ]
+        }
+      },
+      "network_counters_after": {
+        "client_namespace_tcp": {
+          "RetransSegs": 11,
+          "OutSegs": 12583,
+          "InSegs": 6457
+        },
+        "wan_netem": [
+          {
+            "dev": "tdh-la1",
+            "kind": "netem",
+            "bytes": 367996,
+            "packets": 5544,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 264,
+            "qlen": 4
+          },
+          {
+            "dev": "tdh-lb0",
+            "kind": "netem",
+            "bytes": 17549081,
+            "packets": 11662,
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 0,
+            "qlen": 0
+          }
+        ],
+        "endpoint_fq": {
+          "tdh-audit-a": [
+            {
+              "dev": "tdh-la0",
+              "kind": "fq",
+              "bytes": 17550117,
+              "packets": 11676,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ],
+          "tdh-audit-b": [
+            {
+              "dev": "tdh-lb1",
+              "kind": "fq",
+              "bytes": 367558,
+              "packets": 5541,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

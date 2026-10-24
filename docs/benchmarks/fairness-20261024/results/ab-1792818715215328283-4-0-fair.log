@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-fair-20261024/project/tests/high_rtt_worker.py", line 59, in <module>
+    lab=FullLab(binary,args.haproxy,dc_endpoint=('198.51.100.2',26000),experimental_binary=experimental,
+  File "/root/tdh-audit-20261021/tdh-audit-fair-20261024/project/tests/e2e_lab.py", line 161, in __init__
+    raise ValueError("explicit experimental build checksum/version mismatch")
+ValueError: explicit experimental build checksum/version mismatch

@@ -16,6 +16,10 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from lab import exact
 
+# SSLContext is immutable after construction and shared across independent
+# SSLObjects; avoid loading the CA store once per concurrent synthetic client.
+_CLIENT_HELLO_CONTEXT = ssl.create_default_context()
+
 MAX_FRAME = 1024 * 1024
 
 
@@ -113,7 +117,7 @@ class PacketStream:
 
 def faketls_handshake(sock, domain, secret, proxy_v2=False, fragment=False):
     incoming, outgoing = ssl.MemoryBIO(), ssl.MemoryBIO()
-    client = ssl.create_default_context().wrap_bio(incoming, outgoing, server_hostname=domain)
+    client = _CLIENT_HELLO_CONTEXT.wrap_bio(incoming, outgoing, server_hostname=domain)
     try:
         client.do_handshake()
     except ssl.SSLWantReadError:

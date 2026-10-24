@@ -30,6 +30,8 @@ jobs:
         run: python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check
       - name: Test diagnostics, configuration and rollback
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Verify private shared core inode permissions and cleanup
+        run: sudo timeout 20 python3 -m unittest discover -s tests -p 'test_lab_binary.py' -v
       - name: Verify experimental socket policies on private loopback
         run: |
           cc -shared -fPIC -Wall -Wextra -Werror tests/socket_policy_lab.c -ldl -o "$RUNNER_TEMP/tdh-socket-policy.so"

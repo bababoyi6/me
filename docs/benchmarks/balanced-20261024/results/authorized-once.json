@@ -1,0 +1,1 @@
+{"scope": "one balanced1 candidate, 8 streams total64MiB, no control or escalation", "arguments": ["--min-streams", "8", "--max-streams", "8", "--payload-mib", "64", "--rate-mbps", "1000", "--rounds", "1", "--socket-details", "--candidate-only"]}

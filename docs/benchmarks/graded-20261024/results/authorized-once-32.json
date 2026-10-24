@@ -1,0 +1,1 @@
+{"scope": "one two-round fixed/balanced batch per tier; 32 only after all 16 gates; no retries", "arguments": ["--min-streams", "32", "--max-streams", "32", "--payload-mib", "256", "--rate-mbps", "1000", "--rounds", "2", "--socket-details"]}

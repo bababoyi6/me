@@ -16,7 +16,7 @@ from kernel_observer import observe_sockets, qdiscs_in_namespace
 parser=argparse.ArgumentParser()
 parser.add_argument('--root',required=True)
 parser.add_argument('--haproxy',default='haproxy')
-parser.add_argument('--build',choices=('official','baseline','flush','auto'),required=True)
+parser.add_argument('--build',choices=('official','baseline','flush','auto','control','fair','queue','fixed','balanced','bulk'),required=True)
 parser.add_argument('--output',required=True)
 parser.add_argument('--rounds',type=int,choices=(1,2,3),default=3)
 parser.add_argument('--streams',type=int,choices=(1,4,8,16,32))
@@ -31,6 +31,7 @@ parser.add_argument('--socket-observation',choices=('detailed','off'),default='d
 parser.add_argument('--socket-library')
 parser.add_argument('--socket-policy',choices=('pass','auto','client-auto','dc-auto','auto-lowat'),default='pass')
 parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
+parser.add_argument('--share-core-file',action='store_true')
 args=parser.parse_args()
 if not 0<args.bytes<=256*1024**2 or args.bytes//(args.streams or 1)>128*1024**2:
     parser.error('payload must be bounded to 128 MiB per stream and 256 MiB total')
@@ -57,7 +58,8 @@ if args.build!='official':
     binary=ROOT/f'telemt-{args.build}'
     experimental=(metadata['sha256'],metadata['version'])
 lab=FullLab(binary,args.haproxy,dc_endpoint=('198.51.100.2',26000),experimental_binary=experimental,
-            socket_library=args.socket_library,socket_mode=args.socket_policy,artifact_registry=ROOT/'artifact-registry')
+            socket_library=args.socket_library,socket_mode=args.socket_policy,artifact_registry=ROOT/'artifact-registry',
+            shared_binary_root=ROOT if args.share_core_file else None)
 rows=[]
 def ticks(pid=None):
     fields=Path(f'/proc/{pid or lab.telemt.pid}/stat').read_text().rsplit(')',1)[1].split()
@@ -141,14 +143,17 @@ def trial(turn,streams,direction):
                 errors.append(type(exc).__name__)
                 details.append({'type':type(exc).__name__,'phase':getattr(exc,'lab_phase','unknown'),
                                 'received_bytes':getattr(exc,'lab_received_bytes',None)})
-    elapsed=max((r['elapsed_seconds'] for r in success),default=time.monotonic()-started)
+    wall_elapsed=time.monotonic()-started
+    elapsed=wall_elapsed if errors else max((r['elapsed_seconds'] for r in success),default=wall_elapsed)
     row={'round':turn+1,'build':args.build,'telemt':lab.version,'streams':streams,'direction':direction,
+         'core_file_staging':lab.binary_staging,
          'link_rate_mbps':args.rate_mbps,'mock_dc_socket_timeout_seconds':args.dc_timeout,
          'direct_to_telemt':args.slow_readers,'client_receive_buffer_requested_bytes':32768 if args.slow_readers else None,
          'client_send_buffer_requested_bytes':getattr(args,'client_send_buffer',0),
          'client_read_pause_seconds':5 if args.slow_readers and direction=='D' else 0,
          'expected_payload_bytes':size*streams,'sha256_verified_streams':len(success),'failed_streams':len(errors),
          'failure_types':errors,'complete':not errors and len(success)==streams,'elapsed_seconds':elapsed,
+         'trial_wall_elapsed_seconds':wall_elapsed,
          'failure_details':details,'small_probe_errors':probe_errors,
          'mbps':size*streams*8/elapsed/1e6 if not errors else None,
          'telemt_cpu_seconds':ticks()-before_cpu,'haproxy_cpu_seconds':ticks(lab.haproxy.pid)-before_haproxy_cpu,
@@ -176,7 +181,7 @@ def trial(turn,streams,direction):
     Path(args.output).write_text(json.dumps({'scope':'native private-namespace high-RTT mock-DC experiment; no Telegram files','rows':rows},indent=2)+'\n')
     print(json.dumps({k:v for k,v in row.items() if k not in ('socket_samples','small_probes')}),flush=True)
     if not row['measurement_complete']: raise RuntimeError('telemetry failed; transfer evidence retained')
-    if args.build in ('flush','auto') and (not row['complete'] or probe_errors): raise RuntimeError('candidate transfer failed')
+    if args.build in ('flush','auto','control','fair','queue','fixed','balanced','bulk') and (not row['complete'] or probe_errors): raise RuntimeError('candidate transfer failed')
 try:
     stream_counts=(args.streams,) if args.streams else (1,4)
     for turn in range(args.rounds):

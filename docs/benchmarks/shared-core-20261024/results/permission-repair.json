@@ -1,0 +1,9 @@
+{
+  "scope": "permission repair only; 32-stream workload had not started",
+  "relative_file": "run-tdh-audit-04a974917137/supervisor.json",
+  "uid": 0,
+  "mode_before": "0644",
+  "mode_after": "0600",
+  "sha256_unchanged": "8ac3b7e4aea7dabcb5ce8dd4ec553775410e20366b307f88a244ab06fccfcd18",
+  "preserved_preflight_log": "supervisor-1792836054551462532.log"
+}

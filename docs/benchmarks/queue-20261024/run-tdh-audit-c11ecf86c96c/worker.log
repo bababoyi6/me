@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-queue-20261024/project/tests/upload_ab.py", line 197, in <module>
+    main()
+  File "/root/tdh-audit-20261021/tdh-audit-queue-20261024/project/tests/upload_ab.py", line 174, in main
+    raise RuntimeError("paired trial failed; retained; refusing higher load")
+RuntimeError: paired trial failed; retained; refusing higher load
