@@ -59,8 +59,22 @@ def main():
                 'normalized_patch_sha256': digest(normalized_patch),
                 'default_installer_changed': False, 'binaries': {}}
     candidate_version = '3.5.5+tdh.fair1' if args.candidate == 'fair' else '3.5.5+tdh.queue1'
-    for name, version in (('control', '3.5.5+tdh.audit2'), (args.candidate, candidate_version)):
-        if name != 'control':
+    variants = [('control', '3.5.5+tdh.audit2'), (args.candidate, candidate_version)]
+    if args.candidate == 'queue':
+        variants.insert(0, ('fixed', '3.5.5+tdh.audit1'))
+    socket_source = source / 'src/transport/socket.rs'
+    automatic_socket_source = socket_source.read_text()
+    previous_version = '3.5.5+tdh.audit2'
+    for name, version in variants:
+        if name == 'fixed':
+            marker = '    // Preserve bounded kernel TCP autotuning on high-RTT relay paths.\n'
+            assert automatic_socket_source.count(marker) == 2
+            socket_source.write_text(automatic_socket_source.replace(marker,
+                '    socket.set_recv_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;\n'
+                '    socket.set_send_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;\n'))
+        elif name == 'control':
+            socket_source.write_text(automatic_socket_source)
+        else:
             if name == 'fair':
                 helper.write_bytes((ROOT / 'patches/fair_copy.rs').read_bytes())
             else:
@@ -74,13 +88,16 @@ def main():
                 body = body.replace(marker, marker + '    #[cfg(target_os = "linux")]\n'
                     '    {\n        use std::os::fd::AsRawFd;\n'
                     '        unsent_queue::configure_unsent_queue(socket.as_raw_fd())?;\n    }\n', 1)
-                socket_source.write_text('#[cfg(target_os = "linux")]\nmod unsent_queue;\n' + prefix +
-                                         'pub fn create_outgoing_socket_bound(' + body)
-            for filename in ('Cargo.toml', 'Cargo.lock'):
-                path = source / filename
-                text = path.read_text()
-                assert text.count('version = "3.5.5+tdh.audit2"') == 1
-                path.write_text(text.replace('version = "3.5.5+tdh.audit2"', f'version = "{version}"'))
+                combined = prefix + 'pub fn create_outgoing_socket_bound(' + body
+                first_line, rest = combined.split('\n', 1)
+                assert first_line.startswith('//!')
+                socket_source.write_text(first_line + '\n#[cfg(target_os = "linux")]\nmod unsent_queue;\n' + rest)
+        for filename in ('Cargo.toml', 'Cargo.lock'):
+            path = source / filename
+            text = path.read_text()
+            assert text.count(f'version = "{previous_version}"') == 1
+            path.write_text(text.replace(f'version = "{previous_version}"', f'version = "{version}"'))
+        previous_version = version
         run('cargo', 'build', '--release', '--locked', '--bin', 'telemt', cwd=source, timeout=1200)
         binary = source / 'target/release/telemt'
         actual = subprocess.check_output([str(binary), '--version'], text=True, timeout=5).strip()
