@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import shutil
 import subprocess
@@ -13,7 +14,7 @@ import sys
 import time
 import uuid
 
-from lab_preflight import inventory, MIB, read, run, run_checked
+from lab_preflight import inventory, MIB, read, run, run_checked, escalation_budget
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(REPO/'tests'))
@@ -81,6 +82,7 @@ def main():
     parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
     parser.add_argument('--core-pair',choices=('historical','fairness','queue','queue-fixed','balanced','balanced-fixed'),default='historical')
     parser.add_argument('--candidate-only',action='store_true')
+    parser.add_argument('--previous-run', help='owned run-tdh-audit-* directory name; require prior measured memory headroom')
     parser.add_argument("--execute", action="store_true", help="without this flag only prints preflight/plan")
     args = parser.parse_args()
     if args.min_streams > args.max_streams:
@@ -100,6 +102,31 @@ def main():
         parser.error('native core comparison requires the ab profile')
     if args.candidate_only and (args.profile!='ab' or args.core_pair=='historical' or args.rounds!=1 or args.min_streams!=args.max_streams):
         parser.error('candidate-only requires ab, one round, one tier and a named candidate')
+    admission = None
+    if args.previous_run:
+        if args.profile != 'ab' or not re.fullmatch(r'run-tdh-audit-[0-9a-f]{12}', args.previous_run):
+            parser.error('previous-run requires an owned ab run directory name')
+        prior = root / args.previous_run
+        status = prior / 'supervisor.json'
+        try:
+            if not root.is_dir() or not prior.is_dir() or not status.is_file():
+                raise ValueError('prior run requires directories and a regular supervisor file')
+            for path in (root, prior, status):
+                metadata = path.stat()
+                if path.is_symlink() or metadata.st_uid != 0 or metadata.st_mode & 0o077:
+                    raise ValueError('prior run must be private and root-owned')
+            with status.open('rb') as stream:
+                content = stream.read(32 * MIB + 1)
+            if len(content) > 32 * MIB:
+                raise ValueError('prior status exceeds bounded size')
+            previous = json.loads(content)
+            if not isinstance(previous, dict):
+                raise ValueError('invalid prior supervisor')
+            admission = escalation_budget(previous, report['budget'])
+        except (OSError, ValueError) as exc:
+            parser.error(str(exc))
+        if args.execute and not admission['eligible']:
+            parser.error(admission['reason'])
     if args.profile!='mixed' and args.logical_clients!=30:
         parser.error('logical client counts only apply to mixed profile')
     if args.profile in ("ab","socket"):
@@ -133,6 +160,9 @@ def main():
     plan = {"preflight": report, "command": command, "profile": args.profile,
             'temporary_directories_before':sorted(before_temp_names),
             "classification": "SINGLE_VPS_VIRTUAL_3NODE" if args.profile != "ab" else "SINGLE_VPS_SYNTHETIC"}
+    if admission is not None:
+        plan['escalation_admission'] = admission
+        plan['previous_run'] = args.previous_run
     if args.profile == "observer":
         plan["classification"] = "SINGLE_VPS_OBSERVER_ORACLE"
     if args.profile == "socket":

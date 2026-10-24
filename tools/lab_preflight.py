@@ -80,6 +80,28 @@ def inventory():
             "other_workloads": "Require operator review before any load; inventory does not grant permission."}
 
 
+def escalation_budget(previous, limits):
+    """Require headroom above an observed prior tier; never enlarge any limit.
+
+    This is a conservative admission floor, not a higher-tier capacity estimate.
+    Runtime memory/OOM safeguards and explicit load authorization still apply.
+    """
+    successful = (type(previous.get('exit')) is int and previous['exit'] == 0 and
+                  previous.get('stop_reason') is None and previous.get('cleanup_verified') is True and
+                  type(previous.get('host_oom_kill_delta')) is int and previous['host_oom_kill_delta'] == 0)
+    samples = previous.get('samples')
+    peaks = [p.get('memory.current') for p in samples if isinstance(p, dict)] if isinstance(samples, list) else []
+    peaks = [value for value in peaks if type(value) is int and value > 0]
+    peak = max(peaks, default=0)
+    required = (peak * 110 + 99) // 100  # 10% margin above the measured prior-tier peak
+    high = limits.get('memory_high_bytes')
+    admitted = (successful and peak > 0 and limits.get('eligible') is True and
+                type(high) is int and high >= required)
+    return {'eligible': admitted, 'previous_peak_bytes': peak,
+            'required_memory_high_bytes': required, 'current_memory_high_bytes': high,
+            'reason': None if admitted else 'prior tier unsuccessful, unmeasured, or insufficient memory.high headroom'}
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.parse_args()
