@@ -2,11 +2,14 @@
 #[path = "../../../patches/flushed_copy.rs"]
 mod flushed_copy;
 #[cfg(test)]
-use flushed_copy::copy_buf_flushed as copy;
+#[path = "../../../patches/fair_copy.rs"]
+mod fair_copy;
 
+macro_rules! relay_contract_tests {
+    ($name:ident, $copy:path) => {
 #[cfg(test)]
-mod tests {
-    use super::copy;
+mod $name {
+    use $copy as copy;
     use std::time::Duration;
     use tokio::io::{AsyncReadExt, AsyncWriteExt, BufReader, BufWriter, duplex};
 
@@ -66,5 +69,67 @@ mod tests {
         let mut output = BufWriter::new(output);
         let error = copy(&mut input, &mut output).await.unwrap_err();
         assert_eq!(error.kind(), std::io::ErrorKind::BrokenPipe);
+    }
+}
+    };
+}
+
+relay_contract_tests!(baseline_contract, crate::flushed_copy::copy_buf_flushed);
+relay_contract_tests!(fair_contract, crate::fair_copy::copy_buf_flushed);
+
+#[cfg(test)]
+mod fairness_tests {
+    use std::future::Future;
+    use std::io;
+    use std::pin::Pin;
+    use std::sync::{Arc, atomic::{AtomicUsize, Ordering}};
+    use std::task::{Context, Poll, Wake, Waker};
+    use tokio::io::AsyncWrite;
+
+    #[derive(Default)]
+    struct Counter(AtomicUsize);
+    impl Wake for Counter {
+        fn wake(self: Arc<Self>) { self.0.fetch_add(1, Ordering::Relaxed); }
+        fn wake_by_ref(self: &Arc<Self>) { self.0.fetch_add(1, Ordering::Relaxed); }
+    }
+    #[derive(Default)]
+    struct Sink { bytes: usize, flushes: usize }
+    impl AsyncWrite for Sink {
+        fn poll_write(mut self: Pin<&mut Self>, _: &mut Context<'_>, data: &[u8]) -> Poll<io::Result<usize>> {
+            self.bytes += data.len();
+            Poll::Ready(Ok(data.len()))
+        }
+        fn poll_flush(mut self: Pin<&mut Self>, _: &mut Context<'_>) -> Poll<io::Result<()>> {
+            self.flushes += 1;
+            Poll::Ready(Ok(()))
+        }
+        fn poll_shutdown(self: Pin<&mut Self>, _: &mut Context<'_>) -> Poll<io::Result<()>> {
+            Poll::Ready(Ok(()))
+        }
+    }
+
+    #[test]
+    fn ready_burst_yields_without_losing_bytes_or_wakeup() {
+        let payload = vec![42; 8 * 1024 * 1024];
+        let mut input = &payload[..];
+        let mut output = Sink::default();
+        let wakeups = Arc::new(Counter::default());
+        let waker = Waker::from(Arc::clone(&wakeups));
+        let mut context = Context::from_waker(&waker);
+        let mut baseline_input = &payload[..];
+        let mut baseline_output = Sink::default();
+        {
+            let mut baseline = Box::pin(super::flushed_copy::copy_buf_flushed(&mut baseline_input, &mut baseline_output));
+            assert!(baseline.as_mut().poll(&mut context).is_ready());
+        }
+        assert_eq!(baseline_output.bytes, payload.len());
+        assert_eq!(wakeups.0.load(Ordering::Relaxed), 0);
+        let mut transfer = Box::pin(super::fair_copy::copy_buf_flushed(&mut input, &mut output));
+        assert!(transfer.as_mut().poll(&mut context).is_pending());
+        assert_eq!(wakeups.0.load(Ordering::Relaxed), 1);
+        drop(transfer);
+        assert!(output.bytes > 0 && output.bytes <= 64 * 1024);
+        assert_eq!(output.flushes, 1);
+        assert_eq!(payload.len() - input.len(), output.bytes);
     }
 }

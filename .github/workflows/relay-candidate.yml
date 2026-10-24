@@ -1,0 +1,44 @@
+name: Build bounded relay candidate pair
+
+on:
+  push:
+    branches: [dev/upload-fairness-20261024]
+    paths:
+      - patches/fair_copy.rs
+      - tools/build_relay_candidate.py
+      - tests/relay-flush-regression/**
+      - .github/workflows/relay-candidate.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: relay-candidate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: telemt/telemt
+          ref: ac71d92ec41dea00a7eafd6b8d350c3486633500
+          path: upstream
+          persist-credentials: false
+      - name: Use pinned Rust
+        run: rustup toolchain install 1.99.1 --profile minimal --no-self-update && rustup default 1.99.1
+      - name: Verify flush, backpressure and bounded ready bursts
+        run: cargo test --locked --manifest-path tests/relay-flush-regression/Cargo.toml
+      - name: Build control and candidate with the same toolchain
+        run: python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/relay-pair"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: relay-candidate-pair
+          path: |
+            ${{ runner.temp }}/relay-pair.tar.gz
+            ${{ runner.temp }}/relay-pair.tar.gz.sha256
+          retention-days: 7
+          if-no-files-found: error
