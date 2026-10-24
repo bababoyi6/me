@@ -61,6 +61,7 @@ def main():
     parser.add_argument("--socket-details", action="store_true")
     parser.add_argument("--socket-library", help="compare same-binary socket policies, private mock DC only")
     parser.add_argument('--core-pair', choices=('historical', 'fairness', 'queue', 'queue-fixed'), default='historical')
+    parser.add_argument('--candidate-only', action='store_true', help='one native candidate trial; no comparison ratio')
     parser.add_argument('--mock-receive-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--client-send-buffer',type=int,choices=(0,262144),default=0)
     parser.add_argument('--policy-family',choices=('all','client','dc','lowat','queue'),default='all')
@@ -71,6 +72,9 @@ def main():
         parser.error('policy family requires the private lab library')
     if args.core_pair != 'historical' and args.socket_library:
         parser.error('native core comparison cannot preload a socket policy')
+    if args.candidate_only and (args.rounds != 1 or args.min_streams != args.max_streams or
+                               args.core_pair == 'historical' or args.socket_library):
+        parser.error('candidate-only requires one round, one tier and a named native candidate')
     if args.payload_mib > 128 and args.max_streams < 4:
         parser.error("per-stream payload cannot exceed 128 MiB")
     root = Path(args.root).resolve()
@@ -101,6 +105,9 @@ def main():
     if args.core_pair == 'queue-fixed':
         manifest.update(control='same-toolchain audit1 fixed socket buffers',
                         candidate='same-toolchain queue1; automatic buffers and outgoing TCP_NOTSENT_LOWAT=64KiB', core_pair='queue-fixed')
+    if args.candidate_only:
+        manifest.update(classification='SINGLE_VPS_CANDIDATE_SMOKE', candidate_only=True,
+                        scope='one private native candidate trial; no paired comparison or speed ratio')
     manifest['mock_dc_receive_buffer_requested']=args.mock_receive_buffer
     manifest['client_send_buffer_requested']=args.client_send_buffer
     if args.socket_library:
@@ -138,7 +145,7 @@ def main():
                     if args.payload_mib * 1024**2 // streams > 128 * 1024**2:
                         continue
                     for turn in range(args.rounds):
-                        cases=[('flush',mode) for mode in policy_order(turn,args.policy_family)] if args.socket_library else [(b,'pass') for b in paired_order(turn, builds)]
+                        cases=[('flush',mode) for mode in policy_order(turn,args.policy_family)] if args.socket_library else [(b,'pass') for b in ((builds[1],) if args.candidate_only else paired_order(turn, builds))]
                         for build,mode in cases:
                             if memory_available() < 256 * 1024**2:
                                 raise RuntimeError("host memory margin before next load")
