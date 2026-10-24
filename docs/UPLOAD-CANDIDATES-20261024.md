@@ -57,7 +57,7 @@
 
 具体[queue原始记录](benchmarks/queue-20261024/results/summary.json)及[失败前快照](benchmarks/queue-20261024/raw-before-candidate.tar.gz)保留。最终导出21文件，SHA256为`79589e44315841eddf9ed1d83d6be23bd5ba74402406b062ccbc1aa940d68976`，核对76个传输源码文件。清理结果见[cleanup.json](benchmarks/queue-20261024/cleanup.json)：全部本轮实验资源已回收，未改宿主网络/SSH，未访问生产节点。
 
-## 接收侧候选 balanced1：尚未做VPS负载验证
+## 接收侧候选 balanced1
 
 Linux5.15自动接收缓冲增长时会同步改写window_clamp，因此没有采用“只设置TCP_WINDOW_CLAMP就能永久限制自动接收窗口”的假设，依据为[内核接收缓冲实现](https://raw.githubusercontent.com/torvalds/linux/v5.15/net/ipv4/tcp_input.c)。也没有给进程新增CAP_NET_ADMIN、强制扩大系统rmem_max或更改宿主内核配置。
 
@@ -69,4 +69,29 @@ CI回归检查未知/长RTT不设置接收请求、真实socket设置不改变�
 
 构建提交为`f6156a9ba3242215b4df60d118f28f53ee73fb8a`，完整[manifest](balanced-core-manifest-20261024.json)已保存。四核心归档SHA256为`c1329c82aa1b51153213e72cfdd7b652468e7b6f298d9dd023456b8c1dcdd15b`，balanced1二进制SHA256为`8658a5694e7fba1e046103c9638c1766ae96e2167aac28b64e62e8028b0a01f8`。下载后逐一核对二进制长度与摘要，并确认归档中的新helper和构建器与本地源码逐字节一致；没有在本地执行核心。
 
-候选尚未执行任何新的VPS负载，也未替换main默认核心。前次授权仅覆盖已经完成的queue1单次验证；下一次负载须另行明确范围。即使候选8流全部完成，也只能说明该级别的完整性改善，仍不足以证明32×8MiB性能退化修复。
+候选未替换main默认核心。用户另行批准仅一次balanced1候选验证：8流、总64MiB，不重跑对照、不升档。实际结果如下。
+
+### balanced1 单次8流结果
+
+本次为`SINGLE_VPS_CANDIDATE_SMOKE`，同一荷兰机、100ms合成DC链路、1000Mbps预算、CPU60%、Swap0、Tasks192。动态预算公式保持不变，实际MemoryMax为243,854,336字节、MemoryHigh为182,890,752字节。它与前次queue1批次220,344,320字节的MemoryMax不同，不能作为严格同条件A/B或计算速度/内存收益比例。
+
+| 本次观测 | 结果 |
+|---|---:|
+| 完成且SHA256一致的上传流 | 8/8 |
+| 每流/合计负载 | 8MiB / 64MiB |
+| 上传最大连接耗时 / 试验总wall耗时 | 2.026870秒 / 2.188390秒 |
+| 合成上传聚合速率 | 264.876786 Mbps |
+| 小消息探测 | 2次成功，286.144 / 442.787毫秒（含握手） |
+| 实验组内存采样最大 | 171,433,984字节 |
+| memory.high事件 / OOM增量 | 0 / 0 |
+| client实际接收内存采样最大 | 364,317字节 |
+| client接收缓冲上限采样 | 425,984字节 |
+| DC未发送队列采样最大 | 66,608字节 |
+
+采样证实低RTT入口上的接收缓冲请求生效，DC链路采样RTT约100–118ms；发送积压仍约64KiB。client socket丢弃计数采样最大5，namespace重传增量24，不能宣称无丢弃或唯一根因已确定。小消息只采到2次，接收侧也只有两批详细socket采样，均不据此推断尾延迟分布或精确峰值。
+
+本次8流完整性通过，给出了继续检验接收侧方案的证据。未重跑queue/audit2对照，也未运行16/32流；没有稳定收益比例，尚不能宣布32×8MiB性能退化已修复。高RTT入口分支目前只有代码/回归检查，实际吞吐仍须单独验证。
+
+工具源码为已通过CI的`b8a6dbf562762b7a88c5aa62b1fece6146480b06`，核心仍来自`f6156a9`构建，核对77个传输源码文件。完整[原始结果](benchmarks/balanced-20261024/results/ab-1792833806212405179-8-0-balanced.json)、[summary](benchmarks/balanced-20261024/results/summary.json)、运行限制及日志一并保留。导出13文件，SHA256为`8e99f29bf4550cc5f61d5ea620718c60838f72c0727272b84596a5b1c41380a5`。
+
+[清理记录](benchmarks/balanced-20261024/cleanup.json)确认本轮目录、临时文件、namespace、unit和密钥全部回收，历史核心摘要与宿主监听不变，未修改宿主内核/网络/SSH配置，未访问生产节点。此次单次授权已经用完，没有安排自动追加负载。
