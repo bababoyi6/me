@@ -46,6 +46,33 @@ def read_regular(path, limit):
     return data
 
 
+def write_bundle(output, files, manifest):
+    """Serialize an audited payload deterministically and publish it exclusively."""
+    output = Path(output)
+    if output.exists() or output.is_symlink():
+        raise ValueError('refusing to overwrite existing bundle')
+    files = dict(files)
+    files['manifest.json'] = (json.dumps(manifest, sort_keys=True, indent=2) + '\n').encode()
+    stage = None
+    try:
+        descriptor, stage = tempfile.mkstemp(prefix=output.name + '.stage-', dir=output.parent)
+        with os.fdopen(descriptor, 'wb') as target:
+            with gzip.GzipFile(filename='', fileobj=target, mode='wb', mtime=0) as compressed:
+                with tarfile.open(fileobj=compressed, mode='w', format=tarfile.USTAR_FORMAT) as archive:
+                    for name, content in sorted(files.items()):
+                        info = tarfile.TarInfo(name)
+                        info.size, info.mode, info.mtime = len(content), 0o755 if name == 'telemt' else 0o644, 0
+                        archive.addfile(info, io.BytesIO(content))
+            target.flush()
+            os.fsync(target.fileno())
+        # Exclusive publication into the local directory; never clobber a race.
+        os.link(stage, output)
+    finally:
+        if stage is not None:
+            Path(stage).unlink(missing_ok=True)
+    return {'bundle_sha256': sha256(output.read_bytes()), 'files': len(files)}
+
+
 def bundle(binary, output):
     output = Path(output)
     if output.exists() or output.is_symlink():
@@ -72,26 +99,8 @@ def bundle(binary, output):
                 'files': {name: {'sha256': sha256(content), 'bytes': len(content),
                                  'mode': '0755' if name == 'telemt' else '0644'}
                           for name, content in files.items()}}
-    files['manifest.json'] = (json.dumps(manifest, sort_keys=True, indent=2) + '\n').encode()
-    stage = None
-    try:
-        descriptor, stage = tempfile.mkstemp(prefix=output.name + '.stage-', dir=output.parent)
-        with os.fdopen(descriptor, 'wb') as target:
-            with gzip.GzipFile(filename='', fileobj=target, mode='wb', mtime=0) as compressed:
-                with tarfile.open(fileobj=compressed, mode='w', format=tarfile.USTAR_FORMAT) as archive:
-                    for name, content in sorted(files.items()):
-                        info = tarfile.TarInfo(name)
-                        info.size, info.mode, info.mtime = len(content), 0o755 if name == 'telemt' else 0o644, 0
-                        archive.addfile(info, io.BytesIO(content))
-            target.flush()
-            os.fsync(target.fileno())
-        # Exclusive publication into the local directory; never clobber a race.
-        os.link(stage, output)
-    finally:
-        if stage is not None:
-            Path(stage).unlink(missing_ok=True)
-    return {'bundle_sha256': sha256(output.read_bytes()), 'binary_sha256': CORE_SHA256,
-            'version': VERSION, 'files': len(files), 'published': False, 'updater_enabled': False}
+    result = write_bundle(output, files, manifest)
+    return dict(result, binary_sha256=CORE_SHA256, version=VERSION, published=False, updater_enabled=False)
 
 
 if __name__ == '__main__':

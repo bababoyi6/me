@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-path-20261024/project/tests/dualhop_lab.py", line 474, in <module>
+    if args.role=='run': run()
+  File "/root/tdh-audit-20261021/tdh-audit-path-20261024/project/tests/dualhop_lab.py", line 466, in run
+    if result.returncode: raise RuntimeError('entry experiment failed: '+result.stderr[:3000])
+RuntimeError: entry experiment failed: Traceback (most recent call last):
+  File "/root/tdh-audit-20261021/tdh-audit-path-20261024/project/tests/dualhop_lab.py", line 476, in <module>
+    else: entry()
+  File "/root/tdh-audit-20261021/tdh-audit-path-20261024/project/tests/dualhop_lab.py", line 308, in entry
+    observed=validate(rows,states)
+  File "/root/tdh-audit-20261021/tdh-audit-path-20261024/project/tests/candidate_contract.py", line 34, in validate
+    raise ValueError('candidate identity or backend telemetry failed')
+ValueError: candidate identity or backend telemetry failed
+

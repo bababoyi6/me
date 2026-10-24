@@ -1,0 +1,13 @@
+{
+  "classification": "FAILED_CANDIDATE_PATH_ACCEPTANCE",
+  "source_commit": "10e90ff5837bb048ba0686dd13b60196bc99a44e",
+  "export_sha256": "7e2f8c4b672d8587bf521aaed2779be7e6b5cfc6563b77f685c397e04da7edf8",
+  "exit": 1,
+  "cleanup_verified": true,
+  "host_oom_kill_delta": 0,
+  "max_memory_sampled": 95645696,
+  "memory_high_events": 0,
+  "outcome": "entry reached final validation after seven routed SHA256 transfers; generic identity/backend telemetry failure; original backend state not preserved",
+  "accepted": false,
+  "vps_retry_performed": false
+}

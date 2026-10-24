@@ -15,6 +15,11 @@ HEADER = struct.Struct('=IHHII')
 MAX_BYTES = 4 * 1024**2
 MAX_ROWS = 4096
 NAMES = ('tdh-audit-a', 'tdh-audit-wan', 'tdh-audit-b')
+SOCKET_ENDPOINTS = {
+    'tdh-audit-a': ('127.0.0.1', ('198.51.100.2', 26000)),
+    'tdh-audit-b': ('10.77.1.2', ('198.18.0.1', 26000)),
+    'tdh-audit-b2': ('10.77.2.2', ('198.18.0.5', 26000)),
+}
 
 
 class ObservationError(OSError):
@@ -114,7 +119,9 @@ def socket_inodes(pid, deadline):
     return result
 
 
-def decode_socket(body, inodes, listen):
+def decode_socket(body, inodes, listen, *, namespace='tdh-audit-a'):
+    if namespace not in SOCKET_ENDPOINTS:
+        raise ObservationError('socket namespace outside lab scope')
     if len(body) < 72 or body[0] != socket.AF_INET:
         raise ObservationError('short or unsupported socket diagnostic')
     inode = struct.unpack_from('=I', body, 68)[0]
@@ -122,8 +129,9 @@ def decode_socket(body, inodes, listen):
         return None
     sport, dport = struct.unpack_from('!HH', body, 4)
     src, dst = socket.inet_ntoa(body[8:12]), socket.inet_ntoa(body[24:28])
-    role = ('client' if (src, sport) == ('127.0.0.1', listen) else
-            'dc' if (dst, dport) == ('198.51.100.2', 26000) else None)
+    address, dc_endpoint = SOCKET_ENDPOINTS[namespace]
+    role = ('client' if (src, sport) == (address, listen) else
+            'dc' if (dst, dport) == dc_endpoint else None)
     if role is None:
         return None
     attrs = attributes(body[72:])
@@ -145,11 +153,15 @@ def decode_socket(body, inodes, listen):
     return item
 
 
-def observe_sockets(pid, listen):
-    # Only the isolated client namespace: bounded dump, then process inode ownership.
+def observe_sockets(pid, listen, *, namespace='tdh-audit-a'):
+    # Only a named, isolated lab role: bounded dump and process inode ownership.
+    if namespace not in SOCKET_ENDPOINTS:
+        raise ObservationError('socket namespace outside lab scope')
     deadline = time.monotonic() + 2
-    if os.stat('/proc/self/ns/net').st_ino != os.stat('/run/netns/tdh-audit-a').st_ino:
-        raise ObservationError('socket observation outside private client namespace')
+    current = os.stat('/proc/self/ns/net').st_ino
+    if (current != os.stat('/run/netns/'+namespace).st_ino or
+            current != os.stat(f'/proc/{int(pid)}/ns/net').st_ino):
+        raise ObservationError('socket observation outside named private process namespace')
     inodes = socket_inodes(pid, deadline)
     request = struct.pack('=BBBBI', socket.AF_INET, socket.IPPROTO_TCP, 66, 0, 2)
     request += bytes(40) + struct.pack('=II', 0xffffffff, 0xffffffff)
@@ -157,7 +169,7 @@ def observe_sockets(pid, listen):
     if remaining <= 0:
         raise ObservationError('late socket observation setup')
     rows = dump(4, 20, request, timeout=remaining)
-    result = [item for body in rows if (item := decode_socket(body, inodes, listen)) is not None]
+    result = [item for body in rows if (item := decode_socket(body, inodes, listen, namespace=namespace)) is not None]
     if time.monotonic() > deadline:
         raise ObservationError('late socket observation')
     return result

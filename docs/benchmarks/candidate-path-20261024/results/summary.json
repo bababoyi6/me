@@ -1,0 +1,14 @@
+{
+  "candidate_path": null,
+  "supervisors": [
+    {
+      "run": "run-tdh-audit-2d7c23089972",
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 95645696,
+      "memory_high_events": 0
+    }
+  ]
+}

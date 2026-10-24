@@ -17,6 +17,31 @@ def attr(kind, body):
 
 
 class SocketObserverTests(unittest.TestCase):
+    def test_backend_endpoints_preserve_process_inode_and_role_filtering(self):
+        for namespace,address,dc in (('tdh-audit-b','10.77.1.2','198.18.0.1'),
+                                      ('tdh-audit-b2','10.77.2.2','198.18.0.5')):
+            body=bytearray(72);body[0]=socket.AF_INET
+            struct.pack_into('!HH',body,4,24431,50000)
+            body[8:12]=socket.inet_aton(address)
+            struct.pack_into('=I',body,68,99)
+            self.assertIsNone(observer.decode_socket(body,{100},24431,namespace=namespace))
+            self.assertIsNone(observer.decode_socket(body,{99},24431))
+            self.assertEqual(observer.decode_socket(body,{99},24431,namespace=namespace)['role'],'client')
+            struct.pack_into('!HH',body,4,50000,26000)
+            body[24:28]=socket.inet_aton(dc)
+            self.assertEqual(observer.decode_socket(body,{99},24431,namespace=namespace)['role'],'dc')
+
+    def test_socket_namespace_mismatch_and_host_scope_refused_before_query(self):
+        with patch.object(observer,'dump') as queried, patch.object(observer,'socket_inodes') as descriptors:
+            with self.assertRaises(observer.ObservationError):
+                observer.observe_sockets(123,24431,namespace='../host')
+            for values in ((1,2),(1,1,2)):
+                with patch.object(observer.os,'stat',side_effect=[SimpleNamespace(st_ino=i) for i in values]):
+                    with self.assertRaises(observer.ObservationError):
+                        observer.observe_sockets(123,24431,namespace='tdh-audit-b')
+            queried.assert_not_called()
+            descriptors.assert_not_called()
+
     def test_worker_delegates_process_scope_without_subprocess(self):
         tree=ast.parse(Path(__file__).with_name('high_rtt_worker.py').read_text())
         tree.body=[node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=='observe']

@@ -26,16 +26,21 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--root',required=True)
 parser.add_argument('--haproxy',default='haproxy')
 parser.add_argument('--wg',default='wg')
-parser.add_argument('--build',choices=('official','auto'),default='official')
+parser.add_argument('--build',choices=('official','auto','bulk'),default='official')
 parser.add_argument('--separate-dc',action='store_true')
 profile=parser.add_mutually_exclusive_group()
 profile.add_argument('--soak',action='store_true')
 profile.add_argument('--benchmark',action='store_true')
+profile.add_argument('--candidate-check',action='store_true')
 parser.add_argument('--rtt',type=int,choices=(10,20,50,100,200),default=10)
 parser.add_argument('role',choices=('run','backend','entry'))
 parser.add_argument('--shared')
 parser.add_argument('--index',type=int,choices=(1,2))
 args=parser.parse_args()
+if args.candidate_check and (args.build!='bulk' or not args.separate_dc or args.rtt not in (100,200)):
+    parser.error('candidate path check requires bulk, separate mock DC and 100/200ms entry RTT')
+if args.build=='bulk' and not args.candidate_check:
+    parser.error('bulk is confined to the bounded candidate path check')
 ROOT=Path(args.root).resolve()
 HERE=Path(__file__).resolve()
 if args.role!="run":
@@ -65,16 +70,19 @@ def backend():
     address=f'10.77.{args.index}.2'
     binary=ROOT/'telemt-3.5.5/telemt'
     experimental=None
-    if args.build=='auto':
-        metadata=json.loads((ROOT/'auto-build.json').read_text())
-        binary=ROOT/'telemt-auto'
+    if args.build!='official':
+        metadata=json.loads((ROOT/f'{args.build}-build.json').read_text())
+        binary=ROOT/f'telemt-{args.build}'
         experimental=(metadata['sha256'],metadata['version'])
     def create_lab():
         endpoint=(f'198.18.0.{1 if args.index==1 else 5}',26000) if args.separate_dc else None
         return FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,
-                       experimental_binary=experimental,dc_endpoint=endpoint,artifact_registry=ROOT/'artifact-registry')
+                       experimental_binary=experimental,dc_endpoint=endpoint,artifact_registry=ROOT/'artifact-registry',
+                       shared_binary_root=ROOT if args.candidate_check else None)
     lab=create_lab()
     agent=None
+    client_sockets,observation_errors=[],[]
+    last_observation=0
     try:
         agent=Agent((address,19101),AgentHandler)
         agent.process=lab.telemt
@@ -92,8 +100,19 @@ def backend():
                 agent.process=lab.telemt
             state=(json.loads((shared/'dc.json').read_text())['backends'][args.index-1] if args.separate_dc else
                    {'completed':lab.dc.completed,'errors':lab.dc.errors})
+            if args.candidate_check and not observation_errors and time.monotonic()-last_observation>=.5:
+                from kernel_observer import observe_sockets
+                try:
+                    observed=observe_sockets(lab.telemt.pid,lab.listen,namespace=f'tdh-audit-b{2 if args.index==2 else ""}')
+                    client_sockets.extend({'rtt_ms':p.get('rtt_ms'),'rb':p.get('rb')}
+                                          for p in observed if p['role']=='client')
+                    client_sockets=client_sockets[-32:]
+                except OSError as exc:
+                    observation_errors.append({'type':type(exc).__name__,'reason':str(exc)[:160]})
+                last_observation=time.monotonic()
             save(shared/f'backend{args.index}.json',{'ready':lab.telemt.poll() is None,'completed':state['completed'],
-                                                   'errors':state['errors'],'telemt':lab.version})
+                                                   'errors':state['errors'],'telemt':lab.version,
+                                                   'client_sockets':client_sockets,'socket_observation_errors':observation_errors})
             time.sleep(.1)
     finally:
         if agent:
@@ -217,6 +236,8 @@ frontend mtp_tls
         return [sum(int(r.get('stot') or 0) for r in records
                     if r['pxname'] in ('telemt_a','telemt_b') and r['svname']==f'vps{i}') for i in (1,2)]
     def transfer(domain,direction,size=131072,rate=2500000,fragment=False):
+        if args.candidate_check and (not 0<size<=262144 or sum(r['bytes'] for r in rows)+size>2*1024**2):
+            raise ValueError('candidate functional payload budget exceeded before transfer')
         phase="connect"
         try:
             started=time.monotonic()
@@ -259,6 +280,64 @@ frontend mtp_tls
             assert time.monotonic()<deadline,'private HAProxy readiness deadline'
             time.sleep(.05)
         time.sleep(.4)
+        if args.candidate_check:
+            from candidate_contract import validate,validate_wireguard
+            def wg_totals():
+                totals={}
+                for device in ('wg-lab','wg-lab2'):
+                    records=[line.split() for line in command(args.wg,'show',device,'transfer').splitlines()]
+                    if not records or any(len(row)!=3 for row in records):
+                        raise RuntimeError('private WireGuard transfer counters unavailable')
+                    totals[device]={'rx':sum(int(row[1]) for row in records),'tx':sum(int(row[2]) for row in records)}
+                return totals
+            before_wg={}
+            try:
+                before_wg=wg_totals()
+                for domain,expected in (('apple.com',1),('gs.apple.com',2)):
+                    for direction in ('D','U'):
+                        routed(domain,direction,expected,262144,131072,True)
+                down=shared/'backend1.down'
+                down.write_text('synthetic candidate agent gate')
+                try:
+                    wait_state(False)
+                    for direction in ('D','U'):
+                        routed('apple.com',direction,2,4096)
+                finally:
+                    down.unlink(missing_ok=True)
+                wait_state(True)
+                routed('apple.com','U',1,4096)
+                states=[json.loads((shared/f'backend{i}.json').read_text()) for i in (1,2)]
+                observed=validate(rows,states)
+                after_wg=wg_totals()
+                wireguard={name:{key:after_wg[name][key]-before_wg[name][key] for key in ('rx','tx')} for name in before_wg}
+                validate_wireguard(rows,wireguard)
+                result={'classification':'SINGLE_VPS_CANDIDATE_PATH','scope':'actual HAProxy/WG+PSK/two candidate backends and separate synthetic DC; no public or production route',
+                        'telemt':states[0]['telemt'],'rtt_ms_configured':args.rtt,'observed_client_tcp':observed,
+                        'wireguard_psk':True,'wireguard_mtu':1420,'dual_sni_and_directions':True,
+                        'wireguard_transfer_delta_bytes':wireguard,
+                        'agent_failover_and_recovery':True,'source_core_staging':'private-shared-inode',
+                        'payload_bytes':sum(r['bytes'] for r in rows),'rows':rows,
+                        'backend_errors':[s['errors'] for s in states],
+                        'existing_connection_migration_claimed':False,'throughput_or_production_capacity_claimed':False}
+                save(ROOT/'results/candidate-path-bulk.json',result)
+                print(json.dumps({k:v for k,v in result.items() if k!='rows'}),flush=True)
+                return
+            except Exception as exc:
+                states=[]
+                for index in (1,2):
+                    path=shared/f'backend{index}.json'
+                    try:
+                        raw=json.loads(path.read_text())
+                        states.append({key:raw.get(key) for key in ('ready','completed','errors','telemt','client_sockets','socket_observation_errors')})
+                    except (OSError,ValueError) as state_error:
+                        states.append({'state_read_error':type(state_error).__name__})
+                save(ROOT/'results/candidate-path-failure.json',{
+                    'classification':'SINGLE_VPS_CANDIDATE_PATH_FAILED',
+                    'error':{'type':type(exc).__name__,'reason':str(exc)[:300]},
+                    'rows':rows,'payload_bytes':sum(r['bytes'] for r in rows),
+                    'backend_states':states,'wireguard_before_bytes':before_wg,
+                    'accepted':False,'retry_performed':False})
+                raise
         for domain,expected in (('apple.com',1),('gs.apple.com',2)):
             for direction in ('D','U'): routed(domain,direction,expected,fragment=True)
         if args.benchmark:
@@ -385,6 +464,7 @@ def run():
             process=subprocess.Popen(['ip','netns','exec',ns,'python3',str(HERE),
                                       '--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
                                       *(['--separate-dc'] if args.separate_dc else []),
+                                      *(['--candidate-check'] if args.candidate_check else []),
                                       'backend','--shared',str(shared),'--index',str(number)],
                                      stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
             net.processes.append(process)
@@ -394,8 +474,8 @@ def run():
                 if process.poll() is not None: raise RuntimeError('backend startup failed: '+process.stderr.read().decode()[:2000])
             assert time.monotonic()<deadline,'backend readiness deadline'
             time.sleep(.2)
-        entry_args=['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
-        entry_deadline=450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
+        entry_args=['--candidate-check'] if args.candidate_check else ['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
+        entry_deadline=90 if args.candidate_check else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
         result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),'ip','netns','exec',NAMES[0],
                                'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
                                *(['--separate-dc'] if args.separate_dc else []),

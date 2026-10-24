@@ -75,7 +75,7 @@ def main():
     parser.add_argument("--root", required=True)
     parser.add_argument("--haproxy", default="haproxy")
     parser.add_argument("--wg", default="wg")
-    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed"), default="smoke")
+    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed", "candidate"), default="smoke")
     parser.add_argument('--logical-clients',type=int,choices=(30,60,100),default=30)
     parser.add_argument("--rtt", type=int, choices=(20, 50, 100, 200), default=100)
     parser.add_argument("--max-streams", type=int, choices=(1, 4, 8, 16, 32), default=4)
@@ -92,15 +92,17 @@ def main():
     parser.add_argument('--share-core-file',action='store_true',help='ab only: share the verified private core inode')
     parser.add_argument('--previous-run', help='owned run-tdh-audit-* directory name; require prior measured memory headroom')
     parser.add_argument('--memory-high-percent', type=int, choices=(75, 80), default=75,
-                        help='ab only: explicit soft-throttling policy; hard memory/host reserve remain unchanged')
+                        help='private ab/candidate only: explicit soft-throttling policy; hard memory/host reserve unchanged')
     parser.add_argument("--execute", action="store_true", help="without this flag only prints preflight/plan")
     args = parser.parse_args()
     if args.min_streams > args.max_streams:
         parser.error("minimum stream tier exceeds maximum")
     if sys.platform != "linux":
         parser.error("Linux is required")
-    if args.memory_high_percent != 75 and args.profile != 'ab':
-        parser.error('non-default soft memory policy requires the private ab profile')
+    if args.memory_high_percent != 75 and args.profile not in ('ab','candidate'):
+        parser.error('non-default soft memory policy requires the private ab/candidate profile')
+    if args.profile=='candidate' and args.rtt not in (100,200):
+        parser.error('candidate path check requires a high-RTT entry link')
     report = inventory(memory_high_percent=args.memory_high_percent)
     before_temp_names={p.name for p in Path('/tmp').glob('tdh-e2e-*') if p.is_dir()}
     root = Path(args.root).absolute()
@@ -165,12 +167,18 @@ def main():
                 '--haproxy',args.haproxy,'--clients',str(args.logical_clients)]
     elif args.profile == "observer":
         worker = [sys.executable, str(REPO / "tests/observer_oracle.py"), "--root", str(root), "--wg", args.wg]
+    elif args.profile == 'candidate':
+        worker = [sys.executable, str(REPO/'tests/dualhop_lab.py'), '--root', str(root),
+                  '--build','bulk','--haproxy',args.haproxy,'--wg',args.wg,'--rtt',str(args.rtt),
+                  '--separate-dc','--candidate-check','run']
     else:
         worker = [sys.executable, str(REPO / "tests/dualhop_lab.py"), "--root", str(root), "--build", "auto",
                   "--haproxy", args.haproxy, "--wg", args.wg, "--rtt", str(args.rtt), "--separate-dc",
                   *(["--soak"] if args.profile == "soak" else []), "run"]
     unit = "tdh-audit-" + uuid.uuid4().hex[:12]
-    command = systemd_command(unit, report["budget"], worker, 600)
+    if args.profile=='candidate':
+        report['budget']['runtime_max_seconds']=180
+    command = systemd_command(unit, report["budget"], worker, report['budget']['runtime_max_seconds'])
     if args.profile=='mixed':
         command.insert(command.index('--'),'--property=PrivateNetwork=yes')
     plan = {"preflight": report, "command": command, "profile": args.profile,
@@ -185,6 +193,9 @@ def main():
         plan["classification"] = "SINGLE_VPS_SOCKET_POLICY_CAUSAL"
     if args.profile=='mixed':
         plan['classification']='SINGLE_VPS_SYNTHETIC_LOOPBACK_MIXED'
+    if args.profile=='candidate':
+        plan['classification']='SINGLE_VPS_CANDIDATE_PATH'
+        plan['payload_max_bytes']=2*1024**2
     if args.candidate_only:
         plan['classification']='SINGLE_VPS_CANDIDATE_SMOKE'
     if not args.execute:
@@ -246,7 +257,7 @@ def main():
                     reason = "total_output_budget"
                 elif shutil.disk_usage(root).free < 512 * MIB:
                     reason = "host_disk_reserve"
-                elif time.monotonic() - started > 610:
+                elif time.monotonic() - started > report['budget']['runtime_max_seconds']+10:
                     reason = "supervisor_deadline"
                 if reason:
                     break
