@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "state": "REVIEW_READY_NOT_UPLOADED_NOT_PUBLISHED",
+  "state": "CORE_PUBLIC_AND_VERIFIED_INSTALLER_AUTHORIZED_FOR_MAIN",
   "manager_version": "1.6.0",
   "manager_sha256": "376f00d36a4fb1aa082002d96612d297d4f01e2e55935a1a3cf7155ed9f5d26f",
   "manager_release_tag": "v1.6.0",
@@ -17,6 +17,9 @@
   "core_prerelease": true,
   "existing_node_core_replacement": false,
   "public_asset_fetch_verification_required_before_main_merge": true,
-  "publication_authorization_required": true,
-  "approval_review": "Draft release creation/asset upload rejected pending explicit release authorization; local files and PR remain reviewable"
+  "publication_authorization_required": false,
+  "approval_review": "Initial draft upload was rejected; user subsequently explicitly authorized upload/publication and completion. Core public download now verified.",
+  "publication_authorization_granted": true,
+  "core_public_release_url": "https://github.com/bababoyi6/me/releases/tag/telemt-core-3.5.5-tdh.balanced2",
+  "public_asset_fetch_verified": true
 }
