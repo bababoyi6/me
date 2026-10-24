@@ -40,14 +40,19 @@ def main():
     os.environ.update(CARGO_BUILD_JOBS='2', CARGO_PROFILE_RELEASE_LTO='thin',
                       CARGO_PROFILE_RELEASE_CODEGEN_UNITS='8', CMAKE_BUILD_PARALLEL_LEVEL='2')
     patch = ROOT / 'patches/telemt-3.5.5-relay-backpressure.patch'
-    run('git', 'apply', '--check', str(patch), cwd=source)
-    run('git', 'apply', str(patch), cwd=source)
+    # Historical patch context came from a Windows CRLF checkout; upstream Git
+    # blobs use LF. Normalize only line terminators, preserving the stored patch.
+    normalized_patch = output.parent / 'audit2-normalized.patch'
+    normalized_patch.write_bytes(patch.read_bytes().replace(b'\r\n', b'\n'))
+    run('git', 'apply', '--check', str(normalized_patch), cwd=source)
+    run('git', 'apply', str(normalized_patch), cwd=source)
     helper = source / 'src/proxy/relay/adaptive_copy/flushed_copy.rs'
     assert digest(helper) == digest(ROOT / 'patches/flushed_copy.rs')
     manifest = {'classification': 'CI_EXPERIMENTAL_CORE_PAIR', 'source_commit': SOURCE_COMMIT,
                 'project_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                 'rust': rust, 'jobs': 2, 'lto': 'thin', 'codegen_units': 8,
                 'base_patch_sha256': digest(patch), 'candidate_helper_sha256': digest(ROOT / 'patches/fair_copy.rs'),
+                'normalized_patch_sha256': digest(normalized_patch),
                 'default_installer_changed': False, 'binaries': {}}
     for name, version in (('control', '3.5.5+tdh.audit2'), ('fair', '3.5.5+tdh.fair1')):
         if name == 'fair':
