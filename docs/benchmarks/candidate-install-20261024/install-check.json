@@ -1,0 +1,59 @@
+{
+  "classification": "CI_CANDIDATE_CORE_INSTALL_CHAIN",
+  "version": "3.5.5+tdh.balanced2",
+  "binary_sha256": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+  "bundle_sha256": "b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5",
+  "version_check_uid": 997,
+  "version_check_gid": 997,
+  "protocol_service_uid": 65534,
+  "real_fresh_install": true,
+  "source_license_preserved": true,
+  "existing_core_refused": true,
+  "corruption_refused_before_staging": true,
+  "loopback_sha256_verified_flows": 4,
+  "payload_bytes": 4096,
+  "rows": [
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.17250018799995814,
+      "handshake_ms": 170.1808269999674,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.08766180099996745,
+      "handshake_ms": 45.7814170000006,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.08284650500002044,
+      "handshake_ms": 40.52008799999385,
+      "sha256_verified": true,
+      "persistent_dc": false
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 1024,
+      "elapsed_seconds": 0.09112361199998986,
+      "handshake_ms": 49.85933300002898,
+      "sha256_verified": true,
+      "persistent_dc": false
+    }
+  ],
+  "production_nodes_accessed": false,
+  "default_installer_changed": false
+}
