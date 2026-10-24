@@ -1,0 +1,108 @@
+{
+  "batches": [
+    {
+      "file": "ab-1792820958671256702.json",
+      "payload_mib": 64,
+      "summary": {
+        "classification": "SINGLE_VPS_SYNTHETIC",
+        "scope": "raw TCP mock DC segment; WG configured but payload bypasses WG; direct-to-Telemt upload",
+        "complete": false,
+        "groups": [
+          {
+            "streams": 8,
+            "builds": {
+              "control": {
+                "successful_trials": 0,
+                "failed_trials": 1,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_telemt_cpu_seconds": null,
+                "max_sampled_telemt_rss_bytes": null,
+                "median_small_probe_ms": null,
+                "median_namespace_retransmits": null,
+                "max_sampled_dc_receive_limit_bytes": null
+              },
+              "queue": {
+                "successful_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_telemt_cpu_seconds": null,
+                "max_sampled_telemt_rss_bytes": null,
+                "median_small_probe_ms": null,
+                "median_namespace_retransmits": null,
+                "max_sampled_dc_receive_limit_bytes": null
+              }
+            },
+            "complete_pairs": false,
+            "candidate_change_percent": null,
+            "auto_change_percent": null
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      }
+    },
+    {
+      "file": "ab-1792822969574118258.json",
+      "payload_mib": 64,
+      "summary": {
+        "classification": "SINGLE_VPS_CANDIDATE_SMOKE",
+        "scope": "one private native candidate trial; no paired comparison or speed ratio",
+        "complete": false,
+        "groups": [
+          {
+            "streams": 8,
+            "builds": {
+              "control": {
+                "successful_trials": 0,
+                "failed_trials": 0,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_telemt_cpu_seconds": null,
+                "max_sampled_telemt_rss_bytes": null,
+                "median_small_probe_ms": null,
+                "median_namespace_retransmits": null,
+                "max_sampled_dc_receive_limit_bytes": null
+              },
+              "queue": {
+                "successful_trials": 0,
+                "failed_trials": 1,
+                "failed_probes": 0,
+                "median_mbps": null,
+                "median_telemt_cpu_seconds": null,
+                "max_sampled_telemt_rss_bytes": null,
+                "median_small_probe_ms": null,
+                "median_namespace_retransmits": null,
+                "max_sampled_dc_receive_limit_bytes": null
+              }
+            },
+            "complete_pairs": false,
+            "candidate_change_percent": null,
+            "auto_change_percent": null
+          }
+        ],
+        "interpretation": "Small probe includes handshake; retransmission is namespace aggregate, not proof of loss cause."
+      }
+    }
+  ],
+  "supervisors": [
+    {
+      "run": "run-tdh-audit-5576b6f0b712",
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 165023744,
+      "memory_high_events": 341
+    },
+    {
+      "run": "run-tdh-audit-c11ecf86c96c",
+      "exit": 1,
+      "stop_reason": null,
+      "cleanup_verified": true,
+      "host_oom_kill_delta": 0,
+      "max_memory_sampled": 186359808,
+      "memory_high_events": 12
+    }
+  ]
+}

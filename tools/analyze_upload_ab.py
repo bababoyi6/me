@@ -10,7 +10,7 @@ import statistics
 def summarize(data):
     control = data.get('control_build', 'flush')
     candidate = data.get('candidate_build', 'auto')
-    if (control, candidate) not in (('flush', 'auto'), ('control', 'fair'), ('control', 'queue'), ('fixed', 'queue')):
+    if (control, candidate) not in (('flush', 'auto'), ('control', 'fair'), ('control', 'queue'), ('fixed', 'queue'), ('queue','balanced'), ('fixed','balanced')):
         raise ValueError('unknown native core pair')
     groups = []
     for streams in sorted({row["streams"] for row in data["rows"]}):

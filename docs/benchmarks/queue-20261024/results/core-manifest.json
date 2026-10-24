@@ -1,0 +1,32 @@
+{
+  "classification": "CI_EXPERIMENTAL_CORE_PAIR",
+  "source_commit": "ac71d92ec41dea00a7eafd6b8d350c3486633500",
+  "project_commit": "38da0fbf5b8c24913be7bfb61922a2e80fc957e4",
+  "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "jobs": 2,
+  "lto": "thin",
+  "codegen_units": 8,
+  "base_patch_sha256": "3daeee2ebec742d259372d45480647029bc9437f700ecaa8b94e0124af74b734",
+  "candidate_kind": "queue",
+  "candidate_helper_sha256": "a2b795ce2cd3e51f34f9ad2b348942d883a26211277ee708cc2c8ba7635a321e",
+  "builder_sha256": "f70eea21c9bef1a51d27c6152b887dad81d8ee0351f1da46ff595ce09a089cc9",
+  "normalized_patch_sha256": "8afc3307abb4b8fc10513040e4b0cf205f85eebf4f579860de1d34c608de8b05",
+  "default_installer_changed": false,
+  "binaries": {
+    "fixed": {
+      "sha256": "6187f76b784f8b8d1c77f6b71c180b95bc1808749523f048b91f0ba09ebc2d37",
+      "version": "telemt 3.5.5+tdh.audit1",
+      "bytes": 30699240
+    },
+    "control": {
+      "sha256": "a1f45da7e5be8a5e63e59a9a1a59d23549d0be2997695753caa06d287124d877",
+      "version": "telemt 3.5.5+tdh.audit2",
+      "bytes": 30709816
+    },
+    "queue": {
+      "sha256": "6c148bb440e04e3edc4a7887562497780dbe7d27e670fab3f0e29d97f428eea7",
+      "version": "telemt 3.5.5+tdh.queue1",
+      "bytes": 30698480
+    }
+  }
+}

@@ -1,0 +1,72 @@
+# 上传退化：原生背压候选与逐轮结果
+
+这是后续性能修复分支的记录。默认安装器核心仍为audit2；以下实验核心不自动安装到main、测试机宿主服务或生产节点。真实32×8MiB退化不能凭单元测试、单个中位数或历史不同条件的数据宣布修复。
+
+## 公平调度候选 fair1
+
+`patches/fair_copy.rs`保持原flush行为，每次poll最多转发64KiB，驱动pending ciphertext后主动让出执行权。确定性回归显示，旧copy在始终ready的测试I/O中一次poll能处理8MiB，新copy在64KiB以内返回Pending且注册唤醒。旧/新实现的flush、完整背压和错误传播契约共7项通过。
+
+这证明存在调度边界差异，不能证明真实TCP上的32流退化就由它造成。普通Tokio TCP自身也有合作调度，缓存层与一次处理字节数才是此补丁试图约束的范围。
+
+两个核心由[固定源码构建CI](https://github.com/bababoyi6/me/actions/runs/40063912461)在同一Ubuntu22.04/Rust1.99.1、2编译任务、thin LTO、8 codegen units条件下生成。上游固定`ac71d92ec41dea00a7eafd6b8d350c3486633500`，项目构建提交`081514fa67239f18cb623aaddc7f2135287abd62`，具体摘要见[核心manifest](benchmarks/fairness-20261024/results/core-manifest.json)。历史补丁CRLF上下文仅在构建时规范成LF，原文件保持不变。首次因行尾失败的构建记录为[40063796048](https://github.com/bababoyi6/me/actions/runs/40063796048)，不作为成功构建。
+
+### 荷兰机对照
+
+同一个1核/约956MiB、无Swap、Linux5.15宿主，原动态内存预算、CPUQuota60%、TasksMax192；100ms RTT、1000Mbps合成预算，无额外配置丢包。是原始模拟DC TCP段，负载绕过WG；不是真实Telegram业务。两轮交换顺序，所有条件在同批次保持一致。
+
+| 场景 | 轮次 | audit2 control Mbps | fair1 Mbps | 解读 |
+|---|---:|---:|---:|---|
+| 4流共16MiB | 两轮中位数 | 110.241 | 110.165 | −0.07%，无明显收益 |
+| 8流共64MiB | 1 | 60.161 | 28.962 | 候选明显更慢 |
+| 同一8流批次 | 2 | 30.431 | 87.813 | 候选明显更快 |
+| 同一8流批次 | 两轮中位数 | 45.296 | 58.387 | +28.90%，但逐对方向相反，不能宣称稳定改善 |
+
+四流16条上传及八流32条上传全部完成SHA256与小文件探测。没有宿主OOM。八流进程组内存采样最大166,563,840字节，memory.high事件505；anon/file/sock分别采样最大97,386,496/36,372,480/61,026,304字节。它们不是同一时刻的值，不可相加；缓冲限制也不是已用内存。四流采样最大151,351,296字节且无high事件。
+
+第一次试验只有control完成，fair1在传输前被旧版本允许名单拒绝。我遗漏新标识导致该批次不完整，工作进程日志保留，不计算比例；随后仅添加明确版本并继续要求匹配摘要。八流最初被自动审批阻止，用户明确批准一次后才执行；该轮没有重跑。
+
+完整[summary](benchmarks/fairness-20261024/results/summary.json)、逐轮文件及资源记录原样保留。导出40文件SHA256为`75c284a0173bd8ed0506bc04bd108e6ed659ae7d847e73b4eaf79fa8cd35fd79`；与本地保留的传输源码包核对75文件身份。[最终清理](benchmarks/fairness-20261024/cleanup.json)确认实验目录、namespace、unit、临时目录及密钥均移除，历史核心摘要和监听不变，宿主OOM增量0。只保留历史资产及协调锁。
+
+## 未发送队列候选 queue1
+
+公平调度尚未给出稳定收益，下一候选只在outgoing socket设置64KiB的`TCP_NOTSENT_LOWAT`，保留SO_RCVBUF/SO_SNDBUF自动调节。它约束未发送队列及可写通知，不是限制全部在途字节。依据为[Linux内核说明](https://www.kernel.org/doc/html/latest/networking/ip-sysctl.html)及已有DC发送排队观测，仍需原生对照验证。
+
+源文件`patches/unsent_queue.rs`由构建器嵌入固定上游的outgoing transport socket创建路径。本项目使用Direct-DC；函数也被上游其他出站传输调用，不能宣称只影响某一个业务分支。Linux内核选项回归检查实际值为65536且SO_RCVBUF/SO_SNDBUF没有改变。
+
+模拟客户端改为进程内共享只读SSLContext，每条连接仍创建独立SSLObject/MemoryBIO；不修改使用后的context、不共享会话密码状态。[Python文档](https://docs.python.org/3.12/library/ssl.html#ssl.SSLContext)支持这一用法。目的是避免重复证书库分配与读取，尚未给出独立内存收益测量。新测试器版本改变了条件，queue批次必须单独报告，不与fair批次合并计算提升。
+
+用户随后授权queue候选按8→16→32逐级、每级最多一批两轮，前级失败、收益不成立或资源不足即停止，CPU/内存限额不变。实际在8流失败后停止，结果如下。
+
+### queue1 的实际结果
+
+对照核心在八流首项中仅7/8完成，另一路等待摘要超时。按授权停止，未进入16/32；随后用户另行批准**仅一次候选同级验证**，没有重跑对照或升档。queue1也只有7/8完成。因此两个批次均失败，没有可发布的速度或提速比例。
+
+| 观测 | audit2对照 | queue1单次候选 |
+|---|---:|---:|
+| DC侧采样最大未发送字节 | 2,121,320 | 69,504 |
+| client侧采样最大实际接收内存 | 4,903,347 | 5,111,476 |
+| 最后失败连接的client侧接收字节 | 7,799,592 | 7,996,123 |
+| 最后失败连接的client socket丢弃计数 | 22 | 22 |
+| 实验组内存采样最大字节 | 186,359,808 | 165,023,744 |
+| memory.high事件 | 12 | 341 |
+| 宿主OOM增量 | 0 | 0 |
+
+两个批次的动态内存预算字节数不同，且第二项是单次候选验证，不以这张表计算资源节省比例或性能因果。队列阈值确实生效，但不足以修复当前失败。最后样本显示数据尚未全部到达Telemt，queue1的DC未发送队列已经为空，不能将故障继续归结为DC积压或完整传输后的SHA确认丢失。socket丢弃计数也不单独证明内存压力是唯一原因。
+
+旧worker在部分失败时把成功连接最大耗时写入`elapsed_seconds`，可能短于整个失败批次和末次采样时间；原始文件保持不变。后续worker已新增总wall耗时，并在失败时以总耗时记录elapsed；失败仍不给Mbps，不回填或修改历史数据。
+
+具体[queue原始记录](benchmarks/queue-20261024/results/summary.json)及[失败前快照](benchmarks/queue-20261024/raw-before-candidate.tar.gz)保留。最终导出21文件，SHA256为`79589e44315841eddf9ed1d83d6be23bd5ba74402406b062ccbc1aa940d68976`，核对76个传输源码文件。清理结果见[cleanup.json](benchmarks/queue-20261024/cleanup.json)：全部本轮实验资源已回收，未改宿主网络/SSH，未访问生产节点。
+
+## 接收侧候选 balanced1：尚未做VPS负载验证
+
+Linux5.15自动接收缓冲增长时会同步改写window_clamp，因此没有采用“只设置TCP_WINDOW_CLAMP就能永久限制自动接收窗口”的假设，依据为[内核接收缓冲实现](https://raw.githubusercontent.com/torvalds/linux/v5.15/net/ipv4/tcp_input.c)。也没有给进程新增CAP_NET_ADMIN、强制扩大系统rmem_max或更改宿主内核配置。
+
+`patches/low_rtt_receive.rs`在连接建立后读取TCP_INFO：仅当实际SYN RTT为1–5000微秒时，请求256KiB的client接收缓冲；0/未知/较高RTT保留自动调节。保留client发送缓冲和DC接收自动调节，并继续queue1的DC未发送阈值。其目的是处理低RTT入口链路上的大接收突发，不能宣称已证明其为32流根因。
+
+这是实际TCP连接RTT条件，不按地理位置、loopback地址或实验环境判断；HAProxy终结客户端连接后，后端读取的是入口到后端这条连接的RTT。不能把中国客户端到入口的RTT与此混为一谈。5ms阈值是待验证候选，可能在RTT随后上升时限制上传窗口；必须验证吞吐、小消息及长RTT路径，不默认推广。
+
+CI回归检查未知/长RTT不设置接收请求、真实socket设置不改变发送缓冲及原flush/背压契约。[源码检查40070626657](https://github.com/bababoyi6/me/actions/runs/40070626657)通过175项Python测试、10项Rust回归及安装恢复等检查；[原生构建40070623674](https://github.com/bababoyi6/me/actions/runs/40070623674)成功。构建复用摘要固定的已验证参考核心，记录引用的CI提交和归档摘要；参考过期时可从固定源码重建。
+
+构建提交为`f6156a9ba3242215b4df60d118f28f53ee73fb8a`，完整[manifest](balanced-core-manifest-20261024.json)已保存。四核心归档SHA256为`c1329c82aa1b51153213e72cfdd7b652468e7b6f298d9dd023456b8c1dcdd15b`，balanced1二进制SHA256为`8658a5694e7fba1e046103c9638c1766ae96e2167aac28b64e62e8028b0a01f8`。下载后逐一核对二进制长度与摘要，并确认归档中的新helper和构建器与本地源码逐字节一致；没有在本地执行核心。
+
+候选尚未执行任何新的VPS负载，也未替换main默认核心。前次授权仅覆盖已经完成的queue1单次验证；下一次负载须另行明确范围。即使候选8流全部完成，也只能说明该级别的完整性改善，仍不足以证明32×8MiB性能退化修复。
