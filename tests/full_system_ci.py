@@ -51,6 +51,13 @@ def guest(node, script, seconds=60):
     completed = ssh(node, script, seconds)
     if completed.returncode:
         (ROOT / 'private' / (node + '-command.log')).write_text(completed.stdout + completed.stderr)
+        if node=='base':
+            # Before installing any project credentials, only fixed OS package
+            # logs are safe to export. Never apply this to role transcripts.
+            details=ssh(node,"tail -c 8192 /root/preparation.log 2>/dev/null; tail -c 4096 /root/cloud-init-status.log 2>/dev/null\n",20)
+            write(ROOT/'results/preparation-failure.json',{'exit':completed.returncode,
+                  'public_os_preparation_log':details.stdout[-12288:],
+                  'ssh_stderr':completed.stderr[-1024:]})
         raise RuntimeError('private guest command failed: ' + node)
     return completed.stdout
 
@@ -305,7 +312,7 @@ def supervise():
         with (EVIDENCE/'phases.log').open('w') as log:
             process = subprocess.Popen(['systemd-run','--quiet','--wait','--pipe','--collect','--unit='+UNIT,
                 '-p','CPUQuota=60%', '-p',f'MemoryMax={maximum}', '-p',f'MemoryHigh={maximum*3//4}',
-                '-p','MemorySwapMax=0','-p','TasksMax=256','-p',f'RuntimeMaxSec={LIMIT_SECONDS}',
+                '-p','MemorySwapMax=0','-p','OOMPolicy=stop','-p','TasksMax=256','-p',f'RuntimeMaxSec={LIMIT_SECONDS}',
                 '-p','TimeoutStopSec=15','-p','KillMode=control-group','-p','IOWeight=10',
                 '-p','LimitFSIZE=3221225472','--setenv=RUNNER_TEMP='+str(ROOT.parent),
                 sys.executable, str(Path(__file__).resolve()), '--worker'], stdout=log, stderr=subprocess.DEVNULL)
@@ -341,7 +348,7 @@ def supervise():
         report['host_oom_delta'] = host_oom()-startoom
         report['elapsed_sec'] = round(time.monotonic()-started,1)
         # Only fixed-name JSON outputs may cross the private export boundary.
-        for name in ('worker.json','e2e.json','preparation.json'):
+        for name in ('worker.json','e2e.json','preparation.json','preparation-failure.json'):
             source = ROOT/'results'/name
             if source.is_file() and not source.is_symlink():
                 assert source.stat().st_size<1024**2
