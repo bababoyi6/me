@@ -39,12 +39,14 @@ def launch(args):
     assert limits['eligible'] and not report['existing_lab_namespaces']
     assert report['kernel_oom_kill_count'] is not None
     assert {'cpu','memory','pids'}.issubset(report['cgroup_v2_controllers'])
+    executables={name:shutil.which(name) for name in ('haproxy','wg')}
+    assert all(executables.values()), 'required private runtime tools missing'
     bundle=Path(args.bundle).resolve()
     assert bundle.is_file() and not bundle.is_symlink() and bundle.stat().st_size==10171361
     assert hashlib.sha256(bundle.read_bytes()).hexdigest()=='b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5'
     os.umask(0o077);root.mkdir(mode=0o700);(root/'results').mkdir(mode=0o700)
     unit='tdh-audit-endurance-'+uuid.uuid4().hex[:12]+'.service'
-    plan={'unit':unit,'seconds':args.seconds,'bundle':str(bundle),'preflight':report,
+    plan={'unit':unit,'seconds':args.seconds,'bundle':str(bundle),'preflight':report,'executables':executables,
           'started_utc':datetime.now(timezone.utc).isoformat(),'all_controller_and_worker_resources_share_one_unit':True,
           'source_sha256':{str(p.relative_to(REPO)):hashlib.sha256(p.read_bytes()).hexdigest()
                            for folder in ('tools','tests') for p in sorted((REPO/folder).glob('*.py'))}}
@@ -58,6 +60,8 @@ def launch(args):
           '--property=UMask=0077',f'--property=LimitFSIZE={32*MIB}',
           '--property=StandardOutput=append:'+str(root/'worker.log'),'--property=StandardError=inherit',
           '--property=ExecStopPost='+cleanup,
+          '--setenv=PATH='+os.environ.get('PATH','/usr/sbin:/usr/bin:/sbin:/bin'),
+          '--setenv=LD_LIBRARY_PATH='+os.environ.get('LD_LIBRARY_PATH',''),
           *(['--setenv=GITHUB_ACTIONS=true'] if os.environ.get('GITHUB_ACTIONS')=='true' else []),
           *(['--wait'] if args.wait else ['--no-block']),
           sys.executable,str(Path(__file__).resolve()),'--worker','--root',str(root)]
@@ -91,6 +95,7 @@ def worker(root):
     try:
         with (root/'path.log').open('w') as log:
             process=subprocess.Popen([sys.executable,'-B',str(REPO/'tests/dualhop_lab.py'),
+                '--haproxy',plan['executables']['haproxy'],'--wg',plan['executables']['wg'],
                 '--root',str(root),'--build','bulk','--separate-dc','--rtt','100',
                 '--endurance-seconds',str(plan['seconds']),'run'],stdout=log,stderr=log)
             while process.poll() is None:
