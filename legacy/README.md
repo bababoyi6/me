@@ -29,3 +29,5 @@ bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL -
 ## 本轮检查范围
 
 核对历史提交与冻结文件的字节/摘要、官方核心资产摘要；在 CI 检查 Bash 语法、ShellCheck、原脚本内置自检和 README 下载入口。没有重新执行性能矩阵或访问生产节点；不把当前优化版的完整安装验收说成原始版新做的验收。
+
+[CI 40175943736](https://github.com/bababoyi6/me/actions/runs/40175943736) 已通过，包含原版入口的 root/非 root 路径及摘要不匹配拒绝执行。发布后又以无登录请求下载三个 Release 资产和原版标签脚本，摘要全部匹配，标签指向上述旧提交；原始核对结果见 [publication-verification.json](publication-verification.json)。
