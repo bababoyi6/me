@@ -1,0 +1,10 @@
+{
+  "complete": false,
+  "roles": {},
+  "download_boundary_substituted": false,
+  "production_accessed": false,
+  "shared_ci_host": true,
+  "capacity_benchmark": false,
+  "phase": "public-install-entry",
+  "error_type": "TIMEOUT"
+}

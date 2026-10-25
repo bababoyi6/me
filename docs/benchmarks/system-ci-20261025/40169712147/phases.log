@@ -1,0 +1,3 @@
+{"initialized": true, "image_verified": true, "image_sha256": "6a05f0e81090bfa0aad89d6caeedb8ea70c91a89e8961fe5f7347a5ae1ccc84a", "limits_from_transient_unit": true}
+Full-system phase: prepare-base-os
+{"started": "base", "logical_memory_mib": 1024}

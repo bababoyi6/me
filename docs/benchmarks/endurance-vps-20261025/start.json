@@ -1,0 +1,16 @@
+{
+  "unit": "tdh-audit-endurance-a4f60f32fda5.service",
+  "root": "/root/tdh-audit-20261021/tdh-audit-endurance-38f1e199eb13",
+  "seconds": 86400,
+  "completed": false,
+  "started": true,
+  "source_commit": "58196ba",
+  "started_utc": "2026-10-25T06:57:03.382206+00:00",
+  "cpu_quota_percent": 60,
+  "memory_max_bytes": 223081472,
+  "memory_high_bytes": 167311104,
+  "payload_max_bytes": 201326592,
+  "private_only": true,
+  "auto_retry": false,
+  "production_accessed": false
+}

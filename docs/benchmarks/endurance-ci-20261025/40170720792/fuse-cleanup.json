@@ -1,0 +1,15 @@
+{
+  "complete": true,
+  "namespaces_removed": [],
+  "keys_removed": 0,
+  "errors": [],
+  "temporary_artifacts": {
+    "removed": [],
+    "already_absent": [
+      "tdh-e2e-pcaevb7_",
+      "tdh-e2e-qstr66ap",
+      "tdh-e2e-dual-xmok877o"
+    ],
+    "errors": []
+  }
+}
