@@ -219,6 +219,51 @@ PY
 """
 
 
+def failure_diagnostics(node):
+    """Read-only, allow-listed service evidence; never journals or link data."""
+    report={}
+    perf=ssh(node,'a perf 2\n',25)
+    if perf.returncode==0:
+        report['performance']=json.loads(perf.stdout)
+    else:
+        report['performance_exit']=perf.returncode
+    diag=ssh(node,'a diagnose\n',35)
+    text=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',diag.stdout+diag.stderr)
+    report['diagnose_exit']=diag.returncode
+    report['diagnose']=re.sub(r'[A-Za-z0-9_+/=-]{32,}','[redacted-token]',text[-8192:])
+    if node!='entry':
+        value=ssh(node,"""python3 - <<'PY'
+import concurrent.futures,json,socket,subprocess,time,urllib.request,urllib.error
+from pathlib import Path
+addresses=('149.154.175.50','149.154.167.51','149.154.175.100','149.154.167.91','149.154.171.5')
+def probe(item):
+ index,address=item;start=time.monotonic()
+ try:
+  with socket.create_connection((address,443),timeout=2):pass
+  return {'dc_index':index,'tcp_connected':True,'elapsed_sec':time.monotonic()-start}
+ except OSError as e:return {'dc_index':index,'tcp_connected':False,'error_type':type(e).__name__}
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+ def redirect_request(self,*args,**kwargs):return None
+result={}
+try:
+ token=Path('/etc/telemt-dual-hop/telemt/api.token').read_text().strip()
+ request=urllib.request.Request('http://127.0.0.1:19091/v1/health/ready',headers={'Authorization':'Bearer '+token})
+ opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
+ with opener.open(request,timeout=2) as response:
+  payload=json.loads(response.read(16384))
+  result['api']={'http_status':response.status,'ok':payload.get('ok') is True,'ready':payload.get('data',{}).get('ready') is True}
+except (OSError,ValueError,urllib.error.URLError) as e:result['api']={'error_type':type(e).__name__}
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:result['direct_dc_tcp']=list(pool.map(probe,enumerate(addresses,1)))
+raw=subprocess.run(['wg','show','all','latest-handshakes'],capture_output=True,text=True,timeout=3)
+result['wg_handshake_timestamps']=[int(line.split()[-1]) for line in raw.stdout.splitlines()]
+print(json.dumps(result))
+PY
+""",20)
+        if value.returncode==0:report['upstream']=json.loads(value.stdout)
+        else:report['upstream_snapshot_exit']=value.returncode
+    write(ROOT/'results'/('diagnostics-'+node+'.json'),report)
+
+
 def worker():
     os.umask(0o077)
     relative = next(x.split(':', 2)[2] for x in Path('/proc/self/cgroup').read_text().splitlines() if x.startswith('0::'))
@@ -303,6 +348,9 @@ PY
     except BaseException as error:
         result.update(error_type=type(error).__name__)
         write(ROOT/'results/worker.json', result)
+        for node in result['roles']:
+            try:failure_diagnostics(node)
+            except (OSError,ValueError,subprocess.SubprocessError):pass
         raise
     finally:
         for server in servers:
@@ -324,8 +372,8 @@ def supervise():
     kvm_gate()
     assert ROOT.is_dir() and not EVIDENCE.exists()
     info = meminfo(); reserve = max(2*1024**3, info['MemTotal']//3)
-    maximum = min(2*1024**3, (info['MemAvailable']-reserve)*3//4)
-    assert info['MemTotal']>=6*1024**3 and maximum>=1536*1024**2
+    maximum = min(3*1024**3, (info['MemAvailable']-reserve)*3//4)
+    assert info['MemTotal']>=8*1024**3 and maximum>=2560*1024**2
     assert shutil.disk_usage(ROOT).free>=10*1024**3
     EVIDENCE.mkdir(mode=0o755)
     startoom = host_oom()
@@ -378,7 +426,8 @@ def supervise():
         for name in ('worker.json','e2e.json','preparation.json','preparation-failure.json',
                      'interaction-entry-install.json','interaction-backend1-install.json',
                      'interaction-backend2-install.json','interaction-backend1-registration.json',
-                     'interaction-backend2-registration.json'):
+                     'interaction-backend2-registration.json','diagnostics-entry.json',
+                     'diagnostics-backend1.json','diagnostics-backend2.json'):
             source = ROOT/'results'/name
             if source.is_file() and not source.is_symlink():
                 assert source.stat().st_size<1024**2
