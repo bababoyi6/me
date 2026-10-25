@@ -1,0 +1,30 @@
+{
+  "classification": "USER_REQUESTED_EARLY_STOP",
+  "stopped_utc": "2026-10-25T07:53:12.923969+00:00",
+  "user_changed_merge_gate": true,
+  "automatic_followup_paused": true,
+  "accepted_24h": false,
+  "duration_completed_24h": false,
+  "completed_short_flows_before_stop": 60,
+  "all_recorded_short_flows_sha256_verified": true,
+  "long_stream_final_digest_not_available": true,
+  "unit_before": {
+    "Result": "success",
+    "ControlGroup": "/system.slice/tdh-audit-endurance-a4f60f32fda5.service",
+    "ActiveState": "active",
+    "SubState": "running"
+  },
+  "unit_after": {
+    "Result": "success",
+    "ControlGroup": "",
+    "ActiveState": "inactive",
+    "SubState": "dead"
+  },
+  "host_oom_kill_delta": 0,
+  "remaining_test_namespaces": [],
+  "remaining_test_keys": [],
+  "host_listeners_restored": true,
+  "cleanup_verified": true,
+  "production_accessed": false,
+  "new_tests_started": false
+}
