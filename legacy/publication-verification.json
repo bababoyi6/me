@@ -1,0 +1,24 @@
+{
+  "checked_utc": "2026-10-25T08:19:45.206201+00:00",
+  "authentication_used": false,
+  "release_url": "https://github.com/bababoyi6/me/releases/tag/v1.3.1-original",
+  "source_commit": "452c50d268c8a95d68bdda0d27878f4e9ddcefb2",
+  "public_asset_checks": {
+    "telemt-dual-hop.sh": {
+      "bytes": 94637,
+      "sha256": "07642df50587cbad056865445bfe4d38802322b2eb02d564234d1b4252a528dc"
+    },
+    "manifest.json": {
+      "bytes": 766,
+      "sha256": "276650fab6320f8c151ce818ad71993b735e63eab59442bad077cfff8e66790e"
+    },
+    "SHA256SUMS": {
+      "bytes": 167,
+      "sha256": "86f8a9684f05e7cd81cc73dd90138605e1deacab450a9d9dca8a937caa5f2ac8"
+    }
+  },
+  "raw_tag_script_byte_identical": true,
+  "source_core": "unmodified official Telemt 3.5.5",
+  "optimized_latest_retained": "v1.6.0",
+  "local_script_executed": false
+}

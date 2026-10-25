@@ -9,8 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallCommandTests(unittest.TestCase):
-    def invoke(self, download_ok, root=True, payload=None):
-        command = (ROOT / "README.md").read_text().split("```bash\n", 1)[1].split("\n```", 1)[0]
+    def invoke(self, download_ok, root=True, payload=None, original=False):
+        command = (ROOT / "README.md").read_text().split("```bash\n")[2 if original else 1].split("\n```", 1)[0]
         with tempfile.TemporaryDirectory(prefix="tdh-bootstrap-test-") as name:
             base = Path(name)
             commands = base / "commands"
@@ -19,7 +19,7 @@ class InstallCommandTests(unittest.TestCase):
             temporary.mkdir()
             existing = temporary / "telemt-dual-hop.sh"
             existing.write_bytes(b"SYNTHETIC_UNRELATED_EXISTING_FILE\n")
-            candidate = ROOT / "telemt-dual-hop.sh"
+            candidate = ROOT / ("legacy/telemt-dual-hop-1.3.1.sh" if original else "telemt-dual-hop.sh")
             if payload is not None:
                 candidate = base / "payload.sh"
                 candidate.write_bytes(payload)
@@ -65,14 +65,24 @@ exec /bin/bash "$@"
             self.assertIn("--max-filesize", arguments)
             self.assertIn("--proto", arguments)
             self.assertIn("=https", arguments)
+            channel = 'v1.3.1-original' if original else 'main'
+            self.assertIn(f'https://raw.githubusercontent.com/bababoyi6/me/{channel}/telemt-dual-hop.sh', arguments)
             if expected_success:
-                self.assertIn("Telemt Dual-Hop 1.6.0", result.stdout)
+                self.assertIn("Telemt Dual-Hop " + ("1.3.1" if original else "1.6.0"), result.stdout)
 
     def test_download_and_launch_then_clean_private_temporary_file(self):
         self.invoke(True)
 
     def test_nonroot_install_uses_sudo_boundary(self):
         self.invoke(True, root=False)
+
+    def test_original_uses_frozen_channel_for_root_and_nonroot(self):
+        for root in (True,False):
+            with self.subTest(root=root):self.invoke(True,root=root,original=True)
+
+    def test_original_rejects_valid_shell_with_wrong_pinned_digest(self):
+        payload=(ROOT/'legacy/telemt-dual-hop-1.3.1.sh').read_bytes()+b'\n# changed after download\n'
+        self.invoke(True,payload=payload,original=True)
 
     def test_download_failure_never_launches_or_leaves_partial_file(self):
         self.invoke(False)
