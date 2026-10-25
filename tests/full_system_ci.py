@@ -121,6 +121,50 @@ systemctl disable --now haproxy.service >/root/base-haproxy-stop.log 2>&1
           'production_installer_changes_kernel': False})
 
 
+def prepare_lan(node):
+    """A cloned NoCloud netplan must not retain the base guest's LAN match."""
+    index=ROLES.index(node)+1
+    script="""python3 - <<'PY'
+import json,subprocess
+from pathlib import Path
+import yaml
+index=INDEX
+mac=f'52:54:01:71:01:{index:02x}'
+interfaces=[p.name for p in Path('/sys/class/net').iterdir() if (p/'address').read_text().strip()==mac]
+assert len(interfaces)==1
+device=interfaces[0]
+before=json.loads(subprocess.check_output(['ip','-j','address'],text=True))
+for path in Path('/etc/netplan').glob('*.yaml'):
+ data=yaml.safe_load(path.read_text())
+ entries=data.get('network',{}).get('ethernets',{})
+ remove=[name for name,row in entries.items() if str(row.get('match',{}).get('macaddress','')).lower().startswith('52:54:01:71:01:')]
+ if remove:
+  for name in remove:del entries[name]
+  path.write_text(yaml.safe_dump(data));path.chmod(0o600)
+config={'network':{'version':2,'renderer':'networkd','ethernets':{'tdh_lab':{
+ 'match':{'macaddress':mac},'dhcp4':False,'dhcp6':False,'addresses':[f'11.254.254.{index}/24']}}}}
+path=Path('/etc/netplan/60-tdh-lab.yaml');path.write_text(yaml.safe_dump(config));path.chmod(0o600)
+# Apply just the attested lab NIC live; leave the SSH/WAN interface untouched.
+addresses=next(r for r in before if r['ifname']==device).get('addr_info',[])
+assert all(a.get('family')!='inet' or a['local'].startswith('11.254.254.') for a in addresses)
+subprocess.run(['ip','-4','address','flush','dev',device],check=True)
+subprocess.run(['ip','address','add',f'11.254.254.{index}/24','dev',device],check=True)
+subprocess.run(['ip','link','set',device,'up'],check=True)
+subprocess.run(['netplan','generate'],check=True,capture_output=True)
+# The discard route prevents synthetic "public" fixture addresses escaping
+# through SLIRP if the lab NIC is unavailable. This is guest-only routing.
+unit=Path('/etc/systemd/system/tdh-lab-route-guard.service')
+unit.write_text('[Unit]\\nDefaultDependencies=no\\nAfter=local-fs.target\\nBefore=network-pre.target\\nWants=network-pre.target\\n[Service]\\nType=oneshot\\nRemainAfterExit=yes\\nExecStart=/usr/sbin/ip route replace blackhole 11.254.254.0/24 metric 32760\\n[Install]\\nWantedBy=multi-user.target\\n')
+subprocess.run(['systemctl','daemon-reload'],check=True)
+subprocess.run(['systemctl','enable','--now','tdh-lab-route-guard.service'],check=True,capture_output=True)
+route=json.loads(subprocess.check_output(['ip','-j','route','get',f'11.254.254.{2 if index==1 else 1}'],text=True))[0]
+assert route['dev']==device and route['prefsrc']==f'11.254.254.{index}'
+print(json.dumps({'complete':True,'before':before,'device':device,'route':route,'synthetic_wan_escape_blocked':True}))
+PY
+""".replace('INDEX',str(index))
+    return json.loads(guest(node,script,45))
+
+
 def interactive(node, name, line, action):
     import pexpect
     child = None
@@ -287,6 +331,13 @@ def worker():
         boots = {node: ready(node) for node in ROLES}
         for node in ROLES:
             guest(node,'cloud-init status --wait >/root/firstboot-status.log 2>&1\n',90)
+        phase('attest-private-lan-before-installs')
+        lan={node:prepare_lan(node) for node in ROLES}
+        for node in ROLES:
+            for peer in ROLES:
+                if peer!=node:
+                    guest(node,'ping -n -c 1 -W 2 11.254.254.'+str(ROLES.index(peer)+1)+' >/root/private-lan-ping.log\n',15)
+        write(ROOT/'results/lan.json',{'complete':True,'all_six_directed_lan_paths_verified':True,'nodes':lan})
         for node in ROLES:
             phase('public-install-'+node); install(node)
             result['roles'][node] = identity(node)
@@ -423,7 +474,7 @@ def supervise():
         report['host_oom_delta'] = host_oom()-startoom
         report['elapsed_sec'] = round(time.monotonic()-started,1)
         # Only fixed-name JSON outputs may cross the private export boundary.
-        for name in ('worker.json','e2e.json','preparation.json','preparation-failure.json',
+        for name in ('worker.json','e2e.json','preparation.json','preparation-failure.json','lan.json',
                      'interaction-entry-install.json','interaction-backend1-install.json',
                      'interaction-backend2-install.json','interaction-backend1-registration.json',
                      'interaction-backend2-registration.json','diagnostics-entry.json',
