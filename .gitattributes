@@ -1,6 +1,8 @@
 *.sh text eol=lf
 *.py text eol=lf
 *.rs text eol=lf
+# Keep the original historical installer byte-for-byte, including line endings.
+legacy/telemt-dual-hop-1.3.1.sh -text -whitespace
 # Preserve context line endings from the pinned upstream source archive.
 # Unified-diff blank context lines and CRLF are intentional patch syntax.
 patches/*.patch -text -whitespace
