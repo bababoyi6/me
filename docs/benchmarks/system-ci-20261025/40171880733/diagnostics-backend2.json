@@ -1,0 +1,253 @@
+{
+  "performance": {
+    "\u8bf4\u660e": "\u53ea\u8bfb\u672c\u673a\u91c7\u6837\uff1b\u65e0\u4e3b\u52a8\u6d4b\u901f\u3001\u65e0\u4e0a\u4f20\uff1bnull \u8868\u793a\u4e0d\u53ef\u7528\u3002TCP RTT \u4e3a\u5f53\u524d\u8fde\u63a5\u5206\u5e03\uff0c\u4e0d\u662f\u65f6\u95f4\u5e8f\u5217 P95\u3002",
+    "schema": 1,
+    "role": "backend2",
+    "kernel": "5.15.0-198-generic",
+    "sample_seconds": 2.181,
+    "timestamp_utc": "2026-10-25T07:20:24.407690+00:00",
+    "versions": {
+      "telemt": "3.5.5+tdh.balanced2",
+      "haproxy": "2.4.30-0ubuntu0.22.04.2"
+    },
+    "memory_kib": {
+      "MemTotal": 980308,
+      "MemAvailable": 696312,
+      "SwapTotal": 0,
+      "SwapFree": 0
+    },
+    "cpu": {
+      "cpu": {
+        "busy_percent": 1.93,
+        "steal_percent": 1.93
+      },
+      "cpu0": {
+        "busy_percent": 1.93,
+        "steal_percent": 1.93
+      }
+    },
+    "services": {
+      "haproxy": {
+        "running": false,
+        "rss_bytes": 0,
+        "fds": 0,
+        "fd_limit": 1048576,
+        "tasks": null,
+        "sample_seconds": 2.075,
+        "cpu_percent_one_core": 0.0
+      },
+      "telemt": {
+        "running": true,
+        "rss_bytes": 19927040,
+        "fds": 14,
+        "fd_limit": 262144,
+        "tasks": 15,
+        "sample_seconds": 2.071,
+        "cpu_percent_one_core": 0.0
+      },
+      "health-agent": {
+        "running": true,
+        "rss_bytes": 18640896,
+        "fds": 5,
+        "fd_limit": 524288,
+        "tasks": 3,
+        "sample_seconds": 2.026,
+        "cpu_percent_one_core": 0.0
+      }
+    },
+    "interfaces": {
+      "nic0": {
+        "mtu": 1500,
+        "rx_bytes": 10881090,
+        "tx_bytes": 133412,
+        "rx_dropped": 0,
+        "tx_dropped": 0,
+        "rx_errors": 0,
+        "tx_errors": 0,
+        "qdisc": [
+          {
+            "kind": "fq_codel",
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 0,
+            "qlen": 0
+          }
+        ],
+        "offload": {
+          "tcp-segmentation-offload": false,
+          "generic-segmentation-offload": false,
+          "generic-receive-offload": true,
+          "tx-udp-segmentation": false
+        },
+        "rx_bytes_delta": 0,
+        "tx_bytes_delta": 0,
+        "rx_dropped_delta": 0,
+        "tx_dropped_delta": 0,
+        "rx_errors_delta": 0,
+        "tx_errors_delta": 0
+      },
+      "nic1": {
+        "mtu": 1500,
+        "rx_bytes": 0,
+        "tx_bytes": 0,
+        "rx_dropped": 0,
+        "tx_dropped": 0,
+        "rx_errors": 0,
+        "tx_errors": 0,
+        "qdisc": [],
+        "offload": {
+          "tcp-segmentation-offload": false,
+          "generic-segmentation-offload": false,
+          "generic-receive-offload": true,
+          "tx-udp-segmentation": false
+        },
+        "rx_bytes_delta": 0,
+        "tx_bytes_delta": 0,
+        "rx_dropped_delta": 0,
+        "tx_dropped_delta": 0,
+        "rx_errors_delta": 0,
+        "tx_errors_delta": 0
+      },
+      "tdh-b2": {
+        "mtu": 1420,
+        "rx_bytes": 0,
+        "tx_bytes": 0,
+        "rx_dropped": 0,
+        "tx_dropped": 0,
+        "rx_errors": 0,
+        "tx_errors": 0,
+        "qdisc": [
+          {
+            "kind": "noqueue",
+            "drops": 0,
+            "overlimits": 0,
+            "backlog": 0,
+            "qlen": 0
+          }
+        ],
+        "offload": {
+          "tcp-segmentation-offload": true,
+          "generic-segmentation-offload": true,
+          "generic-receive-offload": true,
+          "tx-udp-segmentation": true
+        },
+        "rx_bytes_delta": 0,
+        "tx_bytes_delta": 0,
+        "rx_dropped_delta": 0,
+        "tx_dropped_delta": 0,
+        "rx_errors_delta": 0,
+        "tx_errors_delta": 0
+      }
+    },
+    "tcp": {},
+    "wireguard": {
+      "tdh-b2": {
+        "handshake_age_seconds": null
+      }
+    },
+    "system_counters_delta": {
+      "Ip.ReasmFails": 0,
+      "Ip.FragFails": 0,
+      "Ip.FragCreates": 0,
+      "Icmp.InErrors": 0,
+      "Tcp.InSegs": 20,
+      "Tcp.OutSegs": 20,
+      "Tcp.RetransSegs": 0,
+      "Udp.InErrors": 0,
+      "Udp.RcvbufErrors": 0,
+      "Udp.SndbufErrors": 0,
+      "UdpLite.InErrors": 0,
+      "UdpLite.RcvbufErrors": 0,
+      "UdpLite.SndbufErrors": 0,
+      "TcpExt.ListenOverflows": 0,
+      "TcpExt.ListenDrops": 0,
+      "TcpExt.TCPLostRetransmit": 0,
+      "TcpExt.TCPTimeouts": 0,
+      "TcpExt.TCPMemoryPressures": 0,
+      "TcpExt.TCPBacklogDrop": 0,
+      "TcpExt.TCPRcvQDrop": 0,
+      "Vm.pswpin": 0,
+      "Vm.pswpout": 0,
+      "Vm.pgmajfault": 10,
+      "Vm.oom_kill": 0
+    },
+    "vm_counters_total": {
+      "Vm.pswpin": 0,
+      "Vm.pswpout": 0,
+      "Vm.pgmajfault": 1068,
+      "Vm.oom_kill": 0
+    },
+    "sysctl": {
+      "net.core.default_qdisc": "fq",
+      "net.ipv4.tcp_congestion_control": "bbr",
+      "net.ipv4.tcp_available_congestion_control": "reno cubic bbr",
+      "net.ipv4.tcp_rmem": "4096\t131072\t6291456",
+      "net.ipv4.tcp_wmem": "4096\t16384\t4194304",
+      "net.core.rmem_max": "212992",
+      "net.core.wmem_max": "212992",
+      "net.ipv4.tcp_mtu_probing": "0",
+      "net.core.somaxconn": "65535",
+      "net.ipv4.tcp_max_syn_backlog": "32768"
+    },
+    "haproxy": null,
+    "telemt": {
+      "core": {
+        "connections_total": 0,
+        "connections_bad_total": 0,
+        "handshake_timeouts_total": 0,
+        "accept_permit_timeout_total": 0,
+        "conntrack_pressure_active": false
+      },
+      "upstream": {
+        "connect_attempt_total": 4,
+        "connect_success_total": 4,
+        "connect_fail_total": 0,
+        "connect_failfast_hard_error_total": 0,
+        "connect_duration_success_bucket_le_100ms": 4,
+        "connect_duration_success_bucket_101_500ms": 0,
+        "connect_duration_success_bucket_501_1000ms": 0,
+        "connect_duration_success_bucket_gt_1000ms": 0
+      }
+    },
+    "direct_buffer_pressure": null
+  },
+  "diagnose_exit": 1,
+  "diagnose": "\nTelemt Dual-Hop \u8bca\u65ad\n[\u6210\u529f] wg-quick@tdh-b2.service\n[\u6210\u529f] telemt-dual-hop-telemt.service\n[\u6210\u529f] telemt-dual-hop-health-agent.service\n[\u6210\u529f] BBR / \u9ed8\u8ba4\u961f\u5217 fq \u5df2\u8bbe\u7f6e\uff1ba perf \u53ef\u67e5\u770b\u5b9e\u9645\u8fde\u63a5\u548c\u63a5\u53e3\n[\u6210\u529f] Telemt \u4e8c\u8fdb\u5236\u8eab\u4efd\u901a\u8fc7\uff08a perf \u53ef\u67e5\u770b\u6784\u5efa\u6807\u8bc6\uff09\n[\u6210\u529f] Telemt API \u4e0e 5 \u4e2a Telegram DC \u5168\u90e8\u53ef\u8fbe\n[\u6210\u529f] \u5355\u5b9e\u4f8b\u53cc SNI / Direct-DC / \u8fde\u63a5 1914 / \u7f13\u51b2 239 MiB\n[\u6210\u529f] \u7ebf\u8def A API/\u94fe\u63a5\n[\u6210\u529f] \u7ebf\u8def B API/\u94fe\u63a5\n[\u6210\u529f] Telemt \u53ea\u76d1\u542c WireGuard \u5730\u5740\n[\u6210\u529f] \u5065\u5eb7\u4ee3\u7406\u53ea\u76d1\u542c WireGuard \u5730\u5740\n[\u6210\u529f] Telemt API \u53ea\u76d1\u542c\u56de\u73af\u5730\u5740\n[\u6ce8\u610f] WireGuard \u8d85\u8fc7 180 \u79d2\u6ca1\u6709\u63e1\u624b\n[\u5931\u8d25] \u53d1\u73b0 1 \u9879\u5f02\u5e38\u3002\n",
+  "upstream": {
+    "api": {
+      "http_status": 200,
+      "ok": true,
+      "ready": true
+    },
+    "direct_dc_tcp": [
+      {
+        "dc_index": 1,
+        "tcp_connected": true,
+        "elapsed_sec": 0.06518074000001661
+      },
+      {
+        "dc_index": 2,
+        "tcp_connected": true,
+        "elapsed_sec": 0.14837377699996068
+      },
+      {
+        "dc_index": 3,
+        "tcp_connected": true,
+        "elapsed_sec": 0.07774286799997299
+      },
+      {
+        "dc_index": 4,
+        "tcp_connected": true,
+        "elapsed_sec": 0.14891219600002614
+      },
+      {
+        "dc_index": 5,
+        "tcp_connected": true,
+        "elapsed_sec": 0.17202757699999438
+      }
+    ],
+    "wg_handshake_timestamps": [
+      0
+    ]
+  }
+}

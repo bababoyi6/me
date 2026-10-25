@@ -1,0 +1,56 @@
+{
+  "unit": {
+    "Result": "success",
+    "ControlGroup": "/system.slice/tdh-audit-endurance-a4f60f32fda5.service",
+    "MemoryCurrent": "166969344",
+    "ActiveState": "active",
+    "SubState": "running"
+  },
+  "started_utc": "2026-10-25T06:57:03.382206+00:00",
+  "controller": {
+    "accepted": false,
+    "exit": null,
+    "stop_reason": null,
+    "host_oom_delta": null,
+    "private_keys_exported": false,
+    "latest_sample": [
+      {
+        "elapsed_sec": 1082.0,
+        "memory_current": 167088128,
+        "host_available": 509927424,
+        "memory_events": {
+          "low": 0,
+          "high": 5,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "cpu_stat": "usage_usec 7384417\nuser_usec 4096235\nsystem_usec 3288182\nnr_periods 7832\nnr_throttled 13\nthrottled_usec 375308\n"
+      }
+    ]
+  },
+  "path": {
+    "seconds_requested": 86400,
+    "complete": false,
+    "classification": "PRIVATE_LOW_TRAFFIC_ENDURANCE",
+    "payload_max_bytes": 201326592,
+    "production_accessed": false,
+    "throughput_or_capacity_claimed": false,
+    "initial_route_delta": [
+      1,
+      1
+    ],
+    "completed_short_flows": 22,
+    "latest_probe_sample": [
+      {
+        "elapsed_seconds": 1020.3521229859907,
+        "backend_fd_count": [
+          17,
+          17
+        ]
+      }
+    ]
+  },
+  "host_oom_kill_count": 0,
+  "host_listeners": "udp UNCONN 0      0      127.0.0.53%lo:53 0.0.0.0:*\ntcp LISTEN 0      4096   127.0.0.53%lo:53 0.0.0.0:*\ntcp LISTEN 0      128          0.0.0.0:22 0.0.0.0:*\ntcp LISTEN 0      128             [::]:22    [::]:*\n"
+}

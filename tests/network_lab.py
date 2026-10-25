@@ -76,6 +76,7 @@ class Network:
         self.processes = []
         self.created = []
         self.key_paths = []
+        self.ownership = {}
         supplied = Path(args.root)
         self.root = supplied.resolve()
         if os.geteuid() != 0 or not self.root.name.startswith("tdh-audit-"):
@@ -99,10 +100,21 @@ class Network:
             self.global_lock.close()
             raise
 
+    def add_namespace(self, name):
+        command('ip','netns','add',name)
+        self.created.append(name)
+        if getattr(self.args,'ownership_ledger',False):
+            value=Path('/run/netns',name).stat()
+            self.ownership[name]={'device':value.st_dev,'inode':value.st_ino}
+            temporary=self.root/'namespace-owner.tmp'
+            descriptor=os.open(temporary,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+            with os.fdopen(descriptor,'w') as output:
+                json.dump(self.ownership,output);output.flush();os.fsync(output.fileno())
+            temporary.replace(self.root/'namespace-owner.json')
+
     def setup(self):
         for name in NAMES:
-            command("ip", "netns", "add", name)
-            self.created.append(name)
+            self.add_namespace(name)
             command("ip", "-n", name, "link", "set", "lo", "up")
         for left, right, a, b, prefix in (
             (NAMES[0], NAMES[1], "192.0.2.1", "192.0.2.2", "la"),

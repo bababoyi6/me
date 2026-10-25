@@ -32,6 +32,8 @@ jobs:
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Verify private shared core inode permissions and cleanup
         run: sudo timeout 20 python3 -m unittest discover -s tests -p 'test_lab_binary.py' -v
+      - name: Verify orphan cleanup ownership and refusal of changed namespaces
+        run: sudo timeout 20 python3 -m unittest discover -s tests -p 'test_endurance_cleanup.py' -v
       - name: Verify real backend socket observations in private namespaces
         run: sudo timeout --kill-after=5 20 python3 -m unittest discover -s tests -p 'test_backend_observer.py' -v
       - name: Verify experimental socket policies on private loopback

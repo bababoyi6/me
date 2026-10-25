@@ -1,0 +1,852 @@
+{
+  "node": "entry",
+  "exit": 1,
+  "stop_reason": null,
+  "samples": [
+    {
+      "elapsed_seconds": 0.016349536017514765,
+      "memory_current": 2093056,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 664891392
+    },
+    {
+      "elapsed_seconds": 2.0190972679993138,
+      "memory_current": 186105856,
+      "memory_events": {
+        "low": "0",
+        "high": "585",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 617857024
+    },
+    {
+      "elapsed_seconds": 4.020501159015112,
+      "memory_current": 186015744,
+      "memory_events": {
+        "low": "0",
+        "high": "792",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 616394752
+    },
+    {
+      "elapsed_seconds": 6.021721882047132,
+      "memory_current": 186015744,
+      "memory_events": {
+        "low": "0",
+        "high": "792",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 616394752
+    },
+    {
+      "elapsed_seconds": 8.02445864805486,
+      "memory_current": 185958400,
+      "memory_events": {
+        "low": "0",
+        "high": "900",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 616951808
+    },
+    {
+      "elapsed_seconds": 10.02709822403267,
+      "memory_current": 186146816,
+      "memory_events": {
+        "low": "0",
+        "high": "964",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 612278272
+    },
+    {
+      "elapsed_seconds": 12.02840135304723,
+      "memory_current": 186056704,
+      "memory_events": {
+        "low": "0",
+        "high": "1161",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 614981632
+    },
+    {
+      "elapsed_seconds": 14.031079518026672,
+      "memory_current": 185999360,
+      "memory_events": {
+        "low": "0",
+        "high": "1532",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 616583168
+    },
+    {
+      "elapsed_seconds": 16.032408876053523,
+      "memory_current": 186040320,
+      "memory_events": {
+        "low": "0",
+        "high": "1944",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 614363136
+    },
+    {
+      "elapsed_seconds": 18.03508485702332,
+      "memory_current": 185843712,
+      "memory_events": {
+        "low": "0",
+        "high": "2341",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 613314560
+    },
+    {
+      "elapsed_seconds": 20.036391529021785,
+      "memory_current": 186044416,
+      "memory_events": {
+        "low": "0",
+        "high": "2721",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 612777984
+    },
+    {
+      "elapsed_seconds": 22.039085208030883,
+      "memory_current": 186155008,
+      "memory_events": {
+        "low": "0",
+        "high": "3151",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 614027264
+    },
+    {
+      "elapsed_seconds": 24.040457700029947,
+      "memory_current": 186155008,
+      "memory_events": {
+        "low": "0",
+        "high": "3546",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 613679104
+    },
+    {
+      "elapsed_seconds": 26.043141233036295,
+      "memory_current": 186089472,
+      "memory_events": {
+        "low": "0",
+        "high": "3611",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 612282368
+    },
+    {
+      "elapsed_seconds": 28.044024722999893,
+      "memory_current": 186216448,
+      "memory_events": {
+        "low": "0",
+        "high": "3758",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 612204544
+    },
+    {
+      "elapsed_seconds": 30.046702167019248,
+      "memory_current": 173096960,
+      "memory_events": {
+        "low": "0",
+        "high": "3886",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 596357120
+    },
+    {
+      "elapsed_seconds": 32.04842789605027,
+      "memory_current": 186081280,
+      "memory_events": {
+        "low": "0",
+        "high": "3894",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 608989184
+    },
+    {
+      "elapsed_seconds": 34.051093581016175,
+      "memory_current": 186023936,
+      "memory_events": {
+        "low": "0",
+        "high": "4030",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606736384
+    },
+    {
+      "elapsed_seconds": 36.052409887022804,
+      "memory_current": 186019840,
+      "memory_events": {
+        "low": "0",
+        "high": "4105",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 608202752
+    },
+    {
+      "elapsed_seconds": 38.05504847102566,
+      "memory_current": 186187776,
+      "memory_events": {
+        "low": "0",
+        "high": "4208",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606142464
+    },
+    {
+      "elapsed_seconds": 40.05641621601535,
+      "memory_current": 186224640,
+      "memory_events": {
+        "low": "0",
+        "high": "4328",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606281728
+    },
+    {
+      "elapsed_seconds": 42.0590614110115,
+      "memory_current": 185999360,
+      "memory_events": {
+        "low": "0",
+        "high": "4403",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 607727616
+    },
+    {
+      "elapsed_seconds": 44.06041565502528,
+      "memory_current": 186146816,
+      "memory_events": {
+        "low": "0",
+        "high": "4567",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606425088
+    },
+    {
+      "elapsed_seconds": 46.06309986801352,
+      "memory_current": 186011648,
+      "memory_events": {
+        "low": "0",
+        "high": "4864",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606720000
+    },
+    {
+      "elapsed_seconds": 48.06439102505101,
+      "memory_current": 186236928,
+      "memory_events": {
+        "low": "0",
+        "high": "5093",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606769152
+    },
+    {
+      "elapsed_seconds": 50.06706510204822,
+      "memory_current": 186015744,
+      "memory_events": {
+        "low": "0",
+        "high": "5278",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 607973376
+    },
+    {
+      "elapsed_seconds": 52.06843237602152,
+      "memory_current": 186101760,
+      "memory_events": {
+        "low": "0",
+        "high": "5442",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606429184
+    },
+    {
+      "elapsed_seconds": 54.07161865005037,
+      "memory_current": 186134528,
+      "memory_events": {
+        "low": "0",
+        "high": "5710",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606609408
+    },
+    {
+      "elapsed_seconds": 56.07473359705182,
+      "memory_current": 186068992,
+      "memory_events": {
+        "low": "0",
+        "high": "5947",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 607940608
+    },
+    {
+      "elapsed_seconds": 58.07762819802156,
+      "memory_current": 186122240,
+      "memory_events": {
+        "low": "0",
+        "high": "6191",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 607453184
+    },
+    {
+      "elapsed_seconds": 60.08075468003517,
+      "memory_current": 184614912,
+      "memory_events": {
+        "low": "0",
+        "high": "6203",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 605949952
+    },
+    {
+      "elapsed_seconds": 62.08408098900691,
+      "memory_current": 184860672,
+      "memory_events": {
+        "low": "0",
+        "high": "6204",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606175232
+    },
+    {
+      "elapsed_seconds": 64.08733937505167,
+      "memory_current": 186073088,
+      "memory_events": {
+        "low": "0",
+        "high": "6226",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606846976
+    },
+    {
+      "elapsed_seconds": 66.08878340100637,
+      "memory_current": 184578048,
+      "memory_events": {
+        "low": "0",
+        "high": "6233",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 605421568
+    },
+    {
+      "elapsed_seconds": 68.09170477400767,
+      "memory_current": 186257408,
+      "memory_events": {
+        "low": "0",
+        "high": "6307",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 607109120
+    },
+    {
+      "elapsed_seconds": 70.09243093203986,
+      "memory_current": 186138624,
+      "memory_events": {
+        "low": "0",
+        "high": "6604",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606818304
+    },
+    {
+      "elapsed_seconds": 72.09461532701971,
+      "memory_current": 186155008,
+      "memory_events": {
+        "low": "0",
+        "high": "6762",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606732288
+    },
+    {
+      "elapsed_seconds": 74.09640402800869,
+      "memory_current": 186085376,
+      "memory_events": {
+        "low": "0",
+        "high": "7152",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606720000
+    },
+    {
+      "elapsed_seconds": 76.09905235702172,
+      "memory_current": 186220544,
+      "memory_events": {
+        "low": "0",
+        "high": "7509",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 605847552
+    },
+    {
+      "elapsed_seconds": 78.10039011400659,
+      "memory_current": 186204160,
+      "memory_events": {
+        "low": "0",
+        "high": "8001",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 606040064
+    },
+    {
+      "elapsed_seconds": 80.10115834604949,
+      "memory_current": 185995264,
+      "memory_events": {
+        "low": "0",
+        "high": "8505",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 605671424
+    },
+    {
+      "elapsed_seconds": 82.10264836403076,
+      "memory_current": 186105856,
+      "memory_events": {
+        "low": "0",
+        "high": "8901",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604139520
+    },
+    {
+      "elapsed_seconds": 84.10449395200703,
+      "memory_current": 186191872,
+      "memory_events": {
+        "low": "0",
+        "high": "9302",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604073984
+    },
+    {
+      "elapsed_seconds": 86.10717620200012,
+      "memory_current": 186126336,
+      "memory_events": {
+        "low": "0",
+        "high": "9881",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604037120
+    },
+    {
+      "elapsed_seconds": 88.10839797201334,
+      "memory_current": 186155008,
+      "memory_events": {
+        "low": "0",
+        "high": "10579",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 603987968
+    },
+    {
+      "elapsed_seconds": 90.10921724099899,
+      "memory_current": 185962496,
+      "memory_events": {
+        "low": "0",
+        "high": "11467",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 603820032
+    },
+    {
+      "elapsed_seconds": 92.11199243104784,
+      "memory_current": 186089472,
+      "memory_events": {
+        "low": "0",
+        "high": "12325",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 603996160
+    },
+    {
+      "elapsed_seconds": 94.11389481503284,
+      "memory_current": 186068992,
+      "memory_events": {
+        "low": "0",
+        "high": "13129",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 603688960
+    },
+    {
+      "elapsed_seconds": 96.11640196701046,
+      "memory_current": 185987072,
+      "memory_events": {
+        "low": "0",
+        "high": "14090",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 603717632
+    },
+    {
+      "elapsed_seconds": 98.11725552903954,
+      "memory_current": 186073088,
+      "memory_events": {
+        "low": "0",
+        "high": "14914",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 603832320
+    },
+    {
+      "elapsed_seconds": 100.11999406199902,
+      "memory_current": 186171392,
+      "memory_events": {
+        "low": "0",
+        "high": "15470",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 603070464
+    },
+    {
+      "elapsed_seconds": 102.12172969203675,
+      "memory_current": 186114048,
+      "memory_events": {
+        "low": "0",
+        "high": "16083",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 603136000
+    },
+    {
+      "elapsed_seconds": 104.12250182003481,
+      "memory_current": 186068992,
+      "memory_events": {
+        "low": "0",
+        "high": "16929",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 602939392
+    },
+    {
+      "elapsed_seconds": 106.12442961201305,
+      "memory_current": 185999360,
+      "memory_events": {
+        "low": "0",
+        "high": "17870",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604426240
+    },
+    {
+      "elapsed_seconds": 108.12589947902597,
+      "memory_current": 186155008,
+      "memory_events": {
+        "low": "0",
+        "high": "18807",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604196864
+    },
+    {
+      "elapsed_seconds": 110.12842886301223,
+      "memory_current": 186093568,
+      "memory_events": {
+        "low": "0",
+        "high": "19610",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604188672
+    },
+    {
+      "elapsed_seconds": 112.12998506100848,
+      "memory_current": 186052608,
+      "memory_events": {
+        "low": "0",
+        "high": "20426",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604213248
+    },
+    {
+      "elapsed_seconds": 114.13242141500814,
+      "memory_current": 186093568,
+      "memory_events": {
+        "low": "0",
+        "high": "21202",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604295168
+    },
+    {
+      "elapsed_seconds": 116.13420056103496,
+      "memory_current": 186163200,
+      "memory_events": {
+        "low": "0",
+        "high": "22074",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604315648
+    },
+    {
+      "elapsed_seconds": 118.13639092101948,
+      "memory_current": 186175488,
+      "memory_events": {
+        "low": "0",
+        "high": "23136",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604258304
+    },
+    {
+      "elapsed_seconds": 120.13952150003752,
+      "memory_current": 186220544,
+      "memory_events": {
+        "low": "0",
+        "high": "23784",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604311552
+    },
+    {
+      "elapsed_seconds": 122.14276402705582,
+      "memory_current": 186122240,
+      "memory_events": {
+        "low": "0",
+        "high": "23895",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604184576
+    },
+    {
+      "elapsed_seconds": 124.14583015703829,
+      "memory_current": 186195968,
+      "memory_events": {
+        "low": "0",
+        "high": "24073",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604364800
+    },
+    {
+      "elapsed_seconds": 126.14910613599932,
+      "memory_current": 186167296,
+      "memory_events": {
+        "low": "0",
+        "high": "24074",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604364800
+    },
+    {
+      "elapsed_seconds": 128.1519261810463,
+      "memory_current": 186126336,
+      "memory_events": {
+        "low": "0",
+        "high": "24082",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604319744
+    },
+    {
+      "elapsed_seconds": 130.15505938400747,
+      "memory_current": 185831424,
+      "memory_events": {
+        "low": "0",
+        "high": "24090",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604389376
+    },
+    {
+      "elapsed_seconds": 132.1585676430259,
+      "memory_current": 186126336,
+      "memory_events": {
+        "low": "0",
+        "high": "24096",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604700672
+    },
+    {
+      "elapsed_seconds": 134.16161368205212,
+      "memory_current": 185909248,
+      "memory_events": {
+        "low": "0",
+        "high": "24096",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 604864512
+    },
+    {
+      "elapsed_seconds": 136.16504277504282,
+      "memory_current": 186077184,
+      "memory_events": {
+        "low": "0",
+        "high": "24099",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 605036544
+    },
+    {
+      "elapsed_seconds": 138.16883363202214,
+      "memory_current": 186077184,
+      "memory_events": {
+        "low": "0",
+        "high": "24099",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0"
+      },
+      "host_available": 579489792
+    }
+  ],
+  "host_oom_delta": 0,
+  "host_listeners_restored": true,
+  "owned_guests_stopped": true,
+  "original_parent_disk_metadata_unchanged": true,
+  "temporary_ram_files_remaining": 0
+}

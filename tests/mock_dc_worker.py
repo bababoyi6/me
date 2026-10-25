@@ -14,6 +14,7 @@ parser.add_argument("--output", required=True)
 parser.add_argument("--socket-timeout", type=int, choices=(8, 25), default=8)
 parser.add_argument("--topology", choices=("high-rtt", "dualhop"), default="high-rtt")
 parser.add_argument('--receive-buffer',type=int,choices=(0,262144),default=0)
+parser.add_argument('--sample-seconds',type=int,choices=(1,5),default=None)
 args = parser.parse_args()
 expected = "tdh-audit-dc" if args.topology == "dualhop" else "tdh-audit-b"
 if subprocess.check_output(["ip", "netns", "identify"], text=True, timeout=3).strip() != expected:
@@ -44,7 +45,7 @@ try:
         temporary = destination.with_suffix(".tmp")
         temporary.write_text(json.dumps({"backends": records} if args.topology == "dualhop" else records[0]) + "\n")
         temporary.replace(destination)
-        time.sleep(.1)
+        time.sleep(args.sample_seconds or .1)
 finally:
     for dc in dcs:
         dc.shutdown()

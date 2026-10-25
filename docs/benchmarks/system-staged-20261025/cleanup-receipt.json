@@ -1,0 +1,13 @@
+{
+  "scope": "only current staged overlays and test controls",
+  "export_sha256": "222afcee6bd8ff790f42151cd7eb9d7600eb1cb4e38d492662e37a7bd90db91b",
+  "owned_guests_stopped": true,
+  "temporary_ram_files_remaining": 0,
+  "original_parent_disk_metadata_unchanged": true,
+  "host_listeners_restored": true,
+  "host_oom_delta": 0,
+  "original_test_key_retained_private": true,
+  "original_fixture_disks_retained": 3,
+  "host_kernel_firewall_ssh_configuration_modified": false,
+  "production_nodes_accessed": false
+}

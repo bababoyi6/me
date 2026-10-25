@@ -1,0 +1,12 @@
+{
+  "completed_utc": "2026-10-25T07:56:37.151174+00:00",
+  "export_sha256": "18091e61e4716a5b1096c167b8e52eef24f30347b40f6a48dd740b8404702f6b",
+  "current_endurance_root_removed": true,
+  "current_source_directory_removed": true,
+  "test_namespaces_remaining": false,
+  "test_keys_remaining": false,
+  "historical_core_bytes_unchanged": true,
+  "historical_vm_disks_and_keys_untouched": true,
+  "host_ssh_kernel_firewall_unchanged": true,
+  "production_accessed": false
+}

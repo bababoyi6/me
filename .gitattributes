@@ -21,3 +21,7 @@ docs/benchmarks/candidate-install-20261024/** -text -whitespace
 docs/benchmarks/candidate-path-20261024/** -text -whitespace
 docs/benchmarks/candidate-path-ci-20261024/** -text -whitespace
 docs/benchmarks/core-delivery-20261024/** -text -whitespace
+docs/benchmarks/system-staged-20261025/** -text -whitespace
+docs/benchmarks/system-ci-20261025/** -text -whitespace
+docs/benchmarks/endurance-ci-20261025/** -text -whitespace
+docs/benchmarks/endurance-vps-20261025/** -text -whitespace

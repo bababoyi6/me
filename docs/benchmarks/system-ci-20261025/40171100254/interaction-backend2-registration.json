@@ -1,0 +1,10 @@
+{
+  "node": "entry",
+  "operation": "backend2-registration",
+  "complete": false,
+  "expected": "[<class 'pexpect.exceptions.EOF'>, '\\\\[\u5931\u8d25\\\\]']",
+  "known_markers": [
+    "[\u5931\u8d25]"
+  ],
+  "sanitized_error_lines": "[\u5931\u8d25] \u81f3\u5c11\u4e00\u4e2a\u540e\u7aef\u5b9e\u4f8b\u672a\u5c31\u7eea\u3002\u8bf7\u68c0\u67e5 UDP 51821/51822\u3001\u540e\u7aef\u8bca\u65ad\u548c Telegram \u51fa\u7ad9\u8fde\u901a\u6027\u3002"
+}

@@ -1,0 +1,66 @@
+{
+  "accepted": true,
+  "exit": 0,
+  "stop_reason": null,
+  "samples": [
+    {
+      "elapsed_sec": 0.0,
+      "memory_current": 70266880,
+      "host_available": 15695138816,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "cpu_stat": "usage_usec 266161\nuser_usec 183422\nsystem_usec 82739\ncore_sched.force_idle_usec 0\nnr_periods 5\nnr_throttled 3\nthrottled_usec 119195\nnr_bursts 0\nburst_usec 0\n"
+    },
+    {
+      "elapsed_sec": 30.0,
+      "memory_current": 166993920,
+      "host_available": 15663337472,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "cpu_stat": "usage_usec 1105622\nuser_usec 746797\nsystem_usec 358824\ncore_sched.force_idle_usec 0\nnr_periods 201\nnr_throttled 9\nthrottled_usec 813888\nnr_bursts 0\nburst_usec 0\n"
+    },
+    {
+      "elapsed_sec": 60.1,
+      "memory_current": 175161344,
+      "host_available": 15652528128,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "cpu_stat": "usage_usec 1336336\nuser_usec 875705\nsystem_usec 460631\ncore_sched.force_idle_usec 0\nnr_periods 385\nnr_throttled 9\nthrottled_usec 813888\nnr_bursts 0\nburst_usec 0\n"
+    },
+    {
+      "elapsed_sec": 90.1,
+      "memory_current": 175308800,
+      "host_available": 15650582528,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "cpu_stat": "usage_usec 1490603\nuser_usec 973643\nsystem_usec 516960\ncore_sched.force_idle_usec 0\nnr_periods 555\nnr_throttled 9\nthrottled_usec 813888\nnr_bursts 0\nburst_usec 0\n"
+    }
+  ],
+  "host_oom_delta": 0,
+  "private_keys_exported": false,
+  "elapsed_sec": 103.16424974799975
+}

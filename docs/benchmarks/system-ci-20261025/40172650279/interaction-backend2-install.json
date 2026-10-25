@@ -1,0 +1,13 @@
+{
+  "node": "backend2",
+  "operation": "backend2-install",
+  "complete": true,
+  "expected": "<class 'pexpect.exceptions.EOF'>",
+  "known_markers": [
+    "\u5b89\u88c5\u6240\u9700\u7684 Ubuntu \u8f6f\u4ef6\u5305",
+    "\u8bf7\u8f93\u5165\u540e\u7aef VPS \u516c\u7f51 IPv4",
+    "\u6309 Enter \u8fd4\u56de\u63a7\u5236\u9762\u677f",
+    "\u8bf7\u9009\u62e9"
+  ],
+  "sanitized_error_lines": ""
+}

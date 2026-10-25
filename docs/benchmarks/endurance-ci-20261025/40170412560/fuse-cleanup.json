@@ -1,0 +1,15 @@
+{
+  "complete": true,
+  "namespaces_removed": [],
+  "keys_removed": 0,
+  "errors": [],
+  "temporary_artifacts": {
+    "removed": [],
+    "already_absent": [
+      "tdh-e2e-dual-01n64erv",
+      "tdh-e2e-cfo33gon",
+      "tdh-e2e-w9icg89s"
+    ],
+    "errors": []
+  }
+}

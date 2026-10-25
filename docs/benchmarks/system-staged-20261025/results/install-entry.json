@@ -1,0 +1,10 @@
+{
+  "node": "entry",
+  "operation": "install",
+  "complete": false,
+  "logical_guest_memory_mib": 1024,
+  "capacity_claimed": false,
+  "error_type": "TimeoutExpired",
+  "error_reason": "Command '['ssh', '-i', '/root/tdh-audit-20261021/vm-lab/key', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/root/tdh-audit-20261",
+  "elapsed_seconds": 139.26628868596163
+}

@@ -1,0 +1,121 @@
+{
+  "seconds_requested": 60,
+  "complete": true,
+  "rows": [
+    {
+      "kind": "file",
+      "domain_index": 1,
+      "direction": "D",
+      "backend_index": 1,
+      "bytes": 131072,
+      "sha256_verified": true,
+      "persistent_dc": false,
+      "elapsed_seconds": 1.4474977340000805
+    },
+    {
+      "kind": "file",
+      "domain_index": 1,
+      "direction": "U",
+      "backend_index": 1,
+      "bytes": 131072,
+      "sha256_verified": true,
+      "persistent_dc": false,
+      "elapsed_seconds": 1.2519484170002215
+    },
+    {
+      "kind": "file",
+      "domain_index": 2,
+      "direction": "D",
+      "backend_index": 2,
+      "bytes": 131072,
+      "sha256_verified": true,
+      "persistent_dc": false,
+      "elapsed_seconds": 1.348210379000193
+    },
+    {
+      "kind": "file",
+      "domain_index": 2,
+      "direction": "U",
+      "backend_index": 2,
+      "bytes": 131072,
+      "sha256_verified": true,
+      "persistent_dc": false,
+      "elapsed_seconds": 1.246706403999724
+    },
+    {
+      "kind": "probe",
+      "domain_index": 1,
+      "direction": "U",
+      "backend_index": 1,
+      "bytes": 1024,
+      "sha256_verified": true,
+      "persistent_dc": false,
+      "elapsed_seconds": 0.3533298960001048
+    },
+    {
+      "kind": "long",
+      "domain_index": 1,
+      "direction": "D",
+      "backend_index": 1,
+      "bytes": 61440,
+      "sha256_verified": true,
+      "persistent_dc": true,
+      "elapsed_seconds": 60.550227190999976
+    },
+    {
+      "kind": "long",
+      "domain_index": 2,
+      "direction": "U",
+      "backend_index": 2,
+      "bytes": 61440,
+      "sha256_verified": true,
+      "persistent_dc": true,
+      "elapsed_seconds": 60.5285435589999
+    }
+  ],
+  "classification": "PRIVATE_LOW_TRAFFIC_ENDURANCE",
+  "payload_max_bytes": 201326592,
+  "production_accessed": false,
+  "throughput_or_capacity_claimed": false,
+  "samples": [
+    {
+      "elapsed_seconds": 5.752833740999904,
+      "backend_fd_count": [
+        16,
+        16
+      ]
+    }
+  ],
+  "initial_route_delta": [
+    1,
+    1
+  ],
+  "backend_identity_unchanged": true,
+  "backend_errors": [
+    [],
+    []
+  ],
+  "wireguard_transfer_delta_bytes": {
+    "wg-lab": {
+      "rx": 255448,
+      "tx": 194908
+    },
+    "wg-lab2": {
+      "rx": 190716,
+      "tx": 254936
+    }
+  },
+  "observed_client_tcp": [
+    {
+      "samples": 1,
+      "min_rtt_ms": 103.755,
+      "max_rtt_ms": 103.755
+    },
+    {
+      "samples": 1,
+      "min_rtt_ms": 100.322,
+      "max_rtt_ms": 100.322
+    }
+  ],
+  "payload_bytes": 648192
+}
