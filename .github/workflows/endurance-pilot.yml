@@ -8,7 +8,10 @@ on:
       - 'tests/dualhop_lab.py'
       - 'tests/lab.py'
       - 'tests/mock_dc_worker.py'
+      - 'tests/network_lab.py'
       - 'tools/lab_runner.py'
+      - 'tools/endurance_cleanup.py'
+      - 'tools/endurance_service.py'
       - '.github/workflows/endurance-pilot.yml'
   workflow_dispatch:
 
@@ -34,12 +37,13 @@ jobs:
       - name: Download pinned public balanced2 package
         run: curl -q -fL --proto '=https' --tlsv1.2 --max-time 90 --max-filesize 11000000 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
       - name: One minute of low-traffic persistent upload and download
-        run: sudo --preserve-env=GITHUB_ACTIONS,RUNNER_TEMP timeout --kill-after=10 260 python3 tests/endurance_ci.py --root "$RUNNER_TEMP/tdh-audit-endurance-pilot" --bundle "$RUNNER_TEMP/balanced2.tar.gz"
+        run: sudo --preserve-env=GITHUB_ACTIONS,RUNNER_TEMP timeout --kill-after=10 280 python3 tools/endurance_service.py --root "$RUNNER_TEMP/tdh-audit-endurance-pilot" --bundle "$RUNNER_TEMP/balanced2.tar.gz" --seconds 60 --wait
       - name: Collect only bounded reports
         if: always()
         run: |
           mkdir -p "$RUNNER_TEMP/endurance-evidence"
           sudo find "$RUNNER_TEMP/tdh-audit-endurance-pilot" -maxdepth 3 -type f \( -path '*/results/*.json' -o -path '*/run-tdh-audit-*/*.json' -o -path '*/run-tdh-audit-*/*.log' \) -exec cp --parents '{}' "$RUNNER_TEMP/endurance-evidence/" \;
+          sudo find "$RUNNER_TEMP/tdh-audit-endurance-pilot" -maxdepth 1 -type f \( -name 'fuse-cleanup.json' -o -name 'plan.json' -o -name '*.log' \) -exec cp '{}' "$RUNNER_TEMP/endurance-evidence/" \;
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/endurance-evidence"
       - uses: actions/upload-artifact@v4
         if: always()

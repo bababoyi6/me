@@ -130,8 +130,7 @@ def backend():
 def network_extra(net):
     extra='tdh-audit-b2'
     assert extra not in {line.split()[0] for line in command('ip','netns','list').splitlines()}
-    command('ip','netns','add',extra)
-    net.created.append(extra)
+    net.add_namespace(extra)
     command('ip','-n',extra,'link','set','lo','up')
     command('ip','-n',NAMES[1],'link','add','tdh-lc0','type','veth','peer','name','tdh-lc1','netns',extra)
     for ns,dev,address in ((NAMES[1],'tdh-lc0','198.51.100.5'),(extra,'tdh-lc1','198.51.100.6')):
@@ -173,8 +172,7 @@ def network_extra(net):
 def separate_dc(net,shared):
     """Attach mock DC links only to backend namespaces; no host/external route exists."""
     dc='tdh-audit-dc'
-    command('ip','netns','add',dc)
-    net.created.append(dc)
+    net.add_namespace(dc)
     command('ip','-n',dc,'link','set','lo','up')
     for index,backend_ns in enumerate((NAMES[2],'tdh-audit-b2')):
         back_dev,dc_dev=f'dc-back{index}',f'dc-link{index}'
@@ -463,10 +461,14 @@ frontend mtp_tls
 def run():
     (ROOT/"results").mkdir(exist_ok=True,mode=0o700)
     net=Network(SimpleNamespace(root=str(ROOT),wg=args.wg,start_iperf=False,
-                               rtt_ms=args.rtt,loss_percent=0,rate_mbps=100,mtu=1420))
-    temp=tempfile.TemporaryDirectory(prefix='tdh-audit-dual-')
+                               rtt_ms=args.rtt,loss_percent=0,rate_mbps=100,mtu=1420,
+                               ownership_ledger=bool(args.endurance_seconds)))
+    temp=tempfile.TemporaryDirectory(prefix='tdh-e2e-dual-' if args.endurance_seconds else 'tdh-audit-dual-',dir='/tmp')
     shared=Path(temp.name)
     os.chown(shared,65534,65534)
+    if args.endurance_seconds:
+        from lab_artifacts import register_artifact
+        register_artifact(ROOT/'artifact-registry',shared)
     try:
         assert memory_available()>192*1024**2,'memory safety margin'
         net.setup()
