@@ -57,7 +57,9 @@ def guest(node, script, seconds=60):
             details=ssh(node,"tail -c 8192 /root/preparation.log 2>/dev/null; tail -c 4096 /root/cloud-init-status.log 2>/dev/null\n",20)
             write(ROOT/'results/preparation-failure.json',{'exit':completed.returncode,
                   'public_os_preparation_log':details.stdout[-12288:],
-                  'ssh_stderr':completed.stderr[-1024:]})
+                  'ssh_stderr':completed.stderr[-1024:],
+                  'overlay_file_bytes':(ROOT/'base/disk.qcow2').stat().st_size,
+                  'qemu_public_error':(ROOT/'base/qemu.log').read_text()[-4096:]})
         raise RuntimeError('private guest command failed: ' + node)
     return completed.stdout
 
@@ -92,7 +94,7 @@ def prepare_base():
 cloud-init status --wait >/root/cloud-init-status.log 2>&1
 export DEBIAN_FRONTEND=noninteractive
 apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 update -qq >/root/preparation.log 2>&1
-apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 install -y --no-install-recommends ca-certificates curl jq python3 openssl wireguard-tools iproute2 iputils-ping netcat-openbsd qrencode socat util-linux procps kmod tar gzip haproxy linux-image-generic >>/root/preparation.log 2>&1
+apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 install -y --no-install-recommends ca-certificates curl jq python3 openssl wireguard-tools iproute2 iputils-ping netcat-openbsd qrencode socat util-linux procps kmod tar gzip haproxy linux-image-virtual >>/root/preparation.log 2>&1
 apt-get clean
 ''', 480)
     version = guest('base', "ls /boot/vmlinuz-*-generic\n").strip().removeprefix('/boot/vmlinuz-')
@@ -114,7 +116,8 @@ apt-get clean
         write(ROOT/node/'boot-generic.json', boot)
     write(ROOT/'results/preparation.json', {'complete': True, 'kernel': version, 'factory_clean': False,
           'prepared_once_then_cloned': True, 'guest_logical_mib_each': 1024, 'guest_vcpus_each': 1,
-          'preinstalled_packages': True, 'production_installer_changes_kernel': False})
+          'preinstalled_packages': True, 'kernel_meta_package':'linux-image-virtual',
+          'production_installer_changes_kernel': False})
 
 
 def interactive(node, name, line, action):
