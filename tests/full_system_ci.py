@@ -96,6 +96,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 update -qq >/root/preparation.log 2>&1
 apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 install -y --no-install-recommends ca-certificates curl jq python3 openssl wireguard-tools iproute2 iputils-ping netcat-openbsd qrencode socat util-linux procps kmod tar gzip haproxy linux-image-virtual >>/root/preparation.log 2>&1
 apt-get clean
+systemctl disable --now haproxy.service >/root/base-haproxy-stop.log 2>&1
 ''', 480)
     version = guest('base', "ls /boot/vmlinuz-*-generic\n").strip().removeprefix('/boot/vmlinuz-')
     assert re.fullmatch(r'[0-9][0-9.\-]*-generic', version)
@@ -123,18 +124,38 @@ apt-get clean
 def interactive(node, name, line, action):
     import pexpect
     child = None
+    progress={'node':node,'operation':name,'complete':False,'expected':None,'known_markers':[]}
     try:
         with (ROOT/'private'/(name+'.log')).open('w') as log:
             child = pexpect.spawn(SSH[0], [*SSH[1:], '-tt', '-p', str(ports[node]), 'root@127.0.0.1', line],
                                   encoding='utf8', codec_errors='replace', timeout=180)
             child.logfile_read = log
+            original_expect=child.expect
+            def observe(pattern,*values,**options):
+                progress['expected']=str(pattern)
+                write(ROOT/'results'/('interaction-'+name+'.json'),progress)
+                return original_expect(pattern,*values,**options)
+            child.expect=observe
             action(child)
             child.expect(pexpect.EOF, timeout=30)
             child.close()
             assert child.exitstatus == 0, 'interactive operation failed'
+            progress['complete']=True
     finally:
         if child is not None and child.isalive():
             child.close(force=True)
+        transcript=(ROOT/'private'/(name+'.log')).read_text() if (ROOT/'private'/(name+'.log')).exists() else ''
+        for marker in ('安装所需的 Ubuntu 软件包','请输入入口 VPS 公网 IPv4','请输入后端 VPS 公网 IPv4',
+                       '检测到已有 haproxy.service','无法验证','按 Enter 返回控制面板','请选择','[失败]'):
+            if marker in transcript:progress['known_markers'].append(marker)
+        # Export only installer error lines, never links, join codes or QR data.
+        clean=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',transcript)
+        lines=[line for line in clean.splitlines() if '[失败]' in line or line.startswith(('curl:','ssh:','E:'))]
+        safe='\n'.join(lines)[-2048:]
+        safe=re.sub(r'(?:TDH4|TDHR4)\.[A-Za-z0-9_-]+','[redacted-code]',safe)
+        safe=re.sub(r'[A-Za-z0-9_+/=-]{32,}','[redacted-token]',safe)
+        progress['sanitized_error_lines']=safe
+        write(ROOT/'results'/('interaction-'+name+'.json'),progress)
 
 
 def install(node):
@@ -146,7 +167,8 @@ def install(node):
         if node != 'entry':
             child.expect('Join Code: ')
             child.sendline(json.loads((ROOT/'private/enrollment.json').read_text())[node])
-        child.expect('请输入'+('入口 VPS 公网 IPv4' if node=='entry' else '后端 VPS 公网 IPv4')+': ')
+        assert child.expect(['请输入'+('入口 VPS 公网 IPv4' if node=='entry' else '后端 VPS 公网 IPv4')+': ',
+                             r'\[失败\]','按 Enter 返回控制面板'])==0,'installer stopped before address input'
         child.sendline('11.254.254.'+str(ROLES.index(node)+1))
         matched = child.expect(['按 Enter 返回控制面板', r'\[失败\]'], timeout=240)
         assert matched == 0, 'installer failure; private transcript excluded from artifact'
@@ -218,6 +240,8 @@ def worker():
         for node in ROLES:
             vm.start(node)
         boots = {node: ready(node) for node in ROLES}
+        for node in ROLES:
+            guest(node,'cloud-init status --wait >/root/firstboot-status.log 2>&1\n',90)
         for node in ROLES:
             phase('public-install-'+node); install(node)
             result['roles'][node] = identity(node)
@@ -351,7 +375,10 @@ def supervise():
         report['host_oom_delta'] = host_oom()-startoom
         report['elapsed_sec'] = round(time.monotonic()-started,1)
         # Only fixed-name JSON outputs may cross the private export boundary.
-        for name in ('worker.json','e2e.json','preparation.json','preparation-failure.json'):
+        for name in ('worker.json','e2e.json','preparation.json','preparation-failure.json',
+                     'interaction-entry-install.json','interaction-backend1-install.json',
+                     'interaction-backend2-install.json','interaction-backend1-registration.json',
+                     'interaction-backend2-registration.json'):
             source = ROOT/'results'/name
             if source.is_file() and not source.is_symlink():
                 assert source.stat().st_size<1024**2
