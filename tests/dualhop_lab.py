@@ -32,6 +32,7 @@ profile=parser.add_mutually_exclusive_group()
 profile.add_argument('--soak',action='store_true')
 profile.add_argument('--benchmark',action='store_true')
 profile.add_argument('--candidate-check',action='store_true')
+profile.add_argument('--endurance-seconds',type=int,choices=(60,86400),default=0)
 parser.add_argument('--rtt',type=int,choices=(10,20,50,100,200),default=10)
 parser.add_argument('role',choices=('run','backend','entry'))
 parser.add_argument('--shared')
@@ -39,8 +40,10 @@ parser.add_argument('--index',type=int,choices=(1,2))
 args=parser.parse_args()
 if args.candidate_check and (args.build!='bulk' or not args.separate_dc or args.rtt not in (100,200)):
     parser.error('candidate path check requires bulk, separate mock DC and 100/200ms entry RTT')
-if args.build=='bulk' and not args.candidate_check:
-    parser.error('bulk is confined to the bounded candidate path check')
+if args.endurance_seconds and (args.build!='bulk' or not args.separate_dc or args.rtt!=100):
+    parser.error('endurance requires bulk, separate mock DC and 100ms entry RTT')
+if args.build=='bulk' and not (args.candidate_check or args.endurance_seconds):
+    parser.error('bulk requires a bounded candidate or endurance check')
 ROOT=Path(args.root).resolve()
 HERE=Path(__file__).resolve()
 if args.role!="run":
@@ -78,7 +81,7 @@ def backend():
         endpoint=(f'198.18.0.{1 if args.index==1 else 5}',26000) if args.separate_dc else None
         return FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,
                        experimental_binary=experimental,dc_endpoint=endpoint,artifact_registry=ROOT/'artifact-registry',
-                       shared_binary_root=ROOT if args.candidate_check else None)
+                       shared_binary_root=ROOT if args.candidate_check or args.endurance_seconds else None)
     lab=create_lab()
     agent=None
     client_sockets,observation_errors=[],[]
@@ -100,7 +103,8 @@ def backend():
                 agent.process=lab.telemt
             state=(json.loads((shared/'dc.json').read_text())['backends'][args.index-1] if args.separate_dc else
                    {'completed':lab.dc.completed,'errors':lab.dc.errors})
-            if args.candidate_check and not observation_errors and time.monotonic()-last_observation>=.5:
+            observation_period=(60 if client_sockets else 5) if args.endurance_seconds else .5
+            if (args.candidate_check or args.endurance_seconds) and not observation_errors and time.monotonic()-last_observation>=observation_period:
                 from kernel_observer import observe_sockets
                 try:
                     observed=observe_sockets(lab.telemt.pid,lab.listen,namespace=f'tdh-audit-b{2 if args.index==2 else ""}')
@@ -112,8 +116,11 @@ def backend():
                 last_observation=time.monotonic()
             save(shared/f'backend{args.index}.json',{'ready':lab.telemt.poll() is None,'completed':state['completed'],
                                                    'errors':state['errors'],'telemt':lab.version,
+                                                   'pid':lab.telemt.pid,
+                                                   'start_ticks':Path(f'/proc/{lab.telemt.pid}/stat').read_text().split()[21] if args.endurance_seconds else None,
+                                                   'fd_count':len(list(Path(f'/proc/{lab.telemt.pid}/fd').iterdir())) if args.endurance_seconds else None,
                                                    'client_sockets':client_sockets,'socket_observation_errors':observation_errors})
-            time.sleep(.1)
+            time.sleep(5 if args.endurance_seconds else .1)
     finally:
         if agent:
             agent.shutdown()
@@ -176,7 +183,8 @@ def separate_dc(net,shared):
             command('ip','-n',ns,'address','add',f'198.18.0.{last}/30','dev',dev)
             command('ip','-n',ns,'link','set',dev,'up')
     process=subprocess.Popen(['ip','netns','exec',dc,'python3',str(HERE.with_name('mock_dc_worker.py')),
-                              '--topology','dualhop','--output',str(shared/'dc.json')],
+                              '--topology','dualhop','--output',str(shared/'dc.json'),
+                              *(['--sample-seconds','5','--socket-timeout','25'] if args.endurance_seconds else [])],
                              stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
     net.processes.append(process)
     deadline=time.monotonic()+5
@@ -280,6 +288,11 @@ frontend mtp_tls
             assert time.monotonic()<deadline,'private HAProxy readiness deadline'
             time.sleep(.05)
         time.sleep(.4)
+        if args.endurance_seconds:
+            from endurance_path import run as run_endurance
+            run_endurance(args.endurance_seconds,shared,ROOT,counts,args.wg,save)
+            print(json.dumps({'endurance_complete':True,'seconds':args.endurance_seconds}),flush=True)
+            return
         if args.candidate_check:
             from candidate_contract import validate,validate_wireguard
             def wg_totals():
@@ -465,6 +478,7 @@ def run():
                                       '--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
                                       *(['--separate-dc'] if args.separate_dc else []),
                                       *(['--candidate-check'] if args.candidate_check else []),
+                                      *(['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else []),
                                       'backend','--shared',str(shared),'--index',str(number)],
                                      stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
             net.processes.append(process)
@@ -474,8 +488,8 @@ def run():
                 if process.poll() is not None: raise RuntimeError('backend startup failed: '+process.stderr.read().decode()[:2000])
             assert time.monotonic()<deadline,'backend readiness deadline'
             time.sleep(.2)
-        entry_args=['--candidate-check'] if args.candidate_check else ['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
-        entry_deadline=90 if args.candidate_check else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
+        entry_args=['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else ['--candidate-check'] if args.candidate_check else ['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
+        entry_deadline=args.endurance_seconds+120 if args.endurance_seconds else 90 if args.candidate_check else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
         result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),'ip','netns','exec',NAMES[0],
                                'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
                                *(['--separate-dc'] if args.separate_dc else []),

@@ -48,8 +48,12 @@ def send_payload(sock, size, rate):
     start = time.monotonic()
     sent = 0
     digest = hashlib.sha256()
+    # At low rates a 64KiB burst followed by a minute of silence would test
+    # socket idle timeouts rather than a continuously active long connection.
+    chunk_size = min(len(BLOCK), max(1, int(rate))) if rate else len(BLOCK)
     while sent < size:
-        block = BLOCK[:min(len(BLOCK), size - sent)]
+        offset = sent % len(BLOCK)
+        block = BLOCK[offset:offset + min(chunk_size, len(BLOCK)-offset, size-sent)]
         sock.sendall(block)
         digest.update(block)
         sent += len(block)

@@ -75,7 +75,8 @@ def main():
     parser.add_argument("--root", required=True)
     parser.add_argument("--haproxy", default="haproxy")
     parser.add_argument("--wg", default="wg")
-    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed", "candidate", "delivery"), default="smoke")
+    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed", "candidate", "delivery", "endurance"), default="smoke")
+    parser.add_argument('--endurance-seconds',type=int,choices=(60,86400),default=60)
     parser.add_argument('--logical-clients',type=int,choices=(30,60,100),default=30)
     parser.add_argument("--rtt", type=int, choices=(20, 50, 100, 200), default=100)
     parser.add_argument("--max-streams", type=int, choices=(1, 4, 8, 16, 32), default=4)
@@ -103,6 +104,10 @@ def main():
         parser.error('non-default soft memory policy requires the private ab/candidate profile')
     if args.profile=='candidate' and args.rtt not in (100,200):
         parser.error('candidate path check requires a high-RTT entry link')
+    if args.profile!='endurance' and args.endurance_seconds!=60:
+        parser.error('endurance duration only applies to endurance')
+    if args.profile=='endurance' and args.rtt!=100:
+        parser.error('endurance requires the 100ms private path')
     if args.profile=='delivery' and (os.environ.get('GITHUB_ACTIONS')!='true' or args.rtt!=100):
         parser.error('delivery qualification is confined to the ephemeral CI runner at 100ms')
     report = inventory(memory_high_percent=args.memory_high_percent)
@@ -175,6 +180,10 @@ def main():
         worker = [sys.executable, str(REPO/'tests/dualhop_lab.py'), '--root', str(root),
                   '--build','bulk','--haproxy',args.haproxy,'--wg',args.wg,'--rtt',str(args.rtt),
                   '--separate-dc','--candidate-check','run']
+    elif args.profile == 'endurance':
+        worker=[sys.executable,str(REPO/'tests/dualhop_lab.py'),'--root',str(root),
+                '--build','bulk','--haproxy',args.haproxy,'--wg',args.wg,'--rtt','100',
+                '--separate-dc','--endurance-seconds',str(args.endurance_seconds),'run']
     else:
         worker = [sys.executable, str(REPO / "tests/dualhop_lab.py"), "--root", str(root), "--build", "auto",
                   "--haproxy", args.haproxy, "--wg", args.wg, "--rtt", str(args.rtt), "--separate-dc",
@@ -182,6 +191,8 @@ def main():
     unit = "tdh-audit-" + uuid.uuid4().hex[:12]
     if args.profile in ('candidate','delivery'):
         report['budget']['runtime_max_seconds']=180
+    if args.profile=='endurance':
+        report['budget']['runtime_max_seconds']=args.endurance_seconds+180
     command = systemd_command(unit, report["budget"], worker, report['budget']['runtime_max_seconds'])
     if args.profile=='mixed':
         command.insert(command.index('--'),'--property=PrivateNetwork=yes')
@@ -203,6 +214,9 @@ def main():
     if args.profile=='delivery':
         plan['classification']='CI_CORE_DELIVERY'
         plan['payload_max_bytes']=72*1024**2
+    if args.profile=='endurance':
+        plan['classification']='PRIVATE_LOW_TRAFFIC_ENDURANCE'
+        plan['payload_max_bytes']=192*1024**2
     if args.candidate_only:
         plan['classification']='SINGLE_VPS_CANDIDATE_SMOKE'
     if not args.execute:
@@ -249,7 +263,10 @@ def main():
                                   if line.startswith("MemAvailable:")), 0)
                 sample["host_memory_available_bytes"] = available
                 sample["new_output_bytes"] = output_bytes(root) - initial_output_bytes
-                samples.append(sample)
+                # Keep all host safeguards at 0.5s, but bound retained telemetry
+                # for a day-long run instead of storing 172,800 full snapshots.
+                if args.profile!='endurance' or not samples or sample['elapsed_seconds']-samples[-1]['elapsed_seconds']>=30:
+                    samples.append(sample)
                 oom = next((int(line.split()[1]) for line in read("/proc/vmstat").splitlines()
                             if line.startswith("oom_kill ")), None)
                 if available < report["budget"]["host_reserve_bytes"]:
