@@ -1,0 +1,132 @@
+{
+  "operation": "install",
+  "node": "entry",
+  "unit": "tdh-audit-vm160-996ddcd9d5",
+  "preflight": {
+    "scope": "READ_ONLY_PREFLIGHT",
+    "date_utc": "2026-10-25T05:33:26.486224+00:00",
+    "os": "Ubuntu 22.04.5 LTS",
+    "kernel": "5.15.0-161-generic",
+    "architecture": "x86_64",
+    "cpus": 1,
+    "euid": 0,
+    "memory_bytes": {
+      "MemTotal": 1002803200,
+      "MemAvailable": 657281024,
+      "SwapTotal": 0,
+      "SwapFree": 0
+    },
+    "load_average": [
+      0.0009765625,
+      0.07763671875,
+      0.05810546875
+    ],
+    "tmp_disk_free_bytes": 4621926400,
+    "listeners": [
+      {
+        "protocol": "udp",
+        "port": "53"
+      },
+      {
+        "protocol": "tcp",
+        "port": "53"
+      },
+      {
+        "protocol": "tcp",
+        "port": "22"
+      },
+      {
+        "protocol": "tcp",
+        "port": "22"
+      }
+    ],
+    "running_service_names": [
+      "cron.service                loaded active running Regular background program processing daemon",
+      "dbus.service                loaded active running D-Bus System Message Bus",
+      "getty@tty1.service          loaded active running Getty on tty1",
+      "multipathd.service          loaded active running Device-Mapper Multipath Device Controller",
+      "networkd-dispatcher.service loaded active running Dispatcher daemon for systemd-networkd",
+      "packagekit.service          loaded active running PackageKit Daemon",
+      "polkit.service              loaded active running Authorization Manager",
+      "qemu-guest-agent.service    loaded active running QEMU Guest Agent",
+      "rsyslog.service             loaded active running System Logging Service",
+      "serial-getty@ttyS0.service  loaded active running Serial Getty on ttyS0",
+      "snapd.service               loaded active running Snap Daemon",
+      "ssh.service                 loaded active running OpenBSD Secure Shell server",
+      "systemd-journald.service    loaded active running Journal Service",
+      "systemd-logind.service      loaded active running User Login Management",
+      "systemd-networkd.service    loaded active running Network Configuration",
+      "systemd-resolved.service    loaded active running Network Name Resolution",
+      "systemd-timesyncd.service   loaded active running Network Time Synchronization",
+      "systemd-udevd.service       loaded active running Rule-based Manager for Device Events and Files",
+      "unattended-upgrades.service loaded active running Unattended Upgrades Shutdown",
+      "user@0.service              loaded active running User Manager for UID 0"
+    ],
+    "virtualization": "kvm",
+    "cgroup_v2_controllers": [
+      "cpuset",
+      "cpu",
+      "io",
+      "memory",
+      "hugetlb",
+      "pids",
+      "rdma",
+      "misc"
+    ],
+    "namespace_types": [
+      "cgroup",
+      "ipc",
+      "mnt",
+      "net",
+      "pid",
+      "pid_for_children",
+      "time",
+      "time_for_children",
+      "user",
+      "uts"
+    ],
+    "existing_lab_namespaces": [],
+    "tools": {
+      "ip": true,
+      "tc": true,
+      "wg": false,
+      "ethtool": true,
+      "haproxy": false,
+      "systemd-run": true,
+      "timeout": true,
+      "python3": true
+    },
+    "kernel_oom_kill_count": 0,
+    "budget": {
+      "eligible": true,
+      "host_reserve_bytes": 334267733,
+      "memory_max_bytes": 242259968,
+      "memory_high_bytes": 181694976,
+      "memory_high_percent": 75,
+      "cpu_quota_percent": 60,
+      "tasks_max": 192,
+      "runtime_max_seconds": 600,
+      "output_max_bytes": 33554432,
+      "swap_max_bytes": 0
+    },
+    "permission_note": "Capability and tool presence do not prove namespace/cgroup creation succeeds.",
+    "other_workloads": "Require operator review before any load; inventory does not grant permission."
+  },
+  "properties": {
+    "MemoryMax": 242259968,
+    "MemoryHigh": 181694976,
+    "MemorySwapMax": 0,
+    "CPUQuota": "60%",
+    "TasksMax": 192,
+    "RuntimeMaxSec": 540,
+    "TimeoutStopSec": 20,
+    "KillMode": "control-group",
+    "OOMPolicy": "stop",
+    "UMask": "0077",
+    "LimitFSIZE": 2147483648,
+    "WorkingDirectory": "/root/tdh-audit-20261021",
+    "IOWeight": 10
+  },
+  "disk_reserve_bytes": 1073741824,
+  "log_limit_bytes": 8388608
+}

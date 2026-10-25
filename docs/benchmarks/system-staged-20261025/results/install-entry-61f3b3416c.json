@@ -1,0 +1,23 @@
+{
+  "node": "entry",
+  "operation": "install",
+  "case_id": "61f3b3416c",
+  "complete": false,
+  "logical_guest_memory_mib": 1024,
+  "capacity_claimed": false,
+  "readiness_probe_errors": [
+    "TimeoutExpired"
+  ],
+  "attestation": {
+    "root": true,
+    "hostname": "tdh-test-entry",
+    "virt": "kvm",
+    "pid1": "systemd",
+    "boot_id": "a09fbfd0-209f-42a5-999e-79ca6d080927",
+    "memory_total_kib": 979296,
+    "manager_sha256": "2d1e6c59ef0ce69d0fd734d1d9a6cab89881ac92e26e54d38f4b2080bc16acc3",
+    "project_state_present": true
+  },
+  "ready_seconds": 131.27882989600766,
+  "elapsed_seconds": 512.8814359519747
+}

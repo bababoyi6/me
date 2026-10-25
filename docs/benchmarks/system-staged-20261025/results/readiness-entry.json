@@ -1,0 +1,21 @@
+{
+  "node": "entry",
+  "operation": "boot-attest-normal-shutdown",
+  "complete": false,
+  "logical_guest_memory_mib": 1024,
+  "capacity_claimed": false,
+  "attestation": {
+    "root": true,
+    "hostname": "tdh-test-entry",
+    "virt": "kvm",
+    "pid1": "systemd",
+    "boot_id": "e1e3328e-7884-4846-ba26-fc83225c006c",
+    "memory_total_kib": 979296,
+    "manager_sha256": "2d1e6c59ef0ce69d0fd734d1d9a6cab89881ac92e26e54d38f4b2080bc16acc3",
+    "project_state_present": true
+  },
+  "ready_seconds": 104.19165761600016,
+  "error_type": "AssertionError",
+  "error_reason": "normal shutdown exceeded deadline",
+  "elapsed_seconds": 139.80324912600918
+}

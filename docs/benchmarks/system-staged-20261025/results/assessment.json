@@ -1,0 +1,14 @@
+{
+  "classification": "STAGED_FULL_SYSTEM_INSTALL_NOT_ACCEPTED",
+  "accepted": false,
+  "operator_stopped_final_attempt": true,
+  "reason": "Persistent cgroup high pressure and large I/O while public bootstrap remained in package phase; not a proven installer/core defect.",
+  "last_observed_io_read_bytes": 69116594176,
+  "last_observed_io_write_bytes": 11130555392,
+  "last_observed_memory_high_events": 321275,
+  "manager_source_confirmed_downloaded": "1.6.0",
+  "completed_role_installs": 0,
+  "capacity_claimed": false,
+  "supervisor_exit_alone_is_not_acceptance": true,
+  "private_transcripts_and_guest_disks_excluded": true
+}

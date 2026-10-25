@@ -1,0 +1,49 @@
+name: Published full-system acceptance
+
+on:
+  push:
+    branches: [dev/lab-acceptance-20261025]
+    paths:
+      - 'tests/system_vm*'
+      - 'tests/full_system*'
+      - '.github/workflows/full-system.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: full-system-acceptance
+  cancel-in-progress: false
+
+jobs:
+  system:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require usable KVM before downloads
+        run: sudo python3 tests/full_system_ci.py --gate
+      - name: Install bounded guest tools
+        run: |
+          sudo timeout --kill-after=10 180 apt-get update -qq
+          sudo timeout --kill-after=10 240 apt-get install -y --no-install-recommends qemu-system-x86 qemu-utils seabios gpgv ubuntu-cloudimage-keyring openssh-client python3-pexpect python3-cryptography
+      - name: Download official Ubuntu image and signed manifest
+        run: |
+          sudo install -d -m 0700 "$RUNNER_TEMP/tdh-audit-system-vms"
+          base=https://cloud-images.ubuntu.com/minimal/releases/jammy/release
+          for name in SHA256SUMS SHA256SUMS.gpg ubuntu-22.04-minimal-cloudimg-amd64.img; do
+            limit=262144
+            [ "$name" != ubuntu-22.04-minimal-cloudimg-amd64.img ] || limit=450000000
+            sudo curl -q -fL --proto '=https' --tlsv1.2 --connect-timeout 10 --max-time 240 --max-filesize "$limit" --limit-rate 8M "$base/$name" -o "$RUNNER_TEMP/tdh-audit-system-vms/$name"
+          done
+      - name: Verify public install, real failover and normal reboot
+        run: sudo env RUNNER_TEMP="$RUNNER_TEMP" python3 tests/full_system_ci.py
+      - name: Export sanitized acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-system-1.6.0
+          path: ${{ runner.temp }}/tdh-full-system-evidence/
+          if-no-files-found: warn
+          retention-days: 14
