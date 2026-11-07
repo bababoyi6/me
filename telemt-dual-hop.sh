@@ -1640,6 +1640,8 @@ class ConfigAccessMigration:
     def validate(self):
         safe_directory(self.base)
         safe_directory(self.record.parent)
+        if self.record.parent.stat().st_mode & 0o077:
+            raise CoreError('config access record directory must be private')
         info = self.base.stat()
         if (info.st_gid != self.group or self.group == 0 or
                 stat.S_IMODE(info.st_mode) not in (0o710, 0o750)):
@@ -1691,6 +1693,8 @@ class ConfigAccessMigration:
         # Never restrict a newer core restored from a prior committed transaction.
         if value is not None and digest(self.binary) == value['legacy_binary_sha256']:
             self.set_mode(0o710)
+            return True
+        return False
 
 
 class BackendService:
@@ -1902,6 +1906,13 @@ def upgrade(binary, directory, archive, archive_sha, binary_sha, version, roots,
         migrated = False
         try:
             if access is not None:
+                if stat.S_IMODE(access.base.stat().st_mode) == 0o710:
+                    backup = Path(directory)/('core.previous-'+old)
+                    if backup.exists() or backup.is_symlink():
+                        safe_file(backup)
+                    # Config/key/unit snapshot and original binary are durable
+                    # before the first permissions change, even before preflight.
+                    atomic_copy(binary, backup, 0o600, old)
                 migrated = access.prepare()
             service.validate_candidate(candidate)
             # Bind the snapshot to the exact durable journal, including recovery.
@@ -1923,7 +1934,8 @@ def rollback(binary, directory, roots, service):
     access = (ConfigAccessMigration(service.config.parent.parent, directory, binary,
                                    service.identity['group']) if getattr(service, 'migrate_access', False) else None)
     if not transaction.journal.exists() and access is not None and access.record.exists():
-        access.restore()
+        if not access.restore():
+            raise CoreError('config access recovery baseline changed; review required')
         return 'access-restored'
     value = transaction.load()
     name = value.get('snapshot', '')

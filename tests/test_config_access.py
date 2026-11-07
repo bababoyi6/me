@@ -64,6 +64,9 @@ class ConfigAccessTests(unittest.TestCase):
         with self.assertRaises(CoreError): self.access.prepare()
 
     def test_custom_permissions_group_and_symlink_are_refused(self):
+        self.store.chmod(0o750)
+        with self.assertRaises(CoreError): self.access.prepare()
+        self.store.chmod(0o700)
         self.base.chmod(0o770)
         with self.assertRaises(CoreError): self.access.prepare()
         self.base.chmod(0o710)
@@ -118,6 +121,18 @@ class ConfigAccessTests(unittest.TestCase):
         self.assertEqual(self.base.stat().st_mode & 0o777,0o710)
         self.assertEqual(list(self.store.glob('snapshot-*')),[])
         self.assertEqual(self.binary.read_bytes(),b'LEGACY')
+        backup=self.store/('core.previous-'+hashlib.sha256(b'LEGACY').hexdigest())
+        self.assertEqual(backup.read_bytes(),b'LEGACY')
+        self.assertEqual(backup.stat().st_mode & 0o777,0o600)
+
+    def test_interrupted_access_only_recovery_refuses_changed_core(self):
+        service,config,_,_=self.transaction()
+        self.access.prepare()
+        self.assertEqual(rollback(self.binary,self.store,[config],service),'access-restored')
+        self.access.prepare();self.binary.write_bytes(b'OTHER')
+        with self.assertRaisesRegex(CoreError,'baseline changed'):
+            rollback(self.binary,self.store,[config],service)
+        self.assertEqual(self.base.stat().st_mode & 0o777,0o750)
 
 
 if __name__ == '__main__': unittest.main()
