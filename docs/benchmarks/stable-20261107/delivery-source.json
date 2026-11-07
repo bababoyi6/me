@@ -396,8 +396,8 @@
       "sha256": "05992a0f6d50416fe90d253fc77582417e7242f3c311047b7c1688e07e973cc3"
     },
     ".github/workflows/stable-compat.yml": {
-      "bytes": 3561,
-      "sha256": "52d697619b1d902eeeb0c8b46eae19dcb43af019a7bb9fb71d3fccfb0be0da31"
+      "bytes": 3739,
+      "sha256": "e4610d471adcd85a1fbec66c3e2277ba2e305e8e7d6cf0147116353cd0c8c5ba"
     }
   }
 }

@@ -7,5 +7,16 @@
   "result": "permission denied; no branch pushed and no pull request created",
   "implementation_commit": "f8414e092fc4ace9e1daaba24292d1e545066bf6",
   "main_changed": false,
-  "visibility_changed": false
+  "visibility_changed": false,
+  "resolution": {
+    "authenticated_login": "bababoyi6",
+    "permissions_confirmed": {
+      "push": true,
+      "admin": true
+    },
+    "credential_scope": "current process only; default login unchanged; no token saved",
+    "branch_push": "success",
+    "pull_request": "https://github.com/bababoyi6/me/pull/9",
+    "ci": "Ubuntu22.04 branch-scoped acceptance trigger added; awaiting run"
+  }
 }
