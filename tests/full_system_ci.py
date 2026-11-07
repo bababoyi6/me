@@ -21,12 +21,19 @@ import time
 import system_vm as vm
 from system_vm_ssh import SSH, ports, ssh
 from full_system_contract import validate, MANAGER, CORE
+from full_system_candidate import expectations,bootstrap,PROTECTED,maintenance
 
 ROOT = vm.ROOT
 ROLES = ('entry', 'backend1', 'backend2')
 EVIDENCE = ROOT.parent / 'tdh-full-system-evidence'
 UNIT = 'tdh-audit-fullsystem.service'
 LIMIT_SECONDS = 1500
+PROFILE=os.environ.get('TDH_FULL_SYSTEM_PROFILE','published')
+if PROFILE not in ('published','candidate'):
+    raise ValueError('unknown full-system profile')
+EXPECTED=expectations(os.environ.get('TDH_CANDIDATE_REF','')) if PROFILE=='candidate' else None
+if EXPECTED is not None:
+    MANAGER,CORE=EXPECTED['manager'],EXPECTED['core']
 
 
 def write(path, value):
@@ -203,9 +210,12 @@ def interactive(node, name, line, action):
 
 
 def install(node):
-    text = (Path(__file__).resolve().parents[1]/'README.md').read_text()
-    line = text.split('```bash\n', 1)[1].split('\n```', 1)[0]
-    assert 'https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh' in line
+    if EXPECTED is not None:
+        line=bootstrap(EXPECTED)
+    else:
+        text = (Path(__file__).resolve().parents[1]/'README.md').read_text()
+        line = text.split('```bash\n', 1)[1].split('\n```', 1)[0]
+        assert 'https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh' in line
     def action(child):
         child.expect('请选择'); child.sendline(str(ROLES.index(node)+1))
         if node != 'entry':
@@ -275,6 +285,23 @@ def failure_diagnostics(node):
     text=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',diag.stdout+diag.stderr)
     report['diagnose_exit']=diag.returncode
     report['diagnose']=re.sub(r'[A-Za-z0-9_+/=-]{32,}','[redacted-token]',text[-8192:])
+    if EXPECTED is not None:
+        errors=ssh(node,"""python3 - <<'PY'
+import json,re
+from pathlib import Path
+names=('core-upgrade.log','core-repeat.log','core-rollback.log','core-rollback-repeat.log','core-final-upgrade.log','health-refresh.log')
+rows={}
+for name in names:
+ p=Path('/root')/name
+ if not p.is_file():continue
+ text=p.read_text(errors='replace')[-8192:]
+ text=re.sub(r'\\x1b\\[[0-9;]*[A-Za-z]','',text)
+ lines=[s for s in text.splitlines() if '[失败]' in s or '核心事务失败' in s or s.startswith(('curl:','sha256sum:'))]
+ rows[name]=re.sub(r'[A-Za-z0-9_+/=-]{32,}','[redacted-token]','\\n'.join(lines)[-2048:])
+print(json.dumps(rows))
+PY
+""",20)
+        if errors.returncode==0:report['maintenance_errors']=json.loads(errors.stdout)
     if node!='entry':
         value=ssh(node,"""python3 - <<'PY'
 import concurrent.futures,json,socket,subprocess,time,urllib.request,urllib.error
@@ -318,6 +345,8 @@ def worker():
         (ROOT/name).mkdir(mode=0o700)
     result = {'complete': False, 'roles': {}, 'download_boundary_substituted': False,
               'production_accessed': False, 'shared_ci_host': True, 'capacity_benchmark': False}
+    if EXPECTED is not None:
+        result.update(profile='candidate',source_ref=EXPECTED['source_ref'],pinned_manager_download=True)
     def phase(name):
         result['phase'] = name; write(ROOT/'results/worker.json', result)
         print('Full-system phase: '+name, flush=True)
@@ -351,6 +380,21 @@ def worker():
                 child.expect('TDHR4 回执码: '); child.sendline((ROOT/'private'/(node+'-receipt')).read_text())
                 assert child.expect([pexpect.EOF, r'\[失败\]'], timeout=150) == 0
             interactive('entry', node+'-registration', 'a register', action)
+        if EXPECTED is not None:
+            phase('candidate-repeat-install-preservation')
+            result['repeat_installs']={}
+            for node in ROLES:
+                before=json.loads(guest(node,PROTECTED))
+                core_before=identity(node)
+                def repeat_action(child):
+                    child.expect('请选择');child.sendline('0')
+                interactive(node,node+'-repeat-install',bootstrap(EXPECTED),repeat_action)
+                after=json.loads(guest(node,PROTECTED))
+                assert before==after and identity(node)==core_before,'repeat install changed node identity or config'
+                result['repeat_installs'][node]={'files_unchanged':True,'protected_files':after['files'],
+                                                'core_unchanged':True,'manager_unchanged':True}
+            phase('candidate-native-maintenance')
+            result['native_maintenance']=maintenance(guest,EXPECTED)
         phase('real-dc-and-backend-failover')
         completed = subprocess.run([sys.executable, str(Path(__file__).with_name('system_vm_e2e.py'))], capture_output=True, timeout=220)
         (ROOT/'private/e2e.log').write_bytes(completed.stdout+completed.stderr)
@@ -441,6 +485,8 @@ def supervise():
                 '-p','MemorySwapMax=0','-p','OOMPolicy=stop','-p','TasksMax=256','-p',f'RuntimeMaxSec={LIMIT_SECONDS}',
                 '-p','TimeoutStopSec=15','-p','KillMode=control-group','-p','IOWeight=10',
                 '-p','LimitFSIZE=3221225472','--setenv=RUNNER_TEMP='+str(ROOT.parent),
+                *(['--setenv=TDH_FULL_SYSTEM_PROFILE=candidate',
+                   '--setenv=TDH_CANDIDATE_REF='+EXPECTED['source_ref']] if EXPECTED is not None else []),
                 sys.executable, str(Path(__file__).resolve()), '--worker'], stdout=log, stderr=subprocess.DEVNULL)
             cg = Path('/sys/fs/cgroup/system.slice')/UNIT
             lastsample = 0
@@ -478,7 +524,9 @@ def supervise():
                      'interaction-entry-install.json','interaction-backend1-install.json',
                      'interaction-backend2-install.json','interaction-backend1-registration.json',
                      'interaction-backend2-registration.json','diagnostics-entry.json',
-                     'diagnostics-backend1.json','diagnostics-backend2.json'):
+                     'diagnostics-backend1.json','diagnostics-backend2.json',
+                     'interaction-entry-repeat-install.json','interaction-backend1-repeat-install.json',
+                     'interaction-backend2-repeat-install.json'):
             source = ROOT/'results'/name
             if source.is_file() and not source.is_symlink():
                 assert source.stat().st_size<1024**2
@@ -492,7 +540,7 @@ def supervise():
         write(EVIDENCE/'supervisor.json',report)
     worker_report = json.loads((EVIDENCE/'worker.json').read_text()) if (EVIDENCE/'worker.json').exists() else {}
     try:
-        validate(worker_report,report)
+        validate(worker_report,report,EXPECTED)
         accepted = True
     except ValueError:
         accepted = False
