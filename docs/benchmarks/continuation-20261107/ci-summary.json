@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "code_commit": "94857f2847bacd199a9955c7cff660022ed75a8a",
+  "manager_sha256": "7680bcb8e939d40002b311154505e0b5d549b1ce285fbdbf4073ea3d35d97915",
+  "runs": {
+    "validate": {
+      "id": 42370201295,
+      "url": "https://github.com/bababoyi6/me/actions/runs/42370201295",
+      "status": "PASS",
+      "code_commit": "94857f2847bacd199a9955c7cff660022ed75a8a"
+    },
+    "native_arm": {
+      "id": 42370196967,
+      "url": "https://github.com/bababoyi6/me/actions/runs/42370196967",
+      "status": "PASS",
+      "code_commit": "94857f2847bacd199a9955c7cff660022ed75a8a"
+    },
+    "stable": {
+      "id": 42370197039,
+      "url": "https://github.com/bababoyi6/me/actions/runs/42370197039",
+      "status": "PASS",
+      "code_commit": "94857f2847bacd199a9955c7cff660022ed75a8a"
+    },
+    "three_system": {
+      "id": 42370196980,
+      "url": "https://github.com/bababoyi6/me/actions/runs/42370196980",
+      "status": "PASS",
+      "code_commit": "94857f2847bacd199a9955c7cff660022ed75a8a"
+    }
+  },
+  "wsl_root_regressions_passed": 249,
+  "short_churn": {
+    "run": 42352935615,
+    "code_commit": "9d57ab936ca35987704138123949d59f3dedd077",
+    "connections": 900,
+    "elapsed_seconds": 182.004509951,
+    "scope": "separate short-run evidence, not same-code endurance"
+  },
+  "official_clients": "NOT RUN: user has no devices for this round",
+  "physical_public_three_region_VPS": "NOT RUN: production isolated, old lab expired",
+  "24h_endurance": "NOT RUN: intentionally stopped historical test remains stopped",
+  "production_deployed": false,
+  "main_merged": false
+}

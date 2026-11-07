@@ -31,3 +31,4 @@ docs/benchmarks/endurance-vps-20261025/** -text -whitespace
 # New CI scripts and this delivery evidence keep explicit line-ending rules.
 .github/workflows/*.yml text eol=lf
 docs/benchmarks/stable-20261107/** -text -whitespace
+docs/benchmarks/continuation-20261107/** -text -whitespace

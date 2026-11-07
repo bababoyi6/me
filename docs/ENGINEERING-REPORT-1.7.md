@@ -8,7 +8,7 @@
 
 实际验证采用本机 WSL、真实官方/历史核心二进制、真实 HAProxy/WireGuard/systemd，协议负载使用既有 Fake TLS/obfuscated2/padded-intermediate 工具和本地模拟 DC。没有访问三台美国生产服务器或已过期的荷兰 VPS，没有购买资源，没有更改仓库可见性，没有恢复长时实验或暂停的自动任务。
 
-**当前适合代码审查和实验室交付，尚不足以宣称完成全部生产放行条件。** Ubuntu 22.04 的完整三系统安装/重启、ARM 运行、官方客户端、公网跨地区、长时资源趋势等仍需后续验收。没有千兆跑满、全面客户端兼容、抗封锁或 24 小时稳定性的结论。
+**当前环境的候选实验室验收已通过，适合审查和隔离测试交付；尚不足以宣称完成全部生产放行条件。** 已补验 ARM64 原生运行、短时资源回收及三系统真实安装/维护/正常重启；官方客户端、三台物理 VPS 公网跨地区、长期稳定性仍未验证。没有千兆跑满、全面客户端兼容、抗封锁或 24 小时稳定性的结论。
 
 ## 原项目身份与保护
 
@@ -60,7 +60,7 @@
 | `server.api.*` 和 ready envelope | 本次使用字段及 `ok/data.ready` 兼容 | 真实 401、只读写入 403、ready 和实际 PID 摘要已验 |
 | Metrics | 模板未启用；上游默认绑定范围有安全调整 | 没有增加监听或依赖默认公网绑定 |
 | `server.conntrack_control.inline_conntrack_control` | 目标源码默认 false；部分配置文档仍列 true | 按源码评估并继续显式 false |
-| censorship/SNI/Fake TLS、用户 Secret | 保留；不存在本模板必须重命名的键 | 原模板被新版解析并启动；不重签用户链接 |
+| censorship/SNI/Fake TLS、用户 Secret | 保留；不存在本模板必须重命名的键 | 原模板被新版解析并启动；不重签用户链接；旧 0710 父目录必须做独立权限迁移 |
 | WEB listener/Carrier、quota calendar 等新增字段 | 当前模板未使用 | 不自动新增；官方客户端及定制配置另行验证 |
 
 官方 3.5.16 的 `src/transport/socket.rs` 仍含固定收发缓冲设置。因此切换到官方核心不等于继续使用 balanced2 的所有 socket 策略；本轮没有无条件宣称提速。
@@ -75,6 +75,7 @@
 | 核心与配置备份可能在中断时关联错误 | snapshot 标识随 prepared/committed/prior journal 绑定；不使用独立可提前推进的指针 | 中断恢复、目标二进制已写入仍拒绝未完成事务、失败第二次升级保留 prior snapshot、配置变更拒绝回退 |
 | 仅凭旧官方版本字符串识别核心 | 补齐旧双架构二进制摘要；先校验文件/父目录/摘要，再执行版本查询 | 未知/可写核心执行前拒绝，旧双架构身份测试，真实新核心识别 |
 | 状态文件 source 的文件信任边界不足 | 拒绝软链接、额外硬链接、可被替换的父目录 | 真实安全路径反例与执行前拒绝测试 |
+| 旧父目录 0710 不满足新版安全配置读取 | 新安装 root:telemt 0750；旧节点维护时先备份再迁移，失败/原核心回退恢复 0710，原子私有迁移记录可追踪中断 | 实际三系统发现反复退出及 os error 13；新增非特权目录打开、密钥保护、事务/失败/中断/异常记录回归 |
 | 无明确健康代理更新/回退入口 | `health-refresh` / `health-rollback` 复用同一事务引擎，独立备份 | 原子/幂等/回退测试，实际新代理逻辑独立进程验收 |
 | 新安装队列最低值过大 | 65535/32768 的强制最低值改为 4096，保持更高用户原值 | 私有 mount 中实际生成 sysctl 文件，宿主 sysctl 操作替身，不改宿主参数 |
 | 健康 HTTPError 资源回收、HTTPS 重定向、Windows 换行 | 显式 close HTTPError、限制重定向 HTTPS、活动脚本 LF 属性 | 重定向令牌保护回归、ShellCheck、真实 README 下载边界测试 |
@@ -84,7 +85,7 @@
 
 ## 升级、回退和连接影响
 
-完整步骤见 [升级文档](UPGRADE-1.7.md)。配置迁移采用原字节保持，不在升级中修改 Secret/SNI、密钥或模板。旧二进制、配置、服务、WG、状态和必要的旧许可材料在停止前备份；候选失败恢复旧核心。配置有外部改动时拒绝自动回滚，保留人工审查路径。
+完整步骤见 [升级文档](UPGRADE-1.7.md)。配置文件保持原字节，不在升级中修改 Secret/SNI、密钥或模板；旧父目录需可追踪、可回退的 0710→0750 权限迁移。旧二进制、配置、服务、WG、状态和必要的旧许可材料在停止前备份；候选失败恢复旧核心。配置有外部改动时拒绝自动回滚，保留人工审查路径。
 
 入口 drain 为运行时状态，不持久化，不可在维护窗口重载入口。一次只升级一个后端。后端的 `--maintenance` 是明确维护确认，不伪装成已自动验证入口和另一台服务器。已有 TCP 会话不能跨后端迁移。
 
@@ -99,7 +100,7 @@ WSL Ubuntu **26.04.1**，内核 `6.18.40.1-microsoft-standard-WSL2`，Python 3.1
 | 验收项 | 结果 | 证据/边界 |
 |---|---|---|
 | 改动前全部 Python 回归 | PASS，213 项 | `baseline-tests.log` |
-| 最终回归、Bash、ShellCheck、嵌入一致性 | PASS，236 项回归 | 包含保留原功能、恶意输入、权限、备份、失败恢复 |
+| 最终回归、Bash、ShellCheck、嵌入一致性 | PASS，249 项回归 | WSL root 全部运行，无跳过；包含原功能、恶意输入、权限迁移、备份、失败恢复 |
 | 原始 1.3.1 SHA256 | PASS | 冻结原始脚本未修改 |
 | HAProxy SNI/碎片 ClientHello/PROXYv2/数据摘要/agent 切换 | PASS | `haproxy-integration.log`；loopback 集成 |
 | 安装中断/错误/信号/待提交/已提交/旧状态 | PASS，27 场景 | 私有 mount+net namespaces，真实文件恢复路径；宿主服务/防火墙/账号操作是明确替身 |
@@ -114,8 +115,9 @@ WSL Ubuntu **26.04.1**，内核 `6.18.40.1-microsoft-standard-WSL2`，Python 3.1
 | HAProxy USR2 期间既有传输 | PASS | 持续传输跨重载并校验摘要；未默认开启 splice |
 | 30/50/100 并发 | 候选各组均有 PASS，失败历史保留 | 见下表及两个原始批次；不拼成一个全通过的单批 |
 | 短时 FD 释放 | PASS（有限观察） | 3.5.16 空闲后 FD 为 14，初始约 16；缓存 RSS 保留，不据此证明长期无泄漏 |
-| 完整三角色新 OS 安装/重装、系统重启 | NOT RUN（本候选） | 历史 1.6 有证据，本轮 27 场景不能冒充完整安装/重启 |
-| ARM64 运行/性能 | NOT RUN | 仅包/二进制 SHA256 与 ELF/GLIBC 静态核对 |
+| 三角色安装、重复执行安装命令、正常系统重启 | PASS，Ubuntu 22.04 KVM | 三客体真安装和管理命令，依赖预装后克隆；重复命令进入原管理面板，非强制覆盖重装；不代表裸机或物理跨区 |
+| ARM64 原生运行 | PASS | Ubuntu 22.04.5 aarch64，正式包/生产架构识别、20 条双 SNI 传输、API 401/403；不是 ARM 吞吐基准 |
+| 180 秒连接反复建立/关闭 | PASS，900/900 | FD 14→14；暖机后 RSS +2.29MiB，cgroup 峰值 77.65MiB、OOM 增量 0；不能证明长期无泄漏 |
 | Ubuntu 22.04 CI 工作流 | PASS | stable 验收 `42351018133`、installer/relay 回归 `42351022710`；具体范围见下文 |
 | ME 实际池、WEB Carrier、定制配置迁移 | NOT RUN | 当前生产架构未启用；仅关键变更审计 |
 | 官方 Desktop/Android/iOS、真实 Telegram 文件 | NOT RUN | 没有借用账号或伪称工具就是客户端 |
@@ -141,7 +143,7 @@ WSL Ubuntu **26.04.1**，内核 `6.18.40.1-microsoft-standard-WSL2`，Python 3.1
 
 [完整 p50/p95、CPU、RSS 表](benchmarks/stable-20261107/performance-table.md)及原始 JSON 保留全部数据。没有采集负载 cgroup 的 OOM 增量/峰值总内存，不能给出该指标为零的正式断言。
 
-[最终代码摘要](benchmarks/stable-20261107/delivery-source.json)、[236 项最终回归](benchmarks/stable-20261107/delivery-tests.log)、[最终真实升级验收](benchmarks/stable-20261107/system-upgrade-delivery.json)和[清理核对回执](benchmarks/stable-20261107/cleanup.json)均保留。本轮保留名称的命名空间、实验进程和活动测试单元均无残留；WSL 的临时目录已不存在，回执没有把自然消失的目录伪报为清理脚本实际删除。
+[最终代码摘要](benchmarks/stable-20261107/delivery-source.json)、[早期 236 项回归](benchmarks/stable-20261107/delivery-tests.log)、[最终 249 项回归](benchmarks/continuation-20261107/final-root-tests.log)、[真实升级验收](benchmarks/stable-20261107/system-upgrade-delivery.json)和[清理核对回执](benchmarks/stable-20261107/cleanup.json)均保留。该清理回执对应之前 WSL 批次；新的 CI 每批由自身监督器确认清理，不沿用旧回执冒充新结果。
 
 ### 失败记录及修复界限
 
@@ -204,11 +206,51 @@ git diff --check
 
 此外，真实双 WG+PSK、100ms 配置延迟、0.1% 丢包、5ms 抖动、主备恢复、真实核心进程重启、WG down/up 以及 master-worker 重载期间既有传输均通过。仍使用模拟 DC，三逻辑节点共享一个 runner，不是三台独立 VPS；健康代理在系统步骤单独真实运行，三节点步骤使用进程状态代理。
 
-首轮 `42350787027` 失败保留：核心升级、协议传输和崩溃恢复已完成，停在健康代理冷启动。后续观测确认服务 UID 无法读取 runner home 下仓库源码，修正为将完全相同的代码暂存至可读的测试目录；没有放宽宿主权限或改用 root 运行。新结果 `repository_agent_readable_by_service_uid=false` 与实际代理成功构成对应证据。旧工具硬编码 WSL 的范围标签也改为实际 OS/kernel；第一轮原始 JSON 未伪改。完整三系统安装/重启、ARM、官方客户端、公网跨地区和长期稳定性仍为 NOT RUN。
+首轮 `42350787027` 失败保留：核心升级、协议传输和崩溃恢复已完成，停在健康代理冷启动。后续观测确认服务 UID 无法读取 runner home 下仓库源码，修正为将完全相同的代码暂存至可读的测试目录；没有放宽宿主权限或改用 root 运行。新结果 `repository_agent_readable_by_service_uid=false` 与实际代理成功构成对应证据。旧工具硬编码 WSL 的范围标签也改为实际 OS/kernel；第一轮原始 JSON 未伪改。上述批次未运行三系统安装/重启和 ARM，后续补验见下文；官方客户端、物理公网跨地区和长期稳定性保持未验证。
+
+## 补充：原生 ARM64 与有界资源检查
+
+[本轮补充证据和复验入口](benchmarks/continuation-20261107/README.md)保留原始 JSON 与文件校验。ARM 工作流 `42352100821` 在原生 `ubuntu-22.04-arm` 上执行；不是交叉编译成功或 x86 模拟。共享协议夹具修改后，x86 工作流 `42352100726` 也通过。
+
+资源工作流 `42352935615` 运行 182.0 秒，30 连接/波，共 900/900 条真实原生协议连接成功，数据摘要一致、模拟 DC 无错误；空闲 FD 14→14。核心暖机后 RSS 增长 2,404,352 字节，cgroup（含控制器、HAProxy、模拟 DC）峰值 81,424,384 字节，OOM/OOM kill 增量 0，CPU 累计约 4.17 秒。此处小数据连接检查不替代前述吞吐矩阵，也不能用短时门槛证明长期无泄漏。
+
+三系统工作流复用维护中的 `full_system_ci.py` 和 `system_vm*.py`，不执行归档脚本。先检查真实 KVM，再校验 Ubuntu 官方镜像签名及摘要；三个客体各 1 CPU / 1GiB，控制器总限 0.6 CPU / 3GiB / 无 swap。只向宿主 loopback 暴露测试入口和 SSH，临时 SSH 密钥、客体磁盘及带凭据的交互记录不导出。
+
+修复提交 `9dabd6a1b21c1e0b2082379a278dced38080439b` 的[三系统批次 42369032262](https://github.com/bababoyi6/me/actions/runs/42369032262)完整通过，监督器用时 584.9 秒。三个角色都执行了固定提交原脚本的真实下载/校验/安装及重复执行；入口受保护文件 12 个、各后端 9 个的摘要/模式/UID/GID保持，管理器与核心身份不变。随后实际执行入口 drain、旧 balanced2/0710 夹具准备、核心升级/重复升级、回滚/重复回滚、再次升级、健康代理更新和入口 resume；验证目录 750→710→750，用户配置不变。
+
+正常、backend1 Telemt 停机、恢复三个阶段各两条线路均完成真实 Telegram `req_pq/resPQ`（验证 nonce），HAProxy 会话增量证明停机后两条新连接走 backend2、恢复后回到各自主节点。随后三个客体正常关机并重新启动，boot ID 全部变化，持久文件内容一致、诊断通过，两条公网协议抽检再次成功。历史工具 scope 字段称 public DH，实际仅上述握手阶段，不包含账号登录、授权密钥生成、消息或文件。监督器出口 0、宿主 OOM 增量 0、VM/磁盘/临时密钥清理通过。
+
+三个客体共享 runner、均为 1GiB，未完全复刻洛杉矶后端 2GiB；依赖预装后克隆，不是三套裸系统安装性能评估。实际公网仅为 CI 出站至 Telegram 的有限握手，不是洛杉矶/纽约物理三机或官方客户端验收。
+
+首轮 `42352574411` 已如实判 FAIL：入口安装成功，backend1 安装等待链接失败并自动回滚；没有继续冒充升级/重启成功。监督器记录清理完成、宿主 OOM 增量 0。诊断轮 `42353312993` 观察到实际核心退出码 1、反复重启、API 不可达及 Permission denied / os error 13。对照固定上游 `src/util/secure_fs/path.rs`，确认旧 0710 父目录不能被服务账号以 O_RDONLY 打开。此前合成工具用 0755/0750 临时父目录，未覆盖旧真实布局，因此没有发现此缺陷。修复新安装和旧节点迁移，并新增真实非特权目录读取/密钥保护、事务回退及中断恢复测试；完整复验另行记录。补充采样不导出凭据或日志原文。
+
+用户本轮明确暂不提供设备，先完成当前环境验收。Desktop/Android/iOS 保持 NOT RUN；没有等待设备或使用代理协议工具冒充官方客户端。
+
+### 最终交付代码复验
+
+最终代码提交为 `94857f2847bacd199a9955c7cff660022ed75a8a`，管理器 SHA256 为 `7680bcb8e939d40002b311154505e0b5d549b1ce285fbdbf4073ea3d35d97915`。在首轮通过之后，继续补强迁移前二进制备份、中断恢复基线核对及普通状态保存不提前迁移，随后重新验收准确交付代码：
+
+- [安装器 CI 42370201295](https://github.com/bababoyi6/me/actions/runs/42370201295)、[x86 真实核心/隧道/协议 42370197039](https://github.com/bababoyi6/me/actions/runs/42370197039)、[原生 ARM64 42370196967](https://github.com/bababoyi6/me/actions/runs/42370196967)、[三系统 42370196980](https://github.com/bababoyi6/me/actions/runs/42370196980)均 success，head SHA 一致。
+- WSL root 全部 **249 项**，20.900 秒，无跳过。额外 9 项配置访问测试覆盖内核真实非特权读取、密钥不可读、迁移/回退/重试、中断恢复、被改动记录及普通状态保存；Bash、ShellCheck、嵌入一致性均通过。
+- 最终 x86 为 **364/364**，100 并发上/下行 26.365 / 25.158Mbps，握手 p95 253.94 / 241.17ms，核心最高 RSS 26.44MiB，空闲 FD 14；仍是已说明的 25ms/rate100Mbps 共享 qdisc 合成条件。[完整新批次表](benchmarks/continuation-20261107/README.md)保留 p50/p95，不与不同主机或批次拼算提速。
+- 最终三系统用时 **599.0 秒**，所有原生命令阶段、750/710 权限迁移与回退、三角色正常重启及两条重启后真实 req_pq/resPQ 都通过，三个 boot ID 变化、持久文件内容一致。监督器 exit=0、无停止原因、宿主 OOM 增量=0、清理确认=true。
+
+所有新增原始结果与 CI 作业元数据见[本轮清单](benchmarks/continuation-20261107/ci-summary.json)。目录中不包含临时 SSH 私钥、客体磁盘、seed、原始交互日志、用户链接或账号凭据。代码摘要按 Git 对象字节记录，避免 Windows CRLF 工作副本与实际 Linux/ZIP 字节混淆；它不是历史批次代码身份的替代物。后续文档/证据提交不改变上述代码字节。
+
+补充实际执行入口：
+
+```text
+wsl --cd 'D:\project\MTP脚本\telemt-dual-hop' --user root --exec timeout 180 python3 -m unittest discover -s tests -p 'test_*.py' -v
+sudo env RUNNER_TEMP="$RUNNER_TEMP" TDH_FULL_SYSTEM_PROFILE=candidate TDH_CANDIDATE_REF="$GITHUB_SHA" python3 tests/full_system_ci.py
+gh run view 42370196980 --repo bababoyi6/me --json status,conclusion,jobs
+gh run download 42370196980 --repo bababoyi6/me --name candidate-three-system-evidence --dir <本地证据目录>
+```
+
+第二行为已完成镜像/依赖准备的临时 CI 入口，完整可复现准备与限制在相应工作流；不是生产命令。下载命令的目标目录由复验者选择。三系统工具内实际执行的 `a core-upgrade/core-rollback --maintenance`、`a backend-drain/resume` 等固定命令见 `tests/full_system_candidate.py`。
 
 ## 后续放行门槛
 
-Ubuntu 22.04 的有界新工作流及当前固定资产下载已通过。后续仍需候选版本三角色完整安装、重复安装、升级/回退后系统正常重启及持久文件一致性。ARM 单独运行，不用 x86_64 结果代替。
+Ubuntu 22.04 的有界核心工作流、原生 ARM64、三系统角色安装/重复执行、原生管理命令升级/回退后正常重启及持久文件一致性已通过。当前环境验收不再受缺少测试 VPS 阻塞。发布和生产放行仍需按下面的真实环境边界安排。
 
 获得明确授权和适当测试节点后，才做真实三机公网路径及 Desktop/Android/iOS 官方客户端的连接、空闲、文件上传/下载、切网和备用恢复测试。分别核对 30/50/100 活跃用户的真实消息/文件、跨区 RTT、CPU/总内存/FD/重传、成功率和恢复分布。未获得授权前继续保持生产隔离，不要求用户为了本地开发立即购买 VPS。
 

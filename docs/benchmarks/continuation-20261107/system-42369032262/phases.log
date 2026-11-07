@@ -1,0 +1,22 @@
+{"initialized": true, "image_verified": true, "image_sha256": "5a83bf87599fe26fb86296434305378fe2c136df95c71c721b522fbe63f65900", "limits_from_transient_unit": true}
+Full-system phase: prepare-base-os
+{"started": "base", "logical_memory_mib": 1024}
+{"started": "entry", "logical_memory_mib": 1024}
+{"started": "backend1", "logical_memory_mib": 1024}
+{"started": "backend2", "logical_memory_mib": 1024}
+Full-system phase: attest-private-lan-before-installs
+Full-system phase: public-install-entry
+Full-system phase: public-install-backend1
+Full-system phase: public-install-backend2
+Full-system phase: register-backend1
+Full-system phase: register-backend2
+Full-system phase: candidate-repeat-install-preservation
+Full-system phase: candidate-native-maintenance
+Full-system phase: real-dc-and-backend-failover
+Full-system phase: normal-poweroff
+Full-system phase: reboot-recovery
+{"started": "entry", "logical_memory_mib": 1024}
+{"started": "backend1", "logical_memory_mib": 1024}
+{"started": "backend2", "logical_memory_mib": 1024}
+Full-system phase: post-reboot-two-sni
+Full-system phase: final-normal-poweroff

@@ -1,0 +1,13 @@
+{
+  "node": "backend1",
+  "operation": "backend1-install",
+  "complete": false,
+  "expected": "['\u6309 Enter \u8fd4\u56de\u63a7\u5236\u9762\u677f', '\\\\[\u5931\u8d25\\\\]']",
+  "known_markers": [
+    "\u5b89\u88c5\u6240\u9700\u7684 Ubuntu \u8f6f\u4ef6\u5305",
+    "\u8bf7\u8f93\u5165\u540e\u7aef VPS \u516c\u7f51 IPv4",
+    "\u8bf7\u9009\u62e9",
+    "[\u5931\u8d25]"
+  ],
+  "sanitized_error_lines": "[\u5931\u8d25] Telemt \u672a\u80fd\u751f\u6210\u7ebf\u8def A \u8fde\u63a5\u94fe\u63a5\u3002"
+}

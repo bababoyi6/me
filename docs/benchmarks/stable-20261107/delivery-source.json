@@ -3,81 +3,57 @@
   "baseline_commit": "4510829288fa9779ea06dd6b543327392bda4999",
   "branch": "dev/telemt-stable-compat-20261107",
   "files": {
+    ".github/workflows/arm-compat.yml": {
+      "bytes": 2035,
+      "sha256": "5d7aa0e363cbfc985116f3fd2b1db874386d4cd63f60904c7961707a33196476"
+    },
+    ".github/workflows/candidate-install.yml": {
+      "bytes": 2100,
+      "sha256": "a926345334bd1fdc4dd8472ed74582ce7ff37388abdab07fe36c42dfc68d2eee"
+    },
+    ".github/workflows/candidate-path.yml": {
+      "bytes": 2021,
+      "sha256": "aaf49c6cb5912de18fc76a4f36038341b4acc1bddf381bc708bb5e5e196f6dea"
+    },
+    ".github/workflows/candidate-system.yml": {
+      "bytes": 2280,
+      "sha256": "fda372ab97f7864eacacbe0cfa7f32e04aa189b7080b00c6c49c1ae1bec46dc1"
+    },
+    ".github/workflows/core-delivery.yml": {
+      "bytes": 2684,
+      "sha256": "9bbad2f69e37d81042876dbe89b26e0a4f140f4e4a0b200a3caf2dd9e95242c3"
+    },
+    ".github/workflows/endurance-pilot.yml": {
+      "bytes": 2564,
+      "sha256": "8410a718840160eef4c28a93dd5406ca35b5a9a503dcd052c44f4db4e66d0d1d"
+    },
+    ".github/workflows/full-system.yml": {
+      "bytes": 1947,
+      "sha256": "6e254029eb8922b02b6741f213421d087f1fdd360d284c72625042f3999c925b"
+    },
+    ".github/workflows/relay-candidate.yml": {
+      "bytes": 2600,
+      "sha256": "b5626d54643f79f2e7bac94684aac9321d2041d6cb0eecfb689d007c33071b9f"
+    },
+    ".github/workflows/resource-churn.yml": {
+      "bytes": 1919,
+      "sha256": "a0917445367005d0227b4b65ff1bd8f683601ff96f70804fdae9ec51ba7ada21"
+    },
+    ".github/workflows/stable-compat.yml": {
+      "bytes": 3966,
+      "sha256": "8a93a56bf5226a5d72b3adf810db79b3fd1a36e2568773a895043209e7846fad"
+    },
+    ".github/workflows/validate.yml": {
+      "bytes": 3502,
+      "sha256": "67f3a0fb882385e91e5a02fe3fc8ac3ca5b05f33e800e1cc86c71bcfa1496ba9"
+    },
     "telemt-dual-hop.sh": {
-      "bytes": 175815,
-      "sha256": "b3375aed3d1f40a320b0fe900bddcf7da14a67112f264cb91dafacc675295338"
+      "bytes": 181344,
+      "sha256": "7680bcb8e939d40002b311154505e0b5d549b1ce285fbdbf4073ea3d35d97915"
     },
-    "tools/analyze_socket_policy.py": {
-      "bytes": 3545,
-      "sha256": "3b55bc6be04cee6207957e5ef5e8e4a2e499a85b0ce59d05a89e51e8f734d60e"
-    },
-    "tools/analyze_upload_ab.py": {
-      "bytes": 4934,
-      "sha256": "46bfcb41297d91c13f1d280b4757abd33b0d6b93afdca49f740cc1197aa43723"
-    },
-    "tools/build_relay_candidate.py": {
-      "bytes": 10714,
-      "sha256": "23e9f9f4b567a7060c5852fa1505f78e0d8ca9ffa50973773849df9fe5b745d9"
-    },
-    "tools/candidate_bundle.py": {
-      "bytes": 6238,
-      "sha256": "976ab5fe5213bbfbcfb91b68e27687dc2eb371be3a2839b3795fd92db28baa48"
-    },
-    "tools/core_bundle.py": {
-      "bytes": 5390,
-      "sha256": "d2b8bf405097af6c0bce3f677f73d4ed5e0c486b83bea2032ad337cc84340af2"
-    },
-    "tools/core_install.py": {
-      "bytes": 7113,
-      "sha256": "72b37a072e2400369ccc6ce387fe2cce0ab7da935cb3579ce05009cb4d18e11f"
-    },
-    "tools/core_transaction.py": {
-      "bytes": 9833,
-      "sha256": "0d4e02e249a7f13cbb8a8793cac6b0c520ed8bcc86694cf65e79fda377ade1f1"
-    },
-    "tools/core_upgrade.py": {
-      "bytes": 12608,
-      "sha256": "474064c1ee15d223dfefc8c6caaeb4228a090bbd12232feada75f248e0d1d851"
-    },
-    "tools/embed_core_install.py": {
-      "bytes": 1076,
-      "sha256": "ec099269624b5bc8081710ba09863b6c6888093d17cfbf77a7ee599284bd4f62"
-    },
-    "tools/embed_core_upgrade.py": {
-      "bytes": 1475,
-      "sha256": "0a3d8a10eec39939195adf812dfaeceac0a53f11ff42eb631cb567ff1c50cc17"
-    },
-    "tools/embed_health_agent.py": {
-      "bytes": 996,
-      "sha256": "0c68d697fb87febb6bd6d97781039bc833a6ac307df79ee722b0a0150e904130"
-    },
-    "tools/endurance_cleanup.py": {
-      "bytes": 3974,
-      "sha256": "2c39086eceb173ac95d0afee1fe279b00b473ed17036779bfd31710c90931214"
-    },
-    "tools/endurance_service.py": {
-      "bytes": 8242,
-      "sha256": "886b2a76c4a97b0f5ede0b48f811ce8e2b46d45908dcbc765de70130014065d5"
-    },
-    "tools/entry_maintenance.py": {
-      "bytes": 2014,
-      "sha256": "609532991efbbf1ad3d41e8df009081f25bc497c0932cd1e6aea28bbdc0f4a61"
-    },
-    "tools/health_agent.py": {
-      "bytes": 5501,
-      "sha256": "8321cf9a524b0aa0436a67dab65cad54f6ae245989119554e9321bc973d9eba3"
-    },
-    "tools/iperf_matrix.py": {
-      "bytes": 4440,
-      "sha256": "f53b279502f3bf61edb49d4a9e09876037a3e387e3975d6b28f336e05dc3e257"
-    },
-    "tools/lab_preflight.py": {
-      "bytes": 6009,
-      "sha256": "cf9e337f0366021455ad08660d4ed6013a8303559b8d84cdc0af7d0f0f8ffdb2"
-    },
-    "tools/lab_runner.py": {
-      "bytes": 20370,
-      "sha256": "954af489e1dc6ddce8afa99c11387e930c83a6c91a438879d7449069790c2328"
+    "tests/arm_compat_lab.py": {
+      "bytes": 4349,
+      "sha256": "51d220f63a3e55d55a2aa6146d626b6e2617c60b20fffb8c419940dd6ca6a2bf"
     },
     "tests/backend_endurance.py": {
       "bytes": 9002,
@@ -116,8 +92,8 @@
       "sha256": "e2e9043962fbb6931bc9b57a08f98b9d440325228b0aa23cc82bf0886b0f0b5e"
     },
     "tests/e2e_lab.py": {
-      "bytes": 24285,
-      "sha256": "9b3b66e77bd9d1dd77e30badd2691c5c4beaf1fa461149b685e1ebd2dc82c75c"
+      "bytes": 24360,
+      "sha256": "066f64d5536b5873232710fe4b7e1cc0d64f5c391e7f03fdc0bc568d62ea6a91"
     },
     "tests/endurance_ci.py": {
       "bytes": 1680,
@@ -131,13 +107,29 @@
       "bytes": 6535,
       "sha256": "ccc0ee52a32261dfcda836287928779b1a18a5133a8d4edcef31eefddab13c84"
     },
+    "tests/fixtures/legacy-acquire-lock.sh": {
+      "bytes": 241,
+      "sha256": "2cdcb7442d03b180ee5926090b90779b9a8324752aa34f752b177047e7abf052"
+    },
+    "tests/fixtures/legacy-query-link.sh": {
+      "bytes": 659,
+      "sha256": "1f325dedcb2f7fbd85484675d8d4c3f6dfe9a4a8c29424693a4a23d652464c72"
+    },
+    "tests/fixtures/manager-1.3.1-updater.sh": {
+      "bytes": 4155,
+      "sha256": "f7bebed97cf43aa33b2796fa4a5c43fd61dc10db47f89ef5d16b3898d54cd69b"
+    },
+    "tests/full_system_candidate.py": {
+      "bytes": 8021,
+      "sha256": "f24b368f321205dc9aa6eab3c406dcc9dd579d39e71174c012cd8755d3b81e9f"
+    },
     "tests/full_system_ci.py": {
-      "bytes": 27026,
-      "sha256": "8f1119f0707afcb4d086e2018080ba3d365d8096677f85a94f363e2181812ca5"
+      "bytes": 31993,
+      "sha256": "76c96f0b6e8363665d04c1a86bba5044e22d4fa8295d0bcee831ea14cfd8d9e7"
     },
     "tests/full_system_contract.py": {
-      "bytes": 1658,
-      "sha256": "aacf5e08ebe0ef3cc43b68eea792b8755a70d5c1a2a78094f717a95a0d28450c"
+      "bytes": 3173,
+      "sha256": "ebce2f44a6e97df251032b813f09d9fc6e1459b3bbce8c4bb6cf61079f0bb4af"
     },
     "tests/high_rtt_matrix.py": {
       "bytes": 5969,
@@ -199,6 +191,10 @@
       "bytes": 3170,
       "sha256": "b7e7af041274daff37b66de6328f415008ac59406e6a5ad979f935e4177bd0f4"
     },
+    "tests/resource_churn_lab.py": {
+      "bytes": 6282,
+      "sha256": "f7f56a95ced1c8e8e9059ee9e095e71e911e7c3abbbaea310eddf91f9b018db1"
+    },
     "tests/soak.py": {
       "bytes": 3508,
       "sha256": "fd79098e79a61a54afb17f1bf5103074593435785b91fae16b21b7ba0db53b7b"
@@ -254,6 +250,14 @@
     "tests/test_candidate_contract.py": {
       "bytes": 2295,
       "sha256": "acbf279f9ad194303e96c7bbfe737ca245d564e5bcf10a3bdb3e8a1db3f17d2c"
+    },
+    "tests/test_candidate_system_contract.py": {
+      "bytes": 3357,
+      "sha256": "977fc1433d6f627d7d9930aede0aa63ebc990335cf3a33777354f61b4e5659b3"
+    },
+    "tests/test_config_access.py": {
+      "bytes": 7878,
+      "sha256": "567d3654759fd9b8ea09b733c1b0daea0cb0de3ad07c7f49ea32cc5c2ed3576f"
     },
     "tests/test_core_bundle.py": {
       "bytes": 4243,
@@ -359,6 +363,10 @@
       "bytes": 1188,
       "sha256": "6bae3d24a68f44c56b77f93250f4aed432ae4ba890909e6a9b93f41fd2320cc4"
     },
+    "tests/test_resource_churn_contract.py": {
+      "bytes": 1222,
+      "sha256": "5f68205fbf01a5565aab288ce5a4317c6b76a6cfef89dd144fd8d71717329081"
+    },
     "tests/test_socket_observer.py": {
       "bytes": 11117,
       "sha256": "1b622475b9c10aa182bb16b316a02c0bc797b0759c2121d2c14c14d4ea5cfd58"
@@ -391,13 +399,79 @@
       "bytes": 12983,
       "sha256": "ee726bd1ea099b4578b40aa8f59a3d62ce2dde7a9bc51e0bd6bad062407dd92c"
     },
-    ".github/workflows/validate.yml": {
-      "bytes": 3408,
-      "sha256": "05992a0f6d50416fe90d253fc77582417e7242f3c311047b7c1688e07e973cc3"
+    "tools/analyze_socket_policy.py": {
+      "bytes": 3545,
+      "sha256": "3b55bc6be04cee6207957e5ef5e8e4a2e499a85b0ce59d05a89e51e8f734d60e"
     },
-    ".github/workflows/stable-compat.yml": {
-      "bytes": 3739,
-      "sha256": "e4610d471adcd85a1fbec66c3e2277ba2e305e8e7d6cf0147116353cd0c8c5ba"
+    "tools/analyze_upload_ab.py": {
+      "bytes": 4934,
+      "sha256": "46bfcb41297d91c13f1d280b4757abd33b0d6b93afdca49f740cc1197aa43723"
+    },
+    "tools/build_relay_candidate.py": {
+      "bytes": 10714,
+      "sha256": "23e9f9f4b567a7060c5852fa1505f78e0d8ca9ffa50973773849df9fe5b745d9"
+    },
+    "tools/candidate_bundle.py": {
+      "bytes": 6238,
+      "sha256": "976ab5fe5213bbfbcfb91b68e27687dc2eb371be3a2839b3795fd92db28baa48"
+    },
+    "tools/core_bundle.py": {
+      "bytes": 5390,
+      "sha256": "d2b8bf405097af6c0bce3f677f73d4ed5e0c486b83bea2032ad337cc84340af2"
+    },
+    "tools/core_install.py": {
+      "bytes": 7113,
+      "sha256": "72b37a072e2400369ccc6ce387fe2cce0ab7da935cb3579ce05009cb4d18e11f"
+    },
+    "tools/core_transaction.py": {
+      "bytes": 9833,
+      "sha256": "0d4e02e249a7f13cbb8a8793cac6b0c520ed8bcc86694cf65e79fda377ade1f1"
+    },
+    "tools/core_upgrade.py": {
+      "bytes": 17751,
+      "sha256": "75e3e73e7d71d4bd6130ce8674896b93af86805be4df7e8cc7e8e8bd45c45417"
+    },
+    "tools/embed_core_install.py": {
+      "bytes": 1076,
+      "sha256": "ec099269624b5bc8081710ba09863b6c6888093d17cfbf77a7ee599284bd4f62"
+    },
+    "tools/embed_core_upgrade.py": {
+      "bytes": 1475,
+      "sha256": "0a3d8a10eec39939195adf812dfaeceac0a53f11ff42eb631cb567ff1c50cc17"
+    },
+    "tools/embed_health_agent.py": {
+      "bytes": 996,
+      "sha256": "0c68d697fb87febb6bd6d97781039bc833a6ac307df79ee722b0a0150e904130"
+    },
+    "tools/endurance_cleanup.py": {
+      "bytes": 3974,
+      "sha256": "2c39086eceb173ac95d0afee1fe279b00b473ed17036779bfd31710c90931214"
+    },
+    "tools/endurance_service.py": {
+      "bytes": 8242,
+      "sha256": "886b2a76c4a97b0f5ede0b48f811ce8e2b46d45908dcbc765de70130014065d5"
+    },
+    "tools/entry_maintenance.py": {
+      "bytes": 2014,
+      "sha256": "609532991efbbf1ad3d41e8df009081f25bc497c0932cd1e6aea28bbdc0f4a61"
+    },
+    "tools/health_agent.py": {
+      "bytes": 5501,
+      "sha256": "8321cf9a524b0aa0436a67dab65cad54f6ae245989119554e9321bc973d9eba3"
+    },
+    "tools/iperf_matrix.py": {
+      "bytes": 4440,
+      "sha256": "f53b279502f3bf61edb49d4a9e09876037a3e387e3975d6b28f336e05dc3e257"
+    },
+    "tools/lab_preflight.py": {
+      "bytes": 6009,
+      "sha256": "cf9e337f0366021455ad08660d4ed6013a8303559b8d84cdc0af7d0f0f8ffdb2"
+    },
+    "tools/lab_runner.py": {
+      "bytes": 20370,
+      "sha256": "954af489e1dc6ddce8afa99c11387e930c83a6c91a438879d7449069790c2328"
     }
-  }
+  },
+  "source_commit": "94857f2847bacd199a9955c7cff660022ed75a8a",
+  "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }

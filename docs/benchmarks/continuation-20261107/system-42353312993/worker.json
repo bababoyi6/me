@@ -1,0 +1,23 @@
+{
+  "complete": false,
+  "roles": {
+    "entry": {
+      "role": "entry",
+      "installed_version": "1.7.0",
+      "pid1": "systemd",
+      "manager_sha256": "b3375aed3d1f40a320b0fe900bddcf7da14a67112f264cb91dafacc675295338",
+      "core_sha256": null,
+      "core_version": null,
+      "license_retained": false
+    }
+  },
+  "download_boundary_substituted": false,
+  "production_accessed": false,
+  "shared_ci_host": true,
+  "capacity_benchmark": false,
+  "profile": "candidate",
+  "source_ref": "937ce23a8d39dc01357aa8301fa5d93566271899",
+  "pinned_manager_download": true,
+  "phase": "public-install-backend1",
+  "error_type": "AssertionError"
+}
