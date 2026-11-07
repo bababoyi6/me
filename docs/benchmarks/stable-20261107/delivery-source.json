@@ -212,8 +212,8 @@
       "sha256": "be3a8e9f3173a5abd7c386b85fb57071d0d510d05ad229bdbb58de48056ee91b"
     },
     "tests/stable_system_lab.py": {
-      "bytes": 9472,
-      "sha256": "1baf257a6910e99f9bdb799dfe4892beb8d1ed4dc4b3fc20f73e7acfdf19d7fe"
+      "bytes": 10688,
+      "sha256": "ee2552c93662b739eafd273bf4817da1a682a57e7cc3f0884d3e5ffeadace3e2"
     },
     "tests/stream_matrix.py": {
       "bytes": 4039,

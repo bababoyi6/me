@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import platform
 import signal
 import socket
 import subprocess
@@ -61,8 +62,10 @@ def main():
         raise RuntimeError('root required')
     unit = 'tdh-upgrade-test-'+uuid.uuid4().hex+'.service'
     unit_path = Path('/run/systemd/system')/unit
-    report = {'scope': 'WSL isolated namespace; real systemd, real release binaries; synthetic identities/DC only',
-              'accepted': False}
+    report = {'scope': 'isolated Linux namespace; real systemd and release binaries; synthetic identities/DC only',
+              'os': platform.freedesktop_os_release().get('PRETTY_NAME'),
+              'kernel': os.uname().release, 'accepted': False}
+    stage = 'setup'
     agent = None
     dc = MockDc(socket_timeout=25)
     with tempfile.TemporaryDirectory(prefix='tdh-core-system-') as temp:
@@ -122,11 +125,13 @@ StandardError=null
             unit_path.chmod(0o644)
             systemctl('daemon-reload')
             service = BackendService(binary, config, root/'work/telemt', token, api, unit=unit, user='nobody')
+            stage = 'baseline_start'
             service.start()
             if not service.ready():
                 raise RuntimeError('baseline service not ready')
             protected = [root/'config', unit_path]
             old_config = digest(config)
+            stage = 'core_upgrade'
             report['upgrade'] = upgrade(binary, store, args.stable_archive, PINS['stable'][0],
                                          PINS['stable'][1], '3.5.16', protected, service)
             report['repeat_upgrade'] = upgrade(binary, store, args.stable_archive, PINS['stable'][0],
@@ -134,10 +139,12 @@ StandardError=null
             report['unauthenticated_api_status'] = request(api, 'GET', '/v1/users', authenticated=False)[0]
             report['read_only_api_write_status'] = request(api, 'POST', '/v1/users')[0]
             # Reuse the actual protocol transfer method against the unit's listener.
+            stage = 'native_protocol'
             endpoint = SimpleNamespace(real_dc=False, listen=listen, front=listen)
             report['transfers'] = [FullLab.transfer(endpoint, domain, direction, 4096, 1000000,
                                                     direct=True, persistent=True)
                                    for domain in ('apple.com', 'gs.apple.com') for direction in ('U', 'D')]
+            stage = 'systemd_crash_recovery'
             pid = int(systemctl('show', unit, '--property=MainPID', '--value'))
             os.kill(pid, signal.SIGKILL)
             report['systemd_crash_recovery_seconds'] = wait_for(
@@ -149,16 +156,30 @@ StandardError=null
             agent_env = dict(os.environ, TDH_BIND_IP='127.0.0.1', TDH_AGENT_PORT=str(health_port),
                              TDH_API_PORT=str(api), TDH_TELEMT_PORT=str(listen), TDH_DC_IPV4='127.0.0.1',
                              TDH_DC_PORT=str(dc.server_address[1]), TDH_API_TOKEN_FILE=str(token))
-            agent = subprocess.Popen(['python3', str(Path(__file__).resolve().parents[1]/'tools/health_agent.py')],
+            stage = 'health_agent_cold_start'
+            source = Path(__file__).resolve().parents[1]/'tools/health_agent.py'
+            report['repository_agent_readable_by_service_uid'] = subprocess.run(
+                ['/usr/bin/test', '-r', str(source)], user=65534, group=65534, extra_groups=[],
+                capture_output=True, timeout=3).returncode == 0
+            # GitHub's runner home need not be traversable by nobody. Stage the
+            # exact public source beside the other owned test files, rather than
+            # relaxing runner directory permissions or running the agent as root.
+            staged_agent = root/'health_agent.py'
+            durable_file(staged_agent, source.read_bytes(), 0o644)
+            report['health_agent_source_sha256'] = digest(staged_agent)
+            agent = subprocess.Popen(['python3', str(staged_agent)],
                                      env=agent_env, user=65534, group=65534, extra_groups=[],
                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             report['production_agent_cold_ready_seconds'] = wait_for(lambda: agent_state(health_port, b'up'), 35)
+            stage = 'health_agent_core_down'
             service.stop()
             report['production_agent_core_down_seconds'] = wait_for(lambda: agent_state(health_port, b'down'), 10)
+            stage = 'health_agent_recovery'
             service.start()
             if not service.ready():
                 raise RuntimeError('manually restarted core not ready')
             report['production_agent_recovery_seconds'] = wait_for(lambda: agent_state(health_port, b'up'), 25)
+            stage = 'core_rollback'
             report['rollback'] = rollback(binary, store, protected, service)
             report['old_binary_restored'] = digest(binary) == PINS['balanced2'][1]
             report['config_and_token_unchanged'] = digest(config) == old_config and token.read_text() == TOKEN+'\n'
@@ -167,7 +188,8 @@ StandardError=null
                                   and report['read_only_api_write_status'] == 403)
         except Exception as error:
             report['error_type'] = type(error).__name__
-            report['error_stage'] = ('after_'+next(reversed(report)) if report else 'setup')
+            report['error_stage'] = stage
+            report['health_agent_process_exit'] = agent.poll() if agent is not None else None
             raise
         finally:
             if agent is not None:
