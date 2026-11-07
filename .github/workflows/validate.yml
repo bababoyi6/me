@@ -36,6 +36,8 @@ jobs:
         run: python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check && python3 tools/embed_core_upgrade.py --check
       - name: Test diagnostics, configuration and rollback
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Run complete bounded root regression in disposable CI
+        run: sudo timeout --kill-after=10 180 python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Verify private shared core inode permissions and cleanup
         run: sudo timeout 20 python3 -m unittest discover -s tests -p 'test_lab_binary.py' -v
       - name: Verify orphan cleanup ownership and refusal of changed namespaces
