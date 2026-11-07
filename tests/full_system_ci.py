@@ -224,6 +224,11 @@ def install(node):
         assert child.expect(['请输入'+('入口 VPS 公网 IPv4' if node=='entry' else '后端 VPS 公网 IPv4')+': ',
                              r'\[失败\]','按 Enter 返回控制面板'])==0,'installer stopped before address input'
         child.sendline('11.254.254.'+str(ROLES.index(node)+1))
+        if node != 'entry' and EXPECTED is not None:
+            # Observe startup before a failed installer removes its owned files.
+            # Export only fixed service fields and API counts, never links/logs.
+            sampler=threading.Thread(target=startup_observer,args=(node,),daemon=True)
+            sampler.start()
         matched = child.expect(['按 Enter 返回控制面板', r'\[失败\]'], timeout=240)
         assert matched == 0, 'installer failure; private transcript excluded from artifact'
         child.sendline(''); child.expect('请选择'); child.sendline('0')
@@ -237,6 +242,40 @@ def install(node):
         codes = re.findall(r'TDHR4\.[A-Za-z0-9_-]+', transcript)
         assert len(codes) == 1
         (ROOT/'private'/(node+'-receipt')).write_text(codes[0])
+
+
+def startup_observer(node):
+    rows=[]
+    for _ in range(20):
+        try:
+            value=ssh(node,"""python3 - <<'PY'
+import json,subprocess,urllib.request,urllib.error
+from pathlib import Path
+result={}
+for unit in ('telemt-dual-hop-telemt.service','wg-quick@tdh-b1.service','wg-quick@tdh-b2.service'):
+ p=subprocess.run(['systemctl','show',unit,'--property=ActiveState,SubState,Result,ExecMainStatus,NRestarts'],capture_output=True,text=True,timeout=3)
+ result[unit]=dict(line.split('=',1) for line in p.stdout.splitlines() if '=' in line)
+token=Path('/etc/telemt-dual-hop/telemt/api.token')
+if token.is_file():
+ try:
+  opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+  request=urllib.request.Request('http://127.0.0.1:19091/v1/users',headers={'Authorization':'Bearer '+token.read_text().strip()})
+  with opener.open(request,timeout=2) as response:
+   data=json.loads(response.read(65536))
+   result['api']={'status':response.status,'users':len(data.get('data',[])),'tls_link_counts':[len(u.get('links',{}).get('tls',[])) for u in data.get('data',[])]}
+ except (OSError,ValueError,urllib.error.URLError) as e:result['api']={'error_type':type(e).__name__}
+# Map the journal to fixed booleans; no journal text leaves this process.
+p=subprocess.run(['journalctl','-u','telemt-dual-hop-telemt.service','-n','40','--no-pager','-o','cat'],capture_output=True,text=True,timeout=3)
+text=p.stdout.lower()
+result['startup_markers']={k:k in text for k in ('permission denied','os error 13','panicked','address already in use','failed to parse','unknown field','tls','error','warn')}
+print(json.dumps(result))
+PY
+""",20)
+            if value.returncode==0:
+                rows.append(json.loads(value.stdout))
+                write(ROOT/'results'/('startup-'+node+'.json'),rows)
+        except (OSError,ValueError,subprocess.SubprocessError):pass
+        time.sleep(5)
 
 
 def identity(node):
@@ -526,7 +565,7 @@ def supervise():
                      'interaction-backend2-registration.json','diagnostics-entry.json',
                      'diagnostics-backend1.json','diagnostics-backend2.json',
                      'interaction-entry-repeat-install.json','interaction-backend1-repeat-install.json',
-                     'interaction-backend2-repeat-install.json'):
+                     'interaction-backend2-repeat-install.json','startup-backend1.json','startup-backend2.json'):
             source = ROOT/'results'/name
             if source.is_file() and not source.is_symlink():
                 assert source.stat().st_size<1024**2
