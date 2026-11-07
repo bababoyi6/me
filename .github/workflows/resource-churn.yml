@@ -1,0 +1,39 @@
+name: Bounded native resource churn
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths:
+      - tests/resource_churn_lab.py
+      - tests/test_resource_churn_contract.py
+      - .github/workflows/resource-churn.yml
+
+permissions:
+  contents: read
+
+jobs:
+  churn:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare existing protocol test dependencies
+        run: |
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy python3-cryptography iproute2
+      - name: Fetch exact fixed release
+        run: |
+          mkdir -m 700 "$RUNNER_TEMP/churn-evidence"
+          curl -q -fL --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 10 --max-time 120 --max-filesize 67108864 https://github.com/telemt/telemt/releases/download/3.5.16/telemt-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/stable.tar.gz"
+          printf '%s  %s\n' e6f46b2f3becf29bfd555cec8a059e429f7c082c1af402499b3a7940cf8ebd34 "$RUNNER_TEMP/stable.tar.gz" | sha256sum --check
+      - name: Observe native churn, fd recovery and cgroup OOM counters for three minutes
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-churn-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemoryHigh=384M -p MemorySwapMax=0 -p OOMPolicy=stop -p TasksMax=192 -p RuntimeMaxSec=240 -p "WorkingDirectory=$GITHUB_WORKSPACE" /usr/bin/unshare --net sh -c 'set -e; ip link set lo up; exec python3 tests/resource_churn_lab.py --archive "$1/stable.tar.gz" --output "$1/churn-evidence/churn.json"' lab "$RUNNER_TEMP"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bounded-churn-evidence
+          path: ${{ runner.temp }}/churn-evidence/*.json
+          if-no-files-found: warn
+          retention-days: 14
