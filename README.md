@@ -14,6 +14,20 @@
 
 ---
 
+## 1.7.0 / Telemt 3.5.16 候选（2026-11-07）
+
+当前分支已完成实际代码升级，**尚未发布或部署生产**。本轮开始时远程 `main` 仍为管理器 1.6.0；下面跟随 `main` 的下载命令不会自动取得未合并的候选代码。测试候选请使用本次交付包内经摘要校验的脚本，详见[安装与滚动升级](docs/UPGRADE-1.7.md)。
+
+- 新安装默认固定官方 **3.5.16**；tag、commit、两架构包及二进制 SHA256 均已锁定。保留 balanced2/audit2 备选和旧核心识别。
+- 原入口 TCP 443、双 SNI、双 WG、独立主备后端、Secret 和代理链接保留；不启用 WEB。
+- 增加核心升级/回退、入口维护排空、健康代理更新/回退和后端恢复命令。管理器更新仍不隐式替换核心。
+- 健康检查改为 DC 多数票、失败/恢复阈值、冷却及失效时间，加入本机 Telemt 端口检查。
+- WSL 已执行真实二进制、HAProxy、双 WireGuard、systemd 升级/回退及 30/50/100 并发合成协议测试；失败批次也保留。完整 Ubuntu 22.04 三系统重启、ARM 运行、官方客户端与公网跨地区验收仍未完成。
+
+[详细工程报告](docs/ENGINEERING-REPORT-1.7.md) · [架构与健康模型](docs/ARCHITECTURE-1.7.md) · [升级/回滚](docs/UPGRADE-1.7.md) · [故障排查](docs/TROUBLESHOOTING-1.7.md) · [版本锁](docs/telemt-stable-lock.json) · [版本记录](docs/RELEASE-1.7.0.md)
+
+下面保留已发布版本的使用入口及 **1.6.0 历史测量**。这些旧数字不属于本次 3.5.16 的性能结果。
+
 ## 先选版本，再安装
 
 | 你要什么 | 选哪个 | 实际使用的核心 |
@@ -23,22 +37,22 @@
 
 **原始版不是 audit1，也不是 audit2。** 它是优化前管理器的完整历史快照，脚本原样保留；audit1、audit2 都是后来实验过程中的修改版。
 
-### 优化版：一键部署
+### 跟随远程 main：一键部署
 
 在三台准备好的 Ubuntu 22.04 VPS 上，分别复制执行：
 
 ```bash
-bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
+bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --proto-redir "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
 ```
 
-下载当前 `main` 版本。x86_64 的定制核心带有明确的非官方标记，原许可和对应源码材料随安装保留。
+该命令下载远程 `main`，不固定管理器版本。本次核对远程仍为 1.6.0；1.7 候选正式合并后，新安装默认将是官方 3.5.16。需要完整保留历史 1.6.0 请使用其正式 Release 资产，不要把跟随 main 当作版本锁定。
 
 ### 原始稳定版：一键部署
 
 想装优化前的原版，就用这条：
 
 ```bash
-bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/v1.3.1-original/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; printf "%s  %s\n" "07642df50587cbad056865445bfe4d38802322b2eb02d564234d1b4252a528dc" "$tmp" | sha256sum --check --status; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
+bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --proto-redir "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/v1.3.1-original/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; printf "%s  %s\n" "07642df50587cbad056865445bfe4d38802322b2eb02d564234d1b4252a528dc" "$tmp" | sha256sum --check --status; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
 ```
 
 这条命令固定下载原版标签，并自动核对脚本摘要，不会因为 `main` 更新而变成优化版。[原始脚本与来源说明](legacy/README.md) · [独立下载页](https://github.com/bababoyi6/me/releases/tag/v1.3.1-original)
@@ -65,7 +79,7 @@ Telegram ─ 公网入口 ──┤                    ├─ Telegram 服务器
 
 ---
 
-## 这几天到底改了什么
+## 1.6.0 历史优化做了什么
 
 ### 让该发出去的数据及时发出去
 
@@ -104,6 +118,10 @@ Telegram ─ 公网入口 ──┤                    ├─ Telegram 服务器
 | `a perf 5` | 只读观察资源和连接，不启动测速；优化版管理器支持 |
 | `a update` | 更新管理器，不等于升级或更换后端核心 |
 | `a update-rollback` | 回退管理器备份；后来的管理器支持，原始 1.3.1 没有这个功能 |
+| `a backend-drain 1` / `a backend-resume 1` | 1.7 入口维护某一后端的新连接 |
+| `a core-upgrade --maintenance` / `a core-rollback --maintenance` | 1.7 后端核心事务；先按升级说明排空 |
+| `a health-refresh --maintenance` / `a health-rollback --maintenance` | 1.7 健康代理更新与回退 |
+| `a recover` | 1.7 后端恢复 WG 及依赖服务 |
 
 已有节点继续使用原来的核心和连接信息。**更新管理器，不会自动把原版核心换成优化核心。** 原始 1.3.1 的 `a update` 按历史行为连接 `main`，会取得新版管理器；要保留整个历史快照，就不要执行它。
 
@@ -119,7 +137,7 @@ Telegram ─ 公网入口 ──┤                    ├─ Telegram 服务器
 
 <a id="numbers"></a>
 
-## 最后，直接看数字
+## 1.6.0 历史实测数字
 
 **先说测的是哪里：** 以下速度来自同一台荷兰测试机搭建的模拟网络，不是真实 Telegram 文件下载，也不是三台美国生产机测速。没有访问生产机。不同实验行不能拼在一起计算提升。
 

@@ -1,0 +1,8 @@
+{
+  "reserved_namespaces_remaining": [],
+  "test_processes_remaining": [],
+  "active_test_units_remaining": false,
+  "removed_exact_owned_roots": [],
+  "cleanup_verified": true,
+  "scope": "only this run's explicitly enumerated local temporary paths; no remote or production operations"
+}

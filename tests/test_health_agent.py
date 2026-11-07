@@ -100,32 +100,43 @@ class HealthAgentTests(unittest.TestCase):
         self.assertFalse(env['healthy'](secured,redirect.server_port))
         self.assertEqual(received,[])
 
-    def test_all_dc_policy_and_two_round_recovery_hysteresis(self):
-        # Drive the actual monitor with a fake clock; no sockets or wall-clock sleeps.
+    def test_dc_quorum_tolerates_one_or_two_unreachable_dcs(self):
+        vote = functions()['dc_quorum']
+        for count in range(6):
+            self.assertEqual(vote([True]*count+[False]*(5-count)), count >= 3)
+        self.assertFalse(vote([]))
+        self.assertFalse(vote([1]*5))
+
+    def test_failure_threshold_recovery_and_cooldown(self):
+        gate = functions()['HealthGate'](fall=2, rise=3, cooldown=30)
+        self.assertFalse(gate.sample(True, 0))
+        self.assertFalse(gate.sample(True, 10))
+        self.assertTrue(gate.sample(True, 20))
+        self.assertTrue(gate.sample(False, 30))
+        self.assertTrue(gate.sample(True, 40))
+        self.assertTrue(gate.sample(False, 50))
+        self.assertFalse(gate.sample(False, 60))
+        self.assertFalse(gate.sample(True, 61))
+        self.assertFalse(gate.sample(True, 62))
+        self.assertFalse(gate.sample(True, 63))
+        self.assertTrue(gate.sample(True, 90))
+
+    def test_partial_dc_outage_does_not_flap_actual_monitor(self):
         env = functions()
-        outcomes = iter([True, True, False, False, True, False, True, True])
-        current = [False]
+        rounds = iter([[True]*4+[False]]*3 + [[False]*5]*2 + [[True]*5]*4)
         observed = []
         class Executor:
-            def __init__(self, **kwargs):
-                pass
-            def __enter__(self):
-                return self
-            def __exit__(self, *args):
-                return False
-            def map(self, fn, addresses):
-                self.addresses = list(addresses)
-                return [True] * 4 + [next(outcomes)]
-        class Finished(Exception):
-            pass
+            def __init__(self, **kwargs): pass
+            def __enter__(self): return self
+            def __exit__(self, *args): return False
+            def map(self, fn, addresses): return next(rounds)
+        class Finished(Exception): pass
         def sleep(seconds):
-            self.assertEqual(seconds, 10)
-            observed.append(env["DC_READY"])
-            if len(observed) == 8:
-                raise Finished()
-        env.update(DC_READY=False, DCS=tuple(range(5)), probe_dc=lambda x: current[0],
+            self.assertEqual(seconds,10)
+            observed.append(env['DC_READY'])
+            if len(observed)==9: raise Finished()
+        env.update(DC_READY=False, DCS=tuple(range(5)), probe_dc=lambda x: True,
                    concurrent=SimpleNamespace(futures=SimpleNamespace(ThreadPoolExecutor=Executor)),
-                   time=SimpleNamespace(monotonic=lambda: 100, sleep=sleep))
-        with self.assertRaises(Finished):
-            env["monitor_dcs"]()
-        self.assertEqual(observed, [False, True, True, False, False, False, False, True])
+                   time=SimpleNamespace(monotonic=lambda:len(observed)*10,sleep=sleep))
+        with self.assertRaises(Finished): env['monitor_dcs']()
+        self.assertEqual(observed,[False,False,True,True,False,False,False,True,True])

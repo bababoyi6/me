@@ -1,0 +1,66 @@
+# 1.7 原生 TCP 双后端架构
+
+本分支为候选版本；生产服务器未访问、未部署。入口和地址规划沿用 schema 5 / 节点协议 1.2.1。
+
+```text
+Telegram 官方客户端
+        │ TCP 443，原 Secret + Fake TLS SNI
+        ▼
+唯一公网入口 HAProxy（TCP 透传，不终止 TLS）
+        ├─ apple.com    → WG 10.77.1.2:24431 主 / 10.77.2.2:24431 备
+        └─ gs.apple.com → WG 10.77.2.2:24431 主 / 10.77.1.2:24431 备
+                              │
+                        独立 Telemt 后端
+                              │ Direct-DC
+                         Telegram DC
+```
+
+两台后端互为备份，数据不依次经过两台后端。仍使用 HAProxy、WireGuard、systemd；生产安装没有 Docker、Xray、WebSocket 或额外公网管理服务。
+
+## 数据与信任边界
+
+- Telemt 仅绑定本后端 WireGuard IPv4 地址；两个 SNI 在同一 Telemt 进程中服务。
+- HAProxy 使用原生 TCP PROXY v2；Telemt 仅信任对应入口 WG `/32`。原用户 IP 来自该可信连接，不能把任意公网来源加入信任列表。
+- API 仅监听 `127.0.0.1:19091`，白名单回环、Bearer 认证、只读。模板不启用 Metrics。
+- 健康代理仅绑定 WG 地址 `19101`。已有 UFW 规则仅允许对应 WG 接口和入口 WG 来源；管理器不接管其他防火墙方案，不清空 nftables/iptables。
+- `inline_conntrack_control=false` 继续显式指定；Telemt 无 `CAP_NET_ADMIN`，不与宿主 UFW/nftables 争夺规则。
+- Secret、API 令牌、WG 私钥/PSK 和状态文件维持原有权限模型；升级副本仅存于 root 私有目录。日志和诊断不输出访问凭据。
+
+## 分层健康判断
+
+| 层级 | 实际检查 | 判定边界 |
+|---|---|---|
+| 服务/准入 | 本机认证 API `/v1/health/ready` 返回 HTTP 200、`ok=true`、`ready=true` | 不证明所有 DC 或真实客户端正常 |
+| 本地端口 | 健康代理 TCP 连接本机 WG `24431` | 不验证 MTProto 握手 |
+| 上游网络 | 并行连接五个固定 DC 的 TCP 443，多数票 `3/5` | 仅可达性，不是逐 DC 协议成功率 |
+| 入口观察 | HAProxy TCP 检查健康代理端口 + agent `up/down` | 隧道断开或代理退出后能摘除后端 |
+| 协议/业务 | 独立有界 Fake TLS/MTProto 验收和官方客户端复验 | 不在常驻健康代理中进行高频握手 |
+
+API+端口每秒采样，连续失败 3 次降级、连续成功 2 次恢复；一次降级后至少等待 10 秒。DC 每 10 秒采样，连续 2 轮多数不可达降级、连续 3 轮多数可达恢复；降级后至少等待 30 秒。冷却只阻止提前恢复，不延迟正在服务节点的故障摘除。时间从失败采样开始计算，实际周期还包含最多 2 秒连接超时。
+
+API 样本超过 5 秒、DC 样本超过 25 秒即失效；监控线程退出会让代理进程退出，由已有 systemd `Restart=always` 恢复。HAProxy 继续检查 **代理端口**：若只检查 Telemt 端口，健康代理崩溃而 Telemt 仍监听时，agent-check 的连接错误不能可靠替代摘除判断。
+
+多数票避免单 DC 波动导致整机切换，但可能保留对少数 DC 不通的后端。当前按 SNI 选路，入口在认证前不知道真实 DC，不实现逐 DC 分流；需要独立诊断定位部分 DC 故障。两后端同时不可用时，既有 Apple 伪装备用目标只承载普通 TLS 回落，不能提供代理业务。
+
+## 性能参数与容量
+
+- 保留 BBR+fq、原连接容量计算及 Direct 缓冲预算：1GiB 后端约 2048 连接上限、256MiB Direct 缓冲预算；1 核 2GiB 受 CPU 上限约束为 4000 连接。容量上限不是可承诺的活跃用户量。
+- 新安装仅把 `somaxconn`、SYN backlog 的最低值设置为 4096，与 Telemt listener backlog 对齐；不再无依据提高到 65535/32768，已有更高设置保持。管理器更新和核心升级均不重新应用 sysctl。
+- 保留内核 TCP 缓冲和官方核心的实现；不叠加旧 balanced2 源码补丁。3.5.16 已含上游缓冲复制 flush 修复；官方仍有固定 socket buffer 设置，不能宣称它继承 balanced2 的全部性能策略。
+- 保留既有 FD 上限；上限不是预分配，真实容量仍由连接限制、内存及 CPU 约束。没有增加十万并发 sysctl 模板。
+- WG 保持 `wg-quick` 的 MTU 推导；实验明确使用 1420，不能据此保证任意公网 PMTU。两侧都是 TCP 终结连接，不盲目添加全局 MSS clamp。入口向后端 `PersistentKeepalive=25` 保持 NAT 映射。
+- 不默认开启 splice；实验有一批自动 splice 未启用、一批观察到启用，当前证据不足以覆盖所有内核和 HAProxy 版本。
+
+## 重载、故障和重启
+
+HAProxy 使用 master-worker USR2 校验后重载，旧 worker 排空原连接。本轮真实合成长传输跨越重载并完成摘要校验；这不保证异常杀进程、主机断电或任意重载脚本都无损。
+
+后端崩溃、隧道中断后，新的 TCP 连接可以改走备用；原 TCP 会话不能迁移。客户端需要重连。核心维护必须先在入口排空新连接，等待原会话结束或明确接受其断开。
+
+数据面短暂断链且 WG 接口仍存在时，内核 WireGuard 会在链路恢复后重新握手。显式 `systemctl stop wg-quick@...` 会因 `Requires=` 停止后端依赖；重新 start WG 不保证这些依赖自动重新启动，因此提供 `a recover` 显式恢复本后端隧道、Telemt 和健康代理。它不修改内核、防火墙、SSH 或全局路由配置。
+
+安装器原有 enable 自启动逻辑保留。1.6.0 有历史三系统重启证据；本轮没有把那份证据冒充 1.7 的 Ubuntu 22.04 三系统重启通过。
+
+## WEB 模式结论
+
+维持关闭。WEB 需要 TLS 终止、HTTP listener、Carrier 与对应客户端支持，和当前原生 Fake TLS TCP 透传是不同入口。官方要求 WEB listener `proxy_protocol=false`；不能把 `send-proxy-v2` 原样接到 WEB listener。没有 Desktop/Android/iOS 实机证据，因此本分支不生成 WEB listener，不生成 WEB 链接，也不修改旧原生链接。

@@ -32,6 +32,7 @@ from lab_files import file_sha256, link_private_binary
 
 # Extracted x86_64 binaries from the checksum-verified official GNU archives.
 BINARIES = {
+    "1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8": "telemt 3.5.16",
     "cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd": "telemt 3.5.5",
     "feb1d8779de0b86c6c43d1b871020ec94b11fad9fec5612b07b278edfd2181ff": "telemt 3.5.14",
 }
@@ -121,8 +122,9 @@ class DcHandler(socketserver.BaseRequestHandler):
 class MockDc(socketserver.ThreadingTCPServer):
     daemon_threads = True
     allow_reuse_address = True
-    # Accommodate 16-stream bursts plus probes without a five-slot lab bottleneck.
-    request_queue_size = 64
+    # The bounded 100-stream acceptance burst also needs room for health probes.
+    # This is the synthetic DC's accept queue, never a production tuning value.
+    request_queue_size = 256
 
     def __init__(self, bind="127.0.0.1", listen=0, *, socket_timeout=8, receive_buffer=0):
         if socket_timeout not in (8, 25):
@@ -149,8 +151,10 @@ class FullLab:
     def __init__(self, binary, haproxy="haproxy", fast=True, real_dc=False, splice=False,
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
                  listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None,
-                 shared_binary_root=None,startup_report=None):
-        if startup_report is not None and (real_dc or experimental_binary is None or artifact_registry is None):
+                 shared_binary_root=None,startup_report=None,offline_lab=False):
+        if offline_lab and real_dc:
+            raise ValueError('offline bootstrap is confined to synthetic DC tests')
+        if startup_report is not None and (real_dc or artifact_registry is None):
             raise ValueError('startup diagnostics require a private synthetic experimental lab')
         if listen_endpoint is not None and (listen_endpoint not in (("10.77.1.2", 24431), ("10.77.2.2", 24431))
                                             or real_dc or start_haproxy):
@@ -205,6 +209,12 @@ class FullLab:
             entry_ip = bind_ip.rsplit(".", 1)[0] + ".1" if listen_endpoint else "127.0.0.1"
             config = generate_telemt(config_dir, work, self.listen, self.api, bind_ip, entry_ip)
             text = config.read_text()
+            if offline_lab:
+                # An isolated router drops DNS/STUN/HTTP discovery, delaying
+                # readiness before any listener exists. No public bootstrap is
+                # needed for synthetic transport; leave production templates intact.
+                text = text.replace('tls_emulation = true', 'tls_emulation = false')
+                text = text.replace('[network]\n', '[network]\nstun_use = false\nhttp_ip_detect_urls = []\n')
             if not fast:
                 text = text.replace("fast_mode = true", "fast_mode = false")
             if small_copy:

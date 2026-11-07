@@ -130,6 +130,11 @@ class CoreTransaction:
             raise CoreError("invalid journal phase")
         if value.get("backup") != "core.previous-" + value["old_sha256"]:
             raise CoreError("invalid backup identity")
+        snapshot = value.get("snapshot")
+        if snapshot is not None and (not isinstance(snapshot, str) or len(snapshot) != 17
+                                     or not snapshot.startswith('snapshot-')
+                                     or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for c in snapshot[9:])):
+            raise CoreError("invalid protected snapshot identity")
         if value.get("prior") is not None:
             if not allow_prior:
                 raise CoreError("nested transaction history")
@@ -153,7 +158,7 @@ class CoreTransaction:
         value["phase"] = "recovered"
         self.save(value)
 
-    def activate(self, candidate, expected_sha256, expected_version, current_sha256):
+    def activate(self, candidate, expected_sha256, expected_version, current_sha256, snapshot=None):
         candidate = Path(candidate)
         with self.locked():
             safe_directory(candidate.parent)
@@ -176,6 +181,8 @@ class CoreTransaction:
                     raise CoreError("unfinished transaction; recover it before upgrading")
                 if previous["phase"] == "committed" and previous["new_sha256"] == current_sha256:
                     prior = {k: previous[k] for k in ("schema", "binary", "old_sha256", "new_sha256", "backup", "phase")}
+                    if 'snapshot' in previous:
+                        prior['snapshot'] = previous['snapshot']
             if expected_sha256 == current_sha256:
                 return "unchanged"
             backup = self.directory / ("core.previous-" + current_sha256)
@@ -186,6 +193,9 @@ class CoreTransaction:
                 raise CoreError("baseline changed while saving backup")
             value = {"schema": 1, "binary": str(self.binary), "old_sha256": current_sha256,
                      "new_sha256": expected_sha256, "backup": backup.name, "phase": "prepared", "prior": prior}
+            if snapshot is not None:
+                value['snapshot'] = snapshot
+            self.validate(value)
             self.save(value)
             try:
                 self.service.stop()

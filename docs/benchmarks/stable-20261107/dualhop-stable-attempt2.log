@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/dualhop_lab.py", line 509, in <module>
+    if args.role=='run': run()
+                         ~~~^^
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/dualhop_lab.py", line 491, in run
+    if process.poll() is not None: raise RuntimeError('backend startup failed: '+process.stderr.read().decode()[:2000])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: backend startup failed: Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/dualhop_lab.py", line 510, in <module>
+    elif args.role=='backend': backend()
+                               ~~~~~~~^^
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/dualhop_lab.py", line 85, in backend
+    lab=create_lab()
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/dualhop_lab.py", line 82, in create_lab
+    return FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,
+                   experimental_binary=experimental,dc_endpoint=endpoint,artifact_registry=ROOT/'artifact-registry',
+                   shared_binary_root=ROOT if args.candidate_check or args.endurance_seconds else None)
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/e2e_lab.py", line 258, in __init__
+    raise RuntimeError("Telemt startup failed; raw logs withheld")
+RuntimeError: Telemt startup failed; raw logs withheld
+

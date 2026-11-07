@@ -1,0 +1,19 @@
+# 1.7.0 候选版本记录
+
+2026-11-07。尚未发布 Release，未部署生产。目标核心是官方 3.5.16，准确 commit 与双摘要见 `telemt-stable-lock.json`。
+
+## 改动
+
+- 新安装默认固定官方 3.5.16，保留旧 balanced2/audit2 和官方 3.5.5 的受验证识别；管理器升级仍不隐式更换核心。
+- 新增 `core-upgrade` / `core-rollback`，复用已有原子事务库，增加配置/密钥/服务快照、候选配置预检、MainPID 二进制核对和中断恢复。
+- 新增入口 `backend-drain` / `backend-resume`、后端 `recover`、健康代理 `health-refresh` / `health-rollback`。
+- DC 全部可达改为多数票，加入分层端口检查、失败/恢复阈值、冷却及失效时间。
+- 补强状态文件/旧核心校验顺序和文件权限边界，关闭 HTTPError 资源，限制 HTTPS 重定向，保留既有脚本 LF 规则并补齐新 CI/证据属性。
+- 新安装队列最低值回到与 listener 对齐的 4096，保留已有更高用户设置；不改既有节点 sysctl。
+- 增加真实二进制、systemd、双 WG、丢包/抖动和 30/50/100 原生协议验收工具及 Ubuntu 22.04 手动 CI；更新中文安装、迁移、架构和排错说明。
+
+## 兼容与边界
+
+继续 schema 5 / 节点协议 1.2.1。保持用户配置字节、Secret、SNI、双线路链接和生产 TCP 透传。没有启用 WEB，没有给生产增加 Docker 或公网 API。
+
+核心重启会影响该后端已有 TCP 会话，需逐后端排空维护。官方客户端、ARM 运行、候选完整 Ubuntu 22.04 三系统重启、公网跨区和 24 小时稳定仍未验证。精确结果与失败历史见 [工程报告](ENGINEERING-REPORT-1.7.md)，不能把合成协议负载结果写成真实 Telegram 下载速度。

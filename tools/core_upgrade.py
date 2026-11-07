@@ -1,0 +1,280 @@
+"""Pinned backend-only upgrade adapter for CoreTransaction.
+
+No config migration is needed for the managed schema-5 native TCP template.
+Configuration is preserved byte-for-byte; unknown/custom layouts fail closed.
+The caller holds the manager lock and explicitly acknowledges a maintenance restart.
+"""
+import argparse
+import json
+import os
+from pathlib import Path
+import pwd
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import time
+
+from core_install import InstallError, archive_payload, durable_file
+from core_transaction import CoreError, CoreTransaction, atomic_copy, digest, safe_directory, safe_file, sync_directory
+
+
+class BackendService:
+    def __init__(self, binary, config, work, token_file, api_port=19091,
+                 unit='telemt-dual-hop-telemt.service', user='telemt'):
+        self.binary, self.config, self.work = Path(binary), Path(config), Path(work)
+        self.token_file, self.api_port = Path(token_file), api_port
+        self.unit = unit
+        identity = pwd.getpwnam(user)
+        if identity.pw_uid == 0 or identity.pw_gid == 0:
+            raise CoreError('unprivileged telemt identity required')
+        self.identity = dict(user=identity.pw_uid, group=identity.pw_gid, extra_groups=[])
+
+    def version(self, binary):
+        result = subprocess.run([str(binary), '--version'], capture_output=True,
+                                timeout=5, check=True, cwd='/', **self.identity)
+        return result.stdout.decode('ascii').strip()
+
+    def validate_candidate(self, binary):
+        if not self.running_binary_matches():
+            raise CoreError('service process does not run the expected current core')
+        # Upstream's bounded healthcheck parses the old strict config without
+        # launching a new listener or generation, then probes the current API.
+        result = subprocess.run([str(binary), 'healthcheck', '--mode', 'ready', str(self.config)],
+                                cwd=self.work, capture_output=True, timeout=12, **self.identity)
+        if result.returncode:
+            raise CoreError('candidate rejects old config or current backend is not ready')
+
+    def running_binary_matches(self):
+        result = subprocess.run(['systemctl', 'show', self.unit,
+                                 '--property=MainPID', '--value'], capture_output=True, text=True, timeout=5, check=True)
+        pid = result.stdout.strip()
+        if not pid.isdecimal() or int(pid) <= 0:
+            return False
+        try:
+            return digest(Path('/proc')/pid/'exe') == digest(self.binary)
+        except OSError:
+            return False
+
+    def stop(self):
+        subprocess.run(['systemctl', 'stop', self.unit],
+                       check=True, capture_output=True, timeout=40)
+
+    def start(self):
+        subprocess.run(['systemctl', 'start', self.unit],
+                       check=True, capture_output=True, timeout=40)
+
+    def ready(self):
+        # Control-plane readiness + actual process image; protocol is tested separately.
+        import http.client
+        token = self.token_file.read_text(encoding='ascii').strip()
+        deadline = time.monotonic() + 45
+        while time.monotonic() < deadline:
+            connection = http.client.HTTPConnection('127.0.0.1', self.api_port, timeout=2)
+            try:
+                connection.request('GET', '/v1/health/ready', headers={'Authorization': 'Bearer '+token})
+                response = connection.getresponse()
+                raw = response.read(16385)
+                data = json.loads(raw) if len(raw) <= 16384 else None
+                if (response.status == 200 and isinstance(data, dict) and data.get('ok') is True
+                        and isinstance(data.get('data'), dict) and data['data'].get('ready') is True
+                        and self.running_binary_matches()):
+                    return True
+            except (OSError, ValueError):
+                pass
+            finally:
+                connection.close()
+            time.sleep(1)
+        return False
+
+
+class HealthService:
+    def __init__(self, bind):
+        import ipaddress
+        self.bind = str(ipaddress.IPv4Address(bind))
+    def version(self, path):
+        import ast
+        ast.parse(Path(path).read_text(encoding='utf-8'))
+        return digest(path)
+    def stop(self):
+        subprocess.run(['systemctl', 'stop', 'telemt-dual-hop-health-agent.service'],
+                       check=True, capture_output=True, timeout=20)
+    def start(self):
+        subprocess.run(['systemctl', 'start', 'telemt-dual-hop-health-agent.service'],
+                       check=True, capture_output=True, timeout=20)
+    def ready(self):
+        import socket
+        deadline = time.monotonic()+45
+        while time.monotonic() < deadline:
+            try:
+                with socket.create_connection((self.bind, 19101), timeout=2) as connection:
+                    connection.settimeout(2)
+                    if connection.recv(16).strip() == b'up':
+                        return True
+            except OSError:
+                pass
+            time.sleep(1)
+        return False
+
+
+def refresh_health(base, bind, rollback_only=False, *, target=None, service=None):
+    directory = Path(base)/'health-upgrade'
+    if not directory.exists():
+        directory.mkdir(mode=0o700)
+    target = Path(target or '/usr/local/lib/telemt-dual-hop/health_agent.py')
+    transaction = CoreTransaction(target, directory, service or HealthService(bind))
+    if rollback_only:
+        return transaction.rollback()
+    source = globals().get('HEALTH_AGENT_SOURCE')
+    if source is None:
+        source = Path(__file__).with_name('health_agent.py').read_text(encoding='utf-8')
+    with tempfile.TemporaryDirectory(prefix='.health-candidate-', dir=target.parent) as temp:
+        candidate = Path(temp)/'health_agent.py'
+        durable_file(candidate, source.encode('utf-8'), 0o755)
+        expected = digest(candidate)
+        return transaction.activate(candidate, expected, expected, digest(target))
+
+
+def protected_files(roots):
+    files = {}
+    for root in map(Path, roots):
+        if root.is_symlink() or root.resolve() != root:
+            raise CoreError('protected path contains a symlink')
+        candidates = [root] if root.is_file() else sorted(root.rglob('*')) if root.is_dir() else []
+        if not root.exists():
+            raise CoreError('required protected path is missing')
+        if not root.is_file() and not root.is_dir():
+            raise CoreError('protected root must be a regular file or directory')
+        if root.is_dir():
+            safe_directory(root)
+        for path in candidates:
+            if path.is_symlink():
+                raise CoreError('protected tree contains a symlink')
+            if path.is_dir():
+                safe_directory(path)
+                continue
+            safe_file(path)
+            if path.stat().st_size > 16*1024**2 or len(files) >= 128:
+                raise CoreError('protected state exceeds backup bounds')
+            files[str(path)] = {'sha256': digest(path), 'mode': stat.S_IMODE(path.stat().st_mode)}
+    if sum(Path(name).stat().st_size for name in files) > 32*1024**2:
+        raise CoreError('protected backup exceeds total byte budget')
+    return files
+
+
+def save_snapshot(directory, roots):
+    """Only hashes and fixed paths in the manifest; all copied secrets stay 0600."""
+    files = protected_files(roots)
+    folder = Path(tempfile.mkdtemp(prefix='snapshot-', dir=directory))
+    try:
+        for index, (name, metadata) in enumerate(sorted(files.items())):
+            metadata['copy'] = str(index)
+            atomic_copy(name, folder/str(index), 0o600, metadata['sha256'])
+        durable_file(folder/'manifest.json', (json.dumps(files, sort_keys=True)+'\n').encode(), 0o600)
+        sync_directory(folder)
+        sync_directory(directory)
+        return folder
+    except BaseException:
+        shutil.rmtree(folder)
+        raise
+
+
+def unchanged_snapshot(folder, roots):
+    safe_directory(folder)
+    safe_file(Path(folder)/'manifest.json')
+    files = json.loads((Path(folder)/'manifest.json').read_text())
+    current = protected_files(roots)
+    expected = {name: {k: row[k] for k in ('sha256', 'mode')} for name, row in files.items()}
+    if current != expected:
+        raise CoreError('protected configuration changed; manual review required before rollback')
+    for row in files.values():
+        if not re.fullmatch(r'[0-9]{1,3}', row['copy']):
+            raise CoreError('invalid snapshot member')
+        source = Path(folder)/row['copy']
+        safe_file(source)
+        if digest(source) != row['sha256']:
+            raise CoreError('protected backup checksum mismatch')
+
+
+def upgrade(binary, directory, archive, archive_sha, binary_sha, version, roots, service):
+    safe_directory(directory)
+    if Path(directory).stat().st_mode & 0o077:
+        raise CoreError('transaction storage must be private')
+    safe_file(binary)
+    tx = CoreTransaction(binary, directory, service)
+    if tx.journal.exists() or tx.journal.is_symlink():
+        previous = tx.load()
+        if previous['phase'] in ('prepared', 'switching'):
+            raise CoreError('unfinished transaction; run core-rollback first')
+    old = digest(binary)
+    if old == binary_sha:
+        if not service.ready():
+            raise CoreError('installed target core is not ready; diagnose or recover it first')
+        return 'unchanged'
+    if len(list(Path(directory).glob('snapshot-*'))) >= 8:
+        raise CoreError('snapshot retention limit reached; archive old backups before upgrading')
+    payload, _ = archive_payload(archive, archive_sha, version, binary_sha, False)
+    # Stage on an executable root-owned filesystem, readable by telemt only
+    # through the temporary 0755 directory; no credentials are staged here.
+    with tempfile.TemporaryDirectory(prefix='.core-candidate-', dir=Path(binary).parent) as temp:
+        stage = Path(temp)
+        candidate = stage/'telemt'
+        durable_file(candidate, payload, 0o755)
+        stage.chmod(0o755)
+        service.validate_candidate(candidate)
+        snapshot = save_snapshot(directory, roots)
+        # Bind the snapshot to the exact durable journal, including crash recovery
+        # and prior-transaction restoration. Never advance a separate pointer.
+        result = tx.activate(candidate, binary_sha, 'telemt '+version, old, snapshot=snapshot.name)
+        unchanged_snapshot(snapshot, roots)
+        return result
+
+
+def rollback(binary, directory, roots, service):
+    transaction = CoreTransaction(binary, directory, service)
+    value = transaction.load()
+    name = value.get('snapshot', '')
+    if not re.fullmatch(r'snapshot-[a-z0-9_]{8}', name):
+        raise CoreError('missing or invalid transaction snapshot')
+    unchanged_snapshot(Path(directory)/name, roots)
+    return transaction.rollback()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('action', choices=('upgrade', 'rollback', 'refresh-health', 'rollback-health'))
+    parser.add_argument('--binary', required=True)
+    parser.add_argument('--directory', required=True)
+    parser.add_argument('--config', required=True)
+    parser.add_argument('--work', required=True)
+    parser.add_argument('--token-file', required=True)
+    parser.add_argument('--protect', action='append', required=True)
+    parser.add_argument('--archive')
+    parser.add_argument('--archive-sha')
+    parser.add_argument('--binary-sha')
+    parser.add_argument('--version')
+    parser.add_argument('--bind')
+    args = parser.parse_args()
+    if os.geteuid() != 0:
+        raise CoreError('root required')
+    if args.action in ('refresh-health', 'rollback-health'):
+        result = refresh_health(Path(args.directory).parent, args.bind, args.action == 'rollback-health')
+        print('健康代理事务结果：'+result)
+        return
+    service = BackendService(args.binary, args.config, args.work, args.token_file)
+    if args.action == 'upgrade':
+        result = upgrade(args.binary, args.directory, args.archive, args.archive_sha,
+                         args.binary_sha, args.version, args.protect, service)
+    else:
+        result = rollback(args.binary, args.directory, args.protect, service)
+    print('核心事务结果：'+result)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as error:
+        print('核心事务失败：'+(str(error) if isinstance(error, (CoreError, InstallError)) else type(error).__name__), file=sys.stderr)
+        raise SystemExit(1)

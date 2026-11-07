@@ -26,7 +26,7 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--root',required=True)
 parser.add_argument('--haproxy',default='haproxy')
 parser.add_argument('--wg',default='wg')
-parser.add_argument('--build',choices=('official','auto','bulk'),default='official')
+parser.add_argument('--build',choices=('official','stable','auto','bulk'),default='official')
 parser.add_argument('--separate-dc',action='store_true')
 profile=parser.add_mutually_exclusive_group()
 profile.add_argument('--soak',action='store_true')
@@ -34,10 +34,14 @@ profile.add_argument('--benchmark',action='store_true')
 profile.add_argument('--candidate-check',action='store_true')
 profile.add_argument('--endurance-seconds',type=int,choices=(60,86400),default=0)
 parser.add_argument('--rtt',type=int,choices=(10,20,50,100,200),default=10)
+parser.add_argument('--loss-percent',type=float,choices=(0,.1,.5),default=0)
+parser.add_argument('--jitter-ms',type=int,choices=(0,5),default=0)
 parser.add_argument('role',choices=('run','backend','entry'))
 parser.add_argument('--shared')
 parser.add_argument('--index',type=int,choices=(1,2))
 args=parser.parse_args()
+if (args.loss_percent or args.jitter_ms) and args.build!='stable':
+    parser.error('new impairment profiles require the pinned stable build')
 if args.candidate_check and (args.build!='bulk' or not args.separate_dc or args.rtt not in (100,200)):
     parser.error('candidate path check requires bulk, separate mock DC and 100/200ms entry RTT')
 if args.endurance_seconds and (args.build!='bulk' or not args.separate_dc or args.rtt!=100):
@@ -71,9 +75,9 @@ class Agent(socketserver.ThreadingTCPServer):
 def backend():
     shared=Path(args.shared)
     address=f'10.77.{args.index}.2'
-    binary=ROOT/'telemt-3.5.5/telemt'
+    binary=ROOT/('telemt-3.5.16' if args.build=='stable' else 'telemt-3.5.5')/'telemt'
     experimental=None
-    if args.build!='official':
+    if args.build not in ('official','stable'):
         metadata=json.loads((ROOT/f'{args.build}-build.json').read_text())
         binary=ROOT/f'telemt-{args.build}'
         experimental=(metadata['sha256'],metadata['version'])
@@ -81,7 +85,9 @@ def backend():
         endpoint=(f'198.18.0.{1 if args.index==1 else 5}',26000) if args.separate_dc else None
         return FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,
                        experimental_binary=experimental,dc_endpoint=endpoint,artifact_registry=ROOT/'artifact-registry',
-                       shared_binary_root=ROOT if args.candidate_check or args.endurance_seconds else None)
+                       shared_binary_root=ROOT if args.candidate_check or args.endurance_seconds else None,
+                       startup_report=ROOT/'results'/f'stable-backend{args.index}-startup.json' if args.build=='stable' else None,
+                       offline_lab=args.build=='stable')
     lab=create_lab()
     agent=None
     client_sockets,observation_errors=[],[]
@@ -140,7 +146,12 @@ def network_extra(net):
     command('ip','-n',extra,'route','add','default','via','198.51.100.5')
     command('ip','netns','exec',extra,'sysctl','-qw','net.ipv4.tcp_congestion_control=bbr')
     command('ip','netns','exec',extra,'tc','qdisc','replace','dev','tdh-lc1','root','fq')
-    command('ip','netns','exec',NAMES[1],'tc','qdisc','replace','dev','tdh-lc0','root','netem','delay',f'{args.rtt/2:g}ms','rate','100mbit','limit','10000')
+    impairment=['delay',f'{args.rtt/2:g}ms']
+    if args.jitter_ms:
+        impairment += [f'{args.jitter_ms}ms','distribution','normal']
+    if args.loss_percent:
+        impairment += ['loss','random',f'{args.loss_percent:g}%']
+    command('ip','netns','exec',NAMES[1],'tc','qdisc','replace','dev','tdh-lc0','root','netem',*impairment,'rate','100mbit','limit','10000')
     wg=args.wg
     keys=[]
     for index in range(2):
@@ -440,13 +451,17 @@ frontend mtp_tls
             routed('apple.com','U',1)
         for number in (1,2):
             assert not json.loads((shared/f'backend{number}.json').read_text())['errors'],'mock DC failure'
-        output={'scope':'single native VPS, private entry/two backends and router namespaces; actual HAProxy/WireGuard/Telemt, synthetic DC only',
+        output={'scope':'single Linux host, private entry/two backends and router namespaces; actual HAProxy/WireGuard/Telemt, synthetic DC and process-state health agent only',
                 'kernel':os.uname().release,'wireguard_psk':True,'wireguard_mtu':1420,'rtt_ms_configured':10,
                 'haproxy':subprocess.check_output([binary,'-v'],text=True,timeout=3).splitlines()[0],
                 'telemt':json.loads((shared/'backend1.json').read_text())['telemt'],'agent_failover_and_recovery':True,'master_worker_reload_with_existing_transfer':all(reload_flow_active),'reload_flow_active':reload_flow_active,
                 'splice_auto_pipes_allocated_observed':auto_pipes,'forced_splice_test_pipes_allocated_observed':forced_pipes,
                 'master_worker_reload_count':1+(forced_pipes is not None),'rows':rows}
-        output['classification']='SINGLE_VPS_VIRTUAL_3NODE'
+        output['classification']='SINGLE_LINUX_VIRTUAL_3NODE'
+        output['health_agent_kind']='synthetic process-state agent; production health agent is tested separately'
+        output['offline_bootstrap']=args.build=='stable'
+        output['loss_percent_configured']=args.loss_percent
+        output['jitter_ms_configured']=args.jitter_ms
         output['separate_mock_dc_namespace']=args.separate_dc
         output['actual_backend_process_restart_verified']=args.separate_dc
         output['wireguard_link_outage_recovery_verified']=args.separate_dc
@@ -461,7 +476,7 @@ frontend mtp_tls
 def run():
     (ROOT/"results").mkdir(exist_ok=True,mode=0o700)
     net=Network(SimpleNamespace(root=str(ROOT),wg=args.wg,start_iperf=False,
-                               rtt_ms=args.rtt,loss_percent=0,rate_mbps=100,mtu=1420,
+                               rtt_ms=args.rtt,loss_percent=args.loss_percent,jitter_ms=args.jitter_ms,rate_mbps=100,mtu=1420,
                                ownership_ledger=bool(args.endurance_seconds)))
     temp=tempfile.TemporaryDirectory(prefix='tdh-e2e-dual-' if args.endurance_seconds else 'tdh-audit-dual-',dir='/tmp')
     shared=Path(temp.name)
@@ -478,6 +493,7 @@ def run():
         for number,ns in ((1,NAMES[2]),(2,'tdh-audit-b2')):
             process=subprocess.Popen(['ip','netns','exec',ns,'python3',str(HERE),
                                       '--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
+                                      '--loss-percent',str(args.loss_percent),'--jitter-ms',str(args.jitter_ms),
                                       *(['--separate-dc'] if args.separate_dc else []),
                                       *(['--candidate-check'] if args.candidate_check else []),
                                       *(['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else []),
@@ -494,6 +510,7 @@ def run():
         entry_deadline=args.endurance_seconds+120 if args.endurance_seconds else 90 if args.candidate_check else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
         result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),'ip','netns','exec',NAMES[0],
                                'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
+                               '--loss-percent',str(args.loss_percent),'--jitter-ms',str(args.jitter_ms),
                                *(['--separate-dc'] if args.separate_dc else []),
                                *entry_args,'entry','--shared',str(shared)],
                               capture_output=True,text=True,timeout=entry_deadline+10)

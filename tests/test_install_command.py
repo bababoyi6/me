@@ -68,7 +68,7 @@ exec /bin/bash "$@"
             channel = 'v1.3.1-original' if original else 'main'
             self.assertIn(f'https://raw.githubusercontent.com/bababoyi6/me/{channel}/telemt-dual-hop.sh', arguments)
             if expected_success:
-                self.assertIn("Telemt Dual-Hop " + ("1.3.1" if original else "1.6.0"), result.stdout)
+                self.assertIn("Telemt Dual-Hop " + ("1.3.1" if original else "1.7.0"), result.stdout)
 
     def test_download_and_launch_then_clean_private_temporary_file(self):
         self.invoke(True)

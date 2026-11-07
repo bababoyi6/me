@@ -1,0 +1,928 @@
+{
+  "scope": "real HAProxy/FakeTLS/MTProto and synthetic DC/payload only; shared Linux host",
+  "conditions": "WSL_private_loopback_netem25ms_rate100Mbps_CPU100pct_Memory1GiB_mockBacklog256",
+  "kernel": "6.18.40.1-microsoft-standard-WSL2",
+  "results": [
+    {
+      "version": "telemt 3.5.5+tdh.balanced2",
+      "rows": [
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 25.671993241083815,
+          "wall_seconds": 8.16902676899997,
+          "handshake_ms": {
+            "p50": 247.1302380000111,
+            "p95": 272.4953449999816
+          },
+          "completion_ms": {
+            "p50": 8107.269124000027,
+            "p95": 8119.850477
+          },
+          "backend_cpu_one_core_percent": 1.3465496332737064,
+          "backend_peak_rss_bytes": 30904320,
+          "backend_fds_before": 16,
+          "backend_fds_after": 157
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "successes": 0,
+          "errors": [
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            },
+            {
+              "type": "RuntimeError",
+              "phase": "digest"
+            }
+          ],
+          "success_rate": 0.0,
+          "aggregate_mbps": 0.0,
+          "wall_seconds": 8.61365498500004,
+          "handshake_ms": null,
+          "completion_ms": null,
+          "backend_cpu_one_core_percent": 1.1609473582833496,
+          "backend_peak_rss_bytes": 30904320,
+          "backend_fds_before": 154,
+          "backend_fds_after": 36
+        }
+      ],
+      "before_load": {
+        "cpu_seconds": 0.01,
+        "rss_bytes": 20205568,
+        "fds": 16
+      },
+      "after_idle": {
+        "cpu_seconds": 0.22,
+        "rss_bytes": 24297472,
+        "fds": 14
+      },
+      "mock_dc_completed": 104,
+      "mock_dc_errors": [
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        }
+      ],
+      "validation_error": "RuntimeError",
+      "config_unchanged": true,
+      "accepted": false
+    },
+    {
+      "version": "telemt 3.5.16",
+      "rows": [
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 26.44964417676289,
+          "wall_seconds": 7.928847684999994,
+          "handshake_ms": {
+            "p50": 242.79719899999463,
+            "p95": 268.3780749999869
+          },
+          "completion_ms": {
+            "p50": 7856.096536000025,
+            "p95": 7872.1553949999925
+          },
+          "backend_cpu_one_core_percent": 1.513460779767774,
+          "backend_peak_rss_bytes": 26882048,
+          "backend_fds_before": 16,
+          "backend_fds_after": 40
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 25.067186941609,
+          "wall_seconds": 8.36612422799999,
+          "handshake_ms": {
+            "p50": 221.05384150000873,
+            "p95": 228.25407999999925
+          },
+          "completion_ms": {
+            "p50": 8259.207713499989,
+            "p95": 8269.290243999989
+          },
+          "backend_cpu_one_core_percent": 1.0757669566844987,
+          "backend_peak_rss_bytes": 26882048,
+          "backend_fds_before": 38,
+          "backend_fds_after": 14
+        }
+      ],
+      "before_load": {
+        "cpu_seconds": 0.0,
+        "rss_bytes": 16826368,
+        "fds": 16
+      },
+      "after_idle": {
+        "cpu_seconds": 0.21,
+        "rss_bytes": 20574208,
+        "fds": 14
+      },
+      "mock_dc_completed": 204,
+      "mock_dc_errors": [],
+      "validation_error": null,
+      "config_unchanged": true,
+      "accepted": true
+    }
+  ],
+  "accepted": false
+}

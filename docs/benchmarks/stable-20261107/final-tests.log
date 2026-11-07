@@ -1,0 +1,14 @@
+.......F.......................................................ss.....................................................................................................................................................................
+======================================================================
+FAIL: test_actual_backend_namespace_sockets_and_legacy_scope_rejection (test_backend_observer.BackendObserverTests.test_actual_backend_namespace_sockets_and_legacy_scope_rejection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_backend_observer.py", line 45, in test_actual_backend_namespace_sockets_and_legacy_scope_rejection
+    self.assertFalse(any(line.split()[0] in ('tdh-audit-b','tdh-audit-b2') for line in existing.splitlines()))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 230 tests in 20.307s
+
+FAILED (failures=1, skipped=2)

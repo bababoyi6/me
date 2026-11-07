@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+import shutil
 
 SCRIPT = Path(__file__).resolve().parents[1] / "telemt-dual-hop.sh"
 
@@ -40,6 +41,32 @@ install() { printf 'forbidden install operation\\n' >&2; exit 99; }
 
     def test_unregistered_bbr_is_not_silently_accepted(self):
         self.invoke(available="reno cubic notbbr", apply=True, expected=1)
+
+    @unittest.skipUnless(os.geteuid() == 0 and shutil.which('unshare'), 'private mount namespace requires root')
+    def test_queue_floor_matches_listener_and_preserves_larger_operator_values(self):
+        with tempfile.TemporaryDirectory(prefix='tdh-queue-test-') as name:
+            root = Path(name)
+            for folder in ('sysctl', 'modules'):
+                (root/folder).mkdir()
+            for current, expected in ((1024,4096), (65535,65535)):
+                env = dict(os.environ, TDH_TEST_SCRIPT=str(SCRIPT), TDH_QUEUE_ROOT=name, TDH_QUEUE_CURRENT=str(current))
+                child = r'''
+set -Eeuo pipefail
+mount --make-rprivate /
+mount --bind "$TDH_QUEUE_ROOT/sysctl" /etc/sysctl.d
+mount --bind "$TDH_QUEUE_ROOT/modules" /etc/modules-load.d
+TDH_SOURCE_ONLY=1 source "$TDH_TEST_SCRIPT"
+check_tuning_support() { :; }
+tuning_is_active() { :; }
+save_state() { :; }
+sysctl() { [[ $1 == -p ]] || printf '%s\n' "$TDH_QUEUE_CURRENT"; }
+apply_tuning
+'''
+                result = subprocess.run(['unshare','--mount','bash','-c',child],env=env,capture_output=True,text=True,timeout=10)
+                self.assertEqual(result.returncode,0,result.stderr)
+                text = (root/'sysctl/90-telemt-dual-hop.conf').read_text()
+                for key in ('net.core.somaxconn','net.ipv4.tcp_max_syn_backlog'):
+                    self.assertIn(f'{key} = {expected}',text)
 
 
 if __name__ == "__main__":
