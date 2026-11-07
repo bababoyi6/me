@@ -1,0 +1,154 @@
+{
+  "scope": "real HAProxy/FakeTLS/MTProto and synthetic DC/payload only; shared Linux host",
+  "conditions": "Ubuntu22.04_private_loopback_netem25ms_rate100Mbps_CPU100pct_Memory1GiB",
+  "kernel": "6.8.0-1070-azure",
+  "results": [
+    {
+      "version": "telemt 3.5.16",
+      "rows": [
+        {
+          "concurrency": 30,
+          "direction": "U",
+          "successes": 30,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 22.609632027122625,
+          "wall_seconds": 2.7826441369999912,
+          "handshake_ms": {
+            "p50": 221.4513534999938,
+            "p95": 231.76974500000824
+          },
+          "completion_ms": {
+            "p50": 2747.284748499986,
+            "p95": 2763.299059000005
+          },
+          "backend_cpu_one_core_percent": 1.0781112683831513,
+          "backend_peak_rss_bytes": 19419136,
+          "backend_fds_before": 16,
+          "backend_fds_after": 74
+        },
+        {
+          "concurrency": 30,
+          "direction": "D",
+          "successes": 30,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 21.079376247194997,
+          "wall_seconds": 2.9846499850000043,
+          "handshake_ms": {
+            "p50": 216.58375849999345,
+            "p95": 221.96521800000824
+          },
+          "completion_ms": {
+            "p50": 2887.290635499994,
+            "p95": 2933.8846349999985
+          },
+          "backend_cpu_one_core_percent": 1.0051429866406918,
+          "backend_peak_rss_bytes": 19419136,
+          "backend_fds_before": 74,
+          "backend_fds_after": 18
+        },
+        {
+          "concurrency": 50,
+          "direction": "U",
+          "successes": 50,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 24.944338649325456,
+          "wall_seconds": 4.2036632629999815,
+          "handshake_ms": {
+            "p50": 223.45898250000573,
+            "p95": 235.79479899999
+          },
+          "completion_ms": {
+            "p50": 4170.9689435,
+            "p95": 4185.465411999985
+          },
+          "backend_cpu_one_core_percent": 1.4273265065760874,
+          "backend_peak_rss_bytes": 21970944,
+          "backend_fds_before": 18,
+          "backend_fds_after": 114
+        },
+        {
+          "concurrency": 50,
+          "direction": "D",
+          "successes": 50,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 24.026418459660366,
+          "wall_seconds": 4.364262620999995,
+          "handshake_ms": {
+            "p50": 217.05709799999795,
+            "p95": 224.2995130000054
+          },
+          "completion_ms": {
+            "p50": 4281.344514000011,
+            "p95": 4321.052491999979
+          },
+          "backend_cpu_one_core_percent": 0.6874013460062132,
+          "backend_peak_rss_bytes": 21970944,
+          "backend_fds_before": 114,
+          "backend_fds_after": 26
+        },
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 26.397941186055125,
+          "wall_seconds": 7.944377121000002,
+          "handshake_ms": {
+            "p50": 233.34240900001646,
+            "p95": 252.57535299999745
+          },
+          "completion_ms": {
+            "p50": 7901.16693600001,
+            "p95": 7911.2408270000005
+          },
+          "backend_cpu_one_core_percent": 1.3846271183328935,
+          "backend_peak_rss_bytes": 27643904,
+          "backend_fds_before": 26,
+          "backend_fds_after": 208
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 25.2039915890509,
+          "wall_seconds": 8.320713775000002,
+          "handshake_ms": {
+            "p50": 224.26357850000045,
+            "p95": 237.74552600002608
+          },
+          "completion_ms": {
+            "p50": 8253.584565000012,
+            "p95": 8290.140933000004
+          },
+          "backend_cpu_one_core_percent": 1.0816379752228642,
+          "backend_peak_rss_bytes": 27643904,
+          "backend_fds_before": 208,
+          "backend_fds_after": 92
+        }
+      ],
+      "before_load": {
+        "cpu_seconds": 0.01,
+        "rss_bytes": 16523264,
+        "fds": 16
+      },
+      "after_idle": {
+        "cpu_seconds": 0.37,
+        "rss_bytes": 20865024,
+        "fds": 14
+      },
+      "mock_dc_completed": 364,
+      "mock_dc_errors": [],
+      "validation_error": null,
+      "config_unchanged": true,
+      "accepted": true
+    }
+  ],
+  "accepted": true
+}

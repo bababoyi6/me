@@ -22,7 +22,7 @@
 - 原入口 TCP 443、双 SNI、双 WG、独立主备后端、Secret 和代理链接保留；不启用 WEB。
 - 增加核心升级/回退、入口维护排空、健康代理更新/回退和后端恢复命令。管理器更新仍不隐式替换核心。
 - 健康检查改为 DC 多数票、失败/恢复阈值、冷却及失效时间，加入本机 Telemt 端口检查。
-- WSL 已执行真实二进制、HAProxy、双 WireGuard、systemd 升级/回退及 30/50/100 并发合成协议测试；失败批次也保留。完整 Ubuntu 22.04 三系统重启、ARM 运行、官方客户端与公网跨地区验收仍未完成。
+- WSL 与 Ubuntu 22.04.5 CI 已执行真实二进制、HAProxy、双 WireGuard、systemd 升级/回退及 30/50/100 并发合成协议测试；失败批次也保留。完整 Ubuntu 22.04 三系统重启、ARM 运行、官方客户端与公网跨地区验收仍未完成。
 
 [详细工程报告](docs/ENGINEERING-REPORT-1.7.md) · [架构与健康模型](docs/ARCHITECTURE-1.7.md) · [升级/回滚](docs/UPGRADE-1.7.md) · [故障排查](docs/TROUBLESHOOTING-1.7.md) · [版本锁](docs/telemt-stable-lock.json) · [版本记录](docs/RELEASE-1.7.0.md)
 

@@ -1,13 +1,16 @@
 {
-  "action": "git push --set-upstream origin dev/telemt-stable-compat-20261107",
-  "exit_code": 1,
-  "http_status": 403,
-  "repository": "bababoyi6/me",
-  "authenticated_login": "wolfgang008",
-  "result": "permission denied; no branch pushed and no pull request created",
-  "implementation_commit": "f8414e092fc4ace9e1daaba24292d1e545066bf6",
-  "main_changed": false,
-  "visibility_changed": false,
+  "current_status": "delivered_to_review_branch",
+  "initial_attempt": {
+    "action": "git push --set-upstream origin dev/telemt-stable-compat-20261107",
+    "exit_code": 1,
+    "http_status": 403,
+    "repository": "bababoyi6/me",
+    "authenticated_login": "wolfgang008",
+    "result": "permission denied; no branch pushed and no pull request created",
+    "implementation_commit": "f8414e092fc4ace9e1daaba24292d1e545066bf6",
+    "main_changed": false,
+    "visibility_changed": false
+  },
   "resolution": {
     "authenticated_login": "bababoyi6",
     "permissions_confirmed": {
@@ -17,6 +20,8 @@
     "credential_scope": "current process only; default login unchanged; no token saved",
     "branch_push": "success",
     "pull_request": "https://github.com/bababoyi6/me/pull/9",
-    "ci": "Ubuntu22.04 branch-scoped acceptance trigger added; awaiting run"
+    "ci": "PASS on Ubuntu22.04.5: stable acceptance and installer validation",
+    "stable_run": "https://github.com/bababoyi6/me/actions/runs/42351018133",
+    "validate_run": "https://github.com/bababoyi6/me/actions/runs/42351022710"
   }
 }
