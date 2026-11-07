@@ -32,4 +32,14 @@
 
 ## 运行与证据
 
-工作流 `.github/workflows/paired-performance.yml`，工具 `tests/paired_performance.py` / `tests/paired_analysis.py`。原始报告、确切代码提交和任务元数据将在运行后补充。当前尚无本轮性能结论。
+工作流 `.github/workflows/paired-performance.yml`，工具 `tests/paired_performance.py` / `tests/paired_analysis.py` / `tests/paired_report.py`。
+
+正式批次 [42373634689](https://github.com/bababoyi6/me/actions/runs/42373634689)，固定测量代码 `80e9211073be3534cd5980b8d247533693ff59f8`，两任务完整结束但均因协议失败判 FAIL：普通网络组每任务每核心 2160 条传输全部通过；弱网组新核心各出现 4 次失败，共 8 次，旧核心对应组未失败。多数为 100 并发下载中的 payload EOF，另有一次上传 digest 阶段错误。此时不能宣布新版整体稳定性更优或完成生产放行。
+
+第一任务的旧核心超时诊断中，模拟 DC 等待 8 秒时 100 下载全部失败、等待 25 秒时 100/100 通过。此前旧核心历史 100 下载失败不能作为新版稳定性优势证据。此结果只定位这个受限模拟场景，不解释所有旧版实际业务问题。
+
+无限速组模拟器/生成器 CPU 达到预定瓶颈门槛，不能据此评判核心吞吐极限；普通网络吞吐比率需与第二任务逐项合并复核，不拼接跨主机绝对速度。
+
+短程脱敏诊断 [42375124889](https://github.com/bababoyi6/me/actions/runs/42375124889) 中，旧核心 fast、新核心 fast、以及新核心非 fast 各两轮均通过，未复现上述中断，因此没有贸然修改生产 fast_mode。完整序列观察工作流 `sequence-diagnostic.yml` 正在运行，继续定位。
+
+首个 `a10ea15` 批次 42373447034 因提前发现指标文件为 root 私有权限、runner 无法可靠归档而取消；修正合成指标为可读文件后重跑。它没有计入性能结论，取消记录保留。
