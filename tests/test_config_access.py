@@ -134,5 +134,23 @@ class ConfigAccessTests(unittest.TestCase):
             rollback(self.binary,self.store,[config],service)
         self.assertEqual(self.base.stat().st_mode & 0o777,0o750)
 
+    def test_state_saves_preserve_legacy_mode_until_explicit_migration(self):
+        script=Path(__file__).resolve().parents[1]/'telemt-dual-hop.sh'
+        env=dict(os.environ, TDH_BASE=str(self.base), TDH_TEST_SCRIPT=str(script))
+        code='''set -Eeuo pipefail
+TDH_SOURCE_ONLY=1 source "$TDH_TEST_SCRIPT"
+TDH_ROLE=backend1
+getent() { [[ $* == 'group telemt' ]]; }
+chown() { if [[ $1 == root:telemt ]]; then shift; command chown 0:65534 "$@"; else command chown "$@"; fi; }
+save_state
+'''
+        subprocess.run(['bash','-c',code],env=env,check=True,capture_output=True,timeout=5)
+        self.assertEqual(self.base.stat().st_mode & 0o777,0o710)
+        self.assertEqual(self.secret.stat().st_mode & 0o777,0o600)
+        # A fresh backend gets the required group-readable parent.
+        self.base.chmod(0o700)
+        subprocess.run(['bash','-c',code],env=env,check=True,capture_output=True,timeout=5)
+        self.assertEqual(self.base.stat().st_mode & 0o777,0o750)
+
 
 if __name__ == '__main__': unittest.main()

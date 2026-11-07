@@ -515,6 +515,13 @@ rollback_manager() {
 }
 
 init_dirs() {
+  local backend_base_mode=0750
+  # Routine state saves must not silently migrate an existing legacy node.
+  # Its 0710 -> 0750 change belongs to the explicit core maintenance transaction.
+  if [[ ( $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ) && -d $TDH_BASE && ! -L $TDH_BASE ]] && \
+     [[ $(stat -c '%a' -- "$TDH_BASE") == 710 ]]; then
+    backend_base_mode=0710
+  fi
   install -d -o root -g root -m 0700 "$TDH_BASE" "$TDH_KEY_DIR"
   # New Telemt opens every configuration ancestor with O_RDONLY|O_DIRECTORY.
   # The dedicated group needs read/search; state and WG keys remain root-only.
@@ -522,7 +529,7 @@ init_dirs() {
     install -d -o root -g root -m 0750 "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
     if getent group telemt >/dev/null 2>&1; then
       chown root:telemt "$TDH_BASE" "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
-      chmod 0750 "$TDH_BASE"
+      chmod "$backend_base_mode" "$TDH_BASE"
       chmod 0750 "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
     fi
   fi
