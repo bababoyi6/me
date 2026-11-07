@@ -40,24 +40,50 @@ def summary(values):
     return {'p50': statistics.median(ordered), 'p95': ordered[math.ceil(.95*len(ordered))-1]} if ordered else None
 
 
-def run(binary, kind, cohorts=(30, 50, 100)):
-    lab = FullLab(binary, experimental_binary=(PINS[kind][1], PINS[kind][2]) if kind == 'balanced2' else None)
+def run(binary, kind, cohorts=(30, 50, 100), *, offline_lab=False, payload_bytes=262144, transfer_rate=12500000,
+        backend_cpu=None, dc_timeout_seconds=25):
+    if payload_bytes not in (262144, 1048576) or transfer_rate not in (12500000, 125000000):
+        raise ValueError('bounded acceptance workload required')
+    lab = FullLab(binary, experimental_binary=(PINS[kind][1], PINS[kind][2]) if kind == 'balanced2' else None,
+                  offline_lab=offline_lab)
+    # Queueing in the 100-stream shaped test can exceed eight seconds. Both
+    # protocol endpoints must use the same budget, not just the client socket.
+    if dc_timeout_seconds not in (8, 25):
+        lab.close()
+        raise ValueError('bounded mock DC diagnostic timeout required')
+    lab.dc.socket_timeout = dc_timeout_seconds
+    if backend_cpu is not None:
+        if not isinstance(backend_cpu, int) or backend_cpu < 0:
+            lab.close()
+            raise ValueError('explicit backend CPU required')
+        try:
+            for task in Path(f'/proc/{lab.telemt.pid}/task').iterdir():
+                try:
+                    os.sched_setaffinity(int(task.name), {backend_cpu})
+                except ProcessLookupError:
+                    pass
+        except BaseException:
+            lab.close()
+            raise
     rows, total = [], 0
+    result = None
     try:
         # Persistent tail acknowledgements must complete without an EOF rescue.
         for domain in ('apple.com', 'gs.apple.com'):
             for direction in ('U', 'D'):
-                lab.transfer(domain, direction, 4096, 12500000, persistent=True)
+                lab.transfer(domain, direction, 4096, 12500000, persistent=True, io_timeout=25)
                 total += 1
         baseline = stats(lab.telemt.pid)
         for concurrency in cohorts:
             for direction in ('U', 'D'):
                 before = stats(lab.telemt.pid)
+                proxy_before = stats(lab.haproxy.pid)
+                controller_before = time.process_time()
                 started = time.monotonic()
                 successes, errors, samples = [], [], []
                 with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
                     futures = [pool.submit(lab.transfer, ('apple.com', 'gs.apple.com')[i % 2], direction,
-                                           262144, 12500000, persistent=True, io_timeout=25)
+                                           payload_bytes, transfer_rate, persistent=True, io_timeout=25)
                                for i in range(concurrency)]
                     while not all(future.done() for future in futures):
                         samples.append(stats(lab.telemt.pid))
@@ -69,6 +95,7 @@ def run(binary, kind, cohorts=(30, 50, 100)):
                             errors.append({'type': type(error).__name__, 'phase': getattr(error, 'lab_phase', 'unknown')})
                 elapsed = time.monotonic()-started
                 after = stats(lab.telemt.pid)
+                proxy_after = stats(lab.haproxy.pid)
                 total += len(successes)
                 rows.append({'concurrency': concurrency, 'direction': direction, 'successes': len(successes),
                              'errors': errors, 'success_rate': len(successes)/concurrency,
@@ -76,6 +103,8 @@ def run(binary, kind, cohorts=(30, 50, 100)):
                              'wall_seconds': elapsed, 'handshake_ms': summary([row['handshake_ms'] for row in successes]),
                              'completion_ms': summary([row['elapsed_seconds']*1000 for row in successes]),
                              'backend_cpu_one_core_percent': 100*(after['cpu_seconds']-before['cpu_seconds'])/elapsed,
+                             'controller_and_mock_cpu_one_core_percent': 100*(time.process_time()-controller_before)/elapsed,
+                             'haproxy_cpu_one_core_percent': 100*(proxy_after['cpu_seconds']-proxy_before['cpu_seconds'])/elapsed,
                              'backend_peak_rss_bytes': max([before['rss_bytes'], after['rss_bytes']]+[s['rss_bytes'] for s in samples]),
                              'backend_fds_before': before['fds'], 'backend_fds_after': after['fds']})
         time.sleep(2)
@@ -85,13 +114,26 @@ def run(binary, kind, cohorts=(30, 50, 100)):
             lab.validate(total)
         except Exception as error:
             validation_error = type(error).__name__
-        return {'version': lab.version, 'rows': rows, 'before_load': baseline, 'after_idle': after,
+        policy = lab.telemt_config.read_text()
+        policy = policy.replace(f'port = {lab.listen}\n', 'port = $NATIVE_PORT\n')
+        policy = policy.replace(f'127.0.0.1:{lab.api}', '127.0.0.1:$API_PORT')
+        policy = policy.replace(f'127.0.0.1:{lab.dc.server_address[1]}', '127.0.0.1:$DC_PORT')
+        result = {'version': lab.version, 'rows': rows, 'before_load': baseline, 'after_idle': after,
+                'config_policy_sha256': hashlib.sha256(policy.encode()).hexdigest(),
+                'mock_dc_socket_timeout_seconds': lab.dc.socket_timeout, 'client_io_timeout_seconds': 25,
+                'offline_bootstrap': offline_lab, 'payload_bytes': payload_bytes, 'transfer_rate': transfer_rate,
                 'mock_dc_completed': lab.dc.completed, 'mock_dc_errors': lab.dc.errors,
                 'validation_error': validation_error,
                 'config_unchanged': hashlib.sha256(lab.telemt_config.read_bytes()).hexdigest() == lab.config_hash,
                 'accepted': validation_error is None and all(not row['errors'] for row in rows)}
+        if backend_cpu is not None:
+            result['backend_cpu_affinity_verified'] = all(os.sched_getaffinity(int(t.name)) == {backend_cpu}
+                for t in Path(f'/proc/{lab.telemt.pid}/task').iterdir())
+        return result
     finally:
         lab.close()
+        if result is not None:
+            result['private_processes_closed'] = all(p.poll() is not None for p in lab.processes) and not lab.root.exists()
 
 
 def main():
