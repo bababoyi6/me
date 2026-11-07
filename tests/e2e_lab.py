@@ -30,8 +30,9 @@ from telemt_probe import SECRETS, TOKEN, port, request
 from lab_artifacts import register_artifact
 from lab_files import file_sha256, link_private_binary
 
-# Extracted x86_64 binaries from the checksum-verified official GNU archives.
+# Extracted binaries from the checksum-verified official GNU archives.
 BINARIES = {
+    "ebaec212fd5556ceca7fb0fcc4d3d23c01a8883d20a4cbc567219022d57c2a0b": "telemt 3.5.16",
     "1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8": "telemt 3.5.16",
     "cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd": "telemt 3.5.5",
     "feb1d8779de0b86c6c43d1b871020ec94b11fad9fec5612b07b278edfd2181ff": "telemt 3.5.14",
@@ -178,7 +179,7 @@ class FullLab:
                 raise ValueError("explicit experimental build checksum/version mismatch")
             expected = version
         if expected is None:
-            raise ValueError("lab requires a pinned official x86_64 GNU binary")
+            raise ValueError("lab requires a pinned official GNU binary")
         self.temp = tempfile.TemporaryDirectory(prefix="tdh-e2e-",dir='/tmp' if artifact_registry is not None else None)
         self.root = Path(self.temp.name)
         self.processes, self.dc = [], None

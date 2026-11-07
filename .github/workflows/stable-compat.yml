@@ -7,7 +7,14 @@ on:
     paths:
       - telemt-dual-hop.sh
       - 'tools/**'
-      - 'tests/**'
+      - tests/stable_system_lab.py
+      - tests/stable_acceptance.py
+      - tests/e2e_lab.py
+      - tests/dualhop_lab.py
+      - tests/network_lab.py
+      - tests/lab_config.py
+      - tests/mtproto_transport.py
+      - tests/telemt_probe.py
       - .github/workflows/stable-compat.yml
 
 permissions:
