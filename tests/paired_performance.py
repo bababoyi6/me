@@ -65,7 +65,11 @@ def write(path, value):
     temp = path.with_suffix('.partial')
     with temp.open('w') as target:
         json.dump(value, target, indent=2, allow_nan=False)
-        target.write('\n'); target.flush(); os.fsync(target.fileno())
+        target.write('\n'); target.flush()
+        # The runner uploads this fixed-name, synthetic-metrics-only file as an
+        # unprivileged user. Private binary/config staging remains under 0077.
+        os.fchmod(target.fileno(), 0o644)
+        os.fsync(target.fileno())
     temp.replace(path)
 
 
