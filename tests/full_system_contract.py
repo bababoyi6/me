@@ -37,7 +37,8 @@ def validate(worker,supervisor,expected=None):
         maintenance=worker.get('native_maintenance',{})
         required=('drain_routing_verified','old_core_seeded','upgrade_verified','repeat_upgrade_verified',
                   'rollback_verified','repeat_rollback_verified','final_core_verified',
-                  'health_refresh_verified','configuration_unchanged','resume_routing_verified')
+                  'health_refresh_verified','configuration_unchanged','resume_routing_verified',
+                  'config_access_migration_verified','config_access_rollback_verified')
         if any(maintenance.get(key) is not True for key in required):
             raise ValueError('native maintenance CLI path incomplete')
     return True

@@ -45,6 +45,7 @@ jobs:
       - name: Verify state trust boundaries and conservative tuning in private mounts
         run: |
           sudo timeout 20 python3 -m unittest discover -s tests -p 'test_state_safety.py' -v
+          sudo timeout 20 python3 -m unittest discover -s tests -p 'test_config_access.py' -v
           sudo timeout 20 python3 -m unittest discover -s tests -p 'test_tuning_preflight.py' -v
       - name: Verify experimental socket policies on private loopback
         run: |

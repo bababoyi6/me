@@ -111,6 +111,7 @@ tar -xzf /root/tdh-old-core-fixture/core.tar.gz -C /root/tdh-old-core-fixture te
 printf '%s  %s\\n' {OLD_BINARY} /root/tdh-old-core-fixture/telemt | sha256sum --check --status
 systemctl stop telemt-dual-hop-telemt.service
 install -o root -g root -m 0755 /root/tdh-old-core-fixture/telemt /usr/local/lib/telemt-dual-hop/telemt
+chmod 0710 /etc/telemt-dual-hop
 systemctl start telemt-dual-hop-telemt.service
 '''
     guest('backend1',seed,180)
@@ -130,10 +131,14 @@ systemctl start telemt-dual-hop-telemt.service
     ready()
     guest('backend1','a core-upgrade --maintenance >/root/core-upgrade.log 2>&1\n',180)
     result['upgrade_verified']=core_is(profile['core'])
+    guest('backend1',"test \"$(stat -c %a /etc/telemt-dual-hop)\" = 750\n")
+    result['config_access_migration_verified']=True
     guest('backend1','a core-upgrade --maintenance >/root/core-repeat.log 2>&1\n',180)
     result['repeat_upgrade_verified']=core_is(profile['core'])
     guest('backend1','a core-rollback --maintenance >/root/core-rollback.log 2>&1\n',120)
     result['rollback_verified']=core_is(OLD_BINARY)
+    guest('backend1',"test \"$(stat -c %a /etc/telemt-dual-hop)\" = 710\n")
+    result['config_access_rollback_verified']=True
     guest('backend1','a core-rollback --maintenance >/root/core-rollback-repeat.log 2>&1\n',120)
     result['repeat_rollback_verified']=core_is(OLD_BINARY)
     guest('backend1','a core-upgrade --maintenance >/root/core-final-upgrade.log 2>&1\n',180)

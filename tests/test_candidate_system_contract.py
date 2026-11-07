@@ -18,7 +18,8 @@ class CandidateSystemContractTests(unittest.TestCase):
                for name in ROLES}
         flags=('drain_routing_verified','old_core_seeded','upgrade_verified','repeat_upgrade_verified',
                'rollback_verified','repeat_rollback_verified','final_core_verified','health_refresh_verified',
-               'configuration_unchanged','resume_routing_verified')
+               'configuration_unchanged','resume_routing_verified','config_access_migration_verified',
+               'config_access_rollback_verified')
         worker={'complete':True,'roles':roles,'e2e_failover_verified':True,'post_reboot_sni_cases':2,
                 'download_boundary_substituted':False,'profile':'candidate','source_ref':'a'*40,
                 'pinned_manager_download':True,'repeat_installs':{r:{'files_unchanged':True} for r in ROLES},

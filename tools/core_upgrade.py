@@ -21,12 +21,80 @@ from core_install import InstallError, archive_payload, durable_file
 from core_transaction import CoreError, CoreTransaction, atomic_copy, digest, safe_directory, safe_file, sync_directory
 
 
+class ConfigAccessMigration:
+    """One reversible 0710 -> 0750 parent-mode migration, with an immutable record.
+
+    No ownership, file bytes or child permissions change. The manager holds its
+    node lock. A crash before/after chmod is resumed from the same private record.
+    """
+    def __init__(self, base, directory, binary, group):
+        self.base, self.binary = Path(base), Path(binary)
+        self.record = Path(directory)/'config-access.json'
+        self.group = group
+
+    def validate(self):
+        safe_directory(self.base)
+        safe_directory(self.record.parent)
+        info = self.base.stat()
+        if (info.st_gid != self.group or self.group == 0 or
+                stat.S_IMODE(info.st_mode) not in (0o710, 0o750)):
+            raise CoreError('custom config parent permissions; review required')
+        if self.record.exists() or self.record.is_symlink():
+            safe_file(self.record)
+            if self.record.stat().st_mode & 0o077 or self.record.stat().st_size > 4096:
+                raise CoreError('unsafe config access record')
+            value = json.loads(self.record.read_text())
+            if (value.get('schema') != 1 or value.get('path') != str(self.base) or
+                    value.get('uid') != info.st_uid or value.get('gid') != self.group or
+                    value.get('before') != 0o710 or value.get('after') != 0o750 or
+                    not re.fullmatch('[a-f0-9]{64}', value.get('legacy_binary_sha256', ''))):
+                raise CoreError('invalid config access record')
+            return value
+        return None
+
+    def set_mode(self, mode):
+        descriptor = os.open(self.base, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            info = os.fstat(descriptor)
+            if (info.st_ino, info.st_dev) != (self.base.stat().st_ino, self.base.stat().st_dev):
+                raise CoreError('config directory changed during migration')
+            os.fchmod(descriptor, mode)
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+
+    def prepare(self):
+        value = self.validate()
+        if stat.S_IMODE(self.base.stat().st_mode) == 0o750:
+            return False
+        if value is None:
+            value = {'schema': 1, 'path': str(self.base), 'uid': self.base.stat().st_uid,
+                     'gid': self.group, 'before': 0o710, 'after': 0o750,
+                     'legacy_binary_sha256': digest(self.binary)}
+            with tempfile.TemporaryDirectory(prefix='.config-access-', dir=self.record.parent) as name:
+                staged = Path(name)/'record'
+                durable_file(staged, (json.dumps(value, sort_keys=True)+'\n').encode(), 0o600)
+                os.link(staged, self.record)
+            sync_directory(self.record.parent)
+        elif digest(self.binary) != value['legacy_binary_sha256']:
+            raise CoreError('config access baseline changed; review required')
+        self.set_mode(0o750)
+        return True
+
+    def restore(self):
+        value = self.validate()
+        # Never restrict a newer core restored from a prior committed transaction.
+        if value is not None and digest(self.binary) == value['legacy_binary_sha256']:
+            self.set_mode(0o710)
+
+
 class BackendService:
     def __init__(self, binary, config, work, token_file, api_port=19091,
-                 unit='telemt-dual-hop-telemt.service', user='telemt'):
+                 unit='telemt-dual-hop-telemt.service', user='telemt', migrate_access=False):
         self.binary, self.config, self.work = Path(binary), Path(config), Path(work)
         self.token_file, self.api_port = Path(token_file), api_port
         self.unit = unit
+        self.migrate_access = migrate_access
         identity = pwd.getpwnam(user)
         if identity.pw_uid == 0 or identity.pw_gid == 0:
             raise CoreError('unprivileged telemt identity required')
@@ -223,23 +291,44 @@ def upgrade(binary, directory, archive, archive_sha, binary_sha, version, roots,
         candidate = stage/'telemt'
         durable_file(candidate, payload, 0o755)
         stage.chmod(0o755)
-        service.validate_candidate(candidate)
         snapshot = save_snapshot(directory, roots)
-        # Bind the snapshot to the exact durable journal, including crash recovery
-        # and prior-transaction restoration. Never advance a separate pointer.
-        result = tx.activate(candidate, binary_sha, 'telemt '+version, old, snapshot=snapshot.name)
-        unchanged_snapshot(snapshot, roots)
-        return result
+        access = (ConfigAccessMigration(service.config.parent.parent, directory, binary,
+                                       service.identity['group']) if getattr(service, 'migrate_access', False) else None)
+        migrated = False
+        try:
+            if access is not None:
+                migrated = access.prepare()
+            service.validate_candidate(candidate)
+            # Bind the snapshot to the exact durable journal, including recovery.
+            result = tx.activate(candidate, binary_sha, 'telemt '+version, old, snapshot=snapshot.name)
+            unchanged_snapshot(snapshot, roots)
+            return result
+        except BaseException:
+            if migrated:
+                access.restore()
+            # A preflight failure must not consume the finite snapshot budget.
+            # Keep any snapshot referenced by the durable recovery journal.
+            if not tx.journal.exists() or tx.load().get('snapshot') != snapshot.name:
+                shutil.rmtree(snapshot)
+            raise
 
 
 def rollback(binary, directory, roots, service):
     transaction = CoreTransaction(binary, directory, service)
+    access = (ConfigAccessMigration(service.config.parent.parent, directory, binary,
+                                   service.identity['group']) if getattr(service, 'migrate_access', False) else None)
+    if not transaction.journal.exists() and access is not None and access.record.exists():
+        access.restore()
+        return 'access-restored'
     value = transaction.load()
     name = value.get('snapshot', '')
     if not re.fullmatch(r'snapshot-[a-z0-9_]{8}', name):
         raise CoreError('missing or invalid transaction snapshot')
     unchanged_snapshot(Path(directory)/name, roots)
-    return transaction.rollback()
+    result = transaction.rollback()
+    if access is not None:
+        access.restore()
+    return result
 
 
 def main():
@@ -263,7 +352,7 @@ def main():
         result = refresh_health(Path(args.directory).parent, args.bind, args.action == 'rollback-health')
         print('健康代理事务结果：'+result)
         return
-    service = BackendService(args.binary, args.config, args.work, args.token_file)
+    service = BackendService(args.binary, args.config, args.work, args.token_file, migrate_access=True)
     if args.action == 'upgrade':
         result = upgrade(args.binary, args.directory, args.archive, args.archive_sha,
                          args.binary_sha, args.version, args.protect, service)
