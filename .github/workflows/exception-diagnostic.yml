@@ -17,7 +17,12 @@ concurrency:
 
 jobs:
   inspect:
-    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +42,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: exception-only-diagnostic
+          name: exception-only-diagnostic-${{ matrix.os }}
           path: ${{ runner.temp }}/exception-evidence/*.json
           if-no-files-found: warn
           retention-days: 14

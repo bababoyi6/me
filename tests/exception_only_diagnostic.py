@@ -1,5 +1,8 @@
 """Preserve the original fixture, collecting extra evidence only after an error."""
 from pathlib import Path
+import json
+import ssl
+import cryptography
 import signal
 import sys
 
@@ -27,6 +30,13 @@ def main():
         return paired_performance.main()
     finally:
         FullLab.transfer = original
+        # Read environment details AFTER traffic, without perturbing the failure.
+        observations['environment'] = {'openssl': ssl.OPENSSL_VERSION,
+                                        'python_cryptography': cryptography.__version__}
+        observations['environment']['tcp_sysctl'] = {name: Path('/proc/sys/net/ipv4', name).read_text().strip()
+            for name in ('tcp_congestion_control', 'tcp_rmem', 'tcp_wmem', 'tcp_tw_reuse', 'tcp_timestamps', 'ip_local_port_range')}
+        observations['environment']['cpu_flags'] = next((line.split(':',1)[1].strip()
+            for line in Path('/proc/cpuinfo').read_text().splitlines() if line.startswith('flags')), '')
         paired_performance.write(output, observations)
 
 
