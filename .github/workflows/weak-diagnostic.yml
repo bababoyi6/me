@@ -2,11 +2,6 @@ name: Targeted weak-network failure diagnosis
 
 on:
   workflow_dispatch:
-  push:
-    branches: [dev/telemt-stable-compat-20261107]
-    paths:
-      - tests/weak_network_diagnostic.py
-      - .github/workflows/weak-diagnostic.yml
 
 permissions:
   contents: read

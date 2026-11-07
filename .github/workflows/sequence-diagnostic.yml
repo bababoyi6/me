@@ -2,11 +2,6 @@ name: Observe complete weak-network failure sequence
 
 on:
   workflow_dispatch:
-  push:
-    branches: [dev/telemt-stable-compat-20261107]
-    paths:
-      - tests/weak_sequence_diagnostic.py
-      - .github/workflows/sequence-diagnostic.yml
 
 permissions:
   contents: read

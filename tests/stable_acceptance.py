@@ -16,7 +16,7 @@ import tarfile
 import tempfile
 import time
 
-from e2e_lab import FullLab
+from e2e_lab import FullLab, sanitize_startup_log
 
 PINS = {
     'balanced2': ('b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5',
@@ -92,7 +92,13 @@ def run(binary, kind, cohorts=(30, 50, 100), *, offline_lab=False, payload_bytes
                         try:
                             successes.append(future.result())
                         except Exception as error:
-                            errors.append({'type': type(error).__name__, 'phase': getattr(error, 'lab_phase', 'unknown')})
+                            # Preserve failure details on the normal qualification
+                            # path; a later diagnostic run may not reproduce it.
+                            errors.append({'type': type(error).__name__, 'phase': getattr(error, 'lab_phase', 'unknown'),
+                                           'received_bytes': getattr(error, 'lab_received_bytes', None),
+                                           'elapsed_seconds': getattr(error, 'lab_elapsed_seconds', None),
+                                           'reason': sanitize_startup_log(str(error))[:256],
+                                           'core_exit': lab.telemt.poll()})
                 elapsed = time.monotonic()-started
                 after = stats(lab.telemt.pid)
                 proxy_after = stats(lab.haproxy.pid)
@@ -119,6 +125,7 @@ def run(binary, kind, cohorts=(30, 50, 100), *, offline_lab=False, payload_bytes
         policy = policy.replace(f'127.0.0.1:{lab.api}', '127.0.0.1:$API_PORT')
         policy = policy.replace(f'127.0.0.1:{lab.dc.server_address[1]}', '127.0.0.1:$DC_PORT')
         result = {'version': lab.version, 'rows': rows, 'before_load': baseline, 'after_idle': after,
+                'handshake_measurement': 'client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness',
                 'config_policy_sha256': hashlib.sha256(policy.encode()).hexdigest(),
                 'mock_dc_socket_timeout_seconds': lab.dc.socket_timeout, 'client_io_timeout_seconds': 25,
                 'offline_bootstrap': offline_lab, 'payload_bytes': payload_bytes, 'transfer_rate': transfer_rate,

@@ -372,6 +372,7 @@ backend telemt
         except Exception as exc:
             exc.lab_phase = phase
             exc.lab_received_bytes = observed.bytes if observed else None
+            exc.lab_elapsed_seconds = time.monotonic() - started
             raise
         return {"direction": direction, "domain_index": list(SECRETS).index(domain) + 1,
                 "path": "telemt" if direct else "haproxy-telemt", "bytes": size,

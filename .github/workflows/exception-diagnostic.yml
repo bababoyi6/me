@@ -2,11 +2,6 @@ name: Preserve fixture and inspect weak-network exceptions
 
 on:
   workflow_dispatch:
-  push:
-    branches: [dev/telemt-stable-compat-20261107]
-    paths:
-      - tests/exception_only_diagnostic.py
-      - .github/workflows/exception-diagnostic.yml
 
 permissions:
   contents: read

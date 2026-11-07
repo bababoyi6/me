@@ -2,14 +2,6 @@ name: Paired core performance qualification
 
 on:
   workflow_dispatch:
-  push:
-    branches: [dev/telemt-stable-compat-20261107]
-    paths:
-      - tests/paired_performance.py
-      - tests/paired_analysis.py
-      - tests/test_paired_analysis.py
-      - tests/stable_acceptance.py
-      - .github/workflows/paired-performance.yml
 
 permissions:
   contents: read
