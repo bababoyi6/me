@@ -18,7 +18,7 @@
 - `telemt-upstream-audit/` 只取固定 tag 和审计源码，仍保留原 detached HEAD；未把它变成管理器项目。
 - 冻结 Release 目录、`legacy/` 脚本和历史实验归档未修改；原始脚本 SHA256 检查通过。
 - 本次 GitHub API 返回原仓库 `private=false`，与 10 月历史目录说明不同；本次没有改变可见性。当前 API 身份对原仓库返回 `push=false`，不假定拥有发布权限。
-- 原 v1.6.0 Release API 仍返回管理器资产 SHA256 `376f00d36a4fb1aa082002d96612d297d4f01e2e55935a1a3cf7155ed9f5d26f`。这仅是历史资产核对，不把它当作 1.7 候选的公开安装成功证据。
+- 原 v1.6.0 Release API 仍返回管理器资产 SHA256 `376f00d36a4fb1aa082002d96612d297d4f01e2e55935a1a3cf7155ed9f5d26f`。匿名下载 main 管理器也实际得到相同摘要；固定官方 3.5.16 GNU 资产匿名 HEAD 返回 200。仅验证下载可用性，没有执行该下载，也不把它当作 1.7 候选的公开安装成功证据，见 `anonymous-downloads.json`。
 
 ## 上游锁定与差异
 
