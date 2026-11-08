@@ -15,11 +15,13 @@ from types import SimpleNamespace
 
 from e2e_lab import FullLab, MockDc, sanitize_startup_log
 from network_lab import Network, NAMES, command
-from kernel_observer import observe_sockets
+from kernel_observer import observe_sockets, qdiscs_in_namespace
 from stable_acceptance import PINS, stats
 from paired_performance import resources, write
 from core_install import archive_payload
 from release_pins import NATIVE_BASES
+from queue_analysis import VARIANTS as QUEUE_VARIANTS, ORDERS as QUEUE_ORDERS
+from queue_probe import LatencyProbe, original_wg_policy, configure_wg_fq
 
 HERE=Path(__file__).resolve()
 VARIANTS=('balanced2','stable','stable-auto')
@@ -126,15 +128,17 @@ def main(args):
     os.sched_setaffinity(0,{frontend_cpu})
     output=Path(args.output)
     native=bool(args.native_directory)
-    variants=('control','balanced') if native else VARIANTS
+    queue=args.queue_study
+    if queue and not native:raise RuntimeError('queue study requires pinned native pair')
+    variants=QUEUE_VARIANTS if queue else ('control','balanced') if native else VARIANTS
     profiles=(100,) if native else (0,100)
     report={'scope':'split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only',
-        'plan':'native' if native else 'official',
+        'plan':'queue' if queue else 'native' if native else 'official',
         'source_commit':os.environ['TDH_SOURCE_COMMIT'],'complete':False,'accepted':False,
         'payload_bytes_per_stream':PAYLOAD,'rate_mbps':200,'cpu_assignment':{'core':backend_cpu,'client_and_haproxy':frontend_cpu,'dc':dc_cpu},
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),
         'resources_before':before,'controls':[],'rows':[]}
-    children=[];net=None;front=None;expected=0
+    children=[];probes=[];net=None;front=None;expected=0
     write(output,report)
     try:
         with tempfile.TemporaryDirectory(prefix='tdh-audit-longpath-') as directory:
@@ -143,6 +147,8 @@ def main(args):
                 rtt_ms=0,loss_percent=0,rate_mbps=200,mtu=1420))
             try:
                 net.setup()
+                original_wg=original_wg_policy() if queue else None
+                if queue:report['original_wg_policy']=original_wg
                 command('ip','-n',NAMES[2],'address','add','198.18.0.1/32','dev','lo')
                 binaries={}
                 native_manifest=None
@@ -151,7 +157,7 @@ def main(args):
                     native_manifest=json.loads((bundle/'manifest.json').read_text())
                     if native_manifest['upstream_commit'] not in NATIVE_BASES:raise RuntimeError('native upstream mismatch')
                     report['native_manifest']=native_manifest
-                    for kind in variants:
+                    for kind in (('balanced',) if queue else variants):
                         payload=(bundle/('telemt-'+kind)).read_bytes()
                         if not 0<len(payload)<=64*1024**2 or hashlib.sha256(payload).hexdigest()!=native_manifest['binaries'][kind]['sha256']:
                             raise RuntimeError('native binary mismatch')
@@ -197,31 +203,43 @@ backend telemt
                             'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
                     for turn in range(4 if native else 3):
                         offset=turn%len(variants)
-                        for variant in variants[offset:]+variants[:offset]:
-                            kind=variant if native else 'balanced2' if variant=='balanced2' else 'stable'
+                        order=QUEUE_ORDERS[turn] if queue else variants[offset:]+variants[:offset]
+                        for variant in order:
+                            if queue:
+                                configure_wg_fq(variant=='wg-fq',original_wg)
+                                applied_wg=original_wg_policy()
+                                if variant!='wg-fq' and applied_wg!=original_wg:raise RuntimeError('WG baseline restoration drift')
+                            kind='balanced' if queue else variant if native else 'balanced2' if variant=='balanced2' else 'stable'
                             options={'kind':kind,'binary':binaries[kind]}
                             if native:
                                 pin=native_manifest['binaries'][kind]
                                 options['experimental_binary']=[pin['sha256'],pin['version']]
                             if variant=='stable-auto':options.update(library=str(library),policy='auto')
+                            if queue and variant.startswith('lowat'):
+                                options.update(library=str(library),policy='client-'+variant)
                             backend=Child('core',NAMES[2],backend_cpu,options,children)
                             try:
                                 warm=client.call({'command':'warm'})
                                 if warm['errors']:raise RuntimeError('protocol warmup failed')
                                 expected+=4
-                                cases=[(n,d) for n in (1,4) for d in ('U','D')]
+                                cases=[(n,d) for n in (1,4) for d in (('D',) if queue else ('U','D'))]
                                 for streams,direction in cases[::1 if turn%2==0 else -1]:
                                     ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
                                     snapshots={k:stats(pid) for k,pid in ids.items()}
                                     parent_cpu=time.process_time();started=time.monotonic();samples=[];last=-1
+                                    qdisc_samples=[];probe=None
+                                    if queue:
+                                        probe=LatencyProbe();probes.append(probe)
                                     client.send({'command':'run','streams':streams,'direction':direction})
                                     while not select.select([client.process.stdout],[],[],.1)[0]:
                                         if time.monotonic()-started>90:raise RuntimeError('trial deadline')
                                         if time.monotonic()-started-last>=1:
                                             samples.extend(backend.call({'command':'observe'}))
+                                            if queue:qdisc_samples.append({'offset_seconds':time.monotonic()-started,'rows':qdiscs_in_namespace(NAMES[1])})
                                             last=time.monotonic()-started
                                     result=client.receive()
                                     elapsed=time.monotonic()-started
+                                    path_probe=probe.stop() if probe is not None else None
                                     cpu={k:100*(stats(pid)['cpu_seconds']-snapshots[k]['cpu_seconds'])/elapsed for k,pid in ids.items()}
                                     cpu['controller']=100*(time.process_time()-parent_cpu)/elapsed
                                     affinities=[sorted(os.sched_getaffinity(int(t.name))) for t in Path(f"/proc/{backend.ready['pid']}/task").iterdir()]
@@ -234,6 +252,7 @@ backend telemt
                                         'cpu_percent_one_core':cpu,'socket_samples':samples,
                                         'backend_rss_after_bytes':stats(backend.ready['pid'])['rss_bytes'],'backend_thread_affinities':affinities,
                                         'harness_limited':cpu['client']+cpu['haproxy']+cpu['controller']>=70 or cpu['dc']>=70}
+                                    if queue:row.update(path_probe=path_probe,qdisc_samples=qdisc_samples,wg_policy=applied_wg)
                                     report['rows'].append(row);expected+=len(result['rows'])
                                     write(output,report)
                                     if row['errors'] or row['completed']!=streams:raise RuntimeError('synthetic integrity/ACK failure')
@@ -249,6 +268,9 @@ backend telemt
                 report['complete']=True
             finally:
                 report['cleanup_errors']=[]
+                for probe in probes:
+                    try:probe.stop()
+                    except Exception as error:report['cleanup_errors'].append(type(error).__name__)
                 for child in reversed(children):
                     try:child.close()
                     except Exception as error:report['cleanup_errors'].append(type(error).__name__)
@@ -262,7 +284,8 @@ backend telemt
                             front.wait(timeout=3)
                 finally:
                     if net is not None:net.close()
-                report['private_processes_closed']=all(c.process.poll() is not None for c in children) and (front is None or front.poll() is not None)
+                report['private_processes_closed']=(all(c.process.poll() is not None for c in children) and
+                    (front is None or front.poll() is not None) and all(not p.thread.is_alive() for p in probes))
     finally:
         report['resources_after']=resources()
         report['oom_delta']={k:report['resources_after']['memory_events'][k]-before['memory_events'][k] for k in ('oom','oom_kill')}
@@ -282,6 +305,7 @@ if __name__=='__main__':
     parser.add_argument('--balanced2-archive')
     parser.add_argument('--output')
     parser.add_argument('--native-directory')
+    parser.add_argument('--queue-study',action='store_true')
     args=parser.parse_args()
     if args.role:worker(args.role,args.cpu)
     else:raise SystemExit(main(args))

@@ -17,6 +17,25 @@ def verify(library):
             probe.setsockopt(socket.SOL_SOCKET,option,262144)
             expected[option]=probe.getsockopt(socket.SOL_SOCKET,option)
     rows=[]
+    for mode,limit in (('client-lowat64',65536),('client-lowat256',262144)):
+        with socket.socket() as server,socket.socket() as outgoing:
+            server.bind(('127.0.0.1',0));server.listen(1);outgoing.connect(server.getsockname())
+            with server.accept()[0] as accepted:
+                os.environ.update(TDH_LAB_SOCKET_MODE=mode,TDH_LAB_CLIENT_PORT=str(server.getsockname()[1]))
+                for role,stream in (('client',accepted),('other',outgoing)):
+                    before=stream.getsockopt(socket.IPPROTO_TCP,25)
+                    buffers=[stream.getsockopt(socket.SOL_SOCKET,k) for k in (socket.SO_RCVBUF,socket.SO_SNDBUF)]
+                    value=ctypes.c_int(1)
+                    assert lib.setsockopt(stream.fileno(),socket.IPPROTO_TCP,socket.TCP_NODELAY,ctypes.byref(value),4)==0
+                    after=stream.getsockopt(socket.IPPROTO_TCP,25)
+                    assert after==(limit if role=='client' else before)
+                    assert buffers==[stream.getsockopt(socket.SOL_SOCKET,k) for k in (socket.SO_RCVBUF,socket.SO_SNDBUF)]
+                    rows.append({'mode':mode,'role':role,'lowat_before':before,'lowat_after':after})
+                os.environ.update(TDH_LAB_CLIENT_PORT='invalid',
+                    TDH_LAB_SOCKET_MODE='client-lowat256' if limit==65536 else 'client-lowat64')
+                value=ctypes.c_int(1)
+                assert lib.setsockopt(accepted.fileno(),socket.IPPROTO_TCP,socket.TCP_NODELAY,ctypes.byref(value),4)==0
+                assert accepted.getsockopt(socket.IPPROTO_TCP,25)==limit
     for mode in ('pass','auto','client-auto','dc-auto','auto-lowat'):
         with socket.socket() as server,socket.socket() as outgoing,socket.socket() as unconnected:
             server.bind(('127.0.0.1',0))

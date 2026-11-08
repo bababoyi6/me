@@ -171,7 +171,7 @@ class FullLab:
             raise ValueError("external mock DC must be the fixed private namespace endpoint")
         if real_dc and (dc_endpoint or socket_library or experimental_binary or shared_binary_root is not None):
             raise ValueError("experimental socket policies are forbidden for public DC probes")
-        if socket_mode not in ("pass", "auto", "1m", "4m", "client-auto", "dc-auto", "auto-lowat") or (socket_mode != "pass" and socket_library is None):
+        if socket_mode not in ("pass", "auto", "1m", "4m", "client-auto", "dc-auto", "auto-lowat", "client-lowat64", "client-lowat256") or (socket_mode != "pass" and socket_library is None):
             raise ValueError("explicit lab socket library required for experimental policy")
         binary = Path(binary)
         info = binary.stat()
