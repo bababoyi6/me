@@ -1,0 +1,118 @@
+{
+  "source_commit": "6dd5c4af9b0495f21d5b5b230630ed31077d7477",
+  "transport_accepted": true,
+  "measured_payload_flows": 80,
+  "comparisons": [
+    {
+      "rtt_ms": 100,
+      "streams": 1,
+      "direction": "U",
+      "baseline": "control",
+      "candidate": "balanced",
+      "classification": "REPEATABLE_FASTER",
+      "ratios": [
+        4.706203786181149,
+        4.578135187223592,
+        4.583554324452635,
+        4.587320555633406
+      ],
+      "median_ratio": 4.5854374400430205,
+      "baseline_median_mbps": 22.969889942036488,
+      "candidate_median_mbps": 105.33360205889636,
+      "measured_client_rtt_medians_ms": [
+        100.333,
+        100.337,
+        100.534,
+        100.379,
+        100.325,
+        100.269,
+        100.348,
+        100.333
+      ]
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 1,
+      "direction": "D",
+      "baseline": "control",
+      "candidate": "balanced",
+      "classification": "REPEATABLE_FASTER",
+      "ratios": [
+        4.949416829522514,
+        4.977358828687168,
+        5.044228239464152,
+        5.031723798279602
+      ],
+      "median_ratio": 5.004541313483385,
+      "baseline_median_mbps": 21.069731457384936,
+      "candidate_median_mbps": 105.57009502459948,
+      "measured_client_rtt_medians_ms": [
+        100.45750000000001,
+        100.446,
+        100.4445,
+        100.44149999999999,
+        126.55350000000001,
+        127.263,
+        115.49300000000001,
+        114.487
+      ]
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 4,
+      "direction": "U",
+      "baseline": "control",
+      "candidate": "balanced",
+      "classification": "REPEATABLE_FASTER",
+      "ratios": [
+        1.6501347063324052,
+        1.7059690941407382,
+        1.7652009075433286,
+        1.7188306427568525
+      ],
+      "median_ratio": 1.7123998684487953,
+      "baseline_median_mbps": 89.68445782033811,
+      "candidate_median_mbps": 153.5376983114546,
+      "measured_client_rtt_medians_ms": [
+        100.3625,
+        100.304,
+        100.295,
+        100.27000000000001,
+        100.2575,
+        100.30000000000001,
+        100.263,
+        100.28550000000001
+      ]
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 4,
+      "direction": "D",
+      "baseline": "control",
+      "candidate": "balanced",
+      "classification": "RTT_NOT_ESTABLISHED",
+      "ratios": [
+        1.8874353406029893,
+        1.8581531837393936,
+        1.8762608361558677,
+        1.8888321952909326
+      ],
+      "median_ratio": 1.8818480883794284,
+      "baseline_median_mbps": 84.1590476830644,
+      "candidate_median_mbps": 158.02813154300566,
+      "measured_client_rtt_medians_ms": [
+        100.527,
+        100.628,
+        100.854,
+        100.75800000000001,
+        204.08100000000002,
+        226.1805,
+        223.73899999999998,
+        220.534
+      ]
+    }
+  ],
+  "scope": "one host, four balanced AB/BA rounds; same-toolchain native candidates; synthetic DC only",
+  "rule": "all paired ratios >1.10 for exploratory faster, all <0.90 for slower; CPU <70%, TCP control >=100Mbps, measured RTT required",
+  "analysis_sha256": "294cef033b4572094366b0fc290d0e5dc13f473b8c5fe130cb3551187b3dc722"
+}

@@ -1,0 +1,10 @@
+{
+  "scope": "isolated Linux namespace; real systemd and release binaries; synthetic identities/DC only",
+  "os": "Ubuntu 22.04.5 LTS",
+  "kernel": "6.8.0-1070-azure",
+  "accepted": false,
+  "error_type": "RuntimeError",
+  "error_stage": "setup",
+  "health_agent_process_exit": null,
+  "temporary_unit_removed": true
+}

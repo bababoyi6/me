@@ -1,0 +1,102 @@
+verify	Prepare disposable dependencies and exact tested core	﻿2026-11-08T09:41:31.5700374Z ##[group]Run set -euo pipefail
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5701844Z ^[[36;1mset -euo pipefail^[[0m
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5703209Z ^[[36;1msudo timeout 120 apt-get update -qq^[[0m
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5705784Z ^[[36;1msudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 python3-cryptography^[[0m
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5708917Z ^[[36;1mmkdir -m 700 "$RUNNER_TEMP/native-maintenance"^[[0m
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5711538Z ^[[36;1mgh run download 42456468710 --repo bababoyi6/me --name native-pair --dir "$RUNNER_TEMP/native-pair"^[[0m
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5715815Z ^[[36;1mprintf '%s  %s\n' d0265d1c919966173339f2d9314c76048608b6b099d0a2e9e9ee33053651bc61 "$RUNNER_TEMP/native-pair/telemt-balanced" | sha256sum --check^[[0m
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5723664Z ^[[36;1mcurl -q -fL --retry 3 --retry-delay 2 --retry-max-time 90 --proto '=https' --proto-redir '=https' --connect-timeout 10 --max-time 30 --max-filesize 67108864 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"^[[0m
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5813388Z shell: /usr/bin/bash -e {0}
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5814647Z env:
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5826438Z   GH_TOKEN: ***
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:31.5827470Z ##[endgroup]
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:39.9333368Z Reading package lists...
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.1835689Z Building dependency tree...
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.1846975Z Reading state information...
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3374269Z iproute2 is already the newest version (5.15.0-1ubuntu2.2).
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3375584Z python3-cryptography is already the newest version (3.4.8-1ubuntu2.4).
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3376673Z python3-cryptography set to manually installed.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3377446Z Suggested packages:
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3378070Z   vim-haproxy haproxy-doc
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3551127Z The following NEW packages will be installed:
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3558667Z   haproxy
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3732249Z 0 upgraded, 1 newly installed, 0 to remove and 34 not upgraded.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3733014Z Need to get 1655 kB of archives.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3733741Z After this operation, 3719 kB of additional disk space will be used.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.3734302Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.4063019Z Get:2 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 haproxy amd64 2.4.30-0ubuntu0.22.04.4 [1655 kB]
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7260167Z Fetched 1655 kB in 0s (29.4 MB/s)
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7544296Z Selecting previously unselected package haproxy.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7900276Z (Reading database ... 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7900896Z (Reading database ... 5%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7901434Z (Reading database ... 10%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7901839Z (Reading database ... 15%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7902158Z (Reading database ... 20%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7902482Z (Reading database ... 25%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7902821Z (Reading database ... 30%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7903132Z (Reading database ... 35%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7903441Z (Reading database ... 40%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7903750Z (Reading database ... 45%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.7904131Z (Reading database ... 50%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:40.8240462Z (Reading database ... 55%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:41.0158030Z (Reading database ... 60%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:41.2307376Z (Reading database ... 65%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:41.4170342Z (Reading database ... 70%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:41.5591081Z (Reading database ... 75%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:41.6563262Z (Reading database ... 80%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:41.8150503Z (Reading database ... 85%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:41.9581046Z (Reading database ... 90%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:42.1235745Z (Reading database ... 95%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:42.1237157Z (Reading database ... 100%
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:42.1237694Z (Reading database ... 263778 files and directories currently installed.)
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:42.1306803Z Preparing to unpack .../haproxy_2.4.30-0ubuntu0.22.04.4_amd64.deb ...
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:42.1413641Z Unpacking haproxy (2.4.30-0ubuntu0.22.04.4) ...
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:42.2221889Z Setting up haproxy (2.4.30-0ubuntu0.22.04.4) ...
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:42.6812361Z Created symlink /etc/systemd/system/multi-user.target.wants/haproxy.service → /lib/systemd/system/haproxy.service.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.2822170Z Processing triggers for rsyslog (8.2112.0-2ubuntu2.5) ...
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.3185627Z Processing triggers for man-db (2.10.2-1) ...
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.3208879Z Not building database; man-db/auto-update is not 'true'.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9379601Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9380324Z Running kernel seems to be up-to-date.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9380830Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9381050Z No services need to be restarted.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9381427Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9386818Z No containers need to be restarted.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9387251Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9387521Z No user sessions are running outdated binaries.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9388016Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:43.9388791Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:48.0954821Z /home/runner/work/_temp/native-pair/telemt-balanced: OK
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:48.1028621Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:48.1029774Z                                  Dload  Upload   Total   Spent    Left  Speed
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:48.1030493Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:49.3075114Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:50.3086779Z   0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:51.3098304Z   0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:52.3100694Z   0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:53.3112345Z   0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:54.3123750Z   0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:55.3135625Z   0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:56.3147762Z   0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:57.3159306Z   0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:58.1039485Z   0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:59.1051556Z   0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:59.1404126Z   0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:59.1405309Z   0    92    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:59.1405844Z curl: (22) The requested URL returned error: 504
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:41:59.1406264Z Warning: Problem : HTTP error. Will retry in 2 seconds. 3 retries left.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:01.1427087Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:01.1464578Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:01.1465260Z   0    92    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:01.1465766Z curl: (22) The requested URL returned error: 504
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:01.1466250Z Warning: Problem : HTTP error. Will retry in 2 seconds. 2 retries left.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:03.1487596Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:03.1522982Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:03.1523749Z   0    92    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:03.1524294Z curl: (22) The requested URL returned error: 504
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:03.1524756Z Warning: Problem : HTTP error. Will retry in 2 seconds. 1 retries left.
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:05.1546512Z 
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:05.1579708Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:05.1580648Z   0    92    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:05.1581167Z curl: (22) The requested URL returned error: 504
+verify	Prepare disposable dependencies and exact tested core	2026-11-08T09:42:05.1702978Z ##[error]Process completed with exit code 22.

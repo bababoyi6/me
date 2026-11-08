@@ -1,0 +1,44 @@
+acceptance	Fetch exact archives and verify before extraction	﻿2026-11-08T09:38:06.8964706Z ##[group]Run set -euo pipefail
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.8965053Z ^[[36;1mset -euo pipefail^[[0m
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.8965357Z ^[[36;1mmkdir -m 700 "$RUNNER_TEMP/stable-evidence"^[[0m
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.8966424Z ^[[36;1mcurl -q -fL --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 10 --max-time 120 --max-filesize 67108864 https://github.com/telemt/telemt/releases/download/3.5.16/telemt-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/stable.tar.gz"^[[0m
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.8968331Z ^[[36;1mcurl -q -fL --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 10 --max-time 120 --max-filesize 67108864 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"^[[0m
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.8970131Z ^[[36;1mprintf '%s  %s\n' e6f46b2f3becf29bfd555cec8a059e429f7c082c1af402499b3a7940cf8ebd34 "$RUNNER_TEMP/stable.tar.gz" b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5 "$RUNNER_TEMP/balanced2.tar.gz" | sha256sum --check^[[0m
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.9035567Z shell: /usr/bin/bash -e {0}
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.9035828Z ##[endgroup]
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.9202958Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.9203974Z                                  Dload  Upload   Total   Spent    Left  Speed
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:06.9204457Z 
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:08.1246481Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:09.1258932Z   0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:10.1270437Z   0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:11.1282457Z   0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:12.1294077Z   0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:13.1306249Z   0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:14.1317526Z   0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:15.1329579Z   0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:16.1341396Z   0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:16.9211182Z   0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:17.9223199Z   0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:18.0450363Z   0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:18.0451104Z   0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:18.1810717Z 
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:18.1811409Z 100 6629k  100 6629k    0     0   588k      0  0:00:11  0:00:11 --:--:--  588k
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:18.1900547Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:18.1901495Z                                  Dload  Upload   Total   Spent    Left  Speed
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:18.1902218Z 
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:19.3941977Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:20.3944602Z   0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:21.3954325Z   0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:22.3965755Z   0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:23.3977443Z   0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:24.3989132Z   0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:25.4000547Z   0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:26.4012261Z   0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:27.4024184Z   0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:28.1913547Z   0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:29.1926330Z   0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:29.3572538Z   0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:29.3573485Z   0    92    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:29.3574121Z curl: (22) The requested URL returned error: 504
+acceptance	Fetch exact archives and verify before extraction	2026-11-08T09:38:29.3611192Z ##[error]Process completed with exit code 22.
