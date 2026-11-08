@@ -20,7 +20,7 @@ def expectations(ref,repo=REPO):
     lock=json.loads((repo/'docs/telemt-stable-lock.json').read_text())
     return {'manager':hashlib.sha256(script).hexdigest(),'core':lock['assets']['x86_64']['binary_sha256'],
             'manager_version':version,'core_version':'telemt '+lock['tag'],'notice_required':False,
-            'source_ref':ref}
+            'source_ref':ref,'connect_policy_cli_required':b'connect-refresh --maintenance' in script}
 
 
 def bootstrap(profile):
@@ -96,6 +96,19 @@ PY
     return True
 
 
+LEGACY_CONNECT_POLICY=r"""python3 - <<'PY'
+from pathlib import Path
+path=Path('/etc/telemt-dual-hop/telemt/telemt.toml')
+text=path.read_text()
+for old,new in (('tg_connect = 4\n','tg_connect = 10\n'),
+                ('upstream_connect_budget_ms = 9000\n','upstream_connect_budget_ms = 3000\n')):
+ assert text.count(old)==1,'managed connect fixture required'
+ text=text.replace(old,new)
+path.write_text(text)
+PY
+"""
+
+
 def maintenance(guest,profile):
     result={}
     before=json.loads(guest('backend1',PROTECTED))
@@ -103,6 +116,7 @@ def maintenance(guest,profile):
     result['drain_routing_verified']=probe(guest,{'telemt_a':'vps2','telemt_b':'vps2'})
     # This is explicit laboratory preparation of an old core, not a hidden
     # production downgrade or substitution of the candidate download boundary.
+    policy_seed=LEGACY_CONNECT_POLICY if profile.get('connect_policy_cli_required') else ''
     seed=f'''set -Eeuo pipefail
 install -d -m 0700 /root/tdh-old-core-fixture
 curl -q -fL --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 10 --max-time 120 --max-filesize 67108864 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o /root/tdh-old-core-fixture/core.tar.gz
@@ -112,9 +126,10 @@ printf '%s  %s\\n' {OLD_BINARY} /root/tdh-old-core-fixture/telemt | sha256sum --
 systemctl stop telemt-dual-hop-telemt.service
 install -o root -g root -m 0755 /root/tdh-old-core-fixture/telemt /usr/local/lib/telemt-dual-hop/telemt
 chmod 0710 /etc/telemt-dual-hop
-systemctl start telemt-dual-hop-telemt.service
+{policy_seed}systemctl start telemt-dual-hop-telemt.service
 '''
     guest('backend1',seed,180)
+    legacy_protected=json.loads(guest('backend1',PROTECTED))
     result['old_core_seeded']=True
     def core_is(sha):
         guest('backend1',f"printf '%s  %s\\n' {sha} /usr/local/lib/telemt-dual-hop/telemt | sha256sum --check --status\n")
@@ -135,6 +150,23 @@ systemctl start telemt-dual-hop-telemt.service
     result['config_access_migration_verified']=True
     guest('backend1','a core-upgrade --maintenance >/root/core-repeat.log 2>&1\n',180)
     result['repeat_upgrade_verified']=core_is(profile['core'])
+    def connect(action,expected):
+        guest('backend1',f'a connect-{action} --maintenance >/root/connect-{action}.log 2>&1\n'
+              f'grep -q "{expected}" /root/connect-{action}.log\n',90)
+    if profile.get('connect_policy_cli_required'):
+        connect('refresh','committed')
+        assert json.loads(guest('backend1',PROTECTED))==before,'connect migration changed protected bytes'
+        result['connect_refresh_verified']=True
+        connect('refresh','unchanged')
+        result['repeat_connect_refresh_verified']=True
+        guest('backend1','if a core-rollback --maintenance >/root/connect-drift-guard.log 2>&1; then exit 1; fi\n'
+              'grep -q "protected configuration changed" /root/connect-drift-guard.log\n',90)
+        result['connect_drift_guard_verified']=core_is(profile['core'])
+        connect('rollback','recovered')
+        assert json.loads(guest('backend1',PROTECTED))==legacy_protected,'connect rollback did not restore exact fixture bytes'
+        result['connect_rollback_verified']=True
+        connect('rollback','unchanged')
+        result['repeat_connect_rollback_verified']=True
     guest('backend1','a core-rollback --maintenance >/root/core-rollback.log 2>&1\n',120)
     result['rollback_verified']=core_is(OLD_BINARY)
     guest('backend1',"test \"$(stat -c %a /etc/telemt-dual-hop)\" = 710\n")
@@ -143,6 +175,9 @@ systemctl start telemt-dual-hop-telemt.service
     result['repeat_rollback_verified']=core_is(OLD_BINARY)
     guest('backend1','a core-upgrade --maintenance >/root/core-final-upgrade.log 2>&1\n',180)
     result['final_core_verified']=core_is(profile['core'])
+    if profile.get('connect_policy_cli_required'):
+        connect('refresh','committed')
+        result['connect_final_policy_verified']=True
     guest('backend1','a health-refresh --maintenance >/root/health-refresh.log 2>&1\n',90)
     result['health_refresh_verified']=True
     after=json.loads(guest('backend1',PROTECTED))

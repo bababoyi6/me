@@ -41,4 +41,9 @@ def validate(worker,supervisor,expected=None):
                   'config_access_migration_verified','config_access_rollback_verified')
         if any(maintenance.get(key) is not True for key in required):
             raise ValueError('native maintenance CLI path incomplete')
+        if profile.get('connect_policy_cli_required') and any(maintenance.get(key) is not True for key in (
+                'connect_refresh_verified','repeat_connect_refresh_verified',
+                'connect_rollback_verified','repeat_connect_rollback_verified',
+                'connect_drift_guard_verified','connect_final_policy_verified')):
+            raise ValueError('native connect policy CLI path incomplete')
     return True

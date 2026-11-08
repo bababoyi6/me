@@ -20,6 +20,9 @@ class CandidateSystemContractTests(unittest.TestCase):
                'rollback_verified','repeat_rollback_verified','final_core_verified','health_refresh_verified',
                'configuration_unchanged','resume_routing_verified','config_access_migration_verified',
                'config_access_rollback_verified')
+        flags+=('connect_refresh_verified','repeat_connect_refresh_verified',
+                'connect_rollback_verified','repeat_connect_rollback_verified',
+                'connect_drift_guard_verified','connect_final_policy_verified')
         worker={'complete':True,'roles':roles,'e2e_failover_verified':True,'post_reboot_sni_cases':2,
                 'download_boundary_substituted':False,'profile':'candidate','source_ref':'a'*40,
                 'pinned_manager_download':True,'repeat_installs':{r:{'files_unchanged':True} for r in ROLES},
@@ -35,6 +38,11 @@ class CandidateSystemContractTests(unittest.TestCase):
             with self.subTest(name=name),self.assertRaises(ValueError):validate(bad,supervisor,profile)
         bad=copy.deepcopy(worker);del bad['repeat_installs']['backend2']
         with self.assertRaises(ValueError):validate(bad,supervisor,profile)
+        legacy_profile=dict(profile);legacy_profile.pop('connect_policy_cli_required')
+        legacy=copy.deepcopy(worker)
+        for key in tuple(legacy['native_maintenance']):
+            if 'connect_' in key:del legacy['native_maintenance'][key]
+        self.assertTrue(validate(legacy,supervisor,legacy_profile))
 
     def test_unpinned_source_and_changed_reboot_files_are_rejected(self):
         profile,worker,supervisor=self.fixture()
