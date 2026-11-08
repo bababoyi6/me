@@ -64,10 +64,12 @@ def worker(role,cpu):
                 else:
                     rows,errors=[],[]
                     rate=request.get('rate',125000000)
+                    size=request.get('size',PAYLOAD)
                     if rate not in (2500000,125000000):raise RuntimeError('unregistered transfer rate')
+                    if size not in (4*1024**2,PAYLOAD):raise RuntimeError('unregistered payload size')
                     with concurrent.futures.ThreadPoolExecutor(max_workers=request['streams']) as pool:
                         futures=[pool.submit(FullLab.transfer,endpoint,('apple.com','gs.apple.com')[i%2],
-                            request['direction'],PAYLOAD,rate,persistent=True,io_timeout=25)
+                            request['direction'],size,rate,persistent=True,io_timeout=25)
                             for i in range(request['streams'])]
                         for future in futures:
                             try:rows.append(future.result())
@@ -123,8 +125,9 @@ def main(args):
     if os.geteuid()!=0 or os.environ.get('GITHUB_ACTIONS')!='true':
         raise RuntimeError('disposable GitHub CI only')
     before=resources()
-    if (before['cpu_max']!='300000 100000' or before['memory_max']!=str(1536*1024**2) or before['swap_max']!='0'):
-        raise RuntimeError('3 CPU / 1.5GiB / no-swap budget required')
+    memory_mib=768 if args.sustained_stress else 1536
+    if (before['cpu_max']!='300000 100000' or before['memory_max']!=str(memory_mib*1024**2) or before['swap_max']!='0'):
+        raise RuntimeError('registered CPU / memory / no-swap budget required')
     cpus=sorted(os.sched_getaffinity(0))
     if len(cpus)<3:raise RuntimeError('three available logical CPUs required')
     backend_cpu,frontend_cpu,dc_cpu=cpus[:3]
@@ -133,18 +136,20 @@ def main(args):
     native=bool(args.native_directory)
     equal=args.equal_load_study
     queue=args.queue_study or equal
+    stress=args.sustained_stress
+    if stress and (not native or queue):raise RuntimeError('stress requires the native-only layout')
     if args.queue_study and equal:raise RuntimeError('choose one study layout')
     if queue and not native:raise RuntimeError('queue study requires pinned native pair')
     variants=QUEUE_VARIANTS if queue and not equal else ('control','balanced') if native else VARIANTS
     profiles=(100,) if native else (0,100)
     report={'scope':'split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only',
-        'plan':'equal-load' if equal else 'queue' if queue else 'native' if native else 'official',
+        'plan':'sustained' if stress else 'equal-load' if equal else 'queue' if queue else 'native' if native else 'official',
         'transfer_rate_per_stream':2500000 if equal else 125000000,
         'official_release':args.official_release,
         'source_commit':os.environ['TDH_SOURCE_COMMIT'],'complete':False,'accepted':False,
-        'payload_bytes_per_stream':PAYLOAD,'rate_mbps':200,'cpu_assignment':{'core':backend_cpu,'client_and_haproxy':frontend_cpu,'dc':dc_cpu},
+        'payload_bytes_per_stream':4*1024**2 if stress else PAYLOAD,'rate_mbps':200,'cpu_assignment':{'core':backend_cpu,'client_and_haproxy':frontend_cpu,'dc':dc_cpu},
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),
-        'resources_before':before,'controls':[],'rows':[]}
+        'resources_before':before,'controls':[],'rows':[],'idle_checks':[]}
     children=[];probes=[];net=None;front=None;expected=0
     write(output,report)
     try:
@@ -209,7 +214,7 @@ backend telemt
                         report['controls'].append({'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U',
                             'seconds':8 if native else 4,'omit_seconds':3 if native else 1,
                             'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
-                    for turn in range(4 if native else 3):
+                    for turn in range(1 if stress else 4 if native else 3):
                         offset=turn%len(variants)
                         order=QUEUE_ORDERS[turn] if queue and not equal else variants[offset:]+variants[:offset]
                         for variant in order:
@@ -230,7 +235,8 @@ backend telemt
                                 warm=client.call({'command':'warm'})
                                 if warm['errors']:raise RuntimeError('protocol warmup failed')
                                 expected+=4
-                                cases=[(n,d) for n in (1,4) for d in (('D',) if queue else ('U','D'))]
+                                baseline=stats(backend.ready['pid']) if stress else None
+                                cases=[(n,d) for n in ((30,50,100) if stress else (1,4)) for d in (('D',) if queue else ('U','D'))]
                                 for streams,direction in cases[::1 if turn%2==0 else -1]:
                                     ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
                                     snapshots={k:stats(pid) for k,pid in ids.items()}
@@ -240,7 +246,8 @@ backend telemt
                                     qdisc_samples=[];probe=None
                                     if queue:
                                         probe=LatencyProbe();probes.append(probe)
-                                    client.send({'command':'run','streams':streams,'direction':direction,'rate':2500000 if equal else 125000000})
+                                    client.send({'command':'run','streams':streams,'direction':direction,'rate':2500000 if equal else 125000000,
+                                        'size':4*1024**2 if stress else PAYLOAD})
                                     while not select.select([client.process.stdout],[],[],.1)[0]:
                                         if time.monotonic()-started>90:raise RuntimeError('trial deadline')
                                         if time.monotonic()-started-last>=1:
@@ -276,6 +283,10 @@ backend telemt
                                     if state['completed']==expected:break
                                     if time.monotonic()>deadline:raise RuntimeError('mock DC completion mismatch')
                                     time.sleep(.1)
+                                if stress:
+                                    time.sleep(2);idle=stats(backend.ready['pid'])
+                                    report['idle_checks'].append({'variant':variant,'before':baseline,'after':idle})
+                                    if idle['fds']>baseline['fds']+2:raise RuntimeError('stress descriptors failed idle recovery')
                             finally:backend.close()
                 report['mock_dc']=dc.call({'command':'stats'})
                 report['complete']=True
@@ -320,6 +331,7 @@ if __name__=='__main__':
     parser.add_argument('--native-directory')
     parser.add_argument('--queue-study',action='store_true')
     parser.add_argument('--equal-load-study',action='store_true')
+    parser.add_argument('--sustained-stress',action='store_true')
     parser.add_argument('--official-release',choices=tuple(RELEASES),default='3.5.16')
     args=parser.parse_args()
     if args.role:worker(args.role,args.cpu)
