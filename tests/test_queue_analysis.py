@@ -16,7 +16,7 @@ def fixture():
             for streams in ((1,4) if turn%2==0 else (4,1)):
                 data['rows'].append({'round':turn+1,'variant':variant,'streams':streams,'direction':'D','rtt_ms':100,
                     'version':'telemt 3.5.17+tdh.balanced1','completed':streams,'errors':[],'mbps':150,
-                    'config_policy_sha256':'a'*64,'cpu_percent_one_core':{k:5 for k in ('backend','dc','client','controller','haproxy')},
+                    'config_policy_sha256':'a'*64,'cpu_percent_one_core':{k:5 for k in ('backend','dc','client','controller','haproxy','probe_children')},
                     'backend_thread_affinities':[[0]],'socket_samples':[{'role':'client','rtt_ms':220 if variant=='baseline' else 150}],
                     'path_probe':{'failures':[],'samples':[{'rtt_ms':150} for _ in range(8)]}})
     return data
@@ -59,6 +59,13 @@ class QueueAnalysisTests(unittest.TestCase):
                 if kind=='cpu':row['cpu_percent_one_core']['dc']=80
                 if kind=='loss':row['path_probe']['failures']=[{'type':'missing_reply'}]
             self.assertTrue(all(c['classification']==label for c in analyze(data)['cases']))
+
+    def test_missing_ping_process_cpu_never_promotes_an_apparent_latency_win(self):
+        data=fixture()
+        for row in data['rows']:row['cpu_percent_one_core'].pop('probe_children')
+        result=analyze(data)
+        self.assertTrue(all(c['classification']=='PROBE_CPU_UNMEASURED' for c in result['cases']))
+        self.assertTrue(all(c['decision']=='DO_NOT_PROMOTE' for c in result['decisions']))
 
     def test_ping_parser_does_not_turn_missing_reply_into_zero_latency(self):
         self.assertEqual(ping_value('64 bytes from 10.77.1.2: icmp_seq=1 ttl=64 time=100.7 ms'),100.7)

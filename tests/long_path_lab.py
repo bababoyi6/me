@@ -4,6 +4,7 @@ import concurrent.futures
 import hashlib
 import json
 import os
+import resource
 from pathlib import Path
 import select
 import signal
@@ -229,6 +230,8 @@ backend telemt
                                     ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
                                     snapshots={k:stats(pid) for k,pid in ids.items()}
                                     parent_cpu=time.process_time();started=time.monotonic();samples=[];last=-1
+                                    child_usage=resource.getrusage(resource.RUSAGE_CHILDREN)
+                                    child_cpu=child_usage.ru_utime+child_usage.ru_stime
                                     qdisc_samples=[];probe=None
                                     if queue:
                                         probe=LatencyProbe();probes.append(probe)
@@ -244,6 +247,9 @@ backend telemt
                                     path_probe=probe.stop() if probe is not None else None
                                     cpu={k:100*(stats(pid)['cpu_seconds']-snapshots[k]['cpu_seconds'])/elapsed for k,pid in ids.items()}
                                     cpu['controller']=100*(time.process_time()-parent_cpu)/elapsed
+                                    if queue:
+                                        child_usage=resource.getrusage(resource.RUSAGE_CHILDREN)
+                                        cpu['probe_children']=100*(child_usage.ru_utime+child_usage.ru_stime-child_cpu)/elapsed
                                     affinities=[sorted(os.sched_getaffinity(int(t.name))) for t in Path(f"/proc/{backend.ready['pid']}/task").iterdir()]
                                     if not affinities or any(a!=[backend_cpu] for a in affinities):
                                         raise RuntimeError('backend thread escaped its one-core assignment')

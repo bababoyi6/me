@@ -57,8 +57,10 @@ def analyze(data):
             throughput=[b['mbps']/a['mbps'] for a,b in zip(old,new)]
             tcp=[b['tcp_rtt_median']/a['tcp_rtt_median'] for a,b in zip(old,new)]
             ping=[b['ping_p95']/a['ping_p95'] for a,b in zip(old,new)]
-            limited=any(r['cpu_percent_one_core']['client']+r['cpu_percent_one_core']['haproxy']+r['cpu_percent_one_core']['controller']>=70 or r['cpu_percent_one_core']['dc']>=70 for r in old+new)
-            label=('HARNESS_CPU_LIMITED' if limited else 'PATH_CONTROL_LIMITED' if min(c['receiver_mbps'] for c in controls)<100 else
+            child_cpu=[r['cpu_percent_one_core'].get('probe_children') for r in old+new]
+            accounted=all(number(v,zero=True) for v in child_cpu)
+            limited=any(r['cpu_percent_one_core']['client']+r['cpu_percent_one_core']['haproxy']+r['cpu_percent_one_core']['controller']+(r['cpu_percent_one_core'].get('probe_children') or 0)>=70 or r['cpu_percent_one_core']['dc']>=70 for r in old+new)
+            label=('PROBE_CPU_UNMEASURED' if not accounted else 'HARNESS_CPU_LIMITED' if limited else 'PATH_CONTROL_LIMITED' if min(c['receiver_mbps'] for c in controls)<100 else
                 'PROBE_FAILURE' if any(r['probe_failed'] for r in old+new) else
                 'JOINT_GAIN' if min(throughput)>=.95 and max(tcp)<=.8 and max(ping)<=1.05 else 'NO_JOINT_GAIN')
             cases.append({'streams':streams,'candidate':variant,'classification':label,'throughput_ratios':throughput,
