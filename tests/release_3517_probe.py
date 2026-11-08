@@ -1,6 +1,7 @@
 """CI-only pinned release reconnaissance before changing the production selector."""
 import argparse
 import hashlib
+import http.client
 import json
 import os
 from pathlib import Path
@@ -10,10 +11,22 @@ import time
 from paired_performance import write
 from core_install import archive_payload
 from e2e_lab import FullLab
-from telemt_probe import request
+from telemt_probe import request, TOKEN
 
 PINS={'amd64':'0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e',
       'arm64':'f0d3d06d029f2b21dc66a44069bcc7bd20d32fcb34b5867c5250cee647785de6'}
+
+
+def discovery_request(port,route,authenticated):
+    # Schema discovery is larger than the ordinary health helper's 256KiB cap.
+    connection=http.client.HTTPConnection('127.0.0.1',port,timeout=2)
+    try:
+        connection.request('GET',route,headers={'Authorization':'Bearer '+TOKEN} if authenticated else {})
+        response=connection.getresponse();payload=response.read(2*1024**2+1)
+        if len(payload)>2*1024**2:raise RuntimeError('discovery response exceeds 2MiB bound')
+        json.loads(payload)
+        return response.status,len(payload)
+    finally:connection.close()
 
 
 def main():
@@ -48,9 +61,9 @@ def main():
             report['readiness_compatible']=True
             original=lab.telemt_config.read_bytes()
             for route in ('/v1/config/state','/v1/capabilities','/v1/config/schema'):
-                authorized,_=request(lab.api,'GET',route)
-                anonymous,_=request(lab.api,'GET',route,authenticated=False)
-                report['api'].append({'route':route,'authorized':authorized,'anonymous':anonymous})
+                authorized,size=discovery_request(lab.api,route,True)
+                anonymous,_=discovery_request(lab.api,route,False)
+                report['api'].append({'route':route,'authorized':authorized,'anonymous':anonymous,'response_bytes':size})
                 if authorized!=200 or anonymous!=401:raise RuntimeError('new API authorization incompatible')
             for method,route in (('POST','/v1/users'),('PATCH','/v1/config'),('POST','/v1/reload')):
                 status,_=request(lab.api,method,route)
