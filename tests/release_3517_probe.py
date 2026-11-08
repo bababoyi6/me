@@ -65,7 +65,7 @@ def main():
                 anonymous,_=discovery_request(lab.api,route,False)
                 report['api'].append({'route':route,'authorized':authorized,'anonymous':anonymous,'response_bytes':size})
                 if authorized!=200 or anonymous!=401:raise RuntimeError('new API authorization incompatible')
-            for method,route in (('POST','/v1/users'),('PATCH','/v1/config'),('POST','/v1/config/reload')):
+            for method,route in (('POST','/v1/users'),('PATCH','/v1/config'),('POST','/v1/system/reload')):
                 status,_=request(lab.api,method,route)
                 report['api'].append({'route':route,'method':method,'read_only_status':status})
                 if status!=403:raise RuntimeError('read-only API failed to refuse mutation')
