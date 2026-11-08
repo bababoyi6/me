@@ -5,6 +5,7 @@ on:
     branches: [dev/telemt-stable-compat-20261107]
     paths:
       - .github/workflows/native-maintenance.yml
+      - tests/native_socket_acceptance.py
 permissions:
   contents: read
   actions: read
