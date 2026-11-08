@@ -59,15 +59,20 @@ def main():
     candidate=parser.add_mutually_exclusive_group(required=True)
     candidate.add_argument('--stable-archive')
     candidate.add_argument('--candidate-directory')
-    parser.add_argument('--balanced2-archive', required=True)
+    baseline=parser.add_mutually_exclusive_group(required=True)
+    baseline.add_argument('--balanced2-archive')
+    baseline.add_argument('--previous-stable-archive')
     parser.add_argument('--output', required=True)
     parser.add_argument('--stable-release',choices=tuple(RELEASES),default='3.5.16')
     args = parser.parse_args()
+    baseline_pins=RELEASES['3.5.16'] if args.previous_stable_archive else PINS['balanced2']
+    baseline_archive=args.previous_stable_archive or args.balanced2_archive
     if os.geteuid() != 0:
         raise RuntimeError('root required')
     unit = 'tdh-upgrade-test-'+uuid.uuid4().hex+'.service'
     unit_path = Path('/run/systemd/system')/unit
     report = {'scope': 'isolated Linux namespace; real systemd and release binaries; synthetic identities/DC only',
+              'baseline_core_version':baseline_pins[2],
               'os': platform.freedesktop_os_release().get('PRETTY_NAME'),
               'kernel': os.uname().release, 'accepted': False}
     stage = 'setup'
@@ -98,8 +103,8 @@ def main():
                 candidate_pins=(digest(candidate_archive),pin['sha256'],pin['version'])
                 report['native_manifest']=manifest
             binary = root/'telemt'
-            content, _ = archive_payload(args.balanced2_archive, PINS['balanced2'][0],
-                                          PINS['balanced2'][2].removeprefix('telemt '), PINS['balanced2'][1], True)
+            content, _ = archive_payload(baseline_archive, baseline_pins[0],
+                                          baseline_pins[2].removeprefix('telemt '), baseline_pins[1], not bool(args.previous_stable_archive))
             durable_file(binary, content, 0o755)
             store = root/'transaction'
             store.mkdir(mode=0o700)
@@ -215,7 +220,7 @@ StandardError=null
             report['connect_rollback'] = refresh_connect_policy(root,service,True)
             report['connect_original_bytes_restored'] = digest(config)==old_config
             report['rollback'] = rollback(binary, store, protected, service)
-            report['old_binary_restored'] = digest(binary) == PINS['balanced2'][1]
+            report['old_binary_restored'] = digest(binary) == baseline_pins[1]
             report['config_and_token_unchanged'] = digest(config) == old_config and token.read_text() == TOKEN+'\n'
             report['accepted'] = (report['old_binary_restored'] and report['config_and_token_unchanged']
                                   and report['connect_config_private'] and report['connect_original_bytes_restored']
