@@ -1,6 +1,10 @@
 name: Split-process long-path transport experiment
 on:
   workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths:
+      - .github/workflows/long-path.yml
 permissions:
   contents: read
 concurrency:
