@@ -5,6 +5,7 @@ import json
 import math
 from pathlib import Path
 import statistics
+from release_pins import NATIVE_BASES
 
 VARIANTS=('balanced2','stable','stable-auto')
 KEYS={(r,t,v,n,d) for r in (0,100) for t in (1,2,3) for v in VARIANTS for n in (1,4) for d in ('U','D')}
@@ -16,6 +17,8 @@ def number(value, *, zero=False):
 
 def analyze(data):
     native=data.get('plan','official')=='native'
+    base=NATIVE_BASES.get(data.get('native_manifest',{}).get('upstream_commit')) if native else None
+    if native and base is None:raise ValueError('unknown native upstream identity')
     profiles=(100,) if native else (0,100)
     variants=('control','balanced') if native else VARIANTS
     rounds=(1,2,3,4) if native else (1,2,3)
@@ -31,7 +34,7 @@ def analyze(data):
     if len(keys)!=len(expected_keys) or set(keys)!=expected_keys:raise ValueError('missing or duplicate cohort')
     index=dict(zip(keys,rows));policies=set()
     for row in rows:
-        version=('telemt 3.5.16+tdh.control1' if row['variant']=='control' else 'telemt 3.5.16+tdh.balanced1') if native else ('telemt 3.5.5+tdh.balanced2' if row['variant']=='balanced2' else 'telemt 3.5.16')
+        version=('telemt '+base+('+tdh.control1' if row['variant']=='control' else '+tdh.balanced1')) if native else ('telemt 3.5.5+tdh.balanced2' if row['variant']=='balanced2' else 'telemt 3.5.16')
         if row.get('version')!=version or row.get('completed')!=row['streams'] or row.get('errors')!=[]:
             raise ValueError('identity or transfer failure')
         policy=row.get('config_policy_sha256')

@@ -26,7 +26,7 @@ from core_upgrade import BackendService, upgrade, rollback, refresh_connect_poli
 from e2e_lab import FullLab, MockDc
 from lab_config import generate_telemt
 from stable_acceptance import PINS
-from release_pins import RELEASES
+from release_pins import RELEASES, NATIVE_BASES
 from telemt_probe import port, TOKEN, request
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -86,8 +86,9 @@ def main():
                 bundle=Path(args.candidate_directory)
                 manifest=json.loads((bundle/'manifest.json').read_text())
                 pin=manifest['binaries']['balanced']
-                if (manifest['upstream_commit']!='84e5b827a6619fb2e09ad3d09f253cdffe04bc2f' or
-                        pin['version']!='telemt 3.5.16+tdh.balanced1' or
+                base=NATIVE_BASES.get(manifest['upstream_commit'])
+                if (base is None or
+                        pin['version']!='telemt '+base+'+tdh.balanced1' or
                         digest(bundle/'telemt-balanced')!=pin['sha256']):
                     raise RuntimeError('native candidate identity mismatch')
                 candidate_archive=root/'native.tar.gz'

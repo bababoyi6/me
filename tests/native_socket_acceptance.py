@@ -10,6 +10,7 @@ import time
 from e2e_lab import FullLab, sanitize_startup_log
 from paired_performance import resources, write
 from stable_acceptance import stats
+from release_pins import NATIVE_BASES
 
 
 def main():
@@ -21,7 +22,7 @@ def main():
         raise RuntimeError('owned CI namespace required')
     before=resources();directory=Path(args.directory)
     manifest=json.loads((directory/'manifest.json').read_text())
-    if manifest['upstream_commit']!='84e5b827a6619fb2e09ad3d09f253cdffe04bc2f':raise RuntimeError('source mismatch')
+    if manifest['upstream_commit'] not in NATIVE_BASES:raise RuntimeError('source mismatch')
     report={'source_commit':os.environ['TDH_SOURCE_COMMIT'],'native_manifest':manifest,'accepted':False,'rows':[],
         'resources_before':before,'private_processes_closed':False,
         'mock_dc_socket_timeout_seconds':25,'client_io_timeout_seconds':25,'idle_checks':[]}

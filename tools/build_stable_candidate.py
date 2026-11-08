@@ -1,4 +1,4 @@
-"""CI-only same-toolchain 3.5.16 control/balanced1 build; never an installer."""
+"""CI-only same-toolchain 3.5.17 control/balanced1 build; never an installer."""
 import argparse
 import hashlib
 import json
@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 ROOT=Path(__file__).resolve().parents[1]
-COMMIT='84e5b827a6619fb2e09ad3d09f253cdffe04bc2f'
+COMMIT='66708d2866f3f3a4541c4fa67984d408e71a8af4'
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -34,10 +34,10 @@ def main():
     manifest={'upstream_commit':COMMIT,'manager_commit':os.environ['GITHUB_SHA'],'rust':rust,
         'lto':'thin','codegen_units':8,'production_default_changed':False,'binaries':{},
         'builder_sha256':sha(Path(__file__)),'helpers':{},'scope':'unofficial synthetic lab candidates only; no publication or deployment'}
-    previous='3.5.16'
+    previous='3.5.17'
     socket=source/'src/transport/socket.rs'
     original=socket.read_text()
-    for name,version in (('control','3.5.16+tdh.control1'),('balanced','3.5.16+tdh.balanced1')):
+    for name,version in (('control','3.5.17+tdh.control1'),('balanced','3.5.17+tdh.balanced1')):
         if name=='balanced':
             text=original
             for helper in ('low_rtt_receive','unsent_queue_bulk'):
@@ -75,7 +75,7 @@ def main():
             (output/'candidate.patch').write_bytes(subprocess.check_output(['git','diff','--','Cargo.toml','Cargo.lock','src/transport/socket.rs','src/transport/socket/tests.rs'],cwd=source))
     for name in ('LICENSE',):shutil.copyfile(source/name,output/name)
     for name in ('low_rtt_receive','unsent_queue_bulk'):shutil.copyfile(ROOT/'patches'/(name+'.rs'),output/(name+'.rs'))
-    (output/'NOTICE.txt').write_text('Unofficial Telemt 3.5.16 lab builds. Not a release or production deployment. Original license retained.\n')
+    (output/'NOTICE.txt').write_text('Unofficial Telemt 3.5.17 lab builds. Not a release or production deployment. Original license retained.\n')
     (output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 
 

@@ -1,4 +1,4 @@
-name: Build and qualify optional native 3.5.16 socket port
+name: Build and qualify optional native stable socket port
 on:
   workflow_dispatch:
   push:
@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: telemt/telemt
-          ref: 84e5b827a6619fb2e09ad3d09f253cdffe04bc2f
+          ref: 66708d2866f3f3a4541c4fa67984d408e71a8af4
           path: upstream
           persist-credentials: false
       - name: Prepare pinned Rust
@@ -51,9 +51,16 @@ jobs:
         run: |
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativepath-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=900 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/long_path_lab.py --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/native-evidence/metrics.json"
           python3 tests/long_path_analysis.py "$RUNNER_TEMP/native-evidence/metrics.json" "$RUNNER_TEMP/native-evidence/analysis.json"
-      - name: Validate native FakeTLS SHA ACK transfers at 30 50 100 concurrency
+      - name: Fetch exact legacy rollback fixture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
+      - name: Verify native systemd maintenance and exact legacy rollback
         run: |
-          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativeprotocol-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; exec python3 tests/native_socket_acceptance.py --directory "$1" --output "$2"' native "$RUNNER_TEMP/native-pair" "$RUNNER_TEMP/native-evidence/protocol.json"
+          sudo env GITHUB_ACTIONS=true timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/native-evidence/system.json"' native "$RUNNER_TEMP"
+      - name: Validate native 30 50 100 concurrency and idle recovery inside one CPU and 768MiB
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativeprotocol-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=768M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; tc qdisc add dev lo root netem delay 25ms rate 100mbit limit 10000; exec python3 tests/native_socket_acceptance.py --directory "$1" --output "$2"' native "$RUNNER_TEMP/native-pair" "$RUNNER_TEMP/native-evidence/protocol.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

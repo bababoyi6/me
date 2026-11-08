@@ -20,6 +20,7 @@ def fixture():
 class LongPathAnalysisTests(unittest.TestCase):
     def test_native_four_pair_plan_rejects_missing_round(self):
         data=fixture();data['plan']='native'
+        data['native_manifest']={'upstream_commit':'84e5b827a6619fb2e09ad3d09f253cdffe04bc2f'}
         data['controls']=[r for r in data['controls'] if r['configured_rtt_ms']==100]
         original=data['rows'];data['rows']=[]
         for t in (1,2,3,4):

@@ -19,6 +19,7 @@ from kernel_observer import observe_sockets
 from stable_acceptance import PINS, stats
 from paired_performance import resources, write
 from core_install import archive_payload
+from release_pins import NATIVE_BASES
 
 HERE=Path(__file__).resolve()
 VARIANTS=('balanced2','stable','stable-auto')
@@ -148,7 +149,7 @@ def main(args):
                 if native:
                     bundle=Path(args.native_directory)
                     native_manifest=json.loads((bundle/'manifest.json').read_text())
-                    if native_manifest['upstream_commit']!='84e5b827a6619fb2e09ad3d09f253cdffe04bc2f':raise RuntimeError('native upstream mismatch')
+                    if native_manifest['upstream_commit'] not in NATIVE_BASES:raise RuntimeError('native upstream mismatch')
                     report['native_manifest']=native_manifest
                     for kind in variants:
                         payload=(bundle/('telemt-'+kind)).read_bytes()
