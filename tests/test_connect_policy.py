@@ -81,3 +81,13 @@ class ConnectPolicyTests(unittest.TestCase):
         self.assertEqual(self.config.read_bytes(),changed)
         self.config.chmod(0o644)
         with self.assertRaisesRegex(CoreError,'ownership or mode'): self.call(True)
+
+    def test_config_edit_during_preflight_cannot_become_the_approved_baseline(self):
+        changed=self.original.replace(b'SYNTHETIC_KEEP_SECRET',b'CONCURRENT_SYNTHETIC_SECRET')
+        def editing_preflight(*args,**kwargs):
+            self.config.write_bytes(changed)
+            return SimpleNamespace(returncode=0)
+        with patch('core_upgrade.subprocess.run',side_effect=editing_preflight):
+            with self.assertRaisesRegex(CoreError,'approved baseline'): self.call()
+        self.assertEqual(self.config.read_bytes(),changed)
+        self.assertEqual(self.service.starts,0)

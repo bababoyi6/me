@@ -1895,11 +1895,15 @@ def refresh_connect_policy(base, service, rollback_only=False):
     transaction = CoreTransaction(target, directory, ConnectPolicyService(service),
                                   file_mode=0o640, file_owner=(info.st_uid,info.st_gid))
     if rollback_only: return transaction.rollback()
-    content = bounded_connect_config(target.read_bytes())
+    original = target.read_bytes()
+    baseline = hashlib.sha256(original).hexdigest()
+    content = bounded_connect_config(original)
     expected = hashlib.sha256(content).hexdigest()
     if transaction.journal.exists() and transaction.load()['phase'] not in ('committed','recovered'):
         raise CoreError('unfinished connect transaction; run connect-rollback first')
-    if expected == digest(target):
+    if digest(target) != baseline:
+        raise CoreError('config changed while preparing connect policy')
+    if expected == baseline:
         if not service.ready(): raise CoreError('backend is not ready')
         return 'unchanged'
     with tempfile.TemporaryDirectory(prefix='.connect-candidate-',dir=target.parent) as name:
@@ -1913,7 +1917,7 @@ def refresh_connect_policy(base, service, rollback_only=False):
             cwd=service.work,capture_output=True,timeout=12,**service.identity)
         if result.returncode or not service.running_binary_matches():
             raise CoreError('connect candidate validation or running core identity failed')
-        return transaction.activate(candidate,expected,expected,digest(target))
+        return transaction.activate(candidate,expected,expected,baseline)
 
 
 def protected_files(roots):
