@@ -16,7 +16,10 @@ def number(value, *, zero=False):
 
 
 def analyze(data):
-    native=data.get('plan','official')=='native'
+    equal=data.get('plan')=='equal-load'
+    native=data.get('plan','official') in ('native','equal-load')
+    directions=('D',) if equal else ('U','D')
+    if equal and data.get('transfer_rate_per_stream')!=2500000:raise ValueError('equal offered-load drift')
     base=NATIVE_BASES.get(data.get('native_manifest',{}).get('upstream_commit')) if native else None
     if native and base is None:raise ValueError('unknown native upstream identity')
     official=data.get('official_release','3.5.16')
@@ -24,7 +27,7 @@ def analyze(data):
     profiles=(100,) if native else (0,100)
     variants=('control','balanced') if native else VARIANTS
     rounds=(1,2,3,4) if native else (1,2,3)
-    expected_keys={(r,t,v,n,d) for r in profiles for t in rounds for v in variants for n in (1,4) for d in ('U','D')}
+    expected_keys={(r,t,v,n,d) for r in profiles for t in rounds for v in variants for n in (1,4) for d in directions}
     if (data.get('accepted') is not True or data.get('complete') is not True or
             data.get('namespaces_removed') is not True or data.get('private_processes_closed') is not True or
             data.get('cleanup_errors')!=[] or data.get('oom_delta')!={'oom':0,'oom_kill':0}):
@@ -60,7 +63,7 @@ def analyze(data):
     comparisons=[]
     for rtt in profiles:
         for n in (1,4):
-            for direction in ('U','D'):
+            for direction in directions:
                 for left,right in ((('control','balanced'),) if native else (('balanced2','stable'),('stable','stable-auto'))):
                     old=[index[rtt,t,left,n,direction] for t in rounds]
                     new=[index[rtt,t,right,n,direction] for t in rounds]
@@ -77,13 +80,27 @@ def analyze(data):
                     label=('HARNESS_CPU_LIMITED' if limited else 'PATH_CONTROL_LIMITED' if control_index[rtt,direction]<100 else
                            'RTT_NOT_ESTABLISHED' if not rtt_valid else
                            'REPEATABLE_FASTER' if min(ratios)>1.10 else 'REPEATABLE_SLOWER' if max(ratios)<.90 else 'NO_CLEAR_CHANGE')
+                    equal_ping=None
+                    if equal:
+                        probe_cpu=[r['cpu_percent_one_core'].get('probe_children') for r in old+new]
+                        if any(not number(v,zero=True) for v in probe_cpu):raise ValueError('missing probe CPU')
+                        equal_ping=[]
+                        for row in old+new:
+                            probe=row.get('path_probe',{})
+                            samples=[s.get('rtt_ms') for s in probe.get('samples',[])]
+                            if len(samples)<5 or any(not number(v) for v in samples) or not isinstance(probe.get('failures'),list):raise ValueError('missing equal-load path probe')
+                            equal_ping.append(sorted(samples)[math.ceil(.95*len(samples))-1])
+                        capacity=any(r['cpu_percent_one_core']['client']+r['cpu_percent_one_core']['haproxy']+r['cpu_percent_one_core']['controller']+r['cpu_percent_one_core']['probe_children']>=70 or r['cpu_percent_one_core']['dc']>=70 for r in old+new)
+                        label=('HARNESS_CPU_LIMITED' if capacity else 'PATH_CONTROL_LIMITED' if control_index[rtt,direction]<100 else
+                            'PROBE_FAILURE' if any(r['path_probe']['failures'] for r in old+new) else
+                            'EQUAL_LOAD_WITHIN_BOUNDS' if min(ratios)>=.95 and all(80<=v<=130 for v in observed) and max(equal_ping)<=140 else 'EQUAL_LOAD_REVIEW')
                     comparisons.append({'rtt_ms':rtt,'streams':n,'direction':direction,'baseline':left,'candidate':right,
                         'classification':label,'ratios':ratios,'median_ratio':statistics.median(ratios),
                         'baseline_median_mbps':statistics.median(v['mbps'] for v in old),
                         'candidate_median_mbps':statistics.median(v['mbps'] for v in new),
-                        'measured_client_rtt_medians_ms':observed})
+                        'measured_client_rtt_medians_ms':observed,'equal_load_path_ping_p95_ms':equal_ping})
     return {'source_commit':data['source_commit'],'transport_accepted':True,'measured_payload_flows':sum(r['completed'] for r in rows),
-        'comparisons':comparisons,'scope':('one host, four balanced AB/BA rounds; same-toolchain native candidates; synthetic DC only' if native else 'one host, three rotated rounds; synthetic DC and lab-only preload; no production recommendation'),
+        'comparisons':comparisons,'scope':('mechanism check at 20Mbps per stream, not a maximum-throughput comparison or production rate cap' if equal else 'one host, four balanced AB/BA rounds; same-toolchain native candidates; synthetic DC only' if native else 'one host, three rotated rounds; synthetic DC and lab-only preload; no production recommendation'),
         'rule':'all paired ratios >1.10 for exploratory faster, all <0.90 for slower; CPU <70%, TCP control >=100Mbps, measured RTT required'}
 
 

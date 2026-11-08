@@ -1,10 +1,12 @@
 name: Bounded joint throughput and queue latency study
 on:
   workflow_dispatch:
-  push:
-    branches: [dev/telemt-stable-compat-20261107]
-    paths:
-      - .github/workflows/queue-study.yml
+    inputs:
+      layout:
+        description: Counterfactuals or equal offered-load mechanism check
+        type: choice
+        default: candidates
+        options: [candidates, equal-load]
 permissions:
   contents: read
   actions: read
@@ -40,9 +42,14 @@ jobs:
           timeout 20 python3 tests/policy_oracle.py --library "$RUNNER_TEMP/socket-policy.so"
           mkdir -m 700 "$RUNNER_TEMP/queue-evidence"
       - name: Measure balanced counterfactuals only inside owned namespaces
+        env:
+          STUDY_LAYOUT: ${{ inputs.layout }}
         run: |
-          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-queue-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=900 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/long_path_lab.py --queue-study --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/queue-evidence/metrics.json"
-          python3 tests/queue_analysis.py "$RUNNER_TEMP/queue-evidence/metrics.json" "$RUNNER_TEMP/queue-evidence/analysis.json"
+          flags=(--queue-study)
+          analyzer=tests/queue_analysis.py
+          if [ "$STUDY_LAYOUT" = equal-load ]; then flags=(--equal-load-study); analyzer=tests/long_path_analysis.py; fi
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-queue-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=900 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/long_path_lab.py "${flags[@]}" --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/queue-evidence/metrics.json"
+          python3 "$analyzer" "$RUNNER_TEMP/queue-evidence/metrics.json" "$RUNNER_TEMP/queue-evidence/analysis.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

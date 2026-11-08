@@ -63,9 +63,11 @@ def worker(role,cpu):
                         for domain in ('apple.com','gs.apple.com') for direction in ('U','D')],'errors':[]}
                 else:
                     rows,errors=[],[]
+                    rate=request.get('rate',125000000)
+                    if rate not in (2500000,125000000):raise RuntimeError('unregistered transfer rate')
                     with concurrent.futures.ThreadPoolExecutor(max_workers=request['streams']) as pool:
                         futures=[pool.submit(FullLab.transfer,endpoint,('apple.com','gs.apple.com')[i%2],
-                            request['direction'],PAYLOAD,125000000,persistent=True,io_timeout=25)
+                            request['direction'],PAYLOAD,rate,persistent=True,io_timeout=25)
                             for i in range(request['streams'])]
                         for future in futures:
                             try:rows.append(future.result())
@@ -129,12 +131,15 @@ def main(args):
     os.sched_setaffinity(0,{frontend_cpu})
     output=Path(args.output)
     native=bool(args.native_directory)
-    queue=args.queue_study
+    equal=args.equal_load_study
+    queue=args.queue_study or equal
+    if args.queue_study and equal:raise RuntimeError('choose one study layout')
     if queue and not native:raise RuntimeError('queue study requires pinned native pair')
-    variants=QUEUE_VARIANTS if queue else ('control','balanced') if native else VARIANTS
+    variants=QUEUE_VARIANTS if queue and not equal else ('control','balanced') if native else VARIANTS
     profiles=(100,) if native else (0,100)
     report={'scope':'split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only',
-        'plan':'queue' if queue else 'native' if native else 'official',
+        'plan':'equal-load' if equal else 'queue' if queue else 'native' if native else 'official',
+        'transfer_rate_per_stream':2500000 if equal else 125000000,
         'official_release':args.official_release,
         'source_commit':os.environ['TDH_SOURCE_COMMIT'],'complete':False,'accepted':False,
         'payload_bytes_per_stream':PAYLOAD,'rate_mbps':200,'cpu_assignment':{'core':backend_cpu,'client_and_haproxy':frontend_cpu,'dc':dc_cpu},
@@ -159,7 +164,7 @@ def main(args):
                     native_manifest=json.loads((bundle/'manifest.json').read_text())
                     if native_manifest['upstream_commit'] not in NATIVE_BASES:raise RuntimeError('native upstream mismatch')
                     report['native_manifest']=native_manifest
-                    for kind in (('balanced',) if queue else variants):
+                    for kind in (('balanced',) if queue and not equal else variants):
                         payload=(bundle/('telemt-'+kind)).read_bytes()
                         if not 0<len(payload)<=64*1024**2 or hashlib.sha256(payload).hexdigest()!=native_manifest['binaries'][kind]['sha256']:
                             raise RuntimeError('native binary mismatch')
@@ -206,13 +211,13 @@ backend telemt
                             'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
                     for turn in range(4 if native else 3):
                         offset=turn%len(variants)
-                        order=QUEUE_ORDERS[turn] if queue else variants[offset:]+variants[:offset]
+                        order=QUEUE_ORDERS[turn] if queue and not equal else variants[offset:]+variants[:offset]
                         for variant in order:
                             if queue:
                                 configure_wg_fq(variant=='wg-fq',original_wg)
                                 applied_wg=original_wg_policy()
                                 if variant!='wg-fq' and applied_wg!=original_wg:raise RuntimeError('WG baseline restoration drift')
-                            kind='balanced' if queue else variant if native else 'balanced2' if variant=='balanced2' else 'stable'
+                            kind='balanced' if queue and not equal else variant if native else 'balanced2' if variant=='balanced2' else 'stable'
                             options={'kind':kind,'binary':binaries[kind]}
                             if native:
                                 pin=native_manifest['binaries'][kind]
@@ -235,7 +240,7 @@ backend telemt
                                     qdisc_samples=[];probe=None
                                     if queue:
                                         probe=LatencyProbe();probes.append(probe)
-                                    client.send({'command':'run','streams':streams,'direction':direction})
+                                    client.send({'command':'run','streams':streams,'direction':direction,'rate':2500000 if equal else 125000000})
                                     while not select.select([client.process.stdout],[],[],.1)[0]:
                                         if time.monotonic()-started>90:raise RuntimeError('trial deadline')
                                         if time.monotonic()-started-last>=1:
@@ -314,6 +319,7 @@ if __name__=='__main__':
     parser.add_argument('--output')
     parser.add_argument('--native-directory')
     parser.add_argument('--queue-study',action='store_true')
+    parser.add_argument('--equal-load-study',action='store_true')
     parser.add_argument('--official-release',choices=tuple(RELEASES),default='3.5.16')
     args=parser.parse_args()
     if args.role:worker(args.role,args.cpu)
