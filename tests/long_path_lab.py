@@ -19,7 +19,7 @@ from kernel_observer import observe_sockets, qdiscs_in_namespace
 from stable_acceptance import PINS, stats
 from paired_performance import resources, write
 from core_install import archive_payload
-from release_pins import NATIVE_BASES
+from release_pins import NATIVE_BASES, RELEASES
 from queue_analysis import VARIANTS as QUEUE_VARIANTS, ORDERS as QUEUE_ORDERS
 from queue_probe import LatencyProbe, original_wg_policy, configure_wg_fq
 
@@ -134,6 +134,7 @@ def main(args):
     profiles=(100,) if native else (0,100)
     report={'scope':'split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only',
         'plan':'queue' if queue else 'native' if native else 'official',
+        'official_release':args.official_release,
         'source_commit':os.environ['TDH_SOURCE_COMMIT'],'complete':False,'accepted':False,
         'payload_bytes_per_stream':PAYLOAD,'rate_mbps':200,'cpu_assignment':{'core':backend_cpu,'client_and_haproxy':frontend_cpu,'dc':dc_cpu},
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),
@@ -164,6 +165,7 @@ def main(args):
                         path=root/kind;path.write_bytes(payload);path.chmod(0o755);binaries[kind]=str(path)
                 else:
                     for kind,pins in PINS.items():
+                        if kind=='stable':pins=RELEASES[args.official_release]
                         payload,_=archive_payload(getattr(args,kind+'_archive'),pins[0],pins[2].removeprefix('telemt '),pins[1],False)
                         path=root/kind;path.write_bytes(payload);path.chmod(0o755);binaries[kind]=str(path)
                 library=root/'socket-policy.so'
@@ -306,6 +308,7 @@ if __name__=='__main__':
     parser.add_argument('--output')
     parser.add_argument('--native-directory')
     parser.add_argument('--queue-study',action='store_true')
+    parser.add_argument('--official-release',choices=tuple(RELEASES),default='3.5.16')
     args=parser.parse_args()
     if args.role:worker(args.role,args.cpu)
     else:raise SystemExit(main(args))

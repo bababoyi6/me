@@ -18,6 +18,14 @@ def fixture():
 
 
 class LongPathAnalysisTests(unittest.TestCase):
+    def test_new_official_release_is_explicit_and_unknown_release_is_rejected(self):
+        data=fixture();data['official_release']='3.5.17'
+        for row in data['rows']:
+            if row['variant']!='balanced2':row['version']='telemt 3.5.17'
+        self.assertTrue(analyze(data)['transport_accepted'])
+        data['official_release']='unverified'
+        with self.assertRaises(ValueError):analyze(data)
+
     def test_native_four_pair_plan_rejects_missing_round(self):
         data=fixture();data['plan']='native'
         data['native_manifest']={'upstream_commit':'84e5b827a6619fb2e09ad3d09f253cdffe04bc2f'}
