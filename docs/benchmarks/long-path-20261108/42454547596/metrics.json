@@ -1,0 +1,87 @@
+{
+  "scope": "split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only",
+  "source_commit": "2b525d66953147fbff77dfa0388af07fce2dce56",
+  "complete": false,
+  "accepted": false,
+  "payload_bytes_per_stream": 33554432,
+  "rate_mbps": 200,
+  "cpu_assignment": {
+    "core": 0,
+    "client_and_haproxy": 1,
+    "dc": 2
+  },
+  "cpu_model": "AMD EPYC 7763 64-Core Processor",
+  "resources_before": {
+    "memory_current": 16400384,
+    "memory_peak": 16400384,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 104723,
+      "user_usec": 87768,
+      "system_usec": 16955,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 3,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "300000 100000",
+    "memory_max": "1610612736",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "controls": [
+    {
+      "configured_rtt_ms": 0,
+      "direction": "U",
+      "receiver_mbps": 183.0485154596177
+    },
+    {
+      "configured_rtt_ms": 0,
+      "direction": "D",
+      "receiver_mbps": 183.1341321940502
+    }
+  ],
+  "rows": [],
+  "lab_socket_library_sha256": "dd69154a58d878994a1a70fb49cae43884e03ae6322702d36baf852471cdf900",
+  "resources_after": {
+    "memory_current": 108740608,
+    "memory_peak": 258961408,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 2820846,
+      "user_usec": 908959,
+      "system_usec": 1911886,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 262,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "300000 100000",
+    "memory_max": "1610612736",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "oom_delta": {
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "namespaces_removed": true
+}

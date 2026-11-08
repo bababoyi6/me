@@ -34,3 +34,4 @@ docs/benchmarks/stable-20261107/** -text -whitespace
 docs/benchmarks/continuation-20261107/** -text -whitespace
 docs/benchmarks/paired-20261107/** -text -whitespace
 docs/benchmarks/paired-20261108/** -text -whitespace
+docs/benchmarks/long-path-20261108/** -text -whitespace
