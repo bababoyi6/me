@@ -26,6 +26,10 @@ PAYLOAD=32*1024**2
 
 
 def worker(role,cpu):
+    expected=NAMES[0] if role=='client' else NAMES[2]
+    if (os.geteuid()!=0 or os.environ.get('GITHUB_ACTIONS')!='true' or
+            os.stat('/proc/self/ns/net').st_ino!=os.stat('/run/netns/'+expected).st_ino):
+        raise RuntimeError('worker requires its owned CI namespace')
     os.sched_setaffinity(0,{cpu})
     options=json.loads(sys.stdin.readline())
     lab=dc=None
@@ -65,6 +69,8 @@ def worker(role,cpu):
                                 errors.append({'type':type(error).__name__,'phase':getattr(error,'lab_phase','unknown'),
                                     'reason':sanitize_startup_log(str(error))[:256]})
                     result={'rows':rows,'errors':errors}
+            elif role=='core' and request['command']=='observe':
+                result=observe_sockets(lab.telemt.pid,24431,namespace=NAMES[2])
             else:raise RuntimeError('unexpected core request')
             print(json.dumps(result),flush=True)
     finally:
@@ -95,7 +101,9 @@ class Child:
             self.process.stdin.close()
             try:self.process.wait(timeout=4)
             except subprocess.TimeoutExpired:
-                os.killpg(self.process.pid,signal.SIGKILL);self.process.wait(timeout=3)
+                try:os.killpg(self.process.pid,signal.SIGKILL)
+                except ProcessLookupError:pass
+                self.process.wait(timeout=3)
         if not self.process.stdout.closed:self.process.stdout.close()
 
 
@@ -188,18 +196,21 @@ backend telemt
                                     while not select.select([client.process.stdout],[],[],.1)[0]:
                                         if time.monotonic()-started>90:raise RuntimeError('trial deadline')
                                         if time.monotonic()-started-last>=1:
-                                            samples.extend(observe_sockets(backend.ready['pid'],24431,namespace=NAMES[2]))
+                                            samples.extend(backend.call({'command':'observe'}))
                                             last=time.monotonic()-started
                                     result=client.receive()
                                     elapsed=time.monotonic()-started
                                     cpu={k:100*(stats(pid)['cpu_seconds']-snapshots[k]['cpu_seconds'])/elapsed for k,pid in ids.items()}
                                     cpu['controller']=100*(time.process_time()-parent_cpu)/elapsed
+                                    affinities=[sorted(os.sched_getaffinity(int(t.name))) for t in Path(f"/proc/{backend.ready['pid']}/task").iterdir()]
+                                    if not affinities or any(a!=[backend_cpu] for a in affinities):
+                                        raise RuntimeError('backend thread escaped its one-core assignment')
                                     row={'rtt_ms':rtt,'round':turn+1,'variant':variant,'streams':streams,'direction':direction,
                                         'version':backend.ready['version'],'config_policy_sha256':backend.ready['config_policy_sha256'],
                                         'completed':len(result['rows']),'errors':result['errors'],'wall_seconds':elapsed,
                                         'mbps':sum(v['bytes'] for v in result['rows'])*8/elapsed/1e6,
                                         'cpu_percent_one_core':cpu,'socket_samples':samples,
-                                        'backend_rss_after_bytes':stats(backend.ready['pid'])['rss_bytes'],
+                                        'backend_rss_after_bytes':stats(backend.ready['pid'])['rss_bytes'],'backend_thread_affinities':affinities,
                                         'harness_limited':cpu['client']+cpu['haproxy']+cpu['controller']>=70 or cpu['dc']>=70}
                                     report['rows'].append(row);expected+=len(result['rows'])
                                     write(output,report)
@@ -215,17 +226,27 @@ backend telemt
                 report['mock_dc']=dc.call({'command':'stats'})
                 report['complete']=True
             finally:
-                for child in reversed(children):child.close()
-                if front is not None and front.poll() is None:
-                    front.terminate()
-                    try:front.wait(timeout=3)
-                    except subprocess.TimeoutExpired:os.killpg(front.pid,signal.SIGKILL);front.wait(timeout=3)
-                if net is not None:net.close()
+                report['cleanup_errors']=[]
+                for child in reversed(children):
+                    try:child.close()
+                    except Exception as error:report['cleanup_errors'].append(type(error).__name__)
+                try:
+                    if front is not None and front.poll() is None:
+                        front.terminate()
+                        try:front.wait(timeout=3)
+                        except subprocess.TimeoutExpired:
+                            try:os.killpg(front.pid,signal.SIGKILL)
+                            except ProcessLookupError:pass
+                            front.wait(timeout=3)
+                finally:
+                    if net is not None:net.close()
+                report['private_processes_closed']=all(c.process.poll() is not None for c in children) and (front is None or front.poll() is not None)
     finally:
         report['resources_after']=resources()
         report['oom_delta']={k:report['resources_after']['memory_events'][k]-before['memory_events'][k] for k in ('oom','oom_kill')}
         report['namespaces_removed']=not set(NAMES).intersection(line.split()[0] for line in command('ip','netns','list').splitlines())
-        report['accepted']=report['complete'] and not any(report['oom_delta'].values()) and report['namespaces_removed']
+        report['accepted']=(report['complete'] and not any(report['oom_delta'].values()) and report['namespaces_removed']
+            and report.get('private_processes_closed') is True and not report.get('cleanup_errors',['incomplete']))
         write(output,report)
     return 0 if report['accepted'] else 1
 
