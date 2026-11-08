@@ -18,6 +18,31 @@ def fixture():
 
 
 class LongPathAnalysisTests(unittest.TestCase):
+    def test_equal_load_has_its_own_latency_and_instrumentation_gates(self):
+        data=fixture();data.update(plan='equal-load',transfer_rate_per_stream=2500000,
+            native_manifest={'upstream_commit':'66708d2866f3f3a4541c4fa67984d408e71a8af4'})
+        source=copy.deepcopy(data['rows']);data['rows']=[]
+        data['controls']=[r for r in data['controls'] if r['configured_rtt_ms']==100]
+        for turn in (1,2,3,4):
+            for old,new in (('stable','control'),('stable-auto','balanced')):
+                for row in source:
+                    if row['rtt_ms']==100 and row['round']==1 and row['variant']==old and row['direction']=='D':
+                        changed=copy.deepcopy(row);changed.update(round=turn,variant=new,mbps=20,
+                            version='telemt 3.5.17+tdh.'+('control1' if new=='control' else 'balanced1'))
+                        changed['cpu_percent_one_core']['probe_children']=0
+                        changed['path_probe']={'failures':[],'samples':[{'rtt_ms':120}]*6}
+                        data['rows'].append(changed)
+        result=analyze(data)
+        self.assertEqual(result['measured_payload_flows'],40)
+        self.assertTrue(all(r['classification']=='EQUAL_LOAD_WITHIN_BOUNDS' for r in result['comparisons']))
+        bad=copy.deepcopy(data);bad['rows'][0]['cpu_percent_one_core'].pop('probe_children')
+        with self.assertRaisesRegex(ValueError,'probe CPU'):analyze(bad)
+        bad=copy.deepcopy(data);bad['transfer_rate_per_stream']=125000000
+        with self.assertRaisesRegex(ValueError,'offered-load'):analyze(bad)
+        bad=copy.deepcopy(data)
+        for r in bad['rows']:r['path_probe']['samples']=[{'rtt_ms':170}]*6
+        self.assertTrue(all(r['classification']=='EQUAL_LOAD_REVIEW' for r in analyze(bad)['comparisons']))
+
     def test_new_official_release_is_explicit_and_unknown_release_is_rejected(self):
         data=fixture();data['official_release']='3.5.17'
         for row in data['rows']:

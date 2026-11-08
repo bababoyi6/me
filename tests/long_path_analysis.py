@@ -16,6 +16,7 @@ def number(value, *, zero=False):
 
 
 def analyze(data):
+    if data.get('plan','official') not in ('official','native','equal-load'):raise ValueError('unknown experiment plan')
     equal=data.get('plan')=='equal-load'
     native=data.get('plan','official') in ('native','equal-load')
     directions=('D',) if equal else ('U','D')
