@@ -1,0 +1,34 @@
+name: Split-process long-path transport experiment
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: long-path-lab
+  cancel-in-progress: false
+jobs:
+  measure:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare disposable dependencies
+        run: |
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 wireguard-tools ethtool iperf3 python3-cryptography
+      - name: Fetch pinned releases
+        run: |
+          set -euo pipefail
+          mkdir -m 700 "$RUNNER_TEMP/long-evidence"
+          curl -q -fL --proto '=https' --proto-redir '=https' --connect-timeout 10 --max-time 120 --max-filesize 67108864 https://github.com/telemt/telemt/releases/download/3.5.16/telemt-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/stable.tar.gz"
+          curl -q -fL --proto '=https' --proto-redir '=https' --connect-timeout 10 --max-time 120 --max-filesize 67108864 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
+      - name: Measure offline WG path with independent client and DC processes
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-longpath-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=900 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/long_path_lab.py --stable-archive "$RUNNER_TEMP/stable.tar.gz" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/long-evidence/metrics.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: long-path-evidence
+          path: ${{ runner.temp }}/long-evidence/*.json
+          if-no-files-found: warn
+          retention-days: 14
