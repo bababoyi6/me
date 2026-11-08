@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--balanced2-archive', required=True)
     parser.add_argument('--output', required=True)
     parser.add_argument('--correlate', action='store_true', help='six weak-only 100-stream pairs with private per-connection debug logs')
+    parser.add_argument('--retry-policy', action='store_true', help='test explicit 4s attempts / 9s total connect budget')
     args = parser.parse_args()
     os.umask(0o077)
     backend_cpu, controller_cpu = guard()
@@ -30,6 +31,7 @@ def main():
              'rate', '100mbit', 'limit', '10000'])
     report = {'scope': 'diagnostic only; genuine HAProxy/Telemt/transport, synthetic DC; no production changes',
               'source_commit': os.environ['TDH_SOURCE_COMMIT'], 'complete': False, 'runs': [],
+              'connect_policy': 'bounded-retry' if args.retry_policy else 'unchanged',
               'os': platform.freedesktop_os_release()['PRETTY_NAME'], 'kernel': os.uname().release,
               'cpu_model': next((s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')), None),
               'resources_before': resources(), 'tcp_congestion_control': Path('/proc/sys/net/ipv4/tcp_congestion_control').read_text().strip()}
@@ -53,7 +55,7 @@ def main():
                     class CapturedLab(FullLab):
                         def __init__(self, *values, **options):
                             super().__init__(*values, **options, fast=fast, artifact_registry=ledger, startup_report=startup,
-                                             connection_logs=args.correlate)
+                                             connection_logs=args.correlate, connect_policy='bounded-retry' if args.retry_policy else 'unchanged')
                         def transfer(self, *values, **options):
                             try:
                                 return super().transfer(*values, **options)

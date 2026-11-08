@@ -152,13 +152,15 @@ class FullLab:
     def __init__(self, binary, haproxy="haproxy", fast=True, real_dc=False, splice=False,
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
                  listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None,
-                 shared_binary_root=None,startup_report=None,offline_lab=False,connection_logs=False):
+                 shared_binary_root=None,startup_report=None,offline_lab=False,connection_logs=False,connect_policy='unchanged'):
         if offline_lab and real_dc:
             raise ValueError('offline bootstrap is confined to synthetic DC tests')
         if startup_report is not None and (real_dc or artifact_registry is None):
             raise ValueError('startup diagnostics require a private synthetic experimental lab')
         if connection_logs and (startup_report is None or real_dc):
             raise ValueError('connection diagnostics require private synthetic startup logging')
+        if connect_policy not in ('unchanged', 'upstream-default', 'bounded-retry') or (real_dc and connect_policy != 'unchanged'):
+            raise ValueError('connect policy experiments require the private synthetic DC')
         if listen_endpoint is not None and (listen_endpoint not in (("10.77.1.2", 24431), ("10.77.2.2", 24431))
                                             or real_dc or start_haproxy):
             raise ValueError("private namespace backend requires a fixed WG bind and no local frontend")
@@ -220,6 +222,11 @@ class FullLab:
                 text = text.replace('[network]\n', '[network]\nstun_use = false\nhttp_ip_detect_urls = []\n')
             if not fast:
                 text = text.replace("fast_mode = true", "fast_mode = false")
+            if connect_policy != 'unchanged':
+                for key in ('tg_connect', 'upstream_connect_retry_attempts', 'upstream_connect_budget_ms'):
+                    text = re.sub(r'^'+key+r'\s*=.*\n', '', text, flags=re.MULTILINE)
+                attempt, budget = (4, 9000) if connect_policy == 'bounded-retry' else (10, 3000)
+                text = text.replace('[general]\n', f'[general]\ntg_connect = {attempt}\nupstream_connect_retry_attempts = 2\nupstream_connect_budget_ms = {budget}\n')
             if small_copy:
                 if real_dc:
                     raise ValueError("experimental copy policy is confined to synthetic DC tests")
