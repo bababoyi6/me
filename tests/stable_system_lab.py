@@ -14,6 +14,7 @@ import signal
 import socket
 import subprocess
 import sys
+import tarfile
 import tempfile
 import time
 import uuid
@@ -54,7 +55,9 @@ def agent_state(port_number, expected):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--stable-archive', required=True)
+    candidate=parser.add_mutually_exclusive_group(required=True)
+    candidate.add_argument('--stable-archive')
+    candidate.add_argument('--candidate-directory')
     parser.add_argument('--balanced2-archive', required=True)
     parser.add_argument('--output', required=True)
     args = parser.parse_args()
@@ -72,6 +75,25 @@ def main():
         root = Path(temp)
         root.chmod(0o755)
         try:
+            candidate_archive=args.stable_archive
+            candidate_pins=PINS['stable']
+            candidate_version='3.5.16'
+            if args.candidate_directory:
+                if os.environ.get('GITHUB_ACTIONS')!='true' or os.stat('/proc/self/ns/net').st_ino==os.stat('/proc/1/ns/net').st_ino:
+                    raise RuntimeError('native candidate requires owned CI namespace')
+                bundle=Path(args.candidate_directory)
+                manifest=json.loads((bundle/'manifest.json').read_text())
+                pin=manifest['binaries']['balanced']
+                if (manifest['upstream_commit']!='84e5b827a6619fb2e09ad3d09f253cdffe04bc2f' or
+                        pin['version']!='telemt 3.5.16+tdh.balanced1' or
+                        digest(bundle/'telemt-balanced')!=pin['sha256']):
+                    raise RuntimeError('native candidate identity mismatch')
+                candidate_archive=root/'native.tar.gz'
+                with tarfile.open(candidate_archive,'x:gz') as archive:
+                    archive.add(bundle/'telemt-balanced',arcname='telemt',recursive=False)
+                candidate_version=pin['version'].removeprefix('telemt ')
+                candidate_pins=(digest(candidate_archive),pin['sha256'],pin['version'])
+                report['native_manifest']=manifest
             binary = root/'telemt'
             content, _ = archive_payload(args.balanced2_archive, PINS['balanced2'][0],
                                           PINS['balanced2'][2].removeprefix('telemt '), PINS['balanced2'][1], True)
@@ -84,9 +106,9 @@ def main():
             # do not create a host account just for a test. All other install
             # operations, archive validation and --version execution are real.
             with patch('core_install.pwd.getpwnam', return_value=SimpleNamespace(pw_uid=65534, pw_gid=65534)):
-                report['fresh_official_install'] = fresh_install(args.stable_archive, fresh/'telemt',
-                    PINS['stable'][0], '3.5.16', PINS['stable'][1], False)
-            report['fresh_official_binary_sha256_match'] = digest(fresh/'telemt') == PINS['stable'][1]
+                report['fresh_candidate_install' if args.candidate_directory else 'fresh_official_install'] = fresh_install(candidate_archive, fresh/'telemt',
+                    candidate_pins[0], candidate_version, candidate_pins[1], False)
+            report['fresh_candidate_binary_sha256_match' if args.candidate_directory else 'fresh_official_binary_sha256_match'] = digest(fresh/'telemt') == candidate_pins[1]
             listen, api, health_port = port(), port(), port()
             config = generate_telemt(root/'config', root/'work', listen, api)
             text = config.read_text().replace('tls_emulation = true', 'tls_emulation = false')
@@ -135,10 +157,10 @@ StandardError=null
             protected = [root/'config', unit_path]
             old_config = digest(config)
             stage = 'core_upgrade'
-            report['upgrade'] = upgrade(binary, store, args.stable_archive, PINS['stable'][0],
-                                         PINS['stable'][1], '3.5.16', protected, service)
-            report['repeat_upgrade'] = upgrade(binary, store, args.stable_archive, PINS['stable'][0],
-                                                PINS['stable'][1], '3.5.16', protected, service)
+            report['upgrade'] = upgrade(binary, store, candidate_archive, candidate_pins[0],
+                                         candidate_pins[1], candidate_version, protected, service)
+            report['repeat_upgrade'] = upgrade(binary, store, candidate_archive, candidate_pins[0],
+                                                candidate_pins[1], candidate_version, protected, service)
             stage = 'connect_policy'
             report['connect_refresh'] = refresh_connect_policy(root,service)
             report['repeat_connect_refresh'] = refresh_connect_policy(root,service)
