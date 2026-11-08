@@ -22,8 +22,10 @@ def main():
     before=resources();directory=Path(args.directory)
     manifest=json.loads((directory/'manifest.json').read_text())
     if manifest['upstream_commit']!='84e5b827a6619fb2e09ad3d09f253cdffe04bc2f':raise RuntimeError('source mismatch')
-    report={'source_commit':os.environ['TDH_SOURCE_COMMIT'],'native_manifest':manifest,'accepted':False,'rows':[]}
+    report={'source_commit':os.environ['TDH_SOURCE_COMMIT'],'native_manifest':manifest,'accepted':False,'rows':[],
+        'resources_before':before,'private_processes_closed':False}
     write(Path(args.output),report)
+    processes=[]
     for kind in ('control','balanced'):
         binary=directory/('telemt-'+kind);pin=manifest['binaries'][kind]
         if hashlib.sha256(binary.read_bytes()).hexdigest()!=pin['sha256']:raise RuntimeError('binary mismatch')
@@ -41,10 +43,14 @@ def main():
                         'seconds':time.monotonic()-started,'backend':stats(lab.telemt.pid)})
                     write(Path(args.output),report)
             lab.validate(count)
-        finally:lab.close()
+        finally:
+            lab.close()
+            processes.extend(lab.processes)
     after=resources()
+    report['resources_after']=after
+    report['private_processes_closed']=all(p.poll() is not None for p in processes)
     report['oom_delta']={k:after['memory_events'][k]-before['memory_events'][k] for k in ('oom','oom_kill')}
-    report['accepted']=not any(report['oom_delta'].values())
+    report['accepted']=not any(report['oom_delta'].values()) and report['private_processes_closed']
     write(Path(args.output),report)
 
 

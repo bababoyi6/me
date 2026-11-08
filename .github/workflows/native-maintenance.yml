@@ -30,7 +30,7 @@ jobs:
           curl -q -fL --proto '=https' --proto-redir '=https' --connect-timeout 10 --max-time 120 --max-filesize 67108864 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
       - name: Verify actual systemd candidate upgrade crash recovery and reverse rollback
         run: |
-          sudo timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/native-maintenance/system.json"' native "$RUNNER_TEMP"
+          sudo env GITHUB_ACTIONS=true timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/native-maintenance/system.json"' native "$RUNNER_TEMP"
       - name: Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget
         run: |
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativepressure-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=768M -p MemoryHigh=640M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; tc qdisc add dev lo root netem delay 25ms rate 100mbit limit 10000; exec python3 tests/native_socket_acceptance.py --directory "$1" --output "$2"' native "$RUNNER_TEMP/native-pair" "$RUNNER_TEMP/native-maintenance/pressure.json"
