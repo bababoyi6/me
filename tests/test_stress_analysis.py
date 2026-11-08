@@ -24,6 +24,12 @@ class StressAnalysisTests(unittest.TestCase):
         self.assertEqual(result['payload_flows'],720)
         self.assertEqual(result['generator_limited_batches'],12)
         self.assertNotIn('throughput_ratio',result)
+        self.assertFalse(result['flow_timing_available'])
+        data=fixture()
+        for row in data['rows']:row['completion_ms']={'p50':1000,'p95':1200}
+        self.assertTrue(assess(data)['flow_timing_available'])
+        data['rows'][0]['completion_ms']['p95']=float('nan')
+        with self.assertRaisesRegex(ValueError,'completion latency'):assess(data)
 
     def test_missing_failed_duplicate_and_configuration_drift_are_rejected(self):
         base=fixture()

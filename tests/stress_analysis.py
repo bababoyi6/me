@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 from release_pins import NATIVE_BASES
+from long_path_analysis import number
 
 
 def assess(data):
@@ -27,10 +28,13 @@ def assess(data):
         if (row['completed']!=row['streams'] or row['errors'] or row['rtt_ms']!=100 or
             row['version']!='telemt '+version+('+tdh.control1' if row['variant']=='control' else '+tdh.balanced1')):raise ValueError('identity or protocol failure')
         if not row['backend_thread_affinities'] or any(a!=[data['cpu_assignment']['core']] for a in row['backend_thread_affinities']):raise ValueError('core affinity drift')
+        if 'completion_ms' in row and (not isinstance(row['completion_ms'],dict) or
+            any(not number(row['completion_ms'].get(k)) for k in ('p50','p95'))):raise ValueError('invalid observed completion latency')
     idle=data.get('idle_checks',[])
     if len(idle)!=2 or {r['variant'] for r in idle}!={'control','balanced'} or any(r['after']['fds']>r['before']['fds']+2 for r in idle):raise ValueError('missing descriptor recovery')
     if data.get('mock_dc')!={'completed':728,'errors':[]}:raise ValueError('DC completion mismatch')
     return {'accepted':True,'source_commit':data['source_commit'],'payload_flows':sum(r['completed'] for r in rows),
+        'flow_timing_available':all('completion_ms' in r for r in rows),
         'memory_peak':after['memory_peak'],'idle_checks':idle,'generator_limited_batches':sum(r['harness_limited'] for r in rows),
         'scope':'100ms real WG, 4MiB/flow, 30/50/100 concurrency; whole lab <=768MiB, backend one logical CPU; no core throughput ceiling or 24h claim'}
 

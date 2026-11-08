@@ -17,7 +17,7 @@ from types import SimpleNamespace
 from e2e_lab import FullLab, MockDc, sanitize_startup_log
 from network_lab import Network, NAMES, command
 from kernel_observer import observe_sockets, qdiscs_in_namespace
-from stable_acceptance import PINS, stats
+from stable_acceptance import PINS, stats, summary
 from paired_performance import resources, write
 from core_install import archive_payload
 from release_pins import NATIVE_BASES, RELEASES
@@ -247,7 +247,7 @@ backend telemt
                                     parent_cpu=time.process_time();started=time.monotonic();samples=[];last=-1
                                     child_usage=resource.getrusage(resource.RUSAGE_CHILDREN)
                                     child_cpu=child_usage.ru_utime+child_usage.ru_stime
-                                    qdisc_samples=[];probe=None
+                                    qdisc_samples=[];rss_samples=[snapshots['backend']['rss_bytes']];probe=None
                                     if queue:
                                         probe=LatencyProbe();probes.append(probe)
                                     client.send({'command':'run','streams':streams,'direction':direction,'rate':2500000 if equal else 125000000,
@@ -256,6 +256,7 @@ backend telemt
                                         if time.monotonic()-started>90:raise RuntimeError('trial deadline')
                                         if time.monotonic()-started-last>=1:
                                             samples.extend(backend.call({'command':'observe'}))
+                                            rss_samples.append(stats(backend.ready['pid'])['rss_bytes'])
                                             if queue:qdisc_samples.append({'offset_seconds':time.monotonic()-started,'rows':qdiscs_in_namespace(NAMES[1])})
                                             last=time.monotonic()-started
                                     result=client.receive()
@@ -272,9 +273,12 @@ backend telemt
                                     row={'rtt_ms':rtt,'round':turn+1,'variant':variant,'streams':streams,'direction':direction,
                                         'version':backend.ready['version'],'config_policy_sha256':backend.ready['config_policy_sha256'],
                                         'completed':len(result['rows']),'errors':result['errors'],'wall_seconds':elapsed,
+                                        'completion_ms':summary([v['elapsed_seconds']*1000 for v in result['rows']]),
+                                        'fake_tls_client_phase_ms':summary([v['handshake_ms'] for v in result['rows']]),
                                         'mbps':sum(v['bytes'] for v in result['rows'])*8/elapsed/1e6,
                                         'cpu_percent_one_core':cpu,'socket_samples':samples,
                                         'backend_rss_after_bytes':stats(backend.ready['pid'])['rss_bytes'],'backend_thread_affinities':affinities,
+                                        'sampled_backend_peak_rss_bytes':max(rss_samples),
                                         'harness_limited':cpu['client']+cpu['haproxy']+cpu['controller']>=70 or cpu['dc']>=70}
                                     if queue:row.update(path_probe=path_probe,qdisc_samples=qdisc_samples,wg_policy=applied_wg)
                                     report['rows'].append(row);expected+=len(result['rows'])
