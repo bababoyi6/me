@@ -1,0 +1,32 @@
+name: Probe pinned 3.5.17 before selector migration
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths:
+      - .github/workflows/release-3517-probe.yml
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare bounded disposable dependencies
+        run: sudo timeout 120 apt-get update -qq && sudo timeout 120 apt-get install -y --no-install-recommends haproxy python3-cryptography
+      - name: Fetch exact API assets and probe native protocol and API policy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -m 700 "$RUNNER_TEMP/release-probe"
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821981 > "$RUNNER_TEMP/3517-amd64.tar.gz"
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821990 > "$RUNNER_TEMP/3517-arm64.tar.gz"
+          timeout --kill-after=5 90 python3 tests/release_3517_probe.py --amd64 "$RUNNER_TEMP/3517-amd64.tar.gz" --arm64 "$RUNNER_TEMP/3517-arm64.tar.gz" --output "$RUNNER_TEMP/release-probe/probe.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-3517-probe
+          path: ${{ runner.temp }}/release-probe/*.json
+          retention-days: 14
