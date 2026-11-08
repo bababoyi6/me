@@ -1,0 +1,18 @@
+{
+  "qualification": "bounded lab only; no production or official-client full qualification",
+  "full_matrix_run": 42450540276,
+  "measurement_source_commit": "42ecd9a5867261c33a57a979207c30046c1be0cd",
+  "full_matrix_transport_accepted": true,
+  "total_payload_successes": 20160,
+  "total_payload_errors": 0,
+  "native_cli_kvm_run": 42451301643,
+  "native_cli_source_commit": "b7b5ae122bd019d6a369aed8e496fd94df327adf",
+  "native_cli_contract_revalidated": true,
+  "root_tests": 267,
+  "root_test_seconds": 20.878,
+  "official_clients": "NOT RUN",
+  "physical_public_three_vps": "BLOCKED: no authorized disposable hosts; production isolated",
+  "24_hour_endurance": "NOT RUN: intentionally stopped historical run remains stopped",
+  "censorship_resistance": "NOT RUN",
+  "latest_stable_rechecked": "3.5.16"
+}

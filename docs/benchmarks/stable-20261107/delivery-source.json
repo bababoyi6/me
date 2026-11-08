@@ -64,8 +64,8 @@
       "sha256": "7b8941b660cc15f61d2ddb8be10ef77761ae44e6c14792aa6f97e85dde28ba03"
     },
     "telemt-dual-hop.sh": {
-      "bytes": 187517,
-      "sha256": "cdbca06310a09950fc6b68950d16621427ecbbfd9a61c354dd012514334cb93a"
+      "bytes": 188153,
+      "sha256": "b675562399f6bc21806a485297732f371019106437edea631dd5a5cf4e8a2eeb"
     },
     "tests/arm_compat_lab.py": {
       "bytes": 4349,
@@ -144,16 +144,16 @@
       "sha256": "f7bebed97cf43aa33b2796fa4a5c43fd61dc10db47f89ef5d16b3898d54cd69b"
     },
     "tests/full_system_candidate.py": {
-      "bytes": 8021,
-      "sha256": "f24b368f321205dc9aa6eab3c406dcc9dd579d39e71174c012cd8755d3b81e9f"
+      "bytes": 9955,
+      "sha256": "f2ec47572df9471c80e36aa3fac78d0e50c3b61a3aee0d28d431b4fce138717e"
     },
     "tests/full_system_ci.py": {
       "bytes": 31993,
       "sha256": "76c96f0b6e8363665d04c1a86bba5044e22d4fa8295d0bcee831ea14cfd8d9e7"
     },
     "tests/full_system_contract.py": {
-      "bytes": 3173,
-      "sha256": "ebce2f44a6e97df251032b813f09d9fc6e1459b3bbce8c4bb6cf61079f0bb4af"
+      "bytes": 3595,
+      "sha256": "55e27564ff84b03705b2c1350ad9bfb30c0d6d0d4626642bd1057b83795b52df"
     },
     "tests/high_rtt_matrix.py": {
       "bytes": 5969,
@@ -208,16 +208,16 @@
       "sha256": "690c1850dc2a1b740be41b5cef9faf6b17b4412505ed57b781fb6a1caf098b3c"
     },
     "tests/paired_analysis.py": {
-      "bytes": 5239,
-      "sha256": "27de72c3e4d6b1ee25c289bd5fd4a82e123e708fc026c401898abf9ca29b6f35"
+      "bytes": 5510,
+      "sha256": "2836349d32466cbdfa97dfc7dd54fac151f04e929d9336c556376483febb9032"
     },
     "tests/paired_performance.py": {
       "bytes": 9052,
       "sha256": "716b7355f11a5bd81f1ba063ecf389911d3ad66889e9d32d80d0a9a26f658743"
     },
     "tests/paired_report.py": {
-      "bytes": 4059,
-      "sha256": "e53a61a8ba6a10d9ab190def0656f02e39eae047a36b7d755d1e0998b3961160"
+      "bytes": 4340,
+      "sha256": "a92fc89631e277ed617aaec9ed96651a342825c54f792e76dfe78961d83715c1"
     },
     "tests/persistent_relay_lab.py": {
       "bytes": 3407,
@@ -288,16 +288,16 @@
       "sha256": "acbf279f9ad194303e96c7bbfe737ca245d564e5bcf10a3bdb3e8a1db3f17d2c"
     },
     "tests/test_candidate_system_contract.py": {
-      "bytes": 3357,
-      "sha256": "977fc1433d6f627d7d9930aede0aa63ebc990335cf3a33777354f61b4e5659b3"
+      "bytes": 3914,
+      "sha256": "41a4fecf933198b0a9690f5baba5d741a74a555cb3d1aaabe21631e555edf203"
     },
     "tests/test_config_access.py": {
       "bytes": 7878,
       "sha256": "567d3654759fd9b8ea09b733c1b0daea0cb0de3ad07c7f49ea32cc5c2ed3576f"
     },
     "tests/test_connect_policy.py": {
-      "bytes": 4995,
-      "sha256": "9ae0395b068c04258ce52008c88d91e947ec6fc296d40a7a562de4f948f7f1f0"
+      "bytes": 5863,
+      "sha256": "a9673b4c4d52989a5795964d5b47028f35e61e6bceb1bb63a34aa47ddf6911de"
     },
     "tests/test_core_bundle.py": {
       "bytes": 4243,
@@ -392,12 +392,12 @@
       "sha256": "f48fa851f12b0c413e9d9e9147d04994c9332f1728470058bcfbdce2408a068f"
     },
     "tests/test_paired_analysis.py": {
-      "bytes": 4426,
-      "sha256": "bc778e02b2a867e8a6ec49b195a705624e5d863a9108369db8cdb6822f55a5b5"
+      "bytes": 4807,
+      "sha256": "d8c1e1005caeb6f3e6202c4007c6f056a820b9c7ea0f46107a24f7ef0fcf8d55"
     },
     "tests/test_paired_report.py": {
-      "bytes": 2670,
-      "sha256": "46f0978da678f0e5b9278f46548b7244b4a3b245b8506a3b16d09c96f1012f3e"
+      "bytes": 3711,
+      "sha256": "1c71cec90fffaef070398319cbd467dcc1f20c8ae2c1484fe4b8c03d23e25675"
     },
     "tests/test_payload_pacing.py": {
       "bytes": 1621,
@@ -484,8 +484,8 @@
       "sha256": "7b453f7ed27d36aa8f40c068c62eaec41d39a1b2a26712299b8503d979ac9148"
     },
     "tools/core_upgrade.py": {
-      "bytes": 22072,
-      "sha256": "cdbe36f90f11968ea7ee008d396e1318318ec7c708b7caa86c7ff87002c6e02d"
+      "bytes": 22708,
+      "sha256": "4c56cd9c7e3fd3cc4474f5119e39105f116d2071b3969669dd932523a37682c6"
     },
     "tools/embed_core_install.py": {
       "bytes": 1076,
@@ -528,6 +528,6 @@
       "sha256": "954af489e1dc6ddce8afa99c11387e930c83a6c91a438879d7449069790c2328"
     }
   },
-  "source_commit": "31e2ac5e9635ae2adef3b61a07b5e43807066967",
+  "source_commit": "5a06645ce2278bb75b59ff0720b52d76e7fb05c5",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }
