@@ -1,0 +1,93 @@
+{
+  "conclusion": "success",
+  "databaseId": 42448064301,
+  "headSha": "19ead159d8ff01d2d4c4a89769030abaf2388070",
+  "jobs": [
+    {
+      "completedAt": "2026-11-08T04:56:42Z",
+      "conclusion": "success",
+      "databaseId": 128631124547,
+      "name": "system",
+      "startedAt": "2026-11-08T04:45:15Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-08T04:45:17Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-08T04:45:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T04:45:18Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-08T04:45:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T04:45:18Z",
+          "conclusion": "success",
+          "name": "Require actual KVM before package or image downloads",
+          "number": 3,
+          "startedAt": "2026-11-08T04:45:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T04:45:37Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable host dependencies",
+          "number": 4,
+          "startedAt": "2026-11-08T04:45:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T04:46:15Z",
+          "conclusion": "success",
+          "name": "Fetch official Ubuntu 22.04 minimal image and signed checksums",
+          "number": 5,
+          "startedAt": "2026-11-08T04:45:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T04:56:39Z",
+          "conclusion": "success",
+          "name": "Verify pinned candidate installs, native maintenance and three normal reboots",
+          "number": 6,
+          "startedAt": "2026-11-08T04:46:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T04:56:40Z",
+          "conclusion": "success",
+          "name": "Export fixed-name sanitized evidence only",
+          "number": 7,
+          "startedAt": "2026-11-08T04:56:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T04:56:40Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "startedAt": "2026-11-08T04:56:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T04:56:40Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-11-08T04:56:40Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42448064301/job/128631124547"
+    }
+  ],
+  "name": "Candidate three-system install and reboot",
+  "status": "completed",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42448064301"
+}

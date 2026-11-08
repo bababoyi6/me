@@ -60,12 +60,12 @@
       "sha256": "90b632989fcbb514adc613e9349fece576acc2c0da37920c99cc88b348ee68fd"
     },
     ".github/workflows/weak-diagnostic.yml": {
-      "bytes": 2119,
-      "sha256": "0ef151cae06adfaf51ee750c4db4b86203819aff49ef7f604afc1446d06ab0f7"
+      "bytes": 2297,
+      "sha256": "7b8941b660cc15f61d2ddb8be10ef77761ae44e6c14792aa6f97e85dde28ba03"
     },
     "telemt-dual-hop.sh": {
-      "bytes": 181344,
-      "sha256": "7680bcb8e939d40002b311154505e0b5d549b1ce285fbdbf4073ea3d35d97915"
+      "bytes": 187517,
+      "sha256": "cdbca06310a09950fc6b68950d16621427ecbbfd9a61c354dd012514334cb93a"
     },
     "tests/arm_compat_lab.py": {
       "bytes": 4349,
@@ -86,6 +86,10 @@
     "tests/candidate_path_ci.py": {
       "bytes": 1936,
       "sha256": "bb0e8e40dab06521faf10b74fab561cc18c846f9ab19f71cbe525864f5c4e71c"
+    },
+    "tests/connect_budget_lab.py": {
+      "bytes": 4539,
+      "sha256": "72f04664308994676679e894717b7d662e7ed800dc6fd6f62cbd3ca5a50e960e"
     },
     "tests/core_delivery_ci.py": {
       "bytes": 6988,
@@ -108,8 +112,8 @@
       "sha256": "e2e9043962fbb6931bc9b57a08f98b9d440325228b0aa23cc82bf0886b0f0b5e"
     },
     "tests/e2e_lab.py": {
-      "bytes": 24989,
-      "sha256": "ad216893e4fdd9a9fd1aedec1064936c925c0d90ff6a8be7f15170631a6506ca"
+      "bytes": 25744,
+      "sha256": "1c75622120928e9a4a0ed9f770144fab430a7c9dc27faaaa55419dd889dacb97"
     },
     "tests/endurance_ci.py": {
       "bytes": 1680,
@@ -240,8 +244,8 @@
       "sha256": "c4129f4c78009f297c1ed790e96dd9fd4dc4880f71f695c22abd160194b99fa4"
     },
     "tests/stable_system_lab.py": {
-      "bytes": 10688,
-      "sha256": "ee2552c93662b739eafd273bf4817da1a682a57e7cc3f0884d3e5ffeadace3e2"
+      "bytes": 11547,
+      "sha256": "04440091e2b0bc1bc8a4df134470487c0907bb5b4f26d609ad4004a5dd4a4c4e"
     },
     "tests/stream_matrix.py": {
       "bytes": 4039,
@@ -290,6 +294,10 @@
     "tests/test_config_access.py": {
       "bytes": 7878,
       "sha256": "567d3654759fd9b8ea09b733c1b0daea0cb0de3ad07c7f49ea32cc5c2ed3576f"
+    },
+    "tests/test_connect_policy.py": {
+      "bytes": 4995,
+      "sha256": "9ae0395b068c04258ce52008c88d91e947ec6fc296d40a7a562de4f948f7f1f0"
     },
     "tests/test_core_bundle.py": {
       "bytes": 4243,
@@ -440,8 +448,8 @@
       "sha256": "ee726bd1ea099b4578b40aa8f59a3d62ce2dde7a9bc51e0bd6bad062407dd92c"
     },
     "tests/weak_network_diagnostic.py": {
-      "bytes": 6790,
-      "sha256": "2f5f986c2276ecfdd5feae5491898cc5247e334193ae1c48d1b55fb7f4b67c01"
+      "bytes": 7571,
+      "sha256": "001ec5e88402d2c7ca9a3e47945d9c9ecd222e6d25d6957c49260ea74212b796"
     },
     "tests/weak_sequence_diagnostic.py": {
       "bytes": 2902,
@@ -472,12 +480,12 @@
       "sha256": "72b37a072e2400369ccc6ce387fe2cce0ab7da935cb3579ce05009cb4d18e11f"
     },
     "tools/core_transaction.py": {
-      "bytes": 9833,
-      "sha256": "0d4e02e249a7f13cbb8a8793cac6b0c520ed8bcc86694cf65e79fda377ade1f1"
+      "bytes": 11185,
+      "sha256": "7b453f7ed27d36aa8f40c068c62eaec41d39a1b2a26712299b8503d979ac9148"
     },
     "tools/core_upgrade.py": {
-      "bytes": 17751,
-      "sha256": "75e3e73e7d71d4bd6130ce8674896b93af86805be4df7e8cc7e8e8bd45c45417"
+      "bytes": 22072,
+      "sha256": "cdbe36f90f11968ea7ee008d396e1318318ec7c708b7caa86c7ff87002c6e02d"
     },
     "tools/embed_core_install.py": {
       "bytes": 1076,
@@ -520,6 +528,6 @@
       "sha256": "954af489e1dc6ddce8afa99c11387e930c83a6c91a438879d7449069790c2328"
     }
   },
-  "source_commit": "6e8ed713d507c3ab8519e3c83013910fae7c5713",
+  "source_commit": "31e2ac5e9635ae2adef3b61a07b5e43807066967",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }

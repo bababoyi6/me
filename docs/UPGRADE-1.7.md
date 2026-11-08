@@ -29,7 +29,7 @@ sudo env TDH_NEW_INSTALL_CORE=audit2 bash ./telemt-dual-hop.sh
 
 1. **入口**运行 `a backend-drain 1`。只有 backend2 在两条逻辑线路均为 UP 才允许排空；此操作停止向 backend1 分配新连接，不主动终止已有会话。
 2. 查看 HAProxy `scur` 等待旧会话结束，或接受后端重启将断开这些会话。`--maintenance` 是操作者对维护条件的明确确认，后端不能独立证明入口已排空。
-3. **backend1** 执行 `a core-upgrade --maintenance`，再执行 `a health-refresh --maintenance`。
+3. **backend1** 执行 `a core-upgrade --maintenance`，再执行 `a connect-refresh --maintenance` 和 `a health-refresh --maintenance`。
 4. **backend1** 执行 `a diagnose`；确认服务、隧道和协议抽检。健康代理冷启动通常至少需要三轮 DC 采样。
 5. **入口**执行 `a backend-resume 1`，检查两条线路，完成后再以相同步骤维护 backend2。
 
@@ -45,11 +45,32 @@ sudo env TDH_NEW_INSTALL_CORE=audit2 bash ./telemt-dual-hop.sh
 
 旧核心备份、配置快照标识和事务阶段绑定在同一耐久日志；文件 fsync、原子替换并同步父目录。服务重启后要求 API 就绪且 MainPID 的实际核心摘要匹配。候选启动/就绪失败自动恢复旧二进制并重启旧服务；恢复失败如实报错并保留备份。
 
-本次托管原生模板无需 TOML 重写，保持原文件字节，不增加新配置键，不重生成 Secret/SNI、加入信息或链接。3.5.8 起上游逐级以 `O_RDONLY|O_DIRECTORY|O_NOFOLLOW` 打开配置父目录；旧 `/etc/telemt-dual-hop` 的 0710 权限会导致新核心报 Permission denied。新安装使用 root:telemt 0750。旧节点仅在明确核心维护升级时，将此目录 0710→0750；不改所有者、文件内容或子目录权限。专用服务组因此能列出顶层文件名，但 `state.env` 仍为 0600，WG 密钥目录及升级备份仍为 0700，服务账号不能读取它们。
+核心替换本身保持原 TOML 文件字节；单独的 `connect-refresh` 才迁移三个默认连接参数，不重生成 Secret/SNI、加入信息或链接。3.5.8 起上游逐级以 `O_RDONLY|O_DIRECTORY|O_NOFOLLOW` 打开配置父目录；旧 `/etc/telemt-dual-hop` 的 0710 权限会导致新核心报 Permission denied。新安装使用 root:telemt 0750。旧节点仅在明确核心维护升级时，将此目录 0710→0750；不改所有者、文件内容或子目录权限。专用服务组因此能列出顶层文件名，但 `state.env` 仍为 0600，WG 密钥目录及升级备份仍为 0700，服务账号不能读取它们。
 
 迁移前在私有 `core-upgrade/config-access.json` 原子保存原模式、UID/GID、路径和原核心摘要；中断后重复运行按同一记录继续。预检失败恢复旧权限，核心回退至记录中的原二进制后恢复 0710；回退到仍需新版目录访问的核心时保留 0750。若中断发生在权限迁移后、核心事务日志创建前，`core-rollback --maintenance` 可仅恢复目录访问；原核心已被外部改动则拒绝并要求审查。定制模式、组、软链接或被改动的记录均不自动猜测转换。
 
 上游也更严格拒绝配置/包含文件的软链接、硬链接或不安全布局；遇到定制 include、WEB、配额或非托管单元，应先单独审计。
+
+## DC 连接策略的独立维护
+
+新安装明确设置 `[general]` 的 `tg_connect=4`、`upstream_connect_retry_attempts=2`、`upstream_connect_budget_ms=9000`。正常连接成功即返回；总预算不再是原来的 3 秒，使丢包重传与第二次尝试有机会完成。它不增加后台连接池，不改变已建立连接的数据速率；严重故障下单次新连接可能更晚返回失败，客户端总耗时还包含认证和排队。
+
+旧节点先完成核心升级，再在同一后端排空窗口执行：
+
+```sh
+a connect-refresh --maintenance
+```
+
+仅补齐缺失的三个键或替换对应上游默认值，保留其他字节、注释、Secret/SNI、端口和 API 令牌。定制数值、重复键、多行字符串或非托管布局拒绝自动修改。候选由当前核心实际解析并检查当前服务身份，再停止服务、原子替换、启动与检查就绪；配置保持原 UID/GID 和 0640，原文件备份为私有目录中的 0600。失败自动恢复，崩溃后使用 `connect-rollback`；未完成的事务不能被重复执行掩盖。外部修改配置或权限时拒绝回退覆盖。
+
+按“先核心升级、后连接策略”的推荐顺序应用后，回退应反向进行：
+
+```sh
+a connect-rollback --maintenance
+a core-rollback --maintenance
+```
+
+必须先恢复核心事务快照对应的配置，否则核心回退会因配置漂移安全停止。若曾按其他顺序或在两次维护之间改过配置，先核对私有快照，不猜测回退顺序。回退连接策略不替换核心；管理器普通更新不隐式应用此策略。两台后端逐台操作，已有 TCP 会话不能迁移。
 
 ## 快速回退与中断恢复
 

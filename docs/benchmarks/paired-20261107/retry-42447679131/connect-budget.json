@@ -1,0 +1,133 @@
+{
+  "source_commit": "b9213873889a14edca26c5ababdcd06ea740a4ee",
+  "scope": "synthetic DC only; delay outgoing DC SYN by 3500ms, all other packets unchanged",
+  "rows": [
+    {
+      "kind": "balanced2",
+      "version": "telemt 3.5.5+tdh.balanced2",
+      "policy": "upstream-default",
+      "success": false,
+      "failure": {
+        "type": "RuntimeError",
+        "phase": "payload",
+        "reason": "unexpected EOF",
+        "elapsed_seconds": 3.2440071899999907
+      },
+      "core_alive": true,
+      "config_sha256": "d10e16e15ed07489593f8930894fbf4dab99372a42418c451b7bf33ff4a72442",
+      "cleaned": true
+    },
+    {
+      "kind": "balanced2",
+      "version": "telemt 3.5.5+tdh.balanced2",
+      "policy": "bounded-retry",
+      "success": true,
+      "transfer": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 4096,
+        "elapsed_seconds": 3.558922835999965,
+        "handshake_ms": 16.924996999989617,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "core_alive": true,
+      "config_sha256": "90344fadad9c8c8b2601cda1af2288e29134fa2ac13ac03f011b21ed580adf9a",
+      "cleaned": true
+    },
+    {
+      "kind": "stable",
+      "version": "telemt 3.5.16",
+      "policy": "upstream-default",
+      "success": false,
+      "failure": {
+        "type": "RuntimeError",
+        "phase": "payload",
+        "reason": "unexpected EOF",
+        "elapsed_seconds": 3.199117574000013
+      },
+      "core_alive": true,
+      "config_sha256": "01f91a3e96d85bb5370887c2eff219a9e553a025c78209d10d294bd63d813f02",
+      "cleaned": true
+    },
+    {
+      "kind": "stable",
+      "version": "telemt 3.5.16",
+      "policy": "bounded-retry",
+      "success": true,
+      "transfer": {
+        "direction": "D",
+        "domain_index": 1,
+        "path": "haproxy-telemt",
+        "bytes": 4096,
+        "elapsed_seconds": 3.565410388000032,
+        "handshake_ms": 22.79741400002422,
+        "sha256_verified": true,
+        "persistent_dc": true
+      },
+      "core_alive": true,
+      "config_sha256": "17098045ce25146a7e2bfebe785b2aafbe23b48858435c9ae906db24a4f4a7a8",
+      "cleaned": true
+    }
+  ],
+  "resources_before": {
+    "memory_current": 15515648,
+    "memory_peak": 15716352,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 77393,
+      "user_usec": 64327,
+      "system_usec": 13066,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 1,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "1610612736",
+    "swap_max": "0",
+    "pids_current": 2
+  },
+  "accepted": true,
+  "resources_after": {
+    "memory_current": 90488832,
+    "memory_peak": 171814912,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 564664,
+      "user_usec": 394161,
+      "system_usec": 170502,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 33,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "1610612736",
+    "swap_max": "0",
+    "pids_current": 2
+  },
+  "oom_delta": {
+    "oom": 0,
+    "oom_kill": 0
+  }
+}
