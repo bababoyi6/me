@@ -38,6 +38,7 @@ class QueueAnalysisTests(unittest.TestCase):
                     if field=='speed':row['mbps']=140
                     else:row['path_probe']['samples'][0]['rtt_ms']=170
             self.assertTrue(all(c['classification']=='NO_JOINT_GAIN' for c in analyze(data)['cases']))
+            self.assertTrue(all(c['decision']=='DO_NOT_PROMOTE' for c in analyze(data)['decisions']))
 
     def test_partial_missing_metrics_wrong_order_and_unknown_upstream_fail_closed(self):
         base=fixture()

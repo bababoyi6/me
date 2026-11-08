@@ -66,7 +66,14 @@ def analyze(data):
                 'candidate_median_mbps':statistics.median(r['mbps'] for r in new),
                 'baseline_tcp_rtt_ms':[r['tcp_rtt_median'] for r in old],'candidate_tcp_rtt_ms':[r['tcp_rtt_median'] for r in new],
                 'baseline_ping_p95_ms':[r['ping_p95'] for r in old],'candidate_ping_p95_ms':[r['ping_p95'] for r in new]})
-    return {'source_commit':data['source_commit'],'transport_accepted':True,'cases':cases,
+    decisions=[]
+    for variant in VARIANTS[1:]:
+        single=next(c for c in cases if c['streams']==1 and c['candidate']==variant)
+        multi=next(c for c in cases if c['streams']==4 and c['candidate']==variant)
+        eligible=(multi['classification']=='JOINT_GAIN' and single['classification'] in ('JOINT_GAIN','NO_JOINT_GAIN') and
+            min(single['throughput_ratios'])>=.95 and max(single['tcp_rtt_ratios'])<=1.10 and max(single['path_ping_p95_ratios'])<=1.05)
+        decisions.append({'candidate':variant,'decision':'REPLICATE_CANDIDATE' if eligible else 'DO_NOT_PROMOTE'})
+    return {'source_commit':data['source_commit'],'transport_accepted':True,'cases':cases,'decisions':decisions,
         'scope':'one host, balanced four-way crossover; synthetic payload, no production or client claim',
         'rule':'every pair: throughput >=95%, median TCP RTT <=80%, path ping p95 <=105%; CPU/path/probe gates first'}
 
