@@ -3,6 +3,8 @@ import argparse
 import copy
 import json
 import os
+import platform
+import re
 from pathlib import Path
 import signal
 import tempfile
@@ -19,6 +21,7 @@ def main():
     parser.add_argument('--stable-archive', required=True)
     parser.add_argument('--balanced2-archive', required=True)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--correlate', action='store_true', help='six weak-only 100-stream pairs with private per-connection debug logs')
     args = parser.parse_args()
     os.umask(0o077)
     backend_cpu, controller_cpu = guard()
@@ -27,6 +30,8 @@ def main():
              'rate', '100mbit', 'limit', '10000'])
     report = {'scope': 'diagnostic only; genuine HAProxy/Telemt/transport, synthetic DC; no production changes',
               'source_commit': os.environ['TDH_SOURCE_COMMIT'], 'complete': False, 'runs': [],
+              'os': platform.freedesktop_os_release()['PRETTY_NAME'], 'kernel': os.uname().release,
+              'cpu_model': next((s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')), None),
               'resources_before': resources(), 'tcp_congestion_control': Path('/proc/sys/net/ipv4/tcp_congestion_control').read_text().strip()}
     output = Path(args.output)
     write(output, report)
@@ -37,14 +42,18 @@ def main():
             for kind, pins in acceptance.PINS.items():
                 content, _ = archive_payload(getattr(args, kind+'_archive'), pins[0], pins[2].removeprefix('telemt '), pins[1], False)
                 target = root/kind;target.write_bytes(content);target.chmod(0o755);binaries[kind] = target
-            for pair in range(1, 3):
-                for kind, fast in (('balanced2', True), ('stable', True), ('stable', False)):
+            for pair in range(1, 7 if args.correlate else 3):
+                order = (('balanced2', True), ('stable', True)) if pair % 2 else (('stable', True), ('balanced2', True))
+                if not args.correlate:
+                    order = (('balanced2', True), ('stable', True), ('stable', False))
+                for kind, fast in order:
                     captured = {'errors': []}
                     ledger = root/f'ledger-{pair}-{kind}-{fast}'
                     startup = root/f'startup-{pair}-{kind}-{fast}.json'
                     class CapturedLab(FullLab):
                         def __init__(self, *values, **options):
-                            super().__init__(*values, **options, fast=fast, artifact_registry=ledger, startup_report=startup)
+                            super().__init__(*values, **options, fast=fast, artifact_registry=ledger, startup_report=startup,
+                                             connection_logs=args.correlate)
                         def transfer(self, *values, **options):
                             try:
                                 return super().transfer(*values, **options)
@@ -52,9 +61,23 @@ def main():
                                 captured['errors'].append({'type': type(error).__name__,
                                     'phase': getattr(error, 'lab_phase', 'unknown'),
                                     'received_bytes': getattr(error, 'lab_received_bytes', None),
+                                    'client_port': getattr(error, 'lab_client_port', None),
+                                    'elapsed_seconds': getattr(error, 'lab_elapsed_seconds', None),
                                     'reason': sanitize_startup_log(str(error))[:256]})
                                 raise
                         def close(self):
+                            if args.correlate and hasattr(self, 'root'):
+                                for filename, key in (('startup.log', 'core_connection_log'), ('haproxy-errors.txt', 'haproxy_connection_log')):
+                                    log = self.root/filename
+                                    if log.is_file():
+                                        # Read a bounded tail and export only failed synthetic flow events.
+                                        with log.open('rb') as source:
+                                            source.seek(max(0, log.stat().st_size-4*1024**2))
+                                            lines = source.read(4*1024**2).decode(errors='replace').splitlines()
+                                        for error in captured['errors']:
+                                            port = error.get('client_port')
+                                            pattern = re.compile(r'127\.0\.0\.1:'+str(port)+r'\b')
+                                            error[key] = '\n'.join(sanitize_startup_log(line) for line in lines if pattern.search(line))[-12000:]
                             log = getattr(self, 'root', root)/'startup.log'
                             if log.is_file():
                                 with log.open('rb') as stream:
@@ -67,7 +90,8 @@ def main():
                     acceptance.FullLab = CapturedLab
                     record = {'round': pair, 'kind': kind, 'fast_mode': fast, 'observation': captured}
                     report['runs'].append(record)
-                    record['result'] = acceptance.run(binaries[kind], kind, offline_lab=True, backend_cpu=backend_cpu)
+                    record['result'] = acceptance.run(binaries[kind], kind, (100,) if args.correlate else (30, 50, 100),
+                                                     offline_lab=True, backend_cpu=backend_cpu)
                     write(output, report)
                     print(json.dumps({'round': pair, 'kind': kind, 'fast': fast, 'errors': len(captured['errors'])}), flush=True)
             report['complete'] = True

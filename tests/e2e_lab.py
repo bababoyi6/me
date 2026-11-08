@@ -152,11 +152,13 @@ class FullLab:
     def __init__(self, binary, haproxy="haproxy", fast=True, real_dc=False, splice=False,
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
                  listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None,
-                 shared_binary_root=None,startup_report=None,offline_lab=False):
+                 shared_binary_root=None,startup_report=None,offline_lab=False,connection_logs=False):
         if offline_lab and real_dc:
             raise ValueError('offline bootstrap is confined to synthetic DC tests')
         if startup_report is not None and (real_dc or artifact_registry is None):
             raise ValueError('startup diagnostics require a private synthetic experimental lab')
+        if connection_logs and (startup_report is None or real_dc):
+            raise ValueError('connection diagnostics require private synthetic startup logging')
         if listen_endpoint is not None and (listen_endpoint not in (("10.77.1.2", 24431), ("10.77.2.2", 24431))
                                             or real_dc or start_haproxy):
             raise ValueError("private namespace backend requires a fixed WG bind and no local frontend")
@@ -271,11 +273,13 @@ class FullLab:
             config = self.root / "haproxy.cfg"
             pipes = "    maxpipes 128\n" if splice else ""
             forwarding = "    option splice-auto\n" if splice else ""
+            global_logging = "    log stdout format raw local0\n" if connection_logs else ""
+            session_logging = "    log global\n    option tcplog\n" if connection_logs else ""
             config.write_text(f'''global
     nbthread 1
-{pipes}defaults
+{global_logging}{pipes}defaults
     mode tcp
-    timeout connect 3s
+{session_logging}    timeout connect 3s
     timeout client 20s
     timeout server 20s
 frontend mtp_tls
@@ -306,7 +310,7 @@ backend telemt
             error_file = self.root / "haproxy-errors.txt"
             with error_file.open("wb") as errors:
                 self.haproxy = subprocess.Popen([str(haproxy_target), "-db", "-f", str(config)], cwd=self.root, env=haproxy_environment, **self.identity(),
-                                                stdout=subprocess.DEVNULL, stderr=errors)
+                                                stdout=errors if connection_logs else subprocess.DEVNULL, stderr=errors)
             self.processes.append(self.haproxy)
             deadline = time.monotonic() + 3
             while time.monotonic() < deadline and self.haproxy.poll() is None:
@@ -338,8 +342,10 @@ backend telemt
             raise ValueError('bounded lab send buffer required')
         started = time.monotonic()
         phase, observed = "connect", None
+        client_port = None
         try:
             with socket.create_connection(("127.0.0.1", self.listen if direct else self.front), timeout=8) as sock:
+                client_port = sock.getsockname()[1]
                 if receive_buffer:
                     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, receive_buffer)
                 if send_buffer:
@@ -373,6 +379,7 @@ backend telemt
             exc.lab_phase = phase
             exc.lab_received_bytes = observed.bytes if observed else None
             exc.lab_elapsed_seconds = time.monotonic() - started
+            exc.lab_client_port = client_port
             raise
         return {"direction": direction, "domain_index": list(SECRETS).index(domain) + 1,
                 "path": "telemt" if direct else "haproxy-telemt", "bytes": size,
