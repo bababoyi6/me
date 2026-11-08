@@ -1,0 +1,1247 @@
+{
+  "scope": "observer only; genuine binaries and maintained full paired sequence",
+  "runs": [
+    {
+      "ordinal": 1,
+      "errors": [
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        },
+        {
+          "type": "RuntimeError",
+          "phase": "digest",
+          "received_bytes": 262144,
+          "reason": "unexpected EOF"
+        }
+      ],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:13:29.719478Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:13:29.719486Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:13:29.719490Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:13:29.719497Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:13:29.719709Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:13:29.719862Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:13:29.719868Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:13:29.719898Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:13:29.720814Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:13:29.720828Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:13:29.720831Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:13:29.720833Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:13:29.720837Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:13:29.720839Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:13:29.720842Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:13:29.721021Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:58379 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:13:29.721146Z  INFO telemt::api: API endpoint: http://127.0.0.1:35101/v1/* and /web-status\n2026-11-07T13:13:29.721218Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:13:29.721844Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-m5ys8av8/config/telemt.toml\"\n2026-11-07T13:13:29.721883Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:13:29.772637Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": [
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        },
+        {
+          "phase": "ack",
+          "type": "TimeoutError"
+        }
+      ]
+    },
+    {
+      "ordinal": 2,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:13:51.438772Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:13:51.438784Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:13:51.438788Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:13:51.438796Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:13:51.439495Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:13:51.439653Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:13:51.439659Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:13:51.439683Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:13:51.440703Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:13:51.440719Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:13:51.440722Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:13:51.440725Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:13:51.440729Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:13:51.440731Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:13:51.440734Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:13:51.440881Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:36479 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:13:51.441029Z  INFO telemt::api: API endpoint: http://127.0.0.1:52553/v1/* and /web-status\n2026-11-07T13:13:51.441106Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:13:51.441769Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-n4vjreme/config/telemt.toml\"\n2026-11-07T13:13:51.441812Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:13:51.493755Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 3,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:14:13.122290Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:14:13.122303Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:14:13.122307Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:14:13.122314Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:14:13.122997Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:14:13.123164Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:14:13.123171Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:14:13.123199Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:14:13.124132Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:14:13.124148Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:14:13.124151Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:14:13.124154Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:14:13.124158Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:14:13.124160Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:14:13.124163Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:14:13.124303Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:56637 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:14:13.124417Z  INFO telemt::api: API endpoint: http://127.0.0.1:37131/v1/* and /web-status\n2026-11-07T13:14:13.124496Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:14:13.125197Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-p92rr4g5/config/telemt.toml\"\n2026-11-07T13:14:13.125239Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:14:13.177162Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 4,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:14:50.282792Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:14:50.282804Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:14:50.282807Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:14:50.282810Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:14:50.282953Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:14:50.283173Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:14:50.283183Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:14:50.283214Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:14:50.284356Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:14:50.284374Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:14:50.284377Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:14:50.284380Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:14:50.284383Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:14:50.284386Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:14:50.284388Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:14:50.284440Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:14:50.285242Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-zrdrpd7p/config/telemt.toml\"\n2026-11-07T13:14:50.285288Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:14:50.285582Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:58079 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:14:50.285638Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:45953)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 5,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:15:26.621740Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:15:26.621752Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:15:26.621755Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:15:26.621758Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:15:26.621910Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:15:26.622147Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:15:26.622157Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:15:26.622185Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:15:26.623125Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:15:26.623140Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:15:26.623143Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:15:26.623146Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:15:26.623149Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:15:26.623152Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:15:26.623155Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:15:26.623252Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:39015 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:15:26.623334Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:44297)\n2026-11-07T13:15:26.623357Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:15:26.624080Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-5yw0cs7n/config/telemt.toml\"\n2026-11-07T13:15:26.624127Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 6,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:16:03.554862Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:16:03.554876Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:16:03.554880Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:16:03.554887Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:16:03.555596Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:16:03.555795Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:16:03.555801Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:16:03.555833Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:16:03.556790Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:16:03.556804Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:16:03.556807Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:16:03.556810Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:16:03.556813Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:16:03.556816Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:16:03.556819Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:16:03.556951Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:16:03.557665Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-eiekss7i/config/telemt.toml\"\n2026-11-07T13:16:03.557709Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:16:03.560075Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:44389 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:16:03.561256Z  INFO telemt::api: API endpoint: http://127.0.0.1:36375/v1/* and /web-status\n2026-11-07T13:16:03.609703Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 7,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:16:40.762431Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:16:40.762439Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:16:40.762443Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:16:40.762450Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:16:40.763146Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:16:40.763308Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:16:40.763314Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:16:40.763344Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:16:40.764251Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:16:40.764266Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:16:40.764268Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:16:40.764271Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:16:40.764275Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:16:40.764277Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:16:40.764280Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:16:40.764415Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:34145 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:16:40.764531Z  INFO telemt::api: API endpoint: http://127.0.0.1:34445/v1/* and /web-status\n2026-11-07T13:16:40.764603Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:16:40.765283Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-kn5l0pl1/config/telemt.toml\"\n2026-11-07T13:16:40.765327Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:16:40.817073Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 8,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:17:17.935546Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:17:17.935558Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:17:17.935562Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:17:17.935564Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:17:17.935704Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:17:17.935899Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:17:17.935905Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:17:17.935932Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:17:17.936861Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:17:17.936877Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:17:17.936880Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:17:17.936882Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:17:17.936886Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:17:17.936888Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:17:17.936891Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:17:17.937022Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:34121 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:17:17.937123Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:40469)\n2026-11-07T13:17:17.937145Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:17:17.937852Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-o6lel2sk/config/telemt.toml\"\n2026-11-07T13:17:17.937890Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 9,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:17:54.202305Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:17:54.202316Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:17:54.202319Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:17:54.202322Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:17:54.202456Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:17:54.202671Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:17:54.202678Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:17:54.202707Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:17:54.203639Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:17:54.203655Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:17:54.203657Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:17:54.203660Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:17:54.203663Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:17:54.203666Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:17:54.203668Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:17:54.203758Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:49463 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:17:54.203840Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:33555)\n2026-11-07T13:17:54.203865Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:17:54.204559Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-av0f4em0/config/telemt.toml\"\n2026-11-07T13:17:54.204600Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 10,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:18:30.519311Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:18:30.519323Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:18:30.519327Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:18:30.519334Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:18:30.520042Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:18:30.520201Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:18:30.520207Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:18:30.520231Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:18:30.521271Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:18:30.521286Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:18:30.521289Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:18:30.521292Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:18:30.521295Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:18:30.521298Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:18:30.521301Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:18:30.521434Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:18:30.522162Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-4l1qsiv1/config/telemt.toml\"\n2026-11-07T13:18:30.522206Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:18:30.522329Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:49391 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:18:30.524563Z  INFO telemt::api: API endpoint: http://127.0.0.1:45369/v1/* and /web-status\n2026-11-07T13:18:30.574141Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 11,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:19:07.624772Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:19:07.624779Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:19:07.624783Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:19:07.624790Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:19:07.625059Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:19:07.625253Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:19:07.625259Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:19:07.625288Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:19:07.626186Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:19:07.626200Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:19:07.626203Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:19:07.626205Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:19:07.626209Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:19:07.626212Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:19:07.626214Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:19:07.626350Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:19:07.627058Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:56519 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:19:07.627203Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-ye1tzwrp/config/telemt.toml\"\n2026-11-07T13:19:07.627245Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:19:07.629399Z  INFO telemt::api: API endpoint: http://127.0.0.1:59189/v1/* and /web-status\n2026-11-07T13:19:07.679833Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 12,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:19:44.832358Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:19:44.832365Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:19:44.832368Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:19:44.832371Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:19:44.832516Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:19:44.832707Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:19:44.832714Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:19:44.832745Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:19:44.833698Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:19:44.833716Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:19:44.833719Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:19:44.833721Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:19:44.833725Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:19:44.833728Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:19:44.833730Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:19:44.833828Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:33893 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:19:44.833919Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:48291)\n2026-11-07T13:19:44.833945Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:19:44.834734Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-a07isv7f/config/telemt.toml\"\n2026-11-07T13:19:44.834782Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 13,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:20:21.117524Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:20:21.117536Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:20:21.117539Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:20:21.117542Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:20:21.117679Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:20:21.117900Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:20:21.117907Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:20:21.117937Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:20:21.118853Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:20:21.118869Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:20:21.118872Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:20:21.118875Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:20:21.118878Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:20:21.118881Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:20:21.118883Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:20:21.119012Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:56837 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:20:21.119098Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:57237)\n2026-11-07T13:20:21.119125Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:20:21.119821Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-pzqu94v_/config/telemt.toml\"\n2026-11-07T13:20:21.119857Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 14,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:20:57.428518Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:20:57.428531Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:20:57.428535Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:20:57.428543Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:20:57.428756Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:20:57.428954Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:20:57.428961Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:20:57.429014Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:20:57.429934Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:20:57.429945Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:20:57.429948Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:20:57.429951Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:20:57.429954Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:20:57.429957Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:20:57.429959Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:20:57.430147Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:20:57.430846Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-1lu060xy/config/telemt.toml\"\n2026-11-07T13:20:57.430886Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:20:57.431393Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:58065 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:20:57.431465Z  INFO telemt::api: API endpoint: http://127.0.0.1:39611/v1/* and /web-status\n2026-11-07T13:20:57.483273Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 15,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:21:34.639436Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:21:34.639448Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:21:34.639452Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:21:34.639458Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:21:34.640229Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:21:34.640382Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:21:34.640387Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:21:34.640411Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:21:34.641359Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:21:34.641373Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:21:34.641376Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:21:34.641379Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:21:34.641382Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:21:34.641385Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:21:34.641388Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:21:34.641534Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:35213 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:21:34.641650Z  INFO telemt::api: API endpoint: http://127.0.0.1:50367/v1/* and /web-status\n2026-11-07T13:21:34.641720Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:21:34.642416Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-dnngfxmn/config/telemt.toml\"\n2026-11-07T13:21:34.642462Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:21:34.694090Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 16,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:21:41.394795Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:21:41.394806Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:21:41.394809Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:21:41.394812Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:21:41.394943Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:21:41.395170Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:21:41.395180Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:21:41.395209Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:21:41.396133Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:21:41.396150Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:21:41.396153Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:21:41.396156Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:21:41.396159Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:21:41.396162Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:21:41.396165Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:21:41.396269Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:60255 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:21:41.396348Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:40047)\n2026-11-07T13:21:41.396368Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:21:41.397155Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-j5o2gfig/config/telemt.toml\"\n2026-11-07T13:21:41.397196Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 17,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:21:48.415731Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:21:48.415744Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:21:48.415747Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:21:48.415750Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:21:48.415896Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:21:48.416125Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:21:48.416136Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:21:48.416164Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:21:48.417247Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:21:48.417265Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:21:48.417268Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:21:48.417271Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:21:48.417274Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:21:48.417277Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:21:48.417280Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:21:48.417327Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:21:48.418119Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-58jbeagb/config/telemt.toml\"\n2026-11-07T13:21:48.418164Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:21:48.418456Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:37931 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:21:48.418502Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:58993)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 18,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:21:55.164799Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:21:55.164811Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:21:55.164815Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:21:55.164823Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:21:55.165068Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:21:55.165267Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:21:55.165274Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:21:55.165298Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:21:55.166236Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:21:55.166251Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:21:55.166254Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:21:55.166256Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:21:55.166260Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:21:55.166263Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:21:55.166265Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:21:55.166398Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:21:55.167112Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:48487 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:21:55.167259Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-zn8_f32c/config/telemt.toml\"\n2026-11-07T13:21:55.167298Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:21:55.169508Z  INFO telemt::api: API endpoint: http://127.0.0.1:32877/v1/* and /web-status\n2026-11-07T13:21:55.219161Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 19,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:22:01.938131Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:22:01.938142Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:22:01.938146Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:22:01.938153Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:22:01.938842Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:22:01.939011Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:22:01.939021Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:22:01.939043Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:22:01.939937Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:22:01.939948Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:22:01.939951Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:22:01.939953Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:01.939957Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:22:01.939959Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:22:01.939998Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:01.940142Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:44529 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:22:01.940252Z  INFO telemt::api: API endpoint: http://127.0.0.1:60501/v1/* and /web-status\n2026-11-07T13:22:01.940324Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:22:01.941019Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-5s2dglzl/config/telemt.toml\"\n2026-11-07T13:22:01.941068Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:22:01.992704Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 20,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:22:09.170892Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:22:09.170904Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:22:09.170907Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:22:09.170910Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:22:09.171085Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:22:09.171272Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:22:09.171279Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:22:09.171310Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:22:09.172398Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:22:09.172417Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:22:09.172420Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:22:09.172422Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:09.172426Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:22:09.172429Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:22:09.172431Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:09.172484Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:22:09.173286Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-1xqqwc0z/config/telemt.toml\"\n2026-11-07T13:22:09.173333Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:22:09.173610Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:47767 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:22:09.173681Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:50291)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 21,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:22:16.399578Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:22:16.399589Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:22:16.399593Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:22:16.399596Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:22:16.399740Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:22:16.399923Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:22:16.399930Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:22:16.399956Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:22:16.400884Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:22:16.400901Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:22:16.400904Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:22:16.400906Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:16.400910Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:22:16.400912Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:22:16.400915Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:16.401073Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:49779 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:22:16.401155Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:51815)\n2026-11-07T13:22:16.401177Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:22:16.401848Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-bkh193pu/config/telemt.toml\"\n2026-11-07T13:22:16.401885Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 22,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:22:23.136023Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:22:23.136035Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:22:23.136039Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:22:23.136047Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:22:23.136734Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:22:23.136893Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:22:23.136899Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:22:23.136924Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:22:23.137881Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:22:23.137897Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:22:23.137900Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:22:23.137903Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:23.137907Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:22:23.137909Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:22:23.137912Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:23.138078Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:39461 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:22:23.138210Z  INFO telemt::api: API endpoint: http://127.0.0.1:36115/v1/* and /web-status\n2026-11-07T13:22:23.138283Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:22:23.138940Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-d3bg0u3s/config/telemt.toml\"\n2026-11-07T13:22:23.139011Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:22:23.190755Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 23,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:22:30.118052Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:22:30.118061Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:22:30.118065Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:22:30.118072Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:22:30.118329Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:22:30.118489Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:22:30.118494Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:22:30.118524Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:22:30.119460Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:22:30.119475Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:22:30.119478Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:22:30.119481Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:30.119484Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:22:30.119487Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:22:30.119490Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:22:30.119628Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:44163 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:22:30.119746Z  INFO telemt::api: API endpoint: http://127.0.0.1:33591/v1/* and /web-status\n2026-11-07T13:22:30.119824Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:22:30.120571Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-10vpwkdw/config/telemt.toml\"\n2026-11-07T13:22:30.120616Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:22:30.173219Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 24,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:23:10.126248Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:23:10.126260Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:23:10.126263Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:23:10.126266Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:23:10.126405Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:23:10.126590Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:23:10.126597Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:23:10.126627Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:23:10.127640Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:23:10.127658Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:23:10.127661Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:23:10.127663Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:23:10.127667Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:23:10.127669Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:23:10.127672Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:23:10.127765Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:51295 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:23:10.127857Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:35897)\n2026-11-07T13:23:10.127881Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:23:10.128599Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-zwku68u0/config/telemt.toml\"\n2026-11-07T13:23:10.128642Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 25,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:23:53.826042Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:23:53.826049Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:23:53.826053Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:23:53.826056Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:23:53.826203Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:23:53.826402Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:23:53.826409Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:23:53.826441Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:23:53.827371Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:23:53.827388Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:23:53.827391Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:23:53.827393Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:23:53.827397Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:23:53.827400Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:23:53.827402Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:23:53.827511Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:55149 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:23:53.827602Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:40209)\n2026-11-07T13:23:53.827629Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:23:53.828375Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-bs1dsfrp/config/telemt.toml\"\n2026-11-07T13:23:53.828423Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 26,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:24:33.862388Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:24:33.862402Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:24:33.862406Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:24:33.862413Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:24:33.863155Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:24:33.863318Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:24:33.863324Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:24:33.863350Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:24:33.864303Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:24:33.864319Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:24:33.864322Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:24:33.864324Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:24:33.864328Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:24:33.864331Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:24:33.864334Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:24:33.864473Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:45127 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:24:33.864602Z  INFO telemt::api: API endpoint: http://127.0.0.1:39531/v1/* and /web-status\n2026-11-07T13:24:33.864687Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:24:33.865393Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-tjr9avjs/config/telemt.toml\"\n2026-11-07T13:24:33.865439Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:24:33.916619Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 27,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:25:12.619204Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:25:12.619216Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:25:12.619220Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:25:12.619228Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:25:12.619929Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:25:12.620229Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:25:12.620239Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:25:12.620263Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:25:12.621211Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:25:12.621225Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:25:12.621228Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:25:12.621231Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:25:12.621234Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:25:12.621237Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:25:12.621240Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:25:12.621389Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:35947 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:25:12.621513Z  INFO telemt::api: API endpoint: http://127.0.0.1:46075/v1/* and /web-status\n2026-11-07T13:25:12.621589Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:25:12.622304Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-vezlwo8k/config/telemt.toml\"\n2026-11-07T13:25:12.622347Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:25:12.673664Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 28,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:25:57.126865Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:25:57.126877Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:25:57.126880Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:25:57.126883Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:25:57.127040Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:25:57.127256Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:25:57.127263Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:25:57.127295Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:25:57.128222Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:25:57.128238Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:25:57.128241Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:25:57.128243Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:25:57.128247Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:25:57.128249Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:25:57.128252Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:25:57.128345Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:38911 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:25:57.128425Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:35445)\n2026-11-07T13:25:57.128446Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:25:57.129186Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-u8ezmxlm/config/telemt.toml\"\n2026-11-07T13:25:57.129229Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 29,
+      "errors": [],
+      "experimental_version": "official",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:26:38.726064Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:26:38.726077Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:26:38.726080Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:26:38.726083Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:26:38.726229Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:26:38.726459Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:26:38.726466Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:26:38.726499Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:26:38.727455Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:26:38.727472Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:26:38.727475Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:26:38.727478Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:26:38.727482Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:26:38.727484Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:26:38.727487Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:26:38.727583Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:46669 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:26:38.727669Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:43591)\n2026-11-07T13:26:38.727696Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:26:38.728442Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-aa9r9ury/config/telemt.toml\"\n2026-11-07T13:26:38.728487Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+      "mock_dc_errors_after_close": []
+    },
+    {
+      "ordinal": 30,
+      "errors": [],
+      "experimental_version": "telemt 3.5.5+tdh.balanced2",
+      "core_exit_before_cleanup": null,
+      "core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:27:16.400691Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:27:16.400704Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:27:16.400708Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:27:16.400715Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:27:16.400945Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:27:16.401165Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:27:16.401176Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:27:16.401202Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:27:16.402175Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:27:16.402189Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:27:16.402192Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:27:16.402194Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:27:16.402198Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:27:16.402201Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:27:16.402204Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:27:16.402338Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:27:16.403103Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-bzxmphwn/config/telemt.toml\"\n2026-11-07T13:27:16.403145Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:27:16.405538Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:49129 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:27:16.405674Z  INFO telemt::api: API endpoint: http://127.0.0.1:44663/v1/* and /web-status\n2026-11-07T13:27:16.455372Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+      "mock_dc_errors_after_close": []
+    }
+  ]
+}

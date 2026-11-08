@@ -32,3 +32,4 @@ docs/benchmarks/endurance-vps-20261025/** -text -whitespace
 .github/workflows/*.yml text eol=lf
 docs/benchmarks/stable-20261107/** -text -whitespace
 docs/benchmarks/continuation-20261107/** -text -whitespace
+docs/benchmarks/paired-20261107/** -text -whitespace

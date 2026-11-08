@@ -1,0 +1,1030 @@
+{
+  "source_commit": "80e9211073be3534cd5980b8d247533693ff59f8",
+  "manager_sha256": "7680bcb8e939d40002b311154505e0b5d549b1ce285fbdbf4073ea3d35d97915",
+  "scope": "replicated within-job ratios; absolute Mbps are not pooled across hosts",
+  "complete": true,
+  "transport_accepted": false,
+  "profiles": [
+    {
+      "name": "baseline",
+      "cases": [
+        {
+          "concurrency": 30,
+          "direction": "U",
+          "verdict": "NO_REPLICATED_ADVANTAGE",
+          "replica_1": {
+            "concurrency": 30,
+            "direction": "U",
+            "pairs": 6,
+            "old_successes": 180,
+            "new_successes": 180,
+            "expected_per_core": 180,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0358989580402778,
+              "min": 1.0355829251302133,
+              "max": 1.0361652340602663,
+              "all_pairs": [
+                1.035599489378963,
+                1.0361652340602663,
+                1.035926890475986,
+                1.0355829251302133,
+                1.035957959397245,
+                1.0358710256045696
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9694808344545942,
+              "all_pairs": [
+                0.9694333019473422,
+                0.9645849743999981,
+                0.9640728636814134,
+                0.9734190582080113,
+                0.9708259600056558,
+                0.9695283669618463
+              ]
+            },
+            "old_median_mbps": 21.484332428215318,
+            "new_median_mbps": 22.25322025014496
+          },
+          "replica_2": {
+            "concurrency": 30,
+            "direction": "U",
+            "pairs": 6,
+            "old_successes": 180,
+            "new_successes": 180,
+            "expected_per_core": 180,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0182093718635978,
+              "min": 1.0163951028788976,
+              "max": 1.0358776773145124,
+              "all_pairs": [
+                1.018197638215302,
+                1.0163951028788976,
+                1.0165512517219149,
+                1.0358776773145124,
+                1.0342714321879043,
+                1.0182211055118935
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.96900591475305,
+              "all_pairs": [
+                0.9725938865713157,
+                0.9696709731037058,
+                0.9705941066785281,
+                0.9658712554030486,
+                0.9662298468644152,
+                0.9683408564023942
+              ]
+            },
+            "old_median_mbps": 21.5897369614743,
+            "new_median_mbps": 21.971354734572508
+          }
+        },
+        {
+          "concurrency": 30,
+          "direction": "D",
+          "verdict": "NO_REPLICATED_ADVANTAGE",
+          "replica_1": {
+            "concurrency": 30,
+            "direction": "D",
+            "pairs": 6,
+            "old_successes": 180,
+            "new_successes": 180,
+            "expected_per_core": 180,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 0.9747718278723106,
+              "min": 0.9638442303530413,
+              "max": 0.9994171013717649,
+              "all_pairs": [
+                0.9830410411487512,
+                0.9837953895956363,
+                0.9638442303530413,
+                0.9662583067690037,
+                0.9994171013717649,
+                0.9665026145958701
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.02564391618697,
+              "all_pairs": [
+                1.0286403491244984,
+                1.0226474832494417,
+                1.0207942898841065,
+                1.0312414314111291,
+                1.0157486000876776,
+                1.0444645975081253
+              ]
+            },
+            "old_median_mbps": 21.861538984810792,
+            "new_median_mbps": 21.309060506232832
+          },
+          "replica_2": {
+            "concurrency": 30,
+            "direction": "D",
+            "pairs": 6,
+            "old_successes": 180,
+            "new_successes": 180,
+            "expected_per_core": 180,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 0.9580800876697159,
+              "min": 0.9482994036763783,
+              "max": 0.9674551980995812,
+              "all_pairs": [
+                0.9674551980995812,
+                0.9482994036763783,
+                0.9488116552023143,
+                0.9506366562506469,
+                0.9657757513756068,
+                0.9655235190887849
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0444686715193876,
+              "all_pairs": [
+                1.0333294648354692,
+                1.060817501241927,
+                1.04414508876637,
+                1.0447922542724053,
+                1.037313969151141,
+                1.046239888276846
+              ]
+            },
+            "old_median_mbps": 21.990994853852825,
+            "new_median_mbps": 21.222991729591058
+          }
+        },
+        {
+          "concurrency": 50,
+          "direction": "U",
+          "verdict": "NO_REPLICATED_ADVANTAGE",
+          "replica_1": {
+            "concurrency": 50,
+            "direction": "U",
+            "pairs": 6,
+            "old_successes": 300,
+            "new_successes": 300,
+            "expected_per_core": 300,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0362049061026823,
+              "min": 1.0359683485223101,
+              "max": 1.0390585345115884,
+              "all_pairs": [
+                1.0361984449203605,
+                1.0390585345115884,
+                1.0362276504982644,
+                1.0360088455595895,
+                1.0359683485223101,
+                1.0362113672850042
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9658574415327095,
+              "all_pairs": [
+                0.9700350154443039,
+                0.9658292785670439,
+                0.9634283304569624,
+                0.9658856044983749,
+                0.9651829748034784,
+                0.9683682517664487
+              ]
+            },
+            "old_median_mbps": 24.131146462596263,
+            "new_median_mbps": 25.00327965796464
+          },
+          "replica_2": {
+            "concurrency": 50,
+            "direction": "U",
+            "pairs": 6,
+            "old_successes": 300,
+            "new_successes": 300,
+            "expected_per_core": 300,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0356553312134205,
+              "min": 1.0240936205482931,
+              "max": 1.0478523071349801,
+              "all_pairs": [
+                1.0351644746903326,
+                1.0478523071349801,
+                1.0366311334297833,
+                1.025508716701642,
+                1.0361461877365084,
+                1.0240936205482931
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9664782420175215,
+              "all_pairs": [
+                0.9673341459685199,
+                0.9626643951486782,
+                0.9656437884859648,
+                0.9687843277268404,
+                0.9651432353260594,
+                0.9673126955490782
+              ]
+            },
+            "old_median_mbps": 24.222757120260034,
+            "new_median_mbps": 24.982830111652003
+          }
+        },
+        {
+          "concurrency": 50,
+          "direction": "D",
+          "verdict": "NO_REPLICATED_ADVANTAGE",
+          "replica_1": {
+            "concurrency": 50,
+            "direction": "D",
+            "pairs": 6,
+            "old_successes": 300,
+            "new_successes": 300,
+            "expected_per_core": 300,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 0.9945485346861571,
+              "min": 0.9884242787656407,
+              "max": 1.0110961215227816,
+              "all_pairs": [
+                1.0110961215227816,
+                0.9891992523793228,
+                0.9998978169929915,
+                0.9887494856697928,
+                1.000031607377945,
+                0.9884242787656407
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0061063371221235,
+              "all_pairs": [
+                0.9963798026596108,
+                1.0128808895918804,
+                1.0032587989087662,
+                1.0108088970894387,
+                0.9993573752185956,
+                1.008953875335481
+              ]
+            },
+            "old_median_mbps": 24.1252955620849,
+            "new_median_mbps": 23.987441487613268
+          },
+          "replica_2": {
+            "concurrency": 50,
+            "direction": "D",
+            "pairs": 6,
+            "old_successes": 300,
+            "new_successes": 300,
+            "expected_per_core": 300,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 0.9934577353298956,
+              "min": 0.9769695624162024,
+              "max": 1.0005280334674407,
+              "all_pairs": [
+                0.9988023396108294,
+                0.9874526587349542,
+                1.0005280334674407,
+                0.9769695624162024,
+                0.9894571890309546,
+                0.9974582816288365
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0082751087532915,
+              "all_pairs": [
+                1.003773688563985,
+                1.0237943528795468,
+                1.0044549031325916,
+                1.0120953143739917,
+                1.0175953032222314,
+                1.0039469713778062
+              ]
+            },
+            "old_median_mbps": 23.999450344108915,
+            "new_median_mbps": 23.82762328442964
+          }
+        },
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "verdict": "NO_REPLICATED_ADVANTAGE",
+          "replica_1": {
+            "concurrency": 100,
+            "direction": "U",
+            "pairs": 6,
+            "old_successes": 600,
+            "new_successes": 600,
+            "expected_per_core": 600,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0298557555747532,
+              "min": 1.0248896012013737,
+              "max": 1.0341078838843123,
+              "all_pairs": [
+                1.0324871162665312,
+                1.0272243948829751,
+                1.0337985422938687,
+                1.0264156715459742,
+                1.0341078838843123,
+                1.0248896012013737
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9718068476747193,
+              "all_pairs": [
+                0.9721659452307267,
+                0.9703092467775579,
+                0.9680914476829453,
+                0.9739987564356832,
+                0.9714477501187119,
+                0.9742105582045117
+              ]
+            },
+            "old_median_mbps": 26.70351865934714,
+            "new_median_mbps": 27.50295965087569
+          },
+          "replica_2": {
+            "concurrency": 100,
+            "direction": "U",
+            "pairs": 6,
+            "old_successes": 600,
+            "new_successes": 600,
+            "expected_per_core": 600,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0294803405225803,
+              "min": 1.0262525589772047,
+              "max": 1.0328602818560595,
+              "all_pairs": [
+                1.0328602818560595,
+                1.032626524729065,
+                1.0275739310569059,
+                1.0310410887685009,
+                1.0262525589772047,
+                1.0279195922766595
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9701464521279952,
+              "all_pairs": [
+                0.9691431929376174,
+                0.9711350442379214,
+                0.9724616243110863,
+                0.9676687550446972,
+                0.971053186805984,
+                0.9692397174500065
+              ]
+            },
+            "old_median_mbps": 26.799017468035785,
+            "new_median_mbps": 27.59873058416258
+          }
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "verdict": "NO_REPLICATED_ADVANTAGE",
+          "replica_1": {
+            "concurrency": 100,
+            "direction": "D",
+            "pairs": 6,
+            "old_successes": 600,
+            "new_successes": 600,
+            "expected_per_core": 600,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0547317163565189,
+              "min": 1.0421734659122248,
+              "max": 1.060542218667061,
+              "all_pairs": [
+                1.0546584340384333,
+                1.0560201510101153,
+                1.0537921759979099,
+                1.0548049986746044,
+                1.060542218667061,
+                1.0421734659122248
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9463495492474427,
+              "all_pairs": [
+                0.9475467077346323,
+                0.9466268376205105,
+                0.944312175274232,
+                0.9460722608743749,
+                0.9432124058162619,
+                0.961938688764865
+              ]
+            },
+            "old_median_mbps": 23.787376708510465,
+            "new_median_mbps": 25.10291631273027
+          },
+          "replica_2": {
+            "concurrency": 100,
+            "direction": "D",
+            "pairs": 6,
+            "old_successes": 600,
+            "new_successes": 600,
+            "expected_per_core": 600,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0513455728234948,
+              "min": 1.0227630960170413,
+              "max": 1.0602522285613252,
+              "all_pairs": [
+                1.0602481516154183,
+                1.0227630960170413,
+                1.0539629181427104,
+                1.0602522285613252,
+                1.0482350416991333,
+                1.0487282275042795
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9475918988708385,
+              "all_pairs": [
+                0.945883528262608,
+                0.9724520678108992,
+                0.9444374310011597,
+                0.938294466241204,
+                0.9520220088349082,
+                0.949300269479069
+              ]
+            },
+            "old_median_mbps": 23.81197693985524,
+            "new_median_mbps": 25.043886297756266
+          }
+        }
+      ]
+    },
+    {
+      "name": "sustained",
+      "cases": [
+        {
+          "concurrency": 30,
+          "direction": "U",
+          "verdict": "HARNESS_LIMITED",
+          "replica_1": {
+            "concurrency": 30,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 120,
+            "new_successes": 120,
+            "expected_per_core": 120,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 0.8980911535661265,
+              "min": 0.7670324303736554,
+              "max": 1.012486323153886,
+              "all_pairs": [
+                1.012486323153886,
+                0.9940785042794282,
+                0.7670324303736554,
+                0.8021038028528248
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0119992309014119,
+              "all_pairs": [
+                1.0164976487394042,
+                0.9668615325725448,
+                1.08546391033619,
+                1.0075008130634195
+              ]
+            },
+            "old_median_mbps": 1415.4448808846892,
+            "new_median_mbps": 1268.7018410668188
+          },
+          "replica_2": {
+            "concurrency": 30,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 120,
+            "new_successes": 120,
+            "expected_per_core": 120,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 0.9990271545227358,
+              "min": 0.943047735335654,
+              "max": 1.0086054802365174,
+              "all_pairs": [
+                1.0008795100356291,
+                0.943047735335654,
+                1.0086054802365174,
+                0.9971747990098425
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0316782345703164,
+              "all_pairs": [
+                1.0031267340672532,
+                1.0610244796316963,
+                1.0339059152216823,
+                1.0294505539189507
+              ]
+            },
+            "old_median_mbps": 2283.4496474500384,
+            "new_median_mbps": 2289.982735113178
+          }
+        },
+        {
+          "concurrency": 30,
+          "direction": "D",
+          "verdict": "HARNESS_LIMITED",
+          "replica_1": {
+            "concurrency": 30,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 120,
+            "new_successes": 120,
+            "expected_per_core": 120,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 1.007775982517912,
+              "min": 0.9901186014244524,
+              "max": 1.0173459932998157,
+              "all_pairs": [
+                0.9901186014244524,
+                1.0173459932998157,
+                1.0036577557005433,
+                1.0118942093352805
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9577605382524426,
+              "all_pairs": [
+                0.9367610337080763,
+                0.9486552181298252,
+                0.96686585837506,
+                0.98032332582332
+              ]
+            },
+            "old_median_mbps": 1090.8466435436844,
+            "new_median_mbps": 1091.433453617801
+          },
+          "replica_2": {
+            "concurrency": 30,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 120,
+            "new_successes": 120,
+            "expected_per_core": 120,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 1.0012945524313783,
+              "min": 0.9855019038815896,
+              "max": 1.0138673358567287,
+              "all_pairs": [
+                1.0138673358567287,
+                0.9981699599952569,
+                1.0044191448674997,
+                0.9855019038815896
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0128527218039047,
+              "all_pairs": [
+                1.002547476925457,
+                1.0100957111921083,
+                1.0495909465241717,
+                1.0156097324157014
+              ]
+            },
+            "old_median_mbps": 1554.474167395937,
+            "new_median_mbps": 1555.4973887493952
+          }
+        },
+        {
+          "concurrency": 50,
+          "direction": "U",
+          "verdict": "HARNESS_LIMITED",
+          "replica_1": {
+            "concurrency": 50,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 200,
+            "new_successes": 200,
+            "expected_per_core": 200,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 0.9691201167046395,
+              "min": 0.8853379824406614,
+              "max": 0.9770337160575685,
+              "all_pairs": [
+                0.9770337160575685,
+                0.9766587100469245,
+                0.8853379824406614,
+                0.9615815233623545
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0340513344688858,
+              "all_pairs": [
+                1.0065884588266831,
+                1.0205362001948717,
+                1.0475664687428996,
+                1.0514987215266602
+              ]
+            },
+            "old_median_mbps": 1216.8727284826366,
+            "new_median_mbps": 1175.2176548101897
+          },
+          "replica_2": {
+            "concurrency": 50,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 200,
+            "new_successes": 200,
+            "expected_per_core": 200,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 0.9918997953361017,
+              "min": 0.9617421639786161,
+              "max": 1.015572365430035,
+              "all_pairs": [
+                1.015572365430035,
+                0.9735451760489161,
+                1.0102544146232872,
+                0.9617421639786161
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0233575282448402,
+              "all_pairs": [
+                1.0543094166825193,
+                1.0230302515471015,
+                1.023684804942579,
+                1.0033905204510722
+              ]
+            },
+            "old_median_mbps": 2483.5487725461007,
+            "new_median_mbps": 2463.654489106255
+          }
+        },
+        {
+          "concurrency": 50,
+          "direction": "D",
+          "verdict": "HARNESS_LIMITED",
+          "replica_1": {
+            "concurrency": 50,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 200,
+            "new_successes": 200,
+            "expected_per_core": 200,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 1.0220643685487625,
+              "min": 0.8570969535822879,
+              "max": 1.06595672245204,
+              "all_pairs": [
+                1.06595672245204,
+                1.0099253862678355,
+                0.8570969535822879,
+                1.0342033508296897
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.022471812106927,
+              "all_pairs": [
+                1.0151733299964552,
+                0.9987267511349285,
+                1.0376345541158656,
+                1.0297702942173987
+              ]
+            },
+            "old_median_mbps": 1163.757201664177,
+            "new_median_mbps": 1141.4011504140021
+          },
+          "replica_2": {
+            "concurrency": 50,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 200,
+            "new_successes": 200,
+            "expected_per_core": 200,
+            "classification": "NO_CLEAR_CHANGE",
+            "throughput_ratio": {
+              "median": 0.9794639163455707,
+              "min": 0.94267787288559,
+              "max": 1.0607783342051977,
+              "all_pairs": [
+                1.0607783342051977,
+                0.94267787288559,
+                0.9599366110760793,
+                0.998991221615062
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0264274458565565,
+              "all_pairs": [
+                0.9635562971114289,
+                1.0365495490155487,
+                1.0593708784437597,
+                1.0163053426975641
+              ]
+            },
+            "old_median_mbps": 1891.3551981241092,
+            "new_median_mbps": 1851.4498137997057
+          }
+        },
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "verdict": "HARNESS_LIMITED",
+          "replica_1": {
+            "concurrency": 100,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 400,
+            "new_successes": 400,
+            "expected_per_core": 400,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 0.9893836998118529,
+              "min": 0.9270083837146091,
+              "max": 1.0595757273737496,
+              "all_pairs": [
+                0.9270083837146091,
+                1.0595757273737496,
+                0.9721702142259467,
+                1.006597185397759
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0223847950451221,
+              "all_pairs": [
+                1.0720554474331627,
+                0.9727141426570816,
+                1.1026765185926939,
+                0.9705368255087071
+              ]
+            },
+            "old_median_mbps": 1260.9302862186273,
+            "new_median_mbps": 1246.1834410444067
+          },
+          "replica_2": {
+            "concurrency": 100,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 400,
+            "new_successes": 400,
+            "expected_per_core": 400,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 0.9792994518520737,
+              "min": 0.9135019519605392,
+              "max": 1.0198910929927223,
+              "all_pairs": [
+                0.9135019519605392,
+                0.9742872609679605,
+                1.0198910929927223,
+                0.984311642736187
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.1082787665731302,
+              "all_pairs": [
+                1.1517295147830275,
+                1.0648280183632328,
+                1.0553849323529683,
+                1.1973616069816388
+              ]
+            },
+            "old_median_mbps": 2341.172389089723,
+            "new_median_mbps": 2292.6996329256303
+          }
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "verdict": "HARNESS_LIMITED",
+          "replica_1": {
+            "concurrency": 100,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 400,
+            "new_successes": 400,
+            "expected_per_core": 400,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 1.0083018796201384,
+              "min": 0.993223602897658,
+              "max": 1.0126446831640503,
+              "all_pairs": [
+                1.0126446831640503,
+                1.0070736537186684,
+                1.0095301055216082,
+                0.993223602897658
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 0.9989640920996581,
+              "all_pairs": [
+                0.9988086310656206,
+                1.013614974993202,
+                0.9868035961076472,
+                0.9991195531336955
+              ]
+            },
+            "old_median_mbps": 1174.1311177738874,
+            "new_median_mbps": 1183.8816411377024
+          },
+          "replica_2": {
+            "concurrency": 100,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 400,
+            "new_successes": 400,
+            "expected_per_core": 400,
+            "classification": "HARNESS_CPU_LIMITED",
+            "throughput_ratio": {
+              "median": 0.905770421975893,
+              "min": 0.8647361416882683,
+              "max": 1.023074013894277,
+              "all_pairs": [
+                1.023074013894277,
+                0.9345513433743646,
+                0.8647361416882683,
+                0.8769895005774213
+              ]
+            },
+            "completion_p95_ratio": {
+              "median": 1.0307062328279706,
+              "all_pairs": [
+                0.9695147218114841,
+                1.0371875025009187,
+                1.1515155191448603,
+                1.0242249631550222
+              ]
+            },
+            "old_median_mbps": 2346.511982029793,
+            "new_median_mbps": 2098.396656462338
+          }
+        }
+      ]
+    },
+    {
+      "name": "impaired",
+      "cases": [
+        {
+          "concurrency": 30,
+          "direction": "U",
+          "verdict": "PROTOCOL_FAILURE",
+          "replica_1": {
+            "concurrency": 30,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 120,
+            "new_successes": 120,
+            "expected_per_core": 120,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          },
+          "replica_2": {
+            "concurrency": 30,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 120,
+            "new_successes": 120,
+            "expected_per_core": 120,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          }
+        },
+        {
+          "concurrency": 30,
+          "direction": "D",
+          "verdict": "PROTOCOL_FAILURE",
+          "replica_1": {
+            "concurrency": 30,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 120,
+            "new_successes": 120,
+            "expected_per_core": 120,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          },
+          "replica_2": {
+            "concurrency": 30,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 120,
+            "new_successes": 120,
+            "expected_per_core": 120,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          }
+        },
+        {
+          "concurrency": 50,
+          "direction": "U",
+          "verdict": "PROTOCOL_FAILURE",
+          "replica_1": {
+            "concurrency": 50,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 200,
+            "new_successes": 200,
+            "expected_per_core": 200,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          },
+          "replica_2": {
+            "concurrency": 50,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 200,
+            "new_successes": 200,
+            "expected_per_core": 200,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          }
+        },
+        {
+          "concurrency": 50,
+          "direction": "D",
+          "verdict": "PROTOCOL_FAILURE",
+          "replica_1": {
+            "concurrency": 50,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 200,
+            "new_successes": 200,
+            "expected_per_core": 200,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          },
+          "replica_2": {
+            "concurrency": 50,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 200,
+            "new_successes": 200,
+            "expected_per_core": 200,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          }
+        },
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "verdict": "PROTOCOL_FAILURE",
+          "replica_1": {
+            "concurrency": 100,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 400,
+            "new_successes": 400,
+            "expected_per_core": 400,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          },
+          "replica_2": {
+            "concurrency": 100,
+            "direction": "U",
+            "pairs": 4,
+            "old_successes": 400,
+            "new_successes": 399,
+            "expected_per_core": 400,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          }
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "verdict": "PROTOCOL_FAILURE",
+          "replica_1": {
+            "concurrency": 100,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 400,
+            "new_successes": 396,
+            "expected_per_core": 400,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          },
+          "replica_2": {
+            "concurrency": 100,
+            "direction": "D",
+            "pairs": 4,
+            "old_successes": 400,
+            "new_successes": 397,
+            "expected_per_core": 400,
+            "classification": "TRANSFER_FAILURE",
+            "throughput_ratio": null
+          }
+        }
+      ]
+    }
+  ],
+  "input_sha256": {
+    "replica-1.json": "564937245dd64a4c54d780b423e12d9ea80b1035bbf3ffd2765faa2f6f7624a1",
+    "replica-2.json": "3fefd9e6c3767e9738cd57a69d8e83bfec301b5726a04cb86e632597530bc4c5"
+  }
+}

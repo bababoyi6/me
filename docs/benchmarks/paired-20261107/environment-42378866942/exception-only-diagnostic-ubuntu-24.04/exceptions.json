@@ -1,0 +1,42 @@
+{
+  "scope": "original constructor/stdout/fixture unchanged; capture after exceptions only",
+  "errors": [
+    {
+      "version": "telemt 3.5.5+tdh.balanced2",
+      "type": "RuntimeError",
+      "phase": "payload",
+      "received_bytes": 0,
+      "reason": "unexpected EOF",
+      "dc_timeout_setting": 25,
+      "core_exit": null,
+      "mock_dc_errors_so_far": []
+    }
+  ],
+  "environment": {
+    "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+    "python_cryptography": "41.0.7",
+    "tcp_sysctl": {
+      "tcp_congestion_control": "cubic",
+      "tcp_rmem": "4096\t131072\t33554432",
+      "tcp_wmem": "4096\t16384\t4194304",
+      "tcp_tw_reuse": "2",
+      "tcp_timestamps": "1",
+      "ip_local_port_range": "32768\t60999"
+    },
+    "cpu_flags": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm"
+  },
+  "expected_timeout_diagnostic": [
+    {
+      "version": "telemt 3.5.5+tdh.balanced2",
+      "type": "RuntimeError",
+      "phase": "digest",
+      "received_bytes": 262144,
+      "reason": "unexpected EOF",
+      "count": 100
+    }
+  ],
+  "curation": {
+    "source_sha256": "cc9163754f6a7c38f4a4c3a954a63a27992ea8e6a85c9ad59fecc7f751dd5ef8",
+    "change": "aggregate intentional 8-second diagnostic only; retain all actual 25-second failures unchanged; full diagnostic counts and DC errors remain in companion replica JSON"
+  }
+}

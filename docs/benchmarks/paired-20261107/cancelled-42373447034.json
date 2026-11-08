@@ -1,0 +1,94 @@
+{
+  "conclusion": "cancelled",
+  "databaseId": 42373447034,
+  "headSha": "a10ea157e6dcafc49f4ec9fd6f5c8a25c0a34e3d",
+  "jobs": [
+    {
+      "completedAt": "2026-11-07T12:41:53Z",
+      "conclusion": "cancelled",
+      "databaseId": 128406112473,
+      "name": "paired (2)",
+      "startedAt": "2026-11-07T12:39:25Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42373447034/job/128406112473"
+    },
+    {
+      "completedAt": "2026-11-07T12:42:09Z",
+      "conclusion": "cancelled",
+      "databaseId": 128406112824,
+      "name": "paired (1)",
+      "startedAt": "2026-11-07T12:39:26Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-07T12:39:28Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-07T12:39:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T12:39:29Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-07T12:39:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T12:39:46Z",
+          "conclusion": "success",
+          "name": "Prepare bounded ephemeral dependencies",
+          "number": 3,
+          "startedAt": "2026-11-07T12:39:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T12:39:47Z",
+          "conclusion": "success",
+          "name": "Fetch both exact release assets once",
+          "number": 4,
+          "startedAt": "2026-11-07T12:39:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T12:42:06Z",
+          "conclusion": "cancelled",
+          "name": "Run balanced pairs with backend and generator on separate CPUs",
+          "number": 5,
+          "startedAt": "2026-11-07T12:39:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T12:42:06Z",
+          "conclusion": "failure",
+          "name": "Export only synthetic metrics",
+          "number": 6,
+          "startedAt": "2026-11-07T12:42:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T12:42:07Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 12,
+          "startedAt": "2026-11-07T12:42:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T12:42:07Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-11-07T12:42:07Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42373447034/job/128406112824"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42373447034"
+}

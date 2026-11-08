@@ -1,0 +1,232 @@
+{
+  "conclusion": "success",
+  "databaseId": 42379716007,
+  "headSha": "e13c7fa779cdbde44049a9ed2aadfb65da528e11",
+  "jobs": [
+    {
+      "completedAt": "2026-11-07T14:03:53Z",
+      "conclusion": "success",
+      "databaseId": 128424566591,
+      "name": "validate",
+      "startedAt": "2026-11-07T14:02:40Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-07T14:02:42Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-07T14:02:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:02:43Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-07T14:02:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:02:59Z",
+          "conclusion": "success",
+          "name": "Install local test dependencies",
+          "number": 3,
+          "startedAt": "2026-11-07T14:02:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:02:59Z",
+          "conclusion": "success",
+          "name": "Check Bash syntax",
+          "number": 4,
+          "startedAt": "2026-11-07T14:02:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:01Z",
+          "conclusion": "success",
+          "name": "Run ShellCheck",
+          "number": 5,
+          "startedAt": "2026-11-07T14:02:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:01Z",
+          "conclusion": "success",
+          "name": "Run built-in tests",
+          "number": 6,
+          "startedAt": "2026-11-07T14:03:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:02Z",
+          "conclusion": "success",
+          "name": "Verify the frozen original installer",
+          "number": 7,
+          "startedAt": "2026-11-07T14:03:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:02Z",
+          "conclusion": "success",
+          "name": "Check Python tools",
+          "number": 8,
+          "startedAt": "2026-11-07T14:03:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:22Z",
+          "conclusion": "success",
+          "name": "Test diagnostics, configuration and rollback",
+          "number": 9,
+          "startedAt": "2026-11-07T14:03:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:41Z",
+          "conclusion": "success",
+          "name": "Run complete bounded root regression in disposable CI",
+          "number": 10,
+          "startedAt": "2026-11-07T14:03:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:41Z",
+          "conclusion": "success",
+          "name": "Verify private shared core inode permissions and cleanup",
+          "number": 11,
+          "startedAt": "2026-11-07T14:03:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:41Z",
+          "conclusion": "success",
+          "name": "Verify orphan cleanup ownership and refusal of changed namespaces",
+          "number": 12,
+          "startedAt": "2026-11-07T14:03:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:41Z",
+          "conclusion": "success",
+          "name": "Verify real backend socket observations in private namespaces",
+          "number": 13,
+          "startedAt": "2026-11-07T14:03:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:42Z",
+          "conclusion": "success",
+          "name": "Verify state trust boundaries and conservative tuning in private mounts",
+          "number": 14,
+          "startedAt": "2026-11-07T14:03:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:42Z",
+          "conclusion": "success",
+          "name": "Verify experimental socket policies on private loopback",
+          "number": 15,
+          "startedAt": "2026-11-07T14:03:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:49Z",
+          "conclusion": "success",
+          "name": "Test real HAProxy SNI and failover on loopback",
+          "number": 16,
+          "startedAt": "2026-11-07T14:03:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:51Z",
+          "conclusion": "success",
+          "name": "Test install interruption recovery in isolated filesystems",
+          "number": 17,
+          "startedAt": "2026-11-07T14:03:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:51Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 34,
+          "startedAt": "2026-11-07T14:03:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:03:51Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-11-07T14:03:51Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42379716007/job/128424566591"
+    },
+    {
+      "completedAt": "2026-11-07T14:03:00Z",
+      "conclusion": "success",
+      "databaseId": 128424566686,
+      "name": "relay-regression",
+      "startedAt": "2026-11-07T14:02:40Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-07T14:02:42Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-07T14:02:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:02:43Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-07T14:02:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:02:52Z",
+          "conclusion": "success",
+          "name": "Prepare pinned Rust test toolchain",
+          "number": 3,
+          "startedAt": "2026-11-07T14:02:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:02:58Z",
+          "conclusion": "success",
+          "name": "Test buffered relay progress, backpressure and error propagation",
+          "number": 4,
+          "startedAt": "2026-11-07T14:02:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:02:58Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 8,
+          "startedAt": "2026-11-07T14:02:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-07T14:02:58Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 9,
+          "startedAt": "2026-11-07T14:02:58Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42379716007/job/128424566686"
+    }
+  ],
+  "name": "Validate installer",
+  "status": "completed",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42379716007"
+}

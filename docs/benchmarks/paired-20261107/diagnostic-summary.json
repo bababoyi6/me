@@ -1,0 +1,99 @@
+[
+  {
+    "file": "environment-42378866942/exception-only-diagnostic-ubuntu-22.04/replica-1.json",
+    "source_commit": "b831fca488d4b092e9af59610a4a02c72bf96034",
+    "os": "Ubuntu 22.04.5 LTS",
+    "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+    "complete": true,
+    "accepted": false,
+    "oom_delta": {
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "actual_load_failures": [
+      {
+        "profile": "impaired",
+        "pair": 2,
+        "kind": "stable",
+        "concurrency": 100,
+        "direction": "D",
+        "errors": [
+          {
+            "type": "RuntimeError",
+            "phase": "payload"
+          }
+        ]
+      },
+      {
+        "profile": "impaired",
+        "pair": 3,
+        "kind": "stable",
+        "concurrency": 100,
+        "direction": "D",
+        "errors": [
+          {
+            "type": "RuntimeError",
+            "phase": "payload"
+          }
+        ]
+      }
+    ],
+    "note": "intentional 8-second diagnostic excluded from actual_load_failures"
+  },
+  {
+    "file": "environment-42378866942/exception-only-diagnostic-ubuntu-24.04/replica-1.json",
+    "source_commit": "b831fca488d4b092e9af59610a4a02c72bf96034",
+    "os": "Ubuntu 24.04.5 LTS",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "complete": true,
+    "accepted": false,
+    "oom_delta": {
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "actual_load_failures": [
+      {
+        "profile": "impaired",
+        "pair": 2,
+        "kind": "balanced2",
+        "concurrency": 100,
+        "direction": "D",
+        "errors": [
+          {
+            "type": "RuntimeError",
+            "phase": "payload"
+          }
+        ]
+      }
+    ],
+    "note": "intentional 8-second diagnostic excluded from actual_load_failures"
+  },
+  {
+    "file": "exception-42377323397/replica-1.json",
+    "source_commit": "6b235f35e7cfa53d5ba30d604ef051bf510c7532",
+    "os": "Ubuntu 22.04.5 LTS",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "complete": true,
+    "accepted": true,
+    "oom_delta": {
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "actual_load_failures": [],
+    "note": "intentional 8-second diagnostic excluded from actual_load_failures"
+  },
+  {
+    "file": "sequence-42375952065/replica-1.json",
+    "source_commit": "b345860253194f6a0655d85ad9950609f883a22e",
+    "os": "Ubuntu 22.04.5 LTS",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "complete": true,
+    "accepted": true,
+    "oom_delta": {
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "actual_load_failures": [],
+    "note": "intentional 8-second diagnostic excluded from actual_load_failures"
+  }
+]
