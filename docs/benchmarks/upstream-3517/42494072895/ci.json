@@ -1,0 +1,78 @@
+{
+  "conclusion": "failure",
+  "createdAt": "2026-11-08T15:17:45Z",
+  "databaseId": 42494072895,
+  "headSha": "ec4cf8f941f8d279a320a53ba4b67b3ed4183f66",
+  "jobs": [
+    {
+      "completedAt": "2026-11-08T15:18:14Z",
+      "conclusion": "failure",
+      "databaseId": 128772433271,
+      "name": "probe",
+      "startedAt": "2026-11-08T15:17:48Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-08T15:17:50Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-08T15:17:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T15:17:51Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-08T15:17:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T15:18:07Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable dependencies",
+          "number": 3,
+          "startedAt": "2026-11-08T15:17:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T15:18:10Z",
+          "conclusion": "failure",
+          "name": "Fetch exact API assets and probe native protocol and API policy",
+          "number": 4,
+          "startedAt": "2026-11-08T15:18:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T15:18:12Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 5,
+          "startedAt": "2026-11-08T15:18:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T15:18:12Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 10,
+          "startedAt": "2026-11-08T15:18:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T15:18:12Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 11,
+          "startedAt": "2026-11-08T15:18:12Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42494072895/job/128772433271"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-08T15:18:15Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42494072895"
+}

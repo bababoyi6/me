@@ -1,0 +1,98 @@
+{
+  "accepted": true,
+  "source_commit": "36dddb2e7a396b1af5d8a935891009a83b30d46f",
+  "version": "3.5.17",
+  "upstream_commit": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+  "binaries": {
+    "amd64": {
+      "archive_sha256": "0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e",
+      "binary_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+      "bytes": 18713384
+    },
+    "arm64": {
+      "archive_sha256": "f0d3d06d029f2b21dc66a44069bcc7bd20d32fcb34b5867c5250cee647785de6",
+      "binary_sha256": "e5ca8befdc1428fcd66537ef04f3a95e5f278ebf3c3dd0d0909ce25a390f502b",
+      "bytes": 15304488
+    }
+  },
+  "api": [
+    {
+      "route": "/v1/config/state",
+      "authorized": 200,
+      "anonymous": 401,
+      "response_bytes": 117615
+    },
+    {
+      "route": "/v1/capabilities",
+      "authorized": 200,
+      "anonymous": 401,
+      "response_bytes": 19739
+    },
+    {
+      "route": "/v1/config/schema",
+      "authorized": 200,
+      "anonymous": 401,
+      "response_bytes": 272500
+    },
+    {
+      "route": "/v1/users",
+      "method": "POST",
+      "read_only_status": 403
+    },
+    {
+      "route": "/v1/config",
+      "method": "PATCH",
+      "read_only_status": 403
+    },
+    {
+      "route": "/v1/system/reload",
+      "method": "POST",
+      "read_only_status": 403
+    }
+  ],
+  "transfers": [
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.20455760900006226,
+      "handshake_ms": 201.9153630000119,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.06070820899992668,
+      "handshake_ms": 16.947204999951282,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.05693380800005343,
+      "handshake_ms": 13.802651999981208,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.05494831300006808,
+      "handshake_ms": 10.827694999989035,
+      "sha256_verified": true,
+      "persistent_dc": true
+    }
+  ],
+  "readiness_compatible": true,
+  "config_unchanged": true,
+  "private_processes_closed": true
+}

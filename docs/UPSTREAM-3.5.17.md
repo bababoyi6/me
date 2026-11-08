@@ -12,7 +12,7 @@ GitHub 资产 digest 与 CI 实际读取归档的 SHA 一致，解包后检查 E
 
 3.5.16→3.5.17 共 86 个文件变动，主要是 API 能力/配置 schema 发现、dry-run 预检、desired/effective 状态、DNS override、来源拒绝策略和 API 可观察性；同时调整配置快照 epoch、watcher 准备/观察与跨代缓存。Cargo 新增 `toml_edit`。本项目使用的配置字段没有发现必须改名或迁移的项，新增 source-deny 默认不启用，旧连接预算和 API read-only 继续显式配置。
 
-整个 `src/transport` 差异为空，`src/transport/socket.rs` 两版 Git 对象 SHA256 相同；没有移除固定 256KiB 缓冲。因此“升级 API 正式版”不等于解决此前高延迟吞吐与排队问题。当前正在用新正式二进制补测，不能把旧版吞吐结果当作新版实测。
+整个 `src/transport` 差异为空，`src/transport/socket.rs` 两版 Git 对象 SHA256 相同；没有移除固定 256KiB 缓冲。因此“升级 API 正式版”不等于解决此前高延迟吞吐与排队问题。本轮新正式二进制已再现100ms单流下载退化，见[最终结果](FINAL-ACCEPTANCE-20261109.md)；旧版吞吐结果仍独立保留。
 
 审查重点是本项目用到的 API 认证/只读、配置读取、watcher、runtime 投影、就绪契约及对旧模板的影响；不声称已逐行审完全部新增 API 或完整上游源码。项目不接入新增 API 写操作，不启用 WEB、ME、DNS override 或 source-deny 管理功能；管理监听仍限回环。
 
@@ -35,6 +35,6 @@ GitHub 资产 digest 与 CI 实际读取归档的 SHA 一致，解包后检查 E
 
 预检失败也保留：`42493889571` 读取新 schema 时被旧测试工具的 256KiB 上限截断；改为仅该探测接口的 2MiB 有界读取，实际 schema 272,500 字节。`42494072895` 的 reload 权限检查路径写错，得到 404；官方为 `/v1/system/reload`，更正后返回 403。一次错误路径的重复任务已请求取消。它们是测试夹具问题，不当作核心故障或权限绕过。
 
-原生构建、实际新包长链路、短时资源检查与四组排队实验尚在本轮收集，完成后按独立提交与资产摘要更新，不先写 PASS。排队实验的事先门槛见 [QUEUE-STUDY-20261108](QUEUE-STUDY-20261108.md)。
+原生17构建、实际新包长链路、前版3.5.16精确回退、短时资源及排队/同负载/30–100并发补验均已完成，284项root回归无跳过。三种简单策略无联合收益、不采纳；720条4MiB流全部成功但不作满载延迟已修复结论。逐批结果与失败修正见[11月9日验收报告](FINAL-ACCEPTANCE-20261109.md)，事先门槛见[实验计划](QUEUE-STUDY-20261108.md)。
 
 官方客户端、真实 Telegram 文件、物理公网三机、24 小时和抗封锁仍未验证。没有访问生产或过期 VPS；本地只做 Windows 文件/Git/数据分析，所有 Linux 执行在有界 GitHub CI 内。

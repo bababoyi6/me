@@ -1,0 +1,410 @@
+{
+  "source_commit": "7d3aab97dc9028afa72adc3b7eedff91b66fdbe6",
+  "transport_accepted": true,
+  "measured_payload_flows": 180,
+  "comparisons": [
+    {
+      "rtt_ms": 0,
+      "streams": 1,
+      "direction": "U",
+      "baseline": "balanced2",
+      "candidate": "stable",
+      "classification": "NO_CLEAR_CHANGE",
+      "ratios": [
+        0.9976371512525479,
+        0.996609567873061,
+        1.003371327047574
+      ],
+      "median_ratio": 0.9976371512525479,
+      "baseline_median_mbps": 181.32384754256344,
+      "candidate_median_mbps": 180.99040876860462,
+      "measured_client_rtt_medians_ms": [
+        0.082,
+        0.11,
+        0.077,
+        0.074,
+        0.104,
+        0.081
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 0,
+      "streams": 1,
+      "direction": "U",
+      "baseline": "stable",
+      "candidate": "stable-auto",
+      "classification": "NO_CLEAR_CHANGE",
+      "ratios": [
+        1.0007095594075293,
+        1.004802970069166,
+        0.9986319316062898
+      ],
+      "median_ratio": 1.0007095594075293,
+      "baseline_median_mbps": 180.99040876860462,
+      "candidate_median_mbps": 181.11883221581894,
+      "measured_client_rtt_medians_ms": [
+        0.074,
+        0.104,
+        0.081,
+        0.072,
+        0.086,
+        0.093
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 0,
+      "streams": 1,
+      "direction": "D",
+      "baseline": "balanced2",
+      "candidate": "stable",
+      "classification": "NO_CLEAR_CHANGE",
+      "ratios": [
+        0.9968852411824419,
+        0.9994257351384561,
+        0.9965787774800029
+      ],
+      "median_ratio": 0.9968852411824419,
+      "baseline_median_mbps": 176.17395342573548,
+      "candidate_median_mbps": 175.57122312883843,
+      "measured_client_rtt_medians_ms": [
+        2.8715,
+        2.755,
+        2.7560000000000002,
+        3.4995,
+        2.983,
+        3.0655
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 0,
+      "streams": 1,
+      "direction": "D",
+      "baseline": "stable",
+      "candidate": "stable-auto",
+      "classification": "NO_CLEAR_CHANGE",
+      "ratios": [
+        1.0055753708775383,
+        0.9990526735999437,
+        1.0000986959896003
+      ],
+      "median_ratio": 1.0000986959896003,
+      "baseline_median_mbps": 175.57122312883843,
+      "candidate_median_mbps": 176.18017230249137,
+      "measured_client_rtt_medians_ms": [
+        3.4995,
+        2.983,
+        3.0655,
+        2.784,
+        2.844,
+        2.7889999999999997
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 0,
+      "streams": 4,
+      "direction": "U",
+      "baseline": "balanced2",
+      "candidate": "stable",
+      "classification": "NO_CLEAR_CHANGE",
+      "ratios": [
+        0.999495389793004,
+        1.0001670057879404,
+        0.9997887903991834
+      ],
+      "median_ratio": 0.9997887903991834,
+      "baseline_median_mbps": 182.6717347167473,
+      "candidate_median_mbps": 182.58591816186154,
+      "measured_client_rtt_medians_ms": [
+        1.361,
+        0.879,
+        0.255,
+        0.665,
+        0.98,
+        0.9735
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 0,
+      "streams": 4,
+      "direction": "U",
+      "baseline": "stable",
+      "candidate": "stable-auto",
+      "classification": "NO_CLEAR_CHANGE",
+      "ratios": [
+        0.9995301254919849,
+        0.9995113767614301,
+        0.9995255875212374
+      ],
+      "median_ratio": 0.9995255875212374,
+      "baseline_median_mbps": 182.58591816186154,
+      "candidate_median_mbps": 182.49670243921204,
+      "measured_client_rtt_medians_ms": [
+        0.665,
+        0.98,
+        0.9735,
+        0.4675,
+        0.7035,
+        0.613
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 0,
+      "streams": 4,
+      "direction": "D",
+      "baseline": "balanced2",
+      "candidate": "stable",
+      "classification": "NO_CLEAR_CHANGE",
+      "ratios": [
+        1.0005872201468748,
+        0.9997163297275368,
+        0.9999058612078768
+      ],
+      "median_ratio": 0.9999058612078768,
+      "baseline_median_mbps": 181.21773903912592,
+      "candidate_median_mbps": 181.3241537464608,
+      "measured_client_rtt_medians_ms": [
+        6.050000000000001,
+        5.631,
+        5.675,
+        6.2725,
+        5.8134999999999994,
+        5.7225
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 0,
+      "streams": 4,
+      "direction": "D",
+      "baseline": "stable",
+      "candidate": "stable-auto",
+      "classification": "NO_CLEAR_CHANGE",
+      "ratios": [
+        0.999487352405902,
+        1.000875662418377,
+        0.9993565769866415
+      ],
+      "median_ratio": 0.999487352405902,
+      "baseline_median_mbps": 181.3241537464608,
+      "candidate_median_mbps": 181.25231362532878,
+      "measured_client_rtt_medians_ms": [
+        6.2725,
+        5.8134999999999994,
+        5.7225,
+        5.7465,
+        5.769,
+        5.7645
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 1,
+      "direction": "U",
+      "baseline": "balanced2",
+      "candidate": "stable",
+      "classification": "PATH_CONTROL_LIMITED",
+      "ratios": [
+        0.2178477279432336,
+        0.2125820157549441,
+        0.21833026297561617
+      ],
+      "median_ratio": 0.2178477279432336,
+      "baseline_median_mbps": 105.39214935203528,
+      "candidate_median_mbps": 22.956829412642932,
+      "measured_client_rtt_medians_ms": [
+        100.154,
+        100.194,
+        100.147,
+        100.175,
+        100.134,
+        100.144
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 1,
+      "direction": "U",
+      "baseline": "stable",
+      "candidate": "stable-auto",
+      "classification": "PATH_CONTROL_LIMITED",
+      "ratios": [
+        4.583207524904083,
+        4.698794883084804,
+        4.6006678465653925
+      ],
+      "median_ratio": 4.6006678465653925,
+      "baseline_median_mbps": 22.956829412642932,
+      "candidate_median_mbps": 105.29224379119098,
+      "measured_client_rtt_medians_ms": [
+        100.175,
+        100.134,
+        100.144,
+        100.13,
+        100.136,
+        100.125
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 1,
+      "direction": "D",
+      "baseline": "balanced2",
+      "candidate": "stable",
+      "classification": "REPEATABLE_SLOWER",
+      "ratios": [
+        0.20249074413737012,
+        0.19939468634906324,
+        0.20198297648829663
+      ],
+      "median_ratio": 0.20198297648829663,
+      "baseline_median_mbps": 105.26987643568889,
+      "candidate_median_mbps": 21.24053096121146,
+      "measured_client_rtt_medians_ms": [
+        124.19749999999999,
+        126.518,
+        122.805,
+        100.299,
+        100.2945,
+        100.298
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 1,
+      "direction": "D",
+      "baseline": "stable",
+      "candidate": "stable-auto",
+      "classification": "REPEATABLE_FASTER",
+      "ratios": [
+        4.950014385144793,
+        4.986264183219572,
+        4.967526832650007
+      ],
+      "median_ratio": 4.967526832650007,
+      "baseline_median_mbps": 21.24053096121146,
+      "candidate_median_mbps": 105.5153759290953,
+      "measured_client_rtt_medians_ms": [
+        100.299,
+        100.2945,
+        100.298,
+        126.4995,
+        126.16650000000001,
+        118.89750000000001
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 4,
+      "direction": "U",
+      "baseline": "balanced2",
+      "candidate": "stable",
+      "classification": "PATH_CONTROL_LIMITED",
+      "ratios": [
+        0.5768950499558639,
+        0.5830485991230911,
+        0.5718907707979425
+      ],
+      "median_ratio": 0.5768950499558639,
+      "baseline_median_mbps": 155.42174149861853,
+      "candidate_median_mbps": 89.65202236230004,
+      "measured_client_rtt_medians_ms": [
+        100.131,
+        100.10749999999999,
+        100.12049999999999,
+        100.1235,
+        100.095,
+        100.1395
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 4,
+      "direction": "U",
+      "baseline": "stable",
+      "candidate": "stable-auto",
+      "classification": "PATH_CONTROL_LIMITED",
+      "ratios": [
+        1.7141852827471113,
+        1.776924660895296,
+        1.697499690791088
+      ],
+      "median_ratio": 1.7141852827471113,
+      "baseline_median_mbps": 89.65202236230004,
+      "candidate_median_mbps": 153.69733794873522,
+      "measured_client_rtt_medians_ms": [
+        100.1235,
+        100.095,
+        100.1395,
+        100.13,
+        100.101,
+        100.114
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 4,
+      "direction": "D",
+      "baseline": "balanced2",
+      "candidate": "stable",
+      "classification": "RTT_NOT_ESTABLISHED",
+      "ratios": [
+        0.5277999976237641,
+        0.5455322528306936,
+        0.54539741252392
+      ],
+      "median_ratio": 0.54539741252392,
+      "baseline_median_mbps": 155.17899830410985,
+      "candidate_median_mbps": 84.05008576352868,
+      "measured_client_rtt_medians_ms": [
+        209.44850000000002,
+        223.3245,
+        207.8045,
+        100.416,
+        100.3635,
+        100.413
+      ],
+      "equal_load_path_ping_p95_ms": null
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 4,
+      "direction": "D",
+      "baseline": "stable",
+      "candidate": "stable-auto",
+      "classification": "RTT_NOT_ESTABLISHED",
+      "ratios": [
+        1.8633921678190006,
+        1.8072506846753884,
+        1.812068298736623
+      ],
+      "median_ratio": 1.812068298736623,
+      "baseline_median_mbps": 84.05008576352868,
+      "candidate_median_mbps": 153.36299457602965,
+      "measured_client_rtt_medians_ms": [
+        100.416,
+        100.3635,
+        100.413,
+        231.569,
+        227.999,
+        218.4325
+      ],
+      "equal_load_path_ping_p95_ms": null
+    }
+  ],
+  "scope": "one host, three rotated rounds; synthetic DC and lab-only preload; no production recommendation",
+  "rule": "all paired ratios >1.10 for exploratory faster, all <0.90 for slower; CPU <70%, TCP control >=100Mbps, measured RTT required",
+  "analysis_sha256": "f8c00a276ecea1afe56c0c1b03e6d5c6f8df2a7f86c5c667d0a5947b63438023"
+}

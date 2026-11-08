@@ -1,0 +1,84 @@
+{
+  "source_commit": "8bbc191be37857c8ffe39714fa255bd7893dda5d",
+  "transport_accepted": true,
+  "measured_payload_flows": 40,
+  "comparisons": [
+    {
+      "rtt_ms": 100,
+      "streams": 1,
+      "direction": "D",
+      "baseline": "control",
+      "candidate": "balanced",
+      "classification": "EQUAL_LOAD_WITHIN_BOUNDS",
+      "ratios": [
+        1.0000923992615283,
+        1.000441499630523,
+        1.0002776930977675,
+        0.9996009038232423
+      ],
+      "median_ratio": 1.0001850461796478,
+      "baseline_median_mbps": 19.42007654169584,
+      "candidate_median_mbps": 19.418696762032738,
+      "measured_client_rtt_medians_ms": [
+        100.464,
+        100.46,
+        100.512,
+        100.514,
+        101.259,
+        101.229,
+        101.247,
+        101.185
+      ],
+      "equal_load_path_ping_p95_ms": [
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        101.0,
+        101.0,
+        101.0,
+        101.0
+      ]
+    },
+    {
+      "rtt_ms": 100,
+      "streams": 4,
+      "direction": "D",
+      "baseline": "control",
+      "candidate": "balanced",
+      "classification": "EQUAL_LOAD_WITHIN_BOUNDS",
+      "ratios": [
+        1.013818435298577,
+        1.0001276946207314,
+        1.0074772519167252,
+        1.0002894540620808
+      ],
+      "median_ratio": 1.0038833529894031,
+      "baseline_median_mbps": 77.34452377899741,
+      "candidate_median_mbps": 77.65267947872874,
+      "measured_client_rtt_medians_ms": [
+        101.21350000000001,
+        101.535,
+        100.798,
+        100.793,
+        104.086,
+        103.524,
+        103.5755,
+        103.197
+      ],
+      "equal_load_path_ping_p95_ms": [
+        102.0,
+        102.0,
+        101.0,
+        101.0,
+        104.0,
+        104.0,
+        104.0,
+        104.0
+      ]
+    }
+  ],
+  "scope": "mechanism check at 20Mbps per stream, not a maximum-throughput comparison or production rate cap",
+  "rule": "all paired ratios >1.10 for exploratory faster, all <0.90 for slower; CPU <70%, TCP control >=100Mbps, measured RTT required",
+  "analysis_sha256": "8ad1481e6e6e70c19abc906558d08892920fab506b6b34dc528b057428218060"
+}

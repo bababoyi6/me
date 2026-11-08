@@ -1,0 +1,74 @@
+{
+  "accepted": false,
+  "source_commit": "dc5e7713fcf189b0710745d999a96cc0a32c3b64",
+  "version": "3.5.17",
+  "upstream_commit": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+  "binaries": {
+    "amd64": {
+      "archive_sha256": "0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e",
+      "binary_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+      "bytes": 18713384
+    },
+    "arm64": {
+      "archive_sha256": "f0d3d06d029f2b21dc66a44069bcc7bd20d32fcb34b5867c5250cee647785de6",
+      "binary_sha256": "e5ca8befdc1428fcd66537ef04f3a95e5f278ebf3c3dd0d0909ce25a390f502b",
+      "bytes": 15304488
+    }
+  },
+  "api": [
+    {
+      "route": "/v1/config/state",
+      "authorized": 200,
+      "anonymous": 401
+    },
+    {
+      "route": "/v1/capabilities",
+      "authorized": 200,
+      "anonymous": 401
+    }
+  ],
+  "transfers": [
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.2118779129999666,
+      "handshake_ms": 209.4332660000191,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.061455611000042154,
+      "handshake_ms": 17.030419999969126,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.056953880000037316,
+      "handshake_ms": 14.020978000075957,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.06600020100006532,
+      "handshake_ms": 22.265455000024303,
+      "sha256_verified": true,
+      "persistent_dc": true
+    }
+  ],
+  "readiness_compatible": true,
+  "private_processes_closed": true
+}

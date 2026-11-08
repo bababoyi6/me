@@ -1,0 +1,33 @@
+measure	Measure balanced counterfactuals only inside owned namespaces	﻿2026-11-08T16:21:34.5690502Z ##[group]Run flags=(--queue-study)
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5690790Z ^[[36;1mflags=(--queue-study)^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5691030Z ^[[36;1manalyzer=tests/queue_analysis.py^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5691270Z ^[[36;1mmemory=1536; high=1200^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5691497Z ^[[36;1mcase "$STUDY_LAYOUT" in^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5691707Z ^[[36;1m  candidates) ;;^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5692026Z ^[[36;1m  equal-load) flags=(--equal-load-study); analyzer=tests/long_path_analysis.py ;;^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5692518Z ^[[36;1m  sustained) flags=(--sustained-stress); analyzer=tests/stress_analysis.py; memory=768; high=640 ;;^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5692884Z ^[[36;1m  *) exit 2 ;;^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5693067Z ^[[36;1mesac^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5694567Z ^[[36;1msudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-queue-${GITHUB_RUN_ID}" -p CPUQuota=300% -p "MemoryMax=${memory}M" -p "MemoryHigh=${high}M" -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=900 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/long_path_lab.py "${flags[@]}" --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/queue-evidence/metrics.json"^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5696289Z ^[[36;1mpython3 "$analyzer" "$RUNNER_TEMP/queue-evidence/metrics.json" "$RUNNER_TEMP/queue-evidence/analysis.json"^[[0m
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5750354Z shell: /usr/bin/bash -e {0}
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5750576Z env:
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5750749Z   STUDY_LAYOUT: sustained
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:21:34.5750947Z ##[endgroup]
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9463733Z Traceback (most recent call last):
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9464460Z   File "/home/runner/work/me/me/tests/long_path_lab.py", line 338, in <module>
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9464947Z     else:raise SystemExit(main(args))
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9465390Z   File "/home/runner/work/me/me/tests/long_path_lab.py", line 212, in main
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9465919Z     control=json.loads(command(*argv,timeout=20))
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9466369Z   File "/home/runner/work/me/me/tests/network_lab.py", line 41, in command
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9467123Z     return subprocess.run(args, input=input, check=True, text=True, capture_output=True, timeout=timeout).stdout.strip()
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9467837Z   File "/usr/lib/python3.10/subprocess.py", line 505, in run
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9468331Z     stdout, stderr = process.communicate(input, timeout=timeout)
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9468855Z   File "/usr/lib/python3.10/subprocess.py", line 1154, in communicate
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9469380Z     stdout, stderr = self._communicate(input, endtime, timeout)
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9469894Z   File "/usr/lib/python3.10/subprocess.py", line 2022, in _communicate
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9470631Z     self._check_timeout(endtime, orig_timeout, stdout, stderr)
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9471245Z   File "/usr/lib/python3.10/subprocess.py", line 1198, in _check_timeout
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9472276Z     raise TimeoutExpired(
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9473111Z subprocess.TimeoutExpired: Command '('ip', 'netns', 'exec', 'tdh-audit-a', 'iperf3', '-c', '10.77.1.2', '-t', '8', '-O', '3', '-b', '200M', '-P', '1', '-J', '--connect-timeout', '3000')' timed out after 20 seconds
+measure	Measure balanced counterfactuals only inside owned namespaces	2026-11-08T16:22:01.9697681Z ##[error]Process completed with exit code 1.

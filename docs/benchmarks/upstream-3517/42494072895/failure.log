@@ -1,0 +1,17 @@
+probe	Fetch exact API assets and probe native protocol and API policy	﻿2026-11-08T15:18:07.4556528Z ##[group]Run set -euo pipefail
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4556876Z ^[[36;1mset -euo pipefail^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4557164Z ^[[36;1mmkdir -m 700 "$RUNNER_TEMP/release-probe"^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4557859Z ^[[36;1mtimeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821981 > "$RUNNER_TEMP/3517-amd64.tar.gz"^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4559070Z ^[[36;1mtimeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821990 > "$RUNNER_TEMP/3517-arm64.tar.gz"^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4560195Z ^[[36;1mtimeout --kill-after=5 90 python3 tests/release_3517_probe.py --amd64 "$RUNNER_TEMP/3517-amd64.tar.gz" --arm64 "$RUNNER_TEMP/3517-arm64.tar.gz" --output "$RUNNER_TEMP/release-probe/probe.json"^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4626296Z shell: /usr/bin/bash -e {0}
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4626553Z env:
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4629266Z   GH_TOKEN: ***
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:07.4629488Z ##[endgroup]
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:10.8577648Z Traceback (most recent call last):
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:10.8578806Z   File "/home/runner/work/me/me/tests/release_3517_probe.py", line 81, in <module>
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:10.8579779Z     if __name__=='__main__':main()
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:10.8580777Z   File "/home/runner/work/me/me/tests/release_3517_probe.py", line 71, in main
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:10.8582708Z     if status!=403:raise RuntimeError('read-only API failed to refuse mutation')
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:10.8583723Z RuntimeError: read-only API failed to refuse mutation
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:18:10.8773324Z ##[error]Process completed with exit code 1.

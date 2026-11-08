@@ -1,0 +1,114 @@
+{
+  "status": "REVIEW CANDIDATE; latest stable compatibility passed; high-RTT production upgrade not recommended",
+  "telemt_version": "3.5.17",
+  "upstream_commit": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+  "root_tests": 284,
+  "root_source": {
+    "run": 42501933849,
+    "source_commit": "8fe39203dc1a8c0df4f04b1f436dad32de26f3d9",
+    "count": 284,
+    "seconds": 20.81,
+    "skipped": 0,
+    "identity": {
+      "pr_head_commit": "8fe39203dc1a8c0df4f04b1f436dad32de26f3d9",
+      "checkout_commit": "1e51c4f37034e4db8be95bd308ff3ce9d69a2faa",
+      "head_tree": "c115e3c7faa24d7dc056b31441096297b7e2ca5d",
+      "checkout_tree": "c115e3c7faa24d7dc056b31441096297b7e2ca5d",
+      "tree_equal": true
+    }
+  },
+  "official_api_run": 42494335986,
+  "official_arm_run": 42494911735,
+  "official_system_dual_wg_run": 42496967645,
+  "official_three_kvm_run": 42494738574,
+  "official_short_churn_run": 42494738511,
+  "official_high_rtt_run": 42496474174,
+  "native_build_and_system_run": 42495175073,
+  "queue_pilot_run": 42495712435,
+  "equal_load_run": 42498243533,
+  "sustained_timing_run": 42501930660,
+  "native_experimental_only": true,
+  "native_installer_supported": false,
+  "native_arm_tested": false,
+  "native_binary_identity": {
+    "upstream_commit": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+    "manager_commit": "dec285fbdf5b42dd8be3e9e879bc0c2ad8994bc8",
+    "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "lto": "thin",
+    "codegen_units": 8,
+    "production_default_changed": false,
+    "binaries": {
+      "control": {
+        "sha256": "f1a0f2a91e4e4d9972da5bdc32ea63484d00dc30f0c0fb42cc3d396b07344067",
+        "version": "telemt 3.5.17+tdh.control1",
+        "bytes": 33582016
+      },
+      "balanced": {
+        "sha256": "cd4c5ff500d956a8a7059e3e536ff139983a0c5897b4c410ea0e53c68a6cfa14",
+        "version": "telemt 3.5.17+tdh.balanced1",
+        "bytes": 33559584
+      }
+    },
+    "builder_sha256": "29ce5233f9b1737f674e709b135d9e03a18f467324636c2e09aff5dcd4ce77be",
+    "helpers": {
+      "low_rtt_receive": "7b6c638525d3f2f9a106ae0b6c13b8d87fa21a1224ffc32ad5960b002cbb3990",
+      "unsent_queue_bulk": "b711a4bf9f3bd8296cb1182e7d956250371f54088264c514a483525f13fef3ca"
+    },
+    "scope": "unofficial synthetic lab candidates only; no publication or deployment"
+  },
+  "sustained": {
+    "accepted": true,
+    "source_commit": "8fe39203dc1a8c0df4f04b1f436dad32de26f3d9",
+    "payload_flows": 720,
+    "flow_timing_available": true,
+    "memory_peak": 672464896,
+    "idle_checks": [
+      {
+        "variant": "control",
+        "before": {
+          "cpu_seconds": 0.01,
+          "rss_bytes": 22798336,
+          "fds": 16
+        },
+        "after": {
+          "cpu_seconds": 8.38,
+          "rss_bytes": 32509952,
+          "fds": 14
+        }
+      },
+      {
+        "variant": "balanced",
+        "before": {
+          "cpu_seconds": 0.01,
+          "rss_bytes": 22941696,
+          "fds": 16
+        },
+        "after": {
+          "cpu_seconds": 8.4,
+          "rss_bytes": 55816192,
+          "fds": 14
+        }
+      }
+    ],
+    "generator_limited_batches": 0,
+    "scope": "100ms real WG, 4MiB/flow, 30/50/100 concurrency; whole lab <=768MiB, backend one logical CPU; no core throughput ceiling or 24h claim",
+    "analysis_sha256": "c6a51f3b6f1873f13e34cccfc41923901c65faa0b2432ece190d5bd807650fcd"
+  },
+  "production_accessed": false,
+  "main_merged": false,
+  "not_run": [
+    "official Telegram clients",
+    "real Telegram account/file transfer",
+    "physical public three-VPS cross-region",
+    "24-hour endurance",
+    "censorship resistance",
+    "full upstream Rust test suite",
+    "native candidate ARM64"
+  ],
+  "negative_findings": [
+    "official 100ms single-download regression persists",
+    "three simple queue policies have no qualifying joint gain; pilot probe child CPU unmeasured",
+    "native full-rate four-download queue RTT remains elevated"
+  ],
+  "historical_matrix_version": "3.5.16; 20160 payloads are not attributed to 3.5.17"
+}

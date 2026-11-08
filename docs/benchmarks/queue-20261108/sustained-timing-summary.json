@@ -1,0 +1,287 @@
+{
+  "run": 42501930660,
+  "source_commit": "8fe39203dc1a8c0df4f04b1f436dad32de26f3d9",
+  "core_identity_source": "native_manifest; official_release is an unused historical default in native-only layout",
+  "core_version": "3.5.17",
+  "rows": [
+    {
+      "variant": "control",
+      "streams": 30,
+      "direction": "U",
+      "completed": 30,
+      "mbps": 147.51170956898804,
+      "completion_ms": {
+        "p50": 5883.806915499996,
+        "p95": 6608.35535199999
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 229.4611749999973,
+        "p95": 268.0845160000018
+      },
+      "cpu_percent_one_core": {
+        "backend": 16.265908640779724,
+        "client": 3.6634929371125504,
+        "dc": 7.766605026678607,
+        "haproxy": 1.611936892329522,
+        "controller": 0.12699014685432947
+      },
+      "sampled_backend_peak_rss_bytes": 25718784
+    },
+    {
+      "variant": "control",
+      "streams": 30,
+      "direction": "D",
+      "completed": 30,
+      "mbps": 137.84864770598995,
+      "completion_ms": {
+        "p50": 5616.9723645,
+        "p95": 7037.384704999994
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 215.69087199999615,
+        "p95": 221.0323090000088
+      },
+      "cpu_percent_one_core": {
+        "backend": 3.286567871713399,
+        "client": 20.26716854223263,
+        "dc": 2.3279855757969914,
+        "haproxy": 21.910452478089326,
+        "controller": 0.10807023938482853
+      },
+      "sampled_backend_peak_rss_bytes": 33775616
+    },
+    {
+      "variant": "control",
+      "streams": 50,
+      "direction": "U",
+      "completed": 50,
+      "mbps": 147.76511132268524,
+      "completion_ms": {
+        "p50": 9198.304432,
+        "p95": 10709.855473000005
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 236.1421360000051,
+        "p95": 285.1069919999958
+      },
+      "cpu_percent_one_core": {
+        "backend": 16.822300113816784,
+        "client": 4.932192703527435,
+        "dc": 8.279037752349621,
+        "haproxy": 1.585347654705246,
+        "controller": 0.14362750367118313
+      },
+      "sampled_backend_peak_rss_bytes": 28315648
+    },
+    {
+      "variant": "control",
+      "streams": 50,
+      "direction": "D",
+      "completed": 50,
+      "mbps": 162.50603376883186,
+      "completion_ms": {
+        "p50": 8886.687745499998,
+        "p95": 10229.339003999996
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 216.1873549999953,
+        "p95": 220.78301100000886
+      },
+      "cpu_percent_one_core": {
+        "backend": 3.487001189993587,
+        "client": 24.118424897455654,
+        "dc": 2.905834324994657,
+        "haproxy": 25.95878663661894,
+        "controller": 0.12083048039084313
+      },
+      "sampled_backend_peak_rss_bytes": 41439232
+    },
+    {
+      "variant": "control",
+      "streams": 100,
+      "direction": "U",
+      "completed": 100,
+      "mbps": 170.00093573736643,
+      "completion_ms": {
+        "p50": 18060.8040395,
+        "p95": 19427.51306299999
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 257.5005610000005,
+        "p95": 390.89208100000405
+      },
+      "cpu_percent_one_core": {
+        "backend": 20.519011906872215,
+        "client": 7.700962493443396,
+        "dc": 9.778195797595897,
+        "haproxy": 1.9759048502913972,
+        "controller": 0.2033094376329467
+      },
+      "sampled_backend_peak_rss_bytes": 41439232
+    },
+    {
+      "variant": "control",
+      "streams": 100,
+      "direction": "D",
+      "completed": 100,
+      "mbps": 171.1243864953341,
+      "completion_ms": {
+        "p50": 17142.3700255,
+        "p95": 19332.653298999987
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 215.73270300000047,
+        "p95": 222.10665000000063
+      },
+      "cpu_percent_one_core": {
+        "backend": 3.569932894311371,
+        "client": 26.468502459251408,
+        "dc": 3.7229300183532783,
+        "haproxy": 27.029491914071762,
+        "controller": 0.14669866083705724
+      },
+      "sampled_backend_peak_rss_bytes": 59998208
+    },
+    {
+      "variant": "balanced",
+      "streams": 30,
+      "direction": "U",
+      "completed": 30,
+      "mbps": 149.531170312265,
+      "completion_ms": {
+        "p50": 5897.7107540000015,
+        "p95": 6545.859114999985
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 224.51070750000213,
+        "p95": 289.73186100000703
+      },
+      "cpu_percent_one_core": {
+        "backend": 16.488591735225338,
+        "client": 3.5651009157243996,
+        "dc": 7.575839445914339,
+        "haproxy": 1.48545871488516,
+        "controller": 0.13233036648343638
+      },
+      "sampled_backend_peak_rss_bytes": 25829376
+    },
+    {
+      "variant": "balanced",
+      "streams": 30,
+      "direction": "D",
+      "completed": 30,
+      "mbps": 148.75951499065806,
+      "completion_ms": {
+        "p50": 5721.706437000009,
+        "p95": 6659.109513000004
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 215.5615230000052,
+        "p95": 224.47527699998204
+      },
+      "cpu_percent_one_core": {
+        "backend": 3.398923918391402,
+        "client": 19.802426307149908,
+        "dc": 2.364468812794021,
+        "haproxy": 24.2358053311387,
+        "controller": 0.11150490595365685
+      },
+      "sampled_backend_peak_rss_bytes": 34754560
+    },
+    {
+      "variant": "balanced",
+      "streams": 50,
+      "direction": "U",
+      "completed": 50,
+      "mbps": 152.06093942977705,
+      "completion_ms": {
+        "p50": 8998.255942,
+        "p95": 10924.354502
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 239.0308224999984,
+        "p95": 352.875723000011
+      },
+      "cpu_percent_one_core": {
+        "backend": 17.130087347166455,
+        "client": 4.622404522251264,
+        "dc": 8.24781983382088,
+        "haproxy": 1.6314368902063265,
+        "controller": 0.15329843869222826
+      },
+      "sampled_backend_peak_rss_bytes": 28438528
+    },
+    {
+      "variant": "balanced",
+      "streams": 50,
+      "direction": "D",
+      "completed": 50,
+      "mbps": 162.60464843648265,
+      "completion_ms": {
+        "p50": 8771.202275500002,
+        "p95": 10066.82170100001
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 215.83497299998555,
+        "p95": 222.8832400000158
+      },
+      "cpu_percent_one_core": {
+        "backend": 3.682957077375852,
+        "client": 23.066941695143512,
+        "dc": 3.0045176157539903,
+        "haproxy": 26.55605892634168,
+        "controller": 0.12177651054780186
+      },
+      "sampled_backend_peak_rss_bytes": 58380288
+    },
+    {
+      "variant": "balanced",
+      "streams": 100,
+      "direction": "U",
+      "completed": 100,
+      "mbps": 170.36104571975204,
+      "completion_ms": {
+        "p50": 17978.127798,
+        "p95": 19486.33900500002
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 260.7197654999993,
+        "p95": 419.8313419999806
+      },
+      "cpu_percent_one_core": {
+        "backend": 20.460933871585155,
+        "client": 7.869589950609678,
+        "dc": 10.103538065621455,
+        "haproxy": 1.9293188266010854,
+        "controller": 0.21227754839820226
+      },
+      "sampled_backend_peak_rss_bytes": 34828288
+    },
+    {
+      "variant": "balanced",
+      "streams": 100,
+      "direction": "D",
+      "completed": 100,
+      "mbps": 171.19324951983893,
+      "completion_ms": {
+        "p50": 17492.71321399999,
+        "p95": 19337.551866000013
+      },
+      "fake_tls_client_phase_ms": {
+        "p50": 214.9044805000102,
+        "p95": 222.41134400002238
+      },
+      "cpu_percent_one_core": {
+        "backend": 3.7754477454626816,
+        "client": 25.91793857696001,
+        "dc": 3.7244281813348086,
+        "haproxy": 27.193427680156862,
+        "controller": 0.15022310153874024
+      },
+      "sampled_backend_peak_rss_bytes": 84901888
+    }
+  ],
+  "memory_peak_bytes": 672464896,
+  "memory_high_events": 239,
+  "limitations": "single fixed-order resource sequence, not repeated speed ranking; completion includes 4MiB payload/ACK, Fake TLS phase excludes authenticated DC-ready confirmation"
+}

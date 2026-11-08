@@ -1,0 +1,25 @@
+probe	Fetch exact API assets and probe native protocol and API policy	﻿2026-11-08T15:15:58.1066326Z ##[group]Run set -euo pipefail
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1066602Z ^[[36;1mset -euo pipefail^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1066829Z ^[[36;1mmkdir -m 700 "$RUNNER_TEMP/release-probe"^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1067339Z ^[[36;1mtimeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821981 > "$RUNNER_TEMP/3517-amd64.tar.gz"^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1068448Z ^[[36;1mtimeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821990 > "$RUNNER_TEMP/3517-arm64.tar.gz"^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1069306Z ^[[36;1mtimeout --kill-after=5 90 python3 tests/release_3517_probe.py --amd64 "$RUNNER_TEMP/3517-amd64.tar.gz" --arm64 "$RUNNER_TEMP/3517-arm64.tar.gz" --output "$RUNNER_TEMP/release-probe/probe.json"^[[0m
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1126858Z shell: /usr/bin/bash -e {0}
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1127066Z env:
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1129482Z   GH_TOKEN: ***
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:15:58.1129671Z ##[endgroup]
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3956706Z Traceback (most recent call last):
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3957275Z   File "/home/runner/work/me/me/tests/release_3517_probe.py", line 68, in <module>
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3957619Z     if __name__=='__main__':main()
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3957914Z   File "/home/runner/work/me/me/tests/release_3517_probe.py", line 51, in main
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3958241Z     authorized,_=request(lab.api,'GET',route)
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3958566Z   File "/home/runner/work/me/me/tests/telemt_probe.py", line 43, in request
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3958910Z     return response.status, json.loads(response.read(262144))
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3959247Z   File "/usr/lib/python3.10/json/__init__.py", line 346, in loads
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3961694Z     return _default_decoder.decode(s)
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3962193Z   File "/usr/lib/python3.10/json/decoder.py", line 337, in decode
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3965374Z     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3965785Z   File "/usr/lib/python3.10/json/decoder.py", line 353, in raw_decode
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3966357Z     obj, end = self.scan_once(s, idx)
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.3966980Z json.decoder.JSONDecodeError: Unterminated string starting at: line 1 column 262099 (char 262098)
+probe	Fetch exact API assets and probe native protocol and API policy	2026-11-08T15:16:01.4243970Z ##[error]Process completed with exit code 1.
