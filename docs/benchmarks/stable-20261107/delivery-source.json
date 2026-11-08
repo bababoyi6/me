@@ -27,9 +27,17 @@
       "bytes": 2564,
       "sha256": "8410a718840160eef4c28a93dd5406ca35b5a9a503dcd052c44f4db4e66d0d1d"
     },
+    ".github/workflows/exception-diagnostic.yml": {
+      "bytes": 2299,
+      "sha256": "dfdca4312a530ada228bf99d83e51eb5df0379bde3529902d810e706d3170de6"
+    },
     ".github/workflows/full-system.yml": {
       "bytes": 1947,
       "sha256": "6e254029eb8922b02b6741f213421d087f1fdd360d284c72625042f3999c925b"
+    },
+    ".github/workflows/paired-performance.yml": {
+      "bytes": 2611,
+      "sha256": "10bc6713c1a851db1984e046339d23292d9324d946e4b69aca1bed3e530e1d88"
     },
     ".github/workflows/relay-candidate.yml": {
       "bytes": 2600,
@@ -39,13 +47,21 @@
       "bytes": 1919,
       "sha256": "a0917445367005d0227b4b65ff1bd8f683601ff96f70804fdae9ec51ba7ada21"
     },
+    ".github/workflows/sequence-diagnostic.yml": {
+      "bytes": 2153,
+      "sha256": "ef6050500cc866da1e2e302a78fd5eb130920b4cbf08327c40fe83c5441206dc"
+    },
     ".github/workflows/stable-compat.yml": {
       "bytes": 3966,
       "sha256": "8a93a56bf5226a5d72b3adf810db79b3fd1a36e2568773a895043209e7846fad"
     },
     ".github/workflows/validate.yml": {
-      "bytes": 3502,
-      "sha256": "67f3a0fb882385e91e5a02fe3fc8ac3ca5b05f33e800e1cc86c71bcfa1496ba9"
+      "bytes": 3672,
+      "sha256": "90b632989fcbb514adc613e9349fece576acc2c0da37920c99cc88b348ee68fd"
+    },
+    ".github/workflows/weak-diagnostic.yml": {
+      "bytes": 2119,
+      "sha256": "0ef151cae06adfaf51ee750c4db4b86203819aff49ef7f604afc1446d06ab0f7"
     },
     "telemt-dual-hop.sh": {
       "bytes": 181344,
@@ -92,8 +108,8 @@
       "sha256": "e2e9043962fbb6931bc9b57a08f98b9d440325228b0aa23cc82bf0886b0f0b5e"
     },
     "tests/e2e_lab.py": {
-      "bytes": 24360,
-      "sha256": "066f64d5536b5873232710fe4b7e1cc0d64f5c391e7f03fdc0bc568d62ea6a91"
+      "bytes": 24989,
+      "sha256": "ad216893e4fdd9a9fd1aedec1064936c925c0d90ff6a8be7f15170631a6506ca"
     },
     "tests/endurance_ci.py": {
       "bytes": 1680,
@@ -106,6 +122,10 @@
     "tests/endurance_path.py": {
       "bytes": 6535,
       "sha256": "ccc0ee52a32261dfcda836287928779b1a18a5133a8d4edcef31eefddab13c84"
+    },
+    "tests/exception_only_diagnostic.py": {
+      "bytes": 2145,
+      "sha256": "d1083984a21106e99a7b97eaf30620c57cb4c7e0255e2949f6a35aed2fa84f30"
     },
     "tests/fixtures/legacy-acquire-lock.sh": {
       "bytes": 241,
@@ -183,6 +203,18 @@
       "bytes": 4400,
       "sha256": "690c1850dc2a1b740be41b5cef9faf6b17b4412505ed57b781fb6a1caf098b3c"
     },
+    "tests/paired_analysis.py": {
+      "bytes": 5239,
+      "sha256": "27de72c3e4d6b1ee25c289bd5fd4a82e123e708fc026c401898abf9ca29b6f35"
+    },
+    "tests/paired_performance.py": {
+      "bytes": 9052,
+      "sha256": "716b7355f11a5bd81f1ba063ecf389911d3ad66889e9d32d80d0a9a26f658743"
+    },
+    "tests/paired_report.py": {
+      "bytes": 4059,
+      "sha256": "e53a61a8ba6a10d9ab190def0656f02e39eae047a36b7d755d1e0998b3961160"
+    },
     "tests/persistent_relay_lab.py": {
       "bytes": 3407,
       "sha256": "06cdfcc4b9fada84a6f4ef00e8eca9fe78995663d289bcfa3ebcd99aff82c5e5"
@@ -204,8 +236,8 @@
       "sha256": "5e226f79ebd3b8f7f7801e69f65ab8da35b2884a73b7958e54a19099d8fc688e"
     },
     "tests/stable_acceptance.py": {
-      "bytes": 6818,
-      "sha256": "be3a8e9f3173a5abd7c386b85fb57071d0d510d05ad229bdbb58de48056ee91b"
+      "bytes": 10164,
+      "sha256": "c4129f4c78009f297c1ed790e96dd9fd4dc4880f71f695c22abd160194b99fa4"
     },
     "tests/stable_system_lab.py": {
       "bytes": 10688,
@@ -351,6 +383,14 @@
       "bytes": 3596,
       "sha256": "f48fa851f12b0c413e9d9e9147d04994c9332f1728470058bcfbdce2408a068f"
     },
+    "tests/test_paired_analysis.py": {
+      "bytes": 4426,
+      "sha256": "bc778e02b2a867e8a6ec49b195a705624e5d863a9108369db8cdb6822f55a5b5"
+    },
+    "tests/test_paired_report.py": {
+      "bytes": 2670,
+      "sha256": "46f0978da678f0e5b9278f46548b7244b4a3b245b8506a3b16d09c96f1012f3e"
+    },
     "tests/test_payload_pacing.py": {
       "bytes": 1621,
       "sha256": "f9b15c8506d6f51b1ee57b189e988be3c6d8515785cb998b464b40d458888ac4"
@@ -398,6 +438,14 @@
     "tests/upload_ab.py": {
       "bytes": 12983,
       "sha256": "ee726bd1ea099b4578b40aa8f59a3d62ce2dde7a9bc51e0bd6bad062407dd92c"
+    },
+    "tests/weak_network_diagnostic.py": {
+      "bytes": 6790,
+      "sha256": "2f5f986c2276ecfdd5feae5491898cc5247e334193ae1c48d1b55fb7f4b67c01"
+    },
+    "tests/weak_sequence_diagnostic.py": {
+      "bytes": 2902,
+      "sha256": "0d44751177c152379cceba1738477eee1cfa1fddc24d35f9a68819f9481b7b21"
     },
     "tools/analyze_socket_policy.py": {
       "bytes": 3545,
@@ -472,6 +520,6 @@
       "sha256": "954af489e1dc6ddce8afa99c11387e930c83a6c91a438879d7449069790c2328"
     }
   },
-  "source_commit": "94857f2847bacd199a9955c7cff660022ed75a8a",
+  "source_commit": "6e8ed713d507c3ab8519e3c83013910fae7c5713",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }
