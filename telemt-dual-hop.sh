@@ -1847,8 +1847,14 @@ def refresh_health(base, bind, rollback_only=False, *, target=None, service=None
         return transaction.activate(candidate, expected, expected, digest(target))
 
 
+MAX_CONNECT_CONFIG_BYTES = 1024 * 1024
+MAX_CONNECT_POLICY_BACKUPS = 8
+
+
 def bounded_connect_config(content):
     """Edit three managed defaults only; custom values/layouts fail closed."""
+    if len(content) > MAX_CONNECT_CONFIG_BYTES:
+        raise CoreError('connect config exceeds 1MiB bound')
     text = content.decode('utf8')
     if any(marker in text for marker in ('\x00', '\ufeff', '\"\"\"', "'''")):
         raise CoreError('custom TOML layout; review required')
@@ -1890,12 +1896,15 @@ def refresh_connect_policy(base, service, rollback_only=False):
     info = target.stat()
     if stat.S_IMODE(info.st_mode) != 0o640 or info.st_gid != service.identity['group']:
         raise CoreError('custom config ownership or mode; review required')
+    if not rollback_only and info.st_size > MAX_CONNECT_CONFIG_BYTES:
+        raise CoreError('connect config exceeds 1MiB bound')
     directory = Path(base)/'connect-policy'
     if not directory.exists(): directory.mkdir(mode=0o700)
     transaction = CoreTransaction(target, directory, ConnectPolicyService(service),
                                   file_mode=0o640, file_owner=(info.st_uid,info.st_gid))
     if rollback_only: return transaction.rollback()
-    original = target.read_bytes()
+    with target.open('rb') as source:
+        original = source.read(MAX_CONNECT_CONFIG_BYTES + 1)
     baseline = hashlib.sha256(original).hexdigest()
     content = bounded_connect_config(original)
     expected = hashlib.sha256(content).hexdigest()
@@ -1906,6 +1915,9 @@ def refresh_connect_policy(base, service, rollback_only=False):
     if expected == baseline:
         if not service.ready(): raise CoreError('backend is not ready')
         return 'unchanged'
+    if (len(list(directory.glob('core.previous-*'))) >= MAX_CONNECT_POLICY_BACKUPS
+            and not (directory/('core.previous-'+baseline)).exists()):
+        raise CoreError('connect backup limit reached; privately archive old backups before maintenance')
     with tempfile.TemporaryDirectory(prefix='.connect-candidate-',dir=target.parent) as name:
         stage=Path(name)
         os.chown(stage,info.st_uid,info.st_gid); stage.chmod(0o750)

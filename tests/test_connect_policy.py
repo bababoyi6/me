@@ -91,3 +91,18 @@ class ConnectPolicyTests(unittest.TestCase):
             with self.assertRaisesRegex(CoreError,'approved baseline'): self.call()
         self.assertEqual(self.config.read_bytes(),changed)
         self.assertEqual(self.service.starts,0)
+
+    def test_config_size_and_backup_growth_are_bounded_before_service_changes(self):
+        oversized=self.original+b'#'+b'x'*(1024*1024)
+        self.config.write_bytes(oversized)
+        with self.assertRaisesRegex(CoreError,'1MiB bound'): self.call()
+        self.assertEqual(self.config.read_bytes(),oversized)
+        self.assertEqual(self.service.starts,0)
+        self.config.write_bytes(self.original)
+        store=self.base/'connect-policy'; store.mkdir(mode=0o700)
+        for i in range(8):
+            (store/('core.previous-'+format(i,'064x'))).write_bytes(b'RETAINED_SYNTHETIC_BACKUP')
+        with self.assertRaisesRegex(CoreError,'backup limit reached'): self.call()
+        self.assertEqual(self.config.read_bytes(),self.original)
+        self.assertEqual(len(list(store.glob('core.previous-*'))),8)
+        self.assertEqual(self.service.starts,0)

@@ -6,6 +6,12 @@ from paired_analysis import analyze, schedule, CASES
 
 
 class PairedAnalysisTests(unittest.TestCase):
+    def test_missing_or_invalid_generator_cpu_cannot_hide_a_bottleneck(self):
+        for value in (None, float('nan'), float('inf'), -1, True):
+            data = self.fixture(1.5)
+            data['pairs'][0]['runs']['stable']['rows'][0]['controller_and_mock_cpu_one_core_percent'] = value
+            with self.assertRaisesRegex(ValueError,'load-generator CPU'): analyze(data)
+
     def fixture(self, ratio=1.0):
         profile = {'expected_pairs': 6, 'pairs': []}
         for i, order in enumerate(schedule(6, 1), 1):

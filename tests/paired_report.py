@@ -67,6 +67,8 @@ def main():
     args = parser.parse_args()
     reports = [json.loads(Path(p).read_text()) for p in args.inputs]
     summary = combine(reports)
+    summary['analysis_tool_sha256'] = {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
+                                      for name in ('paired_report.py','paired_analysis.py')}
     summary['input_sha256'] = {Path(p).name: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in args.inputs}
     Path(args.output).write_text(json.dumps(summary, indent=2, allow_nan=False)+'\n')
     print(json.dumps({'complete': True, 'transport_accepted': summary['transport_accepted']}))

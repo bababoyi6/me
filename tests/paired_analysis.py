@@ -73,7 +73,10 @@ def analyze(profile):
                     raise ValueError('non-finite or non-positive metric')
                 ratios.append(values[1]/values[0]); tails.append(values[3]/values[2])
             median, tail = statistics.median(ratios), statistics.median(tails)
-            limited = any(r.get('controller_and_mock_cpu_one_core_percent', 0) >= 70 for r in old+new)
+            controller_cpu = [r.get('controller_and_mock_cpu_one_core_percent') for r in old+new]
+            if any(not isinstance(v, (int,float)) or isinstance(v,bool) or not math.isfinite(v) or v < 0 for v in controller_cpu):
+                raise ValueError('missing or invalid load-generator CPU measurement')
+            limited = any(v >= 70 for v in controller_cpu)
             classification = ('HARNESS_CPU_LIMITED' if limited else
                               'REPEATABLE_FASTER' if min(ratios) > 1.05 and max(tails) <= 1.10 else
                               'REPEATABLE_SLOWER' if max(ratios) < .95 else
