@@ -1,12 +1,12 @@
 # 1.7 安装、迁移与回退
 
-候选目标：官方 Telemt **3.5.16**，固定 tag/commit/包及二进制 SHA256 见 [版本锁](telemt-stable-lock.json)。本分支未发布、未部署生产；`a update` 当前跟随远程 main，不能在候选分支尚未合并时假定它会下载 1.7。
+候选目标：官方 Telemt **3.5.17**，固定 tag/commit/包及二进制 SHA256 见 [版本锁](telemt-stable-lock.json)。本分支未发布、未部署生产；`a update` 当前跟随远程 main，不能在候选分支尚未合并时假定它会下载 1.7。3.5.16 既有核心和同协议加入码仍被精确识别，迁移及新 API 审查见 [3.5.17 说明](UPSTREAM-3.5.17.md)。
 
 11 月 8 日长链路补测已确认官方核心的 100ms 单流吞吐退化，当前不推荐据本分支批量升级高延迟生产线路。`3.5.16+tdh.balanced1` 仅为独立原生实验候选，虽已恢复吞吐并通过有限维护/资源验收，四流下载排队延迟仍需优化；尚不接受作为安装器的版本选项。详见[收益、代价与验收边界](LONG-PATH-20261108.md)，不要将实验产物当作正式 Release。
 
 ## 安装与旧节点保护
 
-新安装执行本分支审核后的 `telemt-dual-hop.sh`，仍按入口、backend1、backend2、回执注册的原流程部署。支持范围仍为 Ubuntu 22.04 / x86_64、ARM64。两架构均固定官方 3.5.16；ARM64 已在 Ubuntu 22.04.5 原生 runner 验证正式包安装、API 及双 SNI 协议传输，不代表完整 ARM 三系统或官方客户端验收。
+新安装执行本分支审核后的 `telemt-dual-hop.sh`，仍按入口、backend1、backend2、回执注册的原流程部署。支持范围仍为 Ubuntu 22.04 / x86_64、ARM64。两架构均固定官方 3.5.17；ARM64 已在 Ubuntu 22.04.5 原生 runner 验证正式包安装、API 及双 SNI 协议传输，不代表完整 ARM 三系统或官方客户端验收。
 
 ```bash
 sudo bash ./telemt-dual-hop.sh
