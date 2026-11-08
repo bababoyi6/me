@@ -72,6 +72,7 @@ def main():
     summary['input_sha256'] = {Path(p).name: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in args.inputs}
     Path(args.output).write_text(json.dumps(summary, indent=2, allow_nan=False)+'\n')
     print(json.dumps({'complete': True, 'transport_accepted': summary['transport_accepted']}))
+    return 0 if summary['transport_accepted'] else 1
 
 
-if __name__ == '__main__': main()
+if __name__ == '__main__': raise SystemExit(main())

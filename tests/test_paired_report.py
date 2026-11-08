@@ -1,4 +1,9 @@
 import copy
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import unittest
 from paired_report import combine
 import test_paired_analysis as fixtures
@@ -46,6 +51,21 @@ class PairedReportTests(unittest.TestCase):
         result = combine(reports)
         self.assertFalse(result['transport_accepted'])
         self.assertEqual(result['profiles'][0]['cases'][0]['verdict'], 'PROTOCOL_FAILURE')
+
+    def test_cli_exit_status_matches_protocol_result_without_losing_failed_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            for failed in (False,True):
+                reports=self.fixture()
+                if failed:reports[1]['profiles'][0]['pairs'][0]['runs']['stable']['accepted']=False
+                inputs=[]
+                for index,report in enumerate(reports,1):
+                    path=root/f'replica-{index}.json';path.write_text(json.dumps(report));inputs.append(str(path))
+                output=root/'summary.json'
+                result=subprocess.run([sys.executable,str(Path(__file__).with_name('paired_report.py')),
+                    *inputs,'--output',str(output)],capture_output=True,timeout=10)
+                self.assertEqual(result.returncode,1 if failed else 0)
+                self.assertEqual(json.loads(output.read_text())['transport_accepted'],not failed)
 
 
 if __name__ == '__main__': unittest.main()
