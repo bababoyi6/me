@@ -24,7 +24,7 @@ def main():
     if manifest['upstream_commit']!='84e5b827a6619fb2e09ad3d09f253cdffe04bc2f':raise RuntimeError('source mismatch')
     report={'source_commit':os.environ['TDH_SOURCE_COMMIT'],'native_manifest':manifest,'accepted':False,'rows':[],
         'resources_before':before,'private_processes_closed':False,
-        'mock_dc_socket_timeout_seconds':25,'client_io_timeout_seconds':25}
+        'mock_dc_socket_timeout_seconds':25,'client_io_timeout_seconds':25,'idle_checks':[]}
     write(Path(args.output),report)
     processes=[]
     complete=False
@@ -37,6 +37,7 @@ def main():
             lab.dc.socket_timeout=25
             processes.extend(lab.processes)
             try:
+                baseline=stats(lab.telemt.pid)
                 count=0
                 for n in (30,50,100):
                     for direction in ('U','D'):
@@ -56,6 +57,11 @@ def main():
                         write(Path(args.output),report)
                         if errors or lab.dc.errors or len(results)!=n:raise RuntimeError('native protocol transfer failed')
                 lab.validate(count)
+                time.sleep(2)
+                idle=stats(lab.telemt.pid)
+                report['idle_checks'].append({'kind':kind,'before':baseline,'after':idle,
+                    'fd_growth':idle['fds']-baseline['fds'],'allowed_fd_growth':2})
+                if idle['fds']>baseline['fds']+2:raise RuntimeError('native sockets failed bounded idle recovery')
             finally:lab.close()
         complete=True
     finally:
