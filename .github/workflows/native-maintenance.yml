@@ -27,7 +27,7 @@ jobs:
           mkdir -m 700 "$RUNNER_TEMP/native-maintenance"
           gh run download 42456468710 --repo bababoyi6/me --name native-pair --dir "$RUNNER_TEMP/native-pair"
           printf '%s  %s\n' d0265d1c919966173339f2d9314c76048608b6b099d0a2e9e9ee33053651bc61 "$RUNNER_TEMP/native-pair/telemt-balanced" | sha256sum --check
-          curl -q -fL --proto '=https' --proto-redir '=https' --connect-timeout 10 --max-time 120 --max-filesize 67108864 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
+          curl -q -fL --retry 3 --retry-delay 2 --retry-max-time 90 --proto '=https' --proto-redir '=https' --connect-timeout 10 --max-time 30 --max-filesize 67108864 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
       - name: Verify actual systemd candidate upgrade crash recovery and reverse rollback
         run: |
           sudo env GITHUB_ACTIONS=true timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/native-maintenance/system.json"' native "$RUNNER_TEMP"
