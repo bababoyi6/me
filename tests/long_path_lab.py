@@ -209,7 +209,11 @@ backend telemt
                         argv=['ip','netns','exec',NAMES[0],'iperf3','-c','10.77.1.2','-t','8' if native else '4','-O','3' if native else '1',
                               '-b','200M','-P','1','-J','--connect-timeout','3000']
                         if reverse:argv.append('-R')
-                        control=json.loads(command(*argv,timeout=20))
+                        try:control=json.loads(command(*argv,timeout=30))
+                        except subprocess.TimeoutExpired:
+                            report['control_error']={'type':'TimeoutExpired','deadline_seconds':30,
+                                'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U'}
+                            raise
                         if control.get('error'):raise RuntimeError('TCP path control failed')
                         report['controls'].append({'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U',
                             'seconds':8 if native else 4,'omit_seconds':3 if native else 1,
