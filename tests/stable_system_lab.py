@@ -21,7 +21,7 @@ import uuid
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools'))
 from core_install import archive_payload, durable_file, fresh_install
 from core_transaction import digest
-from core_upgrade import BackendService, upgrade, rollback
+from core_upgrade import BackendService, upgrade, rollback, refresh_connect_policy
 from e2e_lab import FullLab, MockDc
 from lab_config import generate_telemt
 from stable_acceptance import PINS
@@ -90,6 +90,9 @@ def main():
             listen, api, health_port = port(), port(), port()
             config = generate_telemt(root/'config', root/'work', listen, api)
             text = config.read_text().replace('tls_emulation = true', 'tls_emulation = false')
+            # Legacy configs have no explicit connection defaults.
+            for line in ('tg_connect = 4\n','upstream_connect_retry_attempts = 2\n','upstream_connect_budget_ms = 9000\n'):
+                text = text.replace(line,'')
             text = text.replace('[network]\n', '[network]\nstun_use = false\nhttp_ip_detect_urls = []\n')
             text += '\n[dc_overrides]\n'+''.join(f'"{dcid}" = ["127.0.0.1:{dc.server_address[1]}"]\n' for dcid in range(1, 6))
             config.write_text(text)
@@ -136,6 +139,10 @@ StandardError=null
                                          PINS['stable'][1], '3.5.16', protected, service)
             report['repeat_upgrade'] = upgrade(binary, store, args.stable_archive, PINS['stable'][0],
                                                 PINS['stable'][1], '3.5.16', protected, service)
+            stage = 'connect_policy'
+            report['connect_refresh'] = refresh_connect_policy(root,service)
+            report['repeat_connect_refresh'] = refresh_connect_policy(root,service)
+            report['connect_config_private'] = (config.stat().st_mode & 0o777)==0o640 and config.stat().st_gid==65534
             report['unauthenticated_api_status'] = request(api, 'GET', '/v1/users', authenticated=False)[0]
             report['read_only_api_write_status'] = request(api, 'POST', '/v1/users')[0]
             # Reuse the actual protocol transfer method against the unit's listener.
@@ -180,10 +187,13 @@ StandardError=null
                 raise RuntimeError('manually restarted core not ready')
             report['production_agent_recovery_seconds'] = wait_for(lambda: agent_state(health_port, b'up'), 25)
             stage = 'core_rollback'
+            report['connect_rollback'] = refresh_connect_policy(root,service,True)
+            report['connect_original_bytes_restored'] = digest(config)==old_config
             report['rollback'] = rollback(binary, store, protected, service)
             report['old_binary_restored'] = digest(binary) == PINS['balanced2'][1]
             report['config_and_token_unchanged'] = digest(config) == old_config and token.read_text() == TOKEN+'\n'
             report['accepted'] = (report['old_binary_restored'] and report['config_and_token_unchanged']
+                                  and report['connect_config_private'] and report['connect_original_bytes_restored']
                                   and report['unauthenticated_api_status'] in (401, 403)
                                   and report['read_only_api_write_status'] == 403)
         except Exception as error:

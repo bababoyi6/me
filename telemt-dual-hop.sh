@@ -157,6 +157,8 @@ usage() {
   a backend-resume 1|2                      入口恢复后端接收新连接
   a health-refresh --maintenance            安装本管理器内置的健康代理
   a health-rollback --maintenance           回退上一次健康代理更新
+  a connect-refresh --maintenance           备份并应用有界 DC 连接重试
+  a connect-rollback --maintenance          恢复上一次 DC 连接配置
   a recover                                 后端隧道与服务恢复
   a perf [2-30]                             只读脱敏性能采样（默认 5 秒）
   sudo bash telemt-dual-hop.sh entry        初始化入口 VPS
@@ -1213,7 +1215,9 @@ manage_core() {
   load_state || die "未安装节点。"
   require_current_state
   [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "核心事务只能在后端运行。"
-  [[ $action != upgrade ]] || telemt_binary_is_expected || die "现有核心身份未知；拒绝自动覆盖。"
+  if [[ $action == upgrade || $action == *-connect ]]; then
+    telemt_binary_is_expected || die "现有核心身份未知；拒绝自动维护。"
+  fi
   install -d -m 0700 "${TDH_BASE}/core-upgrade"
   local args=("$action" --binary "$TDH_BIN" --directory "${TDH_BASE}/core-upgrade"
     --config "${TDH_CONFIG_DIR}/telemt.toml" --work "${TDH_WORK_ROOT}/telemt"
@@ -1435,7 +1439,7 @@ def sync_directory(path):
         os.close(fd)
 
 
-def atomic_copy(source, target, mode, expected_sha256=None):
+def atomic_copy(source, target, mode, expected_sha256=None, owner=None):
     target = Path(target)
     safe_directory(target.parent)
     temporary = None
@@ -1444,6 +1448,8 @@ def atomic_copy(source, target, mode, expected_sha256=None):
         with os.fdopen(fd, "wb") as output, Path(source).open("rb") as incoming:
             shutil.copyfileobj(incoming, output, 1024 * 1024)
             output.flush()
+            if owner is not None:
+                os.fchown(output.fileno(), *owner)
             os.fchmod(output.fileno(), mode)
             os.fsync(output.fileno())
         if expected_sha256 is not None and digest(temporary) != expected_sha256:
@@ -1459,10 +1465,15 @@ def atomic_copy(source, target, mode, expected_sha256=None):
 class CoreTransaction:
     """One backend only. Hooks implement stop/start, bounded ready and version."""
 
-    def __init__(self, binary, directory, service):
+    def __init__(self, binary, directory, service, *, file_mode=0o755, file_owner=None):
         self.binary = Path(binary)
         self.directory = Path(directory)
         self.service = service
+        if file_mode not in (0o640, 0o755) or (file_mode == 0o640 and file_owner is None):
+            raise CoreError('explicit config ownership required')
+        self.file_mode, self.file_owner = file_mode, file_owner
+        self.target_metadata = ({'mode': file_mode, 'uid': file_owner[0], 'gid': file_owner[1]}
+                                if file_owner is not None else None)
         safe_directory(self.binary.parent)
         safe_directory(self.directory)
         if self.directory.stat().st_mode & 0o077:
@@ -1507,6 +1518,8 @@ class CoreTransaction:
     def validate(self, value, allow_prior=True):
         if not isinstance(value, dict) or value.get("schema") != 1 or value.get("binary") != str(self.binary):
             raise CoreError("transaction journal belongs to another target")
+        if value.get('target_metadata') != self.target_metadata:
+            raise CoreError('transaction target permissions changed')
         for key in ("old_sha256", "new_sha256"):
             text = value.get(key, "")
             if len(text) != 64 or any(c not in "0123456789abcdef" for c in text):
@@ -1531,12 +1544,13 @@ class CoreTransaction:
         backup = self.directory / value["backup"]
         safe_file(backup)
         safe_file(self.binary)
+        self.validate_target_metadata()
         if digest(backup) != value["old_sha256"]:
             raise CoreError("previous core checksum mismatch")
         if digest(self.binary) not in (value["old_sha256"], value["new_sha256"]):
             raise CoreError("core changed outside this transaction; refusing overwrite")
         self.service.stop()
-        atomic_copy(backup, self.binary, 0o755, value["old_sha256"])
+        atomic_copy(backup, self.binary, self.file_mode, value["old_sha256"], self.file_owner)
         self.service.start()
         if not self.service.ready():
             raise CoreError("previous core did not regain readiness")
@@ -1548,6 +1562,7 @@ class CoreTransaction:
         with self.locked():
             safe_directory(candidate.parent)
             safe_file(self.binary)
+            self.validate_target_metadata()
             safe_file(candidate)
             if candidate.stat().st_size > 64 * 1024**2:
                 raise CoreError("candidate exceeds size limit")
@@ -1568,6 +1583,8 @@ class CoreTransaction:
                     prior = {k: previous[k] for k in ("schema", "binary", "old_sha256", "new_sha256", "backup", "phase")}
                     if 'snapshot' in previous:
                         prior['snapshot'] = previous['snapshot']
+                    if 'target_metadata' in previous:
+                        prior['target_metadata'] = previous['target_metadata']
             if expected_sha256 == current_sha256:
                 return "unchanged"
             backup = self.directory / ("core.previous-" + current_sha256)
@@ -1580,13 +1597,15 @@ class CoreTransaction:
                      "new_sha256": expected_sha256, "backup": backup.name, "phase": "prepared", "prior": prior}
             if snapshot is not None:
                 value['snapshot'] = snapshot
+            if self.target_metadata is not None:
+                value['target_metadata'] = self.target_metadata
             self.validate(value)
             self.save(value)
             try:
                 self.service.stop()
                 value["phase"] = "switching"
                 self.save(value)
-                atomic_copy(candidate, self.binary, 0o755, expected_sha256)
+                atomic_copy(candidate, self.binary, self.file_mode, expected_sha256, self.file_owner)
                 if digest(self.binary) != expected_sha256:
                     raise CoreError("activated core checksum mismatch")
                 self.service.start()
@@ -1601,6 +1620,12 @@ class CoreTransaction:
                 raise
             return "committed"
 
+    def validate_target_metadata(self):
+        if self.target_metadata is not None:
+            info = self.binary.stat()
+            if (stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid) != (self.file_mode, *self.file_owner):
+                raise CoreError('config permissions changed outside transaction')
+
     def rollback(self):
         with self.locked():
             value = self.load()
@@ -1614,11 +1639,12 @@ class CoreTransaction:
 
 """Pinned backend-only upgrade adapter for CoreTransaction.
 
-No config migration is needed for the managed schema-5 native TCP template.
-Configuration is preserved byte-for-byte; unknown/custom layouts fail closed.
+Core replacement preserves the managed schema-5 configuration byte-for-byte.
+A separate explicit connect-policy transaction edits three managed defaults only.
 The caller holds the manager lock and explicitly acknowledges a maintenance restart.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -1821,6 +1847,75 @@ def refresh_health(base, bind, rollback_only=False, *, target=None, service=None
         return transaction.activate(candidate, expected, expected, digest(target))
 
 
+def bounded_connect_config(content):
+    """Edit three managed defaults only; custom values/layouts fail closed."""
+    text = content.decode('utf8')
+    if any(marker in text for marker in ('\x00', '\ufeff', '\"\"\"', "'''")):
+        raise CoreError('custom TOML layout; review required')
+    lines = text.splitlines(keepends=True)
+    headers = [i for i,line in enumerate(lines) if re.fullmatch(r'\[general\][ \t]*(?:#[^\r\n]*)?\r?\n?', line)]
+    if len(headers) != 1:
+        raise CoreError('one managed general table required')
+    start = headers[0]+1
+    end = next((i for i in range(start,len(lines)) if lines[i].lstrip().startswith('[')),len(lines))
+    defaults = {'tg_connect':10, 'upstream_connect_retry_attempts':2, 'upstream_connect_budget_ms':3000}
+    desired = {'tg_connect':4, 'upstream_connect_retry_attempts':2, 'upstream_connect_budget_ms':9000}
+    seen = set()
+    for i in range(start,end):
+        for key in desired:
+            if not re.match(r'\s*'+key+r'\s*=', lines[i]): continue
+            match = re.fullmatch(r'(\s*'+key+r'\s*=\s*)([0-9]+)([ \t]*(?:#[^\r\n]*)?)(\r?\n)?', lines[i])
+            if key in seen or match is None or int(match[2]) not in (defaults[key],desired[key]):
+                raise CoreError('custom connect settings; review required')
+            seen.add(key)
+            lines[i] = match[1]+str(desired[key])+match[3]+(match[4] or '')
+    newline = '\r\n' if lines[start-1].endswith('\r\n') else '\n'
+    if not lines[start-1].endswith('\n'): lines[start-1] += newline
+    lines[start:start] = [f'{key} = {value}{newline}' for key,value in desired.items() if key not in seen]
+    return ''.join(lines).encode('utf8')
+
+
+class ConnectPolicyService:
+    def __init__(self, backend): self.backend = backend
+    def version(self, path): return digest(path)
+    def stop(self): return self.backend.stop()
+    def start(self): return self.backend.start()
+    def ready(self): return self.backend.ready()
+
+
+def refresh_connect_policy(base, service, rollback_only=False):
+    target = service.config
+    safe_directory(Path(base))
+    safe_file(target)
+    info = target.stat()
+    if stat.S_IMODE(info.st_mode) != 0o640 or info.st_gid != service.identity['group']:
+        raise CoreError('custom config ownership or mode; review required')
+    directory = Path(base)/'connect-policy'
+    if not directory.exists(): directory.mkdir(mode=0o700)
+    transaction = CoreTransaction(target, directory, ConnectPolicyService(service),
+                                  file_mode=0o640, file_owner=(info.st_uid,info.st_gid))
+    if rollback_only: return transaction.rollback()
+    content = bounded_connect_config(target.read_bytes())
+    expected = hashlib.sha256(content).hexdigest()
+    if transaction.journal.exists() and transaction.load()['phase'] not in ('committed','recovered'):
+        raise CoreError('unfinished connect transaction; run connect-rollback first')
+    if expected == digest(target):
+        if not service.ready(): raise CoreError('backend is not ready')
+        return 'unchanged'
+    with tempfile.TemporaryDirectory(prefix='.connect-candidate-',dir=target.parent) as name:
+        stage=Path(name)
+        os.chown(stage,info.st_uid,info.st_gid); stage.chmod(0o750)
+        candidate=stage/'telemt.toml'
+        durable_file(candidate,content,0o640)
+        os.chown(candidate,info.st_uid,info.st_gid)
+        # Parse using the installed core before stopping the current service.
+        result=subprocess.run([str(service.binary),'healthcheck','--mode','ready',str(candidate)],
+            cwd=service.work,capture_output=True,timeout=12,**service.identity)
+        if result.returncode or not service.running_binary_matches():
+            raise CoreError('connect candidate validation or running core identity failed')
+        return transaction.activate(candidate,expected,expected,digest(target))
+
+
 def protected_files(roots):
     files = {}
     for root in map(Path, roots):
@@ -1957,7 +2052,7 @@ def rollback(binary, directory, roots, service):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('upgrade', 'rollback', 'refresh-health', 'rollback-health'))
+    parser.add_argument('action', choices=('upgrade', 'rollback', 'refresh-health', 'rollback-health', 'refresh-connect', 'rollback-connect'))
     parser.add_argument('--binary', required=True)
     parser.add_argument('--directory', required=True)
     parser.add_argument('--config', required=True)
@@ -1977,6 +2072,9 @@ def main():
         print('健康代理事务结果：'+result)
         return
     service = BackendService(args.binary, args.config, args.work, args.token_file, migrate_access=True)
+    if args.action in ('refresh-connect','rollback-connect'):
+        print('连接策略事务结果：'+refresh_connect_policy(Path(args.directory).parent,service,args.action=='rollback-connect'))
+        return
     if args.action == 'upgrade':
         result = upgrade(args.binary, args.directory, args.archive, args.archive_sha,
                          args.binary_sha, args.version, args.protect, service)
@@ -2317,6 +2415,9 @@ write_telemt_config() {
 [general]
 config_strict = true
 fast_mode = true
+tg_connect = 4
+upstream_connect_retry_attempts = 2
+upstream_connect_budget_ms = 9000
 use_middle_proxy = false
 beobachten = false
 log_level = "normal"
@@ -3973,6 +4074,9 @@ main() {
     health-refresh|health-rollback)
       (( $# == 2 )) || die "用法：a $1 --maintenance"
       if [[ $1 == health-refresh ]]; then manage_core refresh-health "$2"; else manage_core rollback-health "$2"; fi ;;
+    connect-refresh|connect-rollback)
+      (( $# == 2 )) || die "用法：a $1 --maintenance"
+      if [[ $1 == connect-refresh ]]; then manage_core refresh-connect "$2"; else manage_core rollback-connect "$2"; fi ;;
     recover) recover_backend ;;
     uninstall) uninstall_all ;;
     menu|panel) control_panel ;;

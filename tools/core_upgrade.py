@@ -1,10 +1,11 @@
 """Pinned backend-only upgrade adapter for CoreTransaction.
 
-No config migration is needed for the managed schema-5 native TCP template.
-Configuration is preserved byte-for-byte; unknown/custom layouts fail closed.
+Core replacement preserves the managed schema-5 configuration byte-for-byte.
+A separate explicit connect-policy transaction edits three managed defaults only.
 The caller holds the manager lock and explicitly acknowledges a maintenance restart.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -209,6 +210,75 @@ def refresh_health(base, bind, rollback_only=False, *, target=None, service=None
         return transaction.activate(candidate, expected, expected, digest(target))
 
 
+def bounded_connect_config(content):
+    """Edit three managed defaults only; custom values/layouts fail closed."""
+    text = content.decode('utf8')
+    if any(marker in text for marker in ('\x00', '\ufeff', '\"\"\"', "'''")):
+        raise CoreError('custom TOML layout; review required')
+    lines = text.splitlines(keepends=True)
+    headers = [i for i,line in enumerate(lines) if re.fullmatch(r'\[general\][ \t]*(?:#[^\r\n]*)?\r?\n?', line)]
+    if len(headers) != 1:
+        raise CoreError('one managed general table required')
+    start = headers[0]+1
+    end = next((i for i in range(start,len(lines)) if lines[i].lstrip().startswith('[')),len(lines))
+    defaults = {'tg_connect':10, 'upstream_connect_retry_attempts':2, 'upstream_connect_budget_ms':3000}
+    desired = {'tg_connect':4, 'upstream_connect_retry_attempts':2, 'upstream_connect_budget_ms':9000}
+    seen = set()
+    for i in range(start,end):
+        for key in desired:
+            if not re.match(r'\s*'+key+r'\s*=', lines[i]): continue
+            match = re.fullmatch(r'(\s*'+key+r'\s*=\s*)([0-9]+)([ \t]*(?:#[^\r\n]*)?)(\r?\n)?', lines[i])
+            if key in seen or match is None or int(match[2]) not in (defaults[key],desired[key]):
+                raise CoreError('custom connect settings; review required')
+            seen.add(key)
+            lines[i] = match[1]+str(desired[key])+match[3]+(match[4] or '')
+    newline = '\r\n' if lines[start-1].endswith('\r\n') else '\n'
+    if not lines[start-1].endswith('\n'): lines[start-1] += newline
+    lines[start:start] = [f'{key} = {value}{newline}' for key,value in desired.items() if key not in seen]
+    return ''.join(lines).encode('utf8')
+
+
+class ConnectPolicyService:
+    def __init__(self, backend): self.backend = backend
+    def version(self, path): return digest(path)
+    def stop(self): return self.backend.stop()
+    def start(self): return self.backend.start()
+    def ready(self): return self.backend.ready()
+
+
+def refresh_connect_policy(base, service, rollback_only=False):
+    target = service.config
+    safe_directory(Path(base))
+    safe_file(target)
+    info = target.stat()
+    if stat.S_IMODE(info.st_mode) != 0o640 or info.st_gid != service.identity['group']:
+        raise CoreError('custom config ownership or mode; review required')
+    directory = Path(base)/'connect-policy'
+    if not directory.exists(): directory.mkdir(mode=0o700)
+    transaction = CoreTransaction(target, directory, ConnectPolicyService(service),
+                                  file_mode=0o640, file_owner=(info.st_uid,info.st_gid))
+    if rollback_only: return transaction.rollback()
+    content = bounded_connect_config(target.read_bytes())
+    expected = hashlib.sha256(content).hexdigest()
+    if transaction.journal.exists() and transaction.load()['phase'] not in ('committed','recovered'):
+        raise CoreError('unfinished connect transaction; run connect-rollback first')
+    if expected == digest(target):
+        if not service.ready(): raise CoreError('backend is not ready')
+        return 'unchanged'
+    with tempfile.TemporaryDirectory(prefix='.connect-candidate-',dir=target.parent) as name:
+        stage=Path(name)
+        os.chown(stage,info.st_uid,info.st_gid); stage.chmod(0o750)
+        candidate=stage/'telemt.toml'
+        durable_file(candidate,content,0o640)
+        os.chown(candidate,info.st_uid,info.st_gid)
+        # Parse using the installed core before stopping the current service.
+        result=subprocess.run([str(service.binary),'healthcheck','--mode','ready',str(candidate)],
+            cwd=service.work,capture_output=True,timeout=12,**service.identity)
+        if result.returncode or not service.running_binary_matches():
+            raise CoreError('connect candidate validation or running core identity failed')
+        return transaction.activate(candidate,expected,expected,digest(target))
+
+
 def protected_files(roots):
     files = {}
     for root in map(Path, roots):
@@ -345,7 +415,7 @@ def rollback(binary, directory, roots, service):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('upgrade', 'rollback', 'refresh-health', 'rollback-health'))
+    parser.add_argument('action', choices=('upgrade', 'rollback', 'refresh-health', 'rollback-health', 'refresh-connect', 'rollback-connect'))
     parser.add_argument('--binary', required=True)
     parser.add_argument('--directory', required=True)
     parser.add_argument('--config', required=True)
@@ -365,6 +435,9 @@ def main():
         print('健康代理事务结果：'+result)
         return
     service = BackendService(args.binary, args.config, args.work, args.token_file, migrate_access=True)
+    if args.action in ('refresh-connect','rollback-connect'):
+        print('连接策略事务结果：'+refresh_connect_policy(Path(args.directory).parent,service,args.action=='rollback-connect'))
+        return
     if args.action == 'upgrade':
         result = upgrade(args.binary, args.directory, args.archive, args.archive_sha,
                          args.binary_sha, args.version, args.protect, service)
