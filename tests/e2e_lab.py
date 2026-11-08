@@ -32,6 +32,8 @@ from lab_files import file_sha256, link_private_binary
 
 # Extracted binaries from the checksum-verified official GNU archives.
 BINARIES = {
+    "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4": "telemt 3.5.17",
+    "e5ca8befdc1428fcd66537ef04f3a95e5f278ebf3c3dd0d0909ce25a390f502b": "telemt 3.5.17",
     "ebaec212fd5556ceca7fb0fcc4d3d23c01a8883d20a4cbc567219022d57c2a0b": "telemt 3.5.16",
     "1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8": "telemt 3.5.16",
     "cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd": "telemt 3.5.5",

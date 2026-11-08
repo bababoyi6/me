@@ -17,6 +17,7 @@ import tempfile
 import time
 
 from e2e_lab import FullLab, sanitize_startup_log
+from release_pins import RELEASES
 
 PINS = {
     'balanced2': ('b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5',
@@ -151,18 +152,20 @@ def main():
     parser.add_argument('--conditions', required=True)
     parser.add_argument('--concurrency', type=int, action='append', choices=(30, 50, 100))
     parser.add_argument('--candidate-only', action='store_true')
+    parser.add_argument('--stable-release',choices=tuple(RELEASES),default='3.5.16')
     args = parser.parse_args()
     report = {'scope': 'real HAProxy/FakeTLS/MTProto and synthetic DC/payload only; shared Linux host',
               'conditions': args.conditions, 'kernel': os.uname().release, 'results': []}
     with tempfile.TemporaryDirectory(prefix='tdh-upgrade-load-') as temp:
         for kind in (('stable',) if args.candidate_only else ('balanced2', 'stable')):
+            pins=RELEASES[args.stable_release] if kind=='stable' else PINS[kind]
             archive = Path(getattr(args, kind+'_archive'))
-            if hashlib.sha256(archive.read_bytes()).hexdigest() != PINS[kind][0]:
+            if hashlib.sha256(archive.read_bytes()).hexdigest() != pins[0]:
                 raise ValueError('archive checksum mismatch')
             with tarfile.open(archive, 'r:gz') as source:
                 member = next(m for m in source if m.name == 'telemt' and m.isfile() and m.size < 64*1024**2)
                 payload = source.extractfile(member).read()
-            if hashlib.sha256(payload).hexdigest() != PINS[kind][1]:
+            if hashlib.sha256(payload).hexdigest() != pins[1]:
                 raise ValueError('binary checksum mismatch')
             binary = Path(temp)/'telemt'
             binary.write_bytes(payload)

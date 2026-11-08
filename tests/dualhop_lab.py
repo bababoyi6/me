@@ -27,6 +27,7 @@ parser.add_argument('--root',required=True)
 parser.add_argument('--haproxy',default='haproxy')
 parser.add_argument('--wg',default='wg')
 parser.add_argument('--build',choices=('official','stable','auto','bulk'),default='official')
+parser.add_argument('--stable-release',choices=('3.5.16','3.5.17'),default='3.5.16')
 parser.add_argument('--separate-dc',action='store_true')
 profile=parser.add_mutually_exclusive_group()
 profile.add_argument('--soak',action='store_true')
@@ -75,7 +76,7 @@ class Agent(socketserver.ThreadingTCPServer):
 def backend():
     shared=Path(args.shared)
     address=f'10.77.{args.index}.2'
-    binary=ROOT/('telemt-3.5.16' if args.build=='stable' else 'telemt-3.5.5')/'telemt'
+    binary=ROOT/(f'telemt-{args.stable_release}' if args.build=='stable' else 'telemt-3.5.5')/'telemt'
     experimental=None
     if args.build not in ('official','stable'):
         metadata=json.loads((ROOT/f'{args.build}-build.json').read_text())
@@ -492,7 +493,7 @@ def run():
             separate_dc(net,shared)
         for number,ns in ((1,NAMES[2]),(2,'tdh-audit-b2')):
             process=subprocess.Popen(['ip','netns','exec',ns,'python3',str(HERE),
-                                      '--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
+                                      '--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--stable-release',args.stable_release,'--rtt',str(args.rtt),
                                       '--loss-percent',str(args.loss_percent),'--jitter-ms',str(args.jitter_ms),
                                       *(['--separate-dc'] if args.separate_dc else []),
                                       *(['--candidate-check'] if args.candidate_check else []),
@@ -509,7 +510,7 @@ def run():
         entry_args=['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else ['--candidate-check'] if args.candidate_check else ['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
         entry_deadline=args.endurance_seconds+120 if args.endurance_seconds else 90 if args.candidate_check else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
         result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),'ip','netns','exec',NAMES[0],
-                               'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--rtt',str(args.rtt),
+                               'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--stable-release',args.stable_release,'--rtt',str(args.rtt),
                                '--loss-percent',str(args.loss_percent),'--jitter-ms',str(args.jitter_ms),
                                *(['--separate-dc'] if args.separate_dc else []),
                                *entry_args,'entry','--shared',str(shared)],

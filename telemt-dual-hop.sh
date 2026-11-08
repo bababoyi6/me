@@ -9,15 +9,18 @@ umask 077
 readonly TDH_VERSION="1.7.0"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
-readonly TELEMT_VERSION="3.5.16"
-readonly TELEMT_COMMIT="84e5b827a6619fb2e09ad3d09f253cdffe04bc2f"
-readonly TELEMT_SHA256_AMD64="e6f46b2f3becf29bfd555cec8a059e429f7c082c1af402499b3a7940cf8ebd34"
-readonly TELEMT_BINARY_SHA256_AMD64="1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8"
-readonly TELEMT_BINARY_SHA256_ARM64="ebaec212fd5556ceca7fb0fcc4d3d23c01a8883d20a4cbc567219022d57c2a0b"
+readonly TELEMT_VERSION="3.5.17"
+readonly TELEMT_COMMIT="66708d2866f3f3a4541c4fa67984d408e71a8af4"
+readonly TELEMT_SHA256_AMD64="0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e"
+readonly TELEMT_BINARY_SHA256_AMD64="e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4"
+readonly TELEMT_BINARY_SHA256_ARM64="e5ca8befdc1428fcd66537ef04f3a95e5f278ebf3c3dd0d0909ce25a390f502b"
+readonly TELEMT_PREVIOUS_VERSION="3.5.16"
+readonly TELEMT_PREVIOUS_BINARY_SHA256_AMD64="1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8"
+readonly TELEMT_PREVIOUS_BINARY_SHA256_ARM64="ebaec212fd5556ceca7fb0fcc4d3d23c01a8883d20a4cbc567219022d57c2a0b"
 readonly TELEMT_LEGACY_VERSION="3.5.5"
 readonly TELEMT_LEGACY_BINARY_SHA256_AMD64="cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd"
 readonly TELEMT_LEGACY_BINARY_SHA256_ARM64="5f2031447df06a393af7e271a72c5553ea83bff9611d24c441b492236101f857"
-readonly TELEMT_SHA256_ARM64="1e1bc87f05923b9673cbbaf34a3e50f7fdcf7d496cd24efcdb34c278ed18a659"
+readonly TELEMT_SHA256_ARM64="f0d3d06d029f2b21dc66a44069bcc7bd20d32fcb34b5867c5250cee647785de6"
 readonly TELEMT_CORE_VERSION_AMD64="3.5.5+tdh.balanced2"
 readonly TELEMT_CORE_ARCHIVE_SHA256_AMD64="b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5"
 readonly TELEMT_CORE_BINARY_SHA256_AMD64="5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100"
@@ -2925,6 +2928,7 @@ telemt_binary_is_expected() {
   checksum=$(sha256sum "$TDH_BIN" | awk '{print $1}')
   case $(uname -m):$checksum in
     x86_64:"$TELEMT_BINARY_SHA256_AMD64"|amd64:"$TELEMT_BINARY_SHA256_AMD64"|aarch64:"$TELEMT_BINARY_SHA256_ARM64"|arm64:"$TELEMT_BINARY_SHA256_ARM64") expected="telemt ${TELEMT_VERSION}" ;;
+    x86_64:"$TELEMT_PREVIOUS_BINARY_SHA256_AMD64"|amd64:"$TELEMT_PREVIOUS_BINARY_SHA256_AMD64"|aarch64:"$TELEMT_PREVIOUS_BINARY_SHA256_ARM64"|arm64:"$TELEMT_PREVIOUS_BINARY_SHA256_ARM64") expected="telemt ${TELEMT_PREVIOUS_VERSION}" ;;
     x86_64:"$TELEMT_LEGACY_BINARY_SHA256_AMD64"|amd64:"$TELEMT_LEGACY_BINARY_SHA256_AMD64"|aarch64:"$TELEMT_LEGACY_BINARY_SHA256_ARM64"|arm64:"$TELEMT_LEGACY_BINARY_SHA256_ARM64") expected="telemt ${TELEMT_LEGACY_VERSION}" ;;
     x86_64:"$TELEMT_CORE_BINARY_SHA256_AMD64"|amd64:"$TELEMT_CORE_BINARY_SHA256_AMD64") expected="telemt ${TELEMT_CORE_VERSION_AMD64}" ;;
     x86_64:"$TELEMT_AUDIT2_BINARY_SHA256"|amd64:"$TELEMT_AUDIT2_BINARY_SHA256") expected="telemt ${TELEMT_AUDIT2_VERSION}" ;;
@@ -3067,6 +3071,10 @@ wait_for_link() {
   return 1
 }
 
+join_core_version_is_compatible() {
+  [[ $1 == "$TELEMT_VERSION" || $1 == "$TELEMT_PREVIOUS_VERSION" ]]
+}
+
 install_backend() {
   local requested_role=$1 code decoded backend_priv backend_pub
   local -a fields
@@ -3085,7 +3093,7 @@ install_backend() {
   local wg_psk=${fields[9]}
   LOCAL_WG_IP=${fields[10]} ENTRY_WG_IP=${fields[11]} BACKEND_WG_PORT=${fields[12]}
   ENROLL_TOKEN=${fields[13]}
-  [[ ${fields[14]} == "$TELEMT_VERSION" ]] || die "Join Code 要求的 Telemt 版本与脚本不一致。"
+  join_core_version_is_compatible "${fields[14]}" || die "Join Code 要求的 Telemt 版本与脚本不兼容。"
   [[ ${fields[15]} == "$TDH_PROTOCOL_VERSION" && ${fields[16]} == "$TDH_CONFIG_SCHEMA" ]] || \
     die "Join Code 与当前配置协议不一致，请先更新三台机器的管理脚本。"
   [[ $TDH_ROLE == "$requested_role" ]] || die "Join Code 角色为 $TDH_ROLE，不是 $requested_role。"

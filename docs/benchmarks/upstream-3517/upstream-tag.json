@@ -1,0 +1,24 @@
+{
+  "node_id": "TA_kwDOQw5AKdoAKDg4MTIxMGZkNGMzMjA3MzVmYWQzOTc4YTI5MWI1NjVhZmFlNGI2MWU",
+  "sha": "881210fd4c320735fad3978a291b565afae4b61e",
+  "url": "https://api.github.com/repos/telemt/telemt/git/tags/881210fd4c320735fad3978a291b565afae4b61e",
+  "tagger": {
+    "name": "Alexey",
+    "email": "247128645+axkurcom@users.noreply.github.com",
+    "date": "2026-11-08T12:01:32Z"
+  },
+  "object": {
+    "sha": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+    "type": "commit",
+    "url": "https://api.github.com/repos/telemt/telemt/git/commits/66708d2866f3f3a4541c4fa67984d408e71a8af4"
+  },
+  "tag": "3.5.17",
+  "message": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAKwAAAATZWNkc2Etc2hhMi1uaXN0cDUyMQAAAAhuaXN0cDUyMQAAAI\nUEAY8ruVPW7RyFBb+gkrS9UxtQjSc8YCQKcRD/1+FnqixlGBKZ/TrkBFNpbg2LDRbNa/si\nTt4HXR4VtiYZduuYdU5cAH3BeWoxfbuvK0J241JmvJTnTj54m427kxDjo1O8IYzIOZiXyM\nvH37dnhosBod+xISWyFkR0pef1mSDVQ7xKftRjAAAAA2dpdAAAAAAAAAAGc2hhNTEyAAAA\npwAAABNlY2RzYS1zaGEyLW5pc3RwNTIxAAAAjAAAAEIBF3/9KmF5TLxJG8YLHyORYu+NTM\nMD7Sx6g8u2tverIU/TdeM7nxDG8x9q8jArqc57473/u7DdCpBUYhMYSKOt4TkAAABCAPF5\n7//HB0XdXLNJxnRcmPL91LCL/JgrUm2q/dzIjYIYeUbT0kowG/DNcun9eIQZU6HLV8DKpb\nuCyhLTh1I1V3z8\n-----END SSH SIGNATURE-----\n",
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAKwAAAATZWNkc2Etc2hhMi1uaXN0cDUyMQAAAAhuaXN0cDUyMQAAAI\nUEAY8ruVPW7RyFBb+gkrS9UxtQjSc8YCQKcRD/1+FnqixlGBKZ/TrkBFNpbg2LDRbNa/si\nTt4HXR4VtiYZduuYdU5cAH3BeWoxfbuvK0J241JmvJTnTj54m427kxDjo1O8IYzIOZiXyM\nvH37dnhosBod+xISWyFkR0pef1mSDVQ7xKftRjAAAAA2dpdAAAAAAAAAAGc2hhNTEyAAAA\npwAAABNlY2RzYS1zaGEyLW5pc3RwNTIxAAAAjAAAAEIBF3/9KmF5TLxJG8YLHyORYu+NTM\nMD7Sx6g8u2tverIU/TdeM7nxDG8x9q8jArqc57473/u7DdCpBUYhMYSKOt4TkAAABCAPF5\n7//HB0XdXLNJxnRcmPL91LCL/JgrUm2q/dzIjYIYeUbT0kowG/DNcun9eIQZU6HLV8DKpb\nuCyhLTh1I1V3z8\n-----END SSH SIGNATURE-----\n",
+    "payload": "object 66708d2866f3f3a4541c4fa67984d408e71a8af4\ntype commit\ntag 3.5.17\ntagger Alexey <247128645+axkurcom@users.noreply.github.com> 1794139292 +0300\n\n",
+    "verified_at": "2026-11-08T12:01:53Z"
+  }
+}

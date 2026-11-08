@@ -7,8 +7,8 @@ import unittest
 
 SCRIPT=Path(__file__).resolve().parents[1]/'telemt-dual-hop.sh'
 PINS={
-    'official':('3.5.16','e6f46b2f3becf29bfd555cec8a059e429f7c082c1af402499b3a7940cf8ebd34',
-                '1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8'),
+    'official':('3.5.17','0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e',
+                'e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4'),
     'balanced2':('3.5.5+tdh.balanced2','b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5',
                  '5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100'),
     'audit2':('3.5.5+tdh.audit2','c205183e479716f015378e4e2241103ae8d488e06f6ef65946be0bd94624f356',
@@ -17,6 +17,22 @@ PINS={
 
 
 class CoreSelectionTests(unittest.TestCase):
+    def test_previous_release_both_architectures_and_join_codes_remain_compatible(self):
+        for version,allowed in (('3.5.17',True),('3.5.16',True),('3.5.15',False),('untrusted',False)):
+            result=self.shell('join_core_version_is_compatible "$TEST_VERSION"',TEST_VERSION=version)
+            self.assertEqual(result.returncode==0,allowed)
+        with tempfile.TemporaryDirectory() as folder:
+            binary=Path(folder)/'telemt';binary.write_text('fixture');binary.chmod(0o755)
+            for arch,sha in (('x86_64','1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8'),
+                    ('aarch64','ebaec212fd5556ceca7fb0fcc4d3d23c01a8883d20a4cbc567219022d57c2a0b')):
+                body='''uname() { echo "$TEST_ARCH"; }
+timeout() { printf '%s\\n' "$TEST_VERSION"; }
+sha256sum() { printf '%s  %s\\n' "$TEST_HASH" "$TDH_BIN"; }
+telemt_binary_is_expected'''
+                for version,accepted in (('telemt 3.5.16',True),('telemt 3.5.17',False)):
+                    result=self.shell(body,TDH_BIN=str(binary),TEST_ARCH=arch,TEST_VERSION=version,TEST_HASH=sha)
+                    self.assertEqual(result.returncode==0,accepted,(arch,version,result.stderr))
+
     def shell(self,body,**variables):
         env=dict(os.environ,TDH_SELECTION_SCRIPT=str(SCRIPT),**variables)
         return subprocess.run(['bash','-c','set -Eeuo pipefail\nTDH_SOURCE_ONLY=1 source "$TDH_SELECTION_SCRIPT"\n'+body],

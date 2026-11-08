@@ -41,25 +41,25 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -m 700 "$RUNNER_TEMP/stable-evidence"
-          if ! curl -q -fL --retry 3 --retry-delay 2 --retry-max-time 90 --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 10 --max-time 30 --max-filesize 67108864 https://github.com/telemt/telemt/releases/download/3.5.16/telemt-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/stable.tar.gz"; then
-            timeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/695266457 > "$RUNNER_TEMP/stable.tar.gz"
+          if ! curl -q -fL --retry 3 --retry-delay 2 --retry-max-time 90 --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 10 --max-time 30 --max-filesize 67108864 https://github.com/telemt/telemt/releases/download/3.5.17/telemt-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/stable.tar.gz"; then
+            timeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821981 > "$RUNNER_TEMP/stable.tar.gz"
           fi
           if ! curl -q -fL --retry 3 --retry-delay 2 --retry-max-time 90 --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 10 --max-time 30 --max-filesize 67108864 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"; then
             timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
           fi
-          printf '%s  %s\n' e6f46b2f3becf29bfd555cec8a059e429f7c082c1af402499b3a7940cf8ebd34 "$RUNNER_TEMP/stable.tar.gz" b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5 "$RUNNER_TEMP/balanced2.tar.gz" | sha256sum --check
+          printf '%s  %s\n' 0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e "$RUNNER_TEMP/stable.tar.gz" b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5 "$RUNNER_TEMP/balanced2.tar.gz" | sha256sum --check
       - name: Verify actual install, upgrade, rollback, systemd and production health agent
         run: |
-          sudo timeout --kill-after=10 180 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --stable-archive "$1/stable.tar.gz" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/stable-evidence/system-upgrade.json"' lab "$RUNNER_TEMP"
+          sudo timeout --kill-after=10 180 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --stable-release 3.5.17 --stable-archive "$1/stable.tar.gz" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/stable-evidence/system-upgrade.json"' lab "$RUNNER_TEMP"
       - name: Verify 30, 50 and 100 native protocol sessions under bounded resources
         run: |
-          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-stable-load-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=1G -p MemorySwapMax=0 -p RuntimeMaxSec=240 -p "WorkingDirectory=$GITHUB_WORKSPACE" /usr/bin/unshare --net /bin/sh -c 'set -e; ip link set lo up; tc qdisc add dev lo root netem delay 25ms rate 100mbit limit 10000; exec python3 tests/stable_acceptance.py --candidate-only --stable-archive "$1/stable.tar.gz" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/stable-evidence/protocol-load.json" --conditions Ubuntu22.04_private_loopback_netem25ms_rate100Mbps_CPU100pct_Memory1GiB' lab "$RUNNER_TEMP"
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-stable-load-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=1G -p MemorySwapMax=0 -p RuntimeMaxSec=240 -p "WorkingDirectory=$GITHUB_WORKSPACE" /usr/bin/unshare --net /bin/sh -c 'set -e; ip link set lo up; tc qdisc add dev lo root netem delay 25ms rate 100mbit limit 10000; exec python3 tests/stable_acceptance.py --stable-release 3.5.17 --candidate-only --stable-archive "$1/stable.tar.gz" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/stable-evidence/protocol-load.json" --conditions Ubuntu22.04_private_loopback_netem25ms_rate100Mbps_CPU100pct_Memory1GiB' lab "$RUNNER_TEMP"
       - name: Verify WireGuard, SNI, reload and real process/tunnel failure recovery
         run: |
           sudo install -d -m 700 "$RUNNER_TEMP/tdh-audit-stable"
-          sudo install -d -m 700 "$RUNNER_TEMP/tdh-audit-stable/telemt-3.5.16"
-          sudo tar -xzf "$RUNNER_TEMP/stable.tar.gz" -C "$RUNNER_TEMP/tdh-audit-stable/telemt-3.5.16" telemt
-          sudo timeout --kill-after=10 200 python3 tests/dualhop_lab.py --root "$RUNNER_TEMP/tdh-audit-stable" --build stable --separate-dc --rtt 100 --loss-percent .1 --jitter-ms 5 run
+          sudo install -d -m 700 "$RUNNER_TEMP/tdh-audit-stable/telemt-3.5.17"
+          sudo tar -xzf "$RUNNER_TEMP/stable.tar.gz" -C "$RUNNER_TEMP/tdh-audit-stable/telemt-3.5.17" telemt
+          sudo timeout --kill-after=10 200 python3 tests/dualhop_lab.py --stable-release 3.5.17 --root "$RUNNER_TEMP/tdh-audit-stable" --build stable --separate-dc --rtt 100 --loss-percent .1 --jitter-ms 5 run
           sudo cp "$RUNNER_TEMP/tdh-audit-stable/results/dualhop-native-stable.json" "$RUNNER_TEMP/stable-evidence/dualhop.json"
       - uses: actions/upload-artifact@v4
         if: always()

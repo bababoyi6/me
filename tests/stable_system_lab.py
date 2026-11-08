@@ -26,6 +26,7 @@ from core_upgrade import BackendService, upgrade, rollback, refresh_connect_poli
 from e2e_lab import FullLab, MockDc
 from lab_config import generate_telemt
 from stable_acceptance import PINS
+from release_pins import RELEASES
 from telemt_probe import port, TOKEN, request
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -60,6 +61,7 @@ def main():
     candidate.add_argument('--candidate-directory')
     parser.add_argument('--balanced2-archive', required=True)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--stable-release',choices=tuple(RELEASES),default='3.5.16')
     args = parser.parse_args()
     if os.geteuid() != 0:
         raise RuntimeError('root required')
@@ -76,8 +78,8 @@ def main():
         root.chmod(0o755)
         try:
             candidate_archive=args.stable_archive
-            candidate_pins=PINS['stable']
-            candidate_version='3.5.16'
+            candidate_pins=RELEASES[args.stable_release]
+            candidate_version=args.stable_release
             if args.candidate_directory:
                 if os.environ.get('GITHUB_ACTIONS')!='true' or os.stat('/proc/self/ns/net').st_ino==os.stat('/proc/1/ns/net').st_ino:
                     raise RuntimeError('native candidate requires owned CI namespace')

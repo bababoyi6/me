@@ -10,6 +10,7 @@ import time
 
 from e2e_lab import FullLab
 from stable_acceptance import PINS,stats
+from release_pins import RELEASES
 from lab_files import file_sha256 as digest
 import tarfile
 
@@ -50,8 +51,9 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--archive',required=True)
     parser.add_argument('--output',required=True)
+    parser.add_argument('--stable-release',choices=tuple(RELEASES),default='3.5.16')
     args=parser.parse_args()
-    pin=PINS['stable']
+    pin=RELEASES[args.stable_release]
     if os.geteuid()!=0 or digest(args.archive)!=pin[0]:
         raise RuntimeError('root and exact official archive required')
     report={'scope':'180-second synthetic native protocol connection churn; no 24h or real-client claim',
