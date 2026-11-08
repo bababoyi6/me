@@ -5,7 +5,7 @@
     "write_haproxy_unit": "ee3dc800bdc12194c92a938f3131da4bcc2daddef2bc4d7d40ebcc45d618e284",
     "write_backend_wg": "be3d7737326509d906b066ed97b8327688675a499d3527c02f9fa2721ea41346",
     "write_entry_wg": "6b6fccf4b61637808b606fec0c169afe459ebd89ee34d6754ba5ee6c4ec8985c",
-    "write_telemt_config": "55ea75279f9216d205e88c657b083235116b32f631cb99f5c7b9bf22da5eda7a",
+    "write_telemt_config": "eaac89adfebe2712acfe220b480db33966d32d5f01584029408f8bf2acde0ca2",
     "write_telemt_unit": "30ddd92222cb955614c651748b2eae0b08bb2d702f91c8ad5ede0ee84afb332b",
     "write_health_agent": "65a16a8891c0de6028b24c1884ce6870b361f0a34c77694da83a83335db51643",
     "open_firewall_entry": "a465280996c2a654ea22f54fdab144ca4cd3404f99d8979ee2c51c8d5f40309f",
@@ -13,5 +13,6 @@
     "calculate_connection_limit": "8d0d505452d08b5543450a0dd75c2f080b9844d9a69915af694deb2bffcd7f68",
     "calculate_direct_buffer_budget": "cbb808e6a92b04e79c23c90a75c98d362f48290bef00895b6115964b93587561"
   },
-  "health_agent_change": "2026-11-07: DC quorum 3/5 with fall2/rise3/cooldown30; API+native-port fall3/rise2/cooldown10; HAProxy still fails closed on agent death"
+  "health_agent_change": "2026-11-07: DC quorum 3/5 with fall2/rise3/cooldown30; API+native-port fall3/rise2/cooldown10; HAProxy still fails closed on agent death",
+  "connect_policy_change": "2026-11-08: explicit tg_connect=4, attempts=2, total budget=9000ms; deterministic 3500ms SYN-delay and 2400 weak transfers: CI 42447679131"
 }

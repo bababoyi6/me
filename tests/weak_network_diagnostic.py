@@ -103,8 +103,13 @@ def main():
     finally:
         acceptance.FullLab = FullLab
         report['resources_after'] = resources()
+        report['oom_delta'] = {k: report['resources_after']['memory_events'][k]-report['resources_before']['memory_events'][k]
+                               for k in ('oom','oom_kill')}
+        report['protocol_accepted'] = (report['complete'] and bool(report['runs']) and
+            all(r['result']['accepted'] and r['result']['private_processes_closed'] for r in report['runs']) and
+            not any(report['oom_delta'].values()))
         write(output, report)
-    return 0
+    return 0 if not args.retry_policy or report['protocol_accepted'] else 1
 
 
 if __name__ == '__main__':
