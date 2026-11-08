@@ -54,7 +54,8 @@ jobs:
       - name: Fetch exact legacy rollback fixture
         env:
           GH_TOKEN: ${{ github.token }}
-        run: timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
+        run: |
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
       - name: Verify native systemd maintenance and exact legacy rollback
         run: |
           sudo env GITHUB_ACTIONS=true timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/native-evidence/system.json"' native "$RUNNER_TEMP"
