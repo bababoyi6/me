@@ -38,7 +38,7 @@ def worker(role,cpu):
             kind=options['kind']
             lab=FullLab(options['binary'],listen_endpoint=('10.77.1.2',24431),start_haproxy=False,
                 dc_endpoint=('198.18.0.1',26000),offline_lab=True,
-                experimental_binary=(PINS[kind][1],PINS[kind][2]) if kind=='balanced2' else None,
+                experimental_binary=options.get('experimental_binary') or ((PINS[kind][1],PINS[kind][2]) if kind=='balanced2' else None),
                 socket_library=options.get('library'),socket_mode=options.get('policy','pass'))
             policy=lab.telemt_config.read_text().replace(f'127.0.0.1:{lab.api}','127.0.0.1:$API')
             ready={'pid':lab.telemt.pid,'version':lab.version,'config_policy_sha256':hashlib.sha256(policy.encode()).hexdigest()}
@@ -124,7 +124,11 @@ def main(args):
     backend_cpu,frontend_cpu,dc_cpu=cpus[:3]
     os.sched_setaffinity(0,{frontend_cpu})
     output=Path(args.output)
+    native=bool(args.native_directory)
+    variants=('control','balanced') if native else VARIANTS
+    profiles=(100,) if native else (0,100)
     report={'scope':'split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only',
+        'plan':'native' if native else 'official',
         'source_commit':os.environ['TDH_SOURCE_COMMIT'],'complete':False,'accepted':False,
         'payload_bytes_per_stream':PAYLOAD,'rate_mbps':200,'cpu_assignment':{'core':backend_cpu,'client_and_haproxy':frontend_cpu,'dc':dc_cpu},
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),
@@ -140,9 +144,21 @@ def main(args):
                 net.setup()
                 command('ip','-n',NAMES[2],'address','add','198.18.0.1/32','dev','lo')
                 binaries={}
-                for kind,pins in PINS.items():
-                    payload,_=archive_payload(getattr(args,kind+'_archive'),pins[0],pins[2].removeprefix('telemt '),pins[1],False)
-                    path=root/kind;path.write_bytes(payload);path.chmod(0o755);binaries[kind]=str(path)
+                native_manifest=None
+                if native:
+                    bundle=Path(args.native_directory)
+                    native_manifest=json.loads((bundle/'manifest.json').read_text())
+                    if native_manifest['upstream_commit']!='84e5b827a6619fb2e09ad3d09f253cdffe04bc2f':raise RuntimeError('native upstream mismatch')
+                    report['native_manifest']=native_manifest
+                    for kind in variants:
+                        payload=(bundle/('telemt-'+kind)).read_bytes()
+                        if not 0<len(payload)<=64*1024**2 or hashlib.sha256(payload).hexdigest()!=native_manifest['binaries'][kind]['sha256']:
+                            raise RuntimeError('native binary mismatch')
+                        path=root/kind;path.write_bytes(payload);path.chmod(0o755);binaries[kind]=str(path)
+                else:
+                    for kind,pins in PINS.items():
+                        payload,_=archive_payload(getattr(args,kind+'_archive'),pins[0],pins[2].removeprefix('telemt '),pins[1],False)
+                        path=root/kind;path.write_bytes(payload);path.chmod(0o755);binaries[kind]=str(path)
                 library=root/'socket-policy.so'
                 subprocess.run(['cc','-shared','-fPIC','-Wall','-Wextra','-Werror',
                     str(HERE.with_name('socket_policy_lab.c')),'-ldl','-o',str(library)],check=True,timeout=30,capture_output=True)
@@ -167,20 +183,25 @@ backend telemt
                     stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
                 time.sleep(.3)
                 if front.poll() is not None:raise RuntimeError('private frontend startup failed')
-                for rtt in (0,100):
+                for rtt in profiles:
                     shape(rtt)
                     for reverse in (False,True):
-                        argv=['ip','netns','exec',NAMES[0],'iperf3','-c','10.77.1.2','-t','4','-O','1',
+                        argv=['ip','netns','exec',NAMES[0],'iperf3','-c','10.77.1.2','-t','8' if native else '4','-O','3' if native else '1',
                               '-b','200M','-P','1','-J','--connect-timeout','3000']
                         if reverse:argv.append('-R')
                         control=json.loads(command(*argv,timeout=20))
                         if control.get('error'):raise RuntimeError('TCP path control failed')
                         report['controls'].append({'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U',
+                            'seconds':8 if native else 4,'omit_seconds':3 if native else 1,
                             'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
-                    for turn in range(3):
-                        for variant in VARIANTS[turn:]+VARIANTS[:turn]:
-                            kind='balanced2' if variant=='balanced2' else 'stable'
+                    for turn in range(4 if native else 3):
+                        offset=turn%len(variants)
+                        for variant in variants[offset:]+variants[:offset]:
+                            kind=variant if native else 'balanced2' if variant=='balanced2' else 'stable'
                             options={'kind':kind,'binary':binaries[kind]}
+                            if native:
+                                pin=native_manifest['binaries'][kind]
+                                options['experimental_binary']=[pin['sha256'],pin['version']]
                             if variant=='stable-auto':options.update(library=str(library),policy='auto')
                             backend=Child('core',NAMES[2],backend_cpu,options,children)
                             try:
@@ -259,6 +280,7 @@ if __name__=='__main__':
     parser.add_argument('--stable-archive')
     parser.add_argument('--balanced2-archive')
     parser.add_argument('--output')
+    parser.add_argument('--native-directory')
     args=parser.parse_args()
     if args.role:worker(args.role,args.cpu)
     else:raise SystemExit(main(args))

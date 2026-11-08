@@ -15,6 +15,11 @@ def number(value, *, zero=False):
 
 
 def analyze(data):
+    native=data.get('plan','official')=='native'
+    profiles=(100,) if native else (0,100)
+    variants=('control','balanced') if native else VARIANTS
+    rounds=(1,2,3,4) if native else (1,2,3)
+    expected_keys={(r,t,v,n,d) for r in profiles for t in rounds for v in variants for n in (1,4) for d in ('U','D')}
     if (data.get('accepted') is not True or data.get('complete') is not True or
             data.get('namespaces_removed') is not True or data.get('private_processes_closed') is not True or
             data.get('cleanup_errors')!=[] or data.get('oom_delta')!={'oom':0,'oom_kill':0}):
@@ -23,10 +28,10 @@ def analyze(data):
         raise ValueError('unregistered workload')
     rows=data.get('rows',[])
     keys=[(r['rtt_ms'],r['round'],r['variant'],r['streams'],r['direction']) for r in rows]
-    if len(keys)!=len(KEYS) or set(keys)!=KEYS:raise ValueError('missing or duplicate cohort')
+    if len(keys)!=len(expected_keys) or set(keys)!=expected_keys:raise ValueError('missing or duplicate cohort')
     index=dict(zip(keys,rows));policies=set()
     for row in rows:
-        version='telemt 3.5.5+tdh.balanced2' if row['variant']=='balanced2' else 'telemt 3.5.16'
+        version=('telemt 3.5.16+tdh.control1' if row['variant']=='control' else 'telemt 3.5.16+tdh.balanced1') if native else ('telemt 3.5.5+tdh.balanced2' if row['variant']=='balanced2' else 'telemt 3.5.16')
         if row.get('version')!=version or row.get('completed')!=row['streams'] or row.get('errors')!=[]:
             raise ValueError('identity or transfer failure')
         policy=row.get('config_policy_sha256')
@@ -43,17 +48,17 @@ def analyze(data):
         if not affinities or any(a!=[expected] for a in affinities):raise ValueError('core affinity drift')
     if len(policies)!=1:raise ValueError('configuration drift')
     controls=data.get('controls',[])
-    if len(controls)!=4 or {(r['configured_rtt_ms'],r['direction']) for r in controls}!={(r,d) for r in (0,100) for d in ('U','D')}:
+    if len(controls)!=2*len(profiles) or {(r['configured_rtt_ms'],r['direction']) for r in controls}!={(r,d) for r in profiles for d in ('U','D')}:
         raise ValueError('missing TCP path control')
     if any(not number(r.get('receiver_mbps')) for r in controls):raise ValueError('invalid TCP path control')
     control_index={(r['configured_rtt_ms'],r['direction']):r['receiver_mbps'] for r in controls}
     comparisons=[]
-    for rtt in (0,100):
+    for rtt in profiles:
         for n in (1,4):
             for direction in ('U','D'):
-                for left,right in (('balanced2','stable'),('stable','stable-auto')):
-                    old=[index[rtt,t,left,n,direction] for t in (1,2,3)]
-                    new=[index[rtt,t,right,n,direction] for t in (1,2,3)]
+                for left,right in ((('control','balanced'),) if native else (('balanced2','stable'),('stable','stable-auto'))):
+                    old=[index[rtt,t,left,n,direction] for t in rounds]
+                    new=[index[rtt,t,right,n,direction] for t in rounds]
                     ratios=[b['mbps']/a['mbps'] for a,b in zip(old,new)]
                     limited=any((v['cpu_percent_one_core']['client']+v['cpu_percent_one_core']['haproxy']+
                         v['cpu_percent_one_core']['controller']>=70 or v['cpu_percent_one_core']['dc']>=70) for v in old+new)
@@ -73,8 +78,8 @@ def analyze(data):
                         'candidate_median_mbps':statistics.median(v['mbps'] for v in new),
                         'measured_client_rtt_medians_ms':observed})
     return {'source_commit':data['source_commit'],'transport_accepted':True,'measured_payload_flows':sum(r['completed'] for r in rows),
-        'comparisons':comparisons,'scope':'one host, three rotated rounds; synthetic DC and lab-only preload; no production recommendation',
-        'rule':'all three ratios >1.10 for exploratory faster, all <0.90 for slower; CPU <70%, TCP control >=100Mbps, measured RTT required'}
+        'comparisons':comparisons,'scope':('one host, four balanced AB/BA rounds; same-toolchain native candidates; synthetic DC only' if native else 'one host, three rotated rounds; synthetic DC and lab-only preload; no production recommendation'),
+        'rule':'all paired ratios >1.10 for exploratory faster, all <0.90 for slower; CPU <70%, TCP control >=100Mbps, measured RTT required'}
 
 
 if __name__=='__main__':

@@ -18,6 +18,23 @@ def fixture():
 
 
 class LongPathAnalysisTests(unittest.TestCase):
+    def test_native_four_pair_plan_rejects_missing_round(self):
+        data=fixture();data['plan']='native'
+        data['controls']=[r for r in data['controls'] if r['configured_rtt_ms']==100]
+        original=data['rows'];data['rows']=[]
+        for t in (1,2,3,4):
+            for old,new,version in (('stable','control','control1'),('stable-auto','balanced','balanced1')):
+                for row in original:
+                    if row['rtt_ms']==100 and row['round']==1 and row['variant']==old:
+                        changed=copy.deepcopy(row);changed.update(round=t,variant=new,version='telemt 3.5.16+tdh.'+version)
+                        data['rows'].append(changed)
+        result=analyze(data)
+        self.assertEqual(result['measured_payload_flows'],80)
+        self.assertEqual(len(result['comparisons']),4)
+        self.assertTrue(all(r['classification']=='REPEATABLE_FASTER' for r in result['comparisons']))
+        data['rows'].pop()
+        with self.assertRaises(ValueError):analyze(data)
+
     def test_exact_workload_and_exploratory_threshold(self):
         result=analyze(fixture())
         self.assertEqual(result['measured_payload_flows'],180)
