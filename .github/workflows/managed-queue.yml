@@ -2,6 +2,10 @@ name: Bounded managed backend queue acceptance
 on:
   workflow_dispatch:
     inputs:
+      proof_only:
+        description: Run shared dual-WG prerequisite only, without downloading binaries or performance pairs
+        type: boolean
+        default: false
       shared_entry:
         description: Screen one shared entry budget; backend shaping held constant, isolated prototype only
         type: boolean
@@ -46,6 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Fetch exact existing binaries without rebuilding
+        if: inputs.proof_only != true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -67,6 +72,7 @@ jobs:
         run: |
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-entry-proof-${GITHUB_RUN_ID}" -p CPUQuota=200% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=180 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/shared_entry_lab.py --output "$RUNNER_TEMP/managed-queue/shared-entry-proof.json"
       - name: Test actual backend-only controller, unchanged entry and fixed original gates
+        if: inputs.proof_only != true
         env:
           SHARED_ENTRY: ${{ inputs.shared_entry }}
         run: |
