@@ -39,9 +39,7 @@ def main(args):
     queue_screen=getattr(args,'queue_screen',False)
     queue_core=getattr(args,'queue_core','balanced2')
     managed=getattr(args,'managed_backend_queue',False)
-    shared_entry=getattr(args,'shared_entry_queue',False)
     if managed and not queue_screen:raise RuntimeError('managed backend queue requires registered screening mode')
-    if shared_entry and not managed:raise RuntimeError('shared entry screen requires unchanged managed backend in both arms')
     if queue_screen and (args.client_diagnostic or args.profile!='rtt100'):
         raise RuntimeError('shaper screen is registered only for the 100ms mixed workload')
     output=Path(args.output)
@@ -59,10 +57,7 @@ def main(args):
         report['queue_telemetry']='plain-tc-v2'
         report['scope']='one pinned core only; four AB/BA mixed pairs, 30 logical connections; pre-encryption 180Mbps HTB/fq_codel versus unchanged 200Mbps WAN'
         if managed:report['scope']='exact opt-in controller on backend WG only; entry unchanged; four AB/BA mixed pairs, 30 logical connections'
-        if shared_entry:
-            report['plan']='shared-entry-screen-v1'
-            report['scope']='backend180 unchanged in BOTH arms; only entry two-WG shared IFB180 toggled; fixed native17; 30 logical connections on first backend; second WG raw proof is separate'
-    children=[];net=None;front=None;dc=None;expected=0;entry_queue=None
+    children=[];net=None;front=None;dc=None;expected=0
     write(output,report)
     try:
         with tempfile.TemporaryDirectory(prefix='tdh-audit-mixed-') as folder:
@@ -81,9 +76,6 @@ def main(args):
             net=Network(SimpleNamespace(root=str(root),wg='wg',iperf='iperf3',start_iperf=True,
                 rtt_ms=rtt,rate_mbps=rate,loss_percent=loss,mtu=1420))
             net.setup()
-            if shared_entry:
-                from shared_entry_lab import second_tunnel,Worker
-                second_tunnel(net);entry_queue=Worker()
             command('ip','-n',NAMES[2],'address','add','198.18.0.1/32','dev','lo')
             report['capacity_recipe']='receiver-local-v2; full JSON, matched windows and bytes required'
             capacity_controls(net,rate,report['controls'])
@@ -93,15 +85,12 @@ def main(args):
             def configure_queue(enabled):
                 if managed:
                     command('ip','netns','exec',NAMES[2],'python3',str(Path(__file__).with_name('managed_queue_worker.py')),
-                        str(root),'enable' if enabled or shared_entry else 'disable',timeout=30)
-                    if shared_entry:entry_queue.call('enable' if enabled else 'disable')
+                        str(root),'enable' if enabled else 'disable',timeout=30)
                 else:configure_private_shaper(enabled,wg_original)
             def snapshot_queue():
                 if managed:
-                    result={NAMES[2]:{kind:command('ip','netns','exec',NAMES[2],
+                    return {NAMES[2]:{kind:command('ip','netns','exec',NAMES[2],
                         'tc','-s','-d',kind,'show','dev','tdh-b1') for kind in ('qdisc','class')}}
-                    if shared_entry:result[NAMES[0]]=entry_queue.call('snapshot')
-                    return result
                 return private_wg_snapshot()
             if managed:
                 command('ip','-n',NAMES[2],'link','set','dev','wg-lab','name','tdh-b1')
@@ -231,14 +220,11 @@ backend line_b
             front.terminate()
             try:front.wait(timeout=3)
             except subprocess.TimeoutExpired:os.killpg(front.pid,signal.SIGKILL);front.wait(timeout=3)
-        if entry_queue is not None:
-            try:entry_queue.close()
-            except Exception as exc:report['cleanup_errors'].append(type(exc).__name__)
         if net is not None:
             try:net.close()
             except Exception as exc:report['cleanup_errors'].append(type(exc).__name__)
         report['private_processes_closed']=all(child.process.poll() is not None for child in children) and (front is None or front.poll() is not None)
-        report['namespaces_removed']=not set((*NAMES,'tdh-audit-b2')).intersection(line.split()[0] for line in command('ip','netns','list').splitlines())
+        report['namespaces_removed']=not set(NAMES).intersection(line.split()[0] for line in command('ip','netns','list').splitlines())
         report['resources_after']=resources()
         report['oom_delta']={key:report['resources_after']['memory_events'][key]-before['memory_events'][key] for key in ('oom','oom_kill')}
         report['accepted']=(report['complete'] and report['private_processes_closed'] and report['namespaces_removed']
@@ -256,6 +242,5 @@ if __name__=='__main__':
     parser.add_argument('--queue-screen',action='store_true')
     parser.add_argument('--queue-core',choices=('balanced2','native17'),default='balanced2')
     parser.add_argument('--managed-backend-queue',action='store_true')
-    parser.add_argument('--shared-entry-queue',action='store_true')
     signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
     raise SystemExit(main(parser.parse_args()))

@@ -10,7 +10,7 @@ from path_capacity import validate as capacity_validate
 
 
 def analyze(report):
-    if (report.get('plan') not in ('private-shaper-screen-v1','managed-backend-screen-v1','shared-entry-screen-v1') or report.get('accepted') is not True or
+    if (report.get('plan') not in ('private-shaper-screen-v1','managed-backend-screen-v1') or report.get('accepted') is not True or
         report.get('oom_delta')!={'oom':0,'oom_kill':0} or report.get('cleanup_errors')!=[] or
         report.get('resources_after',{}).get('pids_current')!=1 or
         report.get('binary_sha256',{}).get('balanced2')!=LEGACY_SHA):

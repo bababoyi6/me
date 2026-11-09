@@ -1,0 +1,161 @@
+{
+  "conclusion": "failure",
+  "createdAt": "2026-11-09T16:01:56Z",
+  "databaseId": 42650600426,
+  "headSha": "077ba127cea461031b2f5f0d8023a2450795ffef",
+  "jobs": [
+    {
+      "completedAt": "2026-11-09T16:02:40Z",
+      "conclusion": "success",
+      "databaseId": 129275586862,
+      "name": "lifecycle",
+      "startedAt": "2026-11-09T16:02:00Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T16:02:01Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T16:02:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:02:03Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T16:02:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:02:18Z",
+          "conclusion": "success",
+          "name": "Prepare disposable lifecycle tools",
+          "number": 3,
+          "startedAt": "2026-11-09T16:02:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:02:36Z",
+          "conclusion": "success",
+          "name": "Real wg-quick hooks, preserved queue baseline, crash recovery and drift rejection",
+          "number": 4,
+          "startedAt": "2026-11-09T16:02:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:02:38Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 5,
+          "startedAt": "2026-11-09T16:02:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:02:38Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 10,
+          "startedAt": "2026-11-09T16:02:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:02:38Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 11,
+          "startedAt": "2026-11-09T16:02:38Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42650600426/job/129275586862"
+    },
+    {
+      "completedAt": "2026-11-09T16:03:25Z",
+      "conclusion": "failure",
+      "databaseId": 129276013032,
+      "name": "measure",
+      "startedAt": "2026-11-09T16:02:43Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T16:02:45Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T16:02:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:02:48Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T16:02:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:02:48Z",
+          "conclusion": "skipped",
+          "name": "Fetch exact existing binaries without rebuilding",
+          "number": 3,
+          "startedAt": "2026-11-09T16:02:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:03:11Z",
+          "conclusion": "success",
+          "name": "Prepare bounded private path",
+          "number": 4,
+          "startedAt": "2026-11-09T16:02:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:03:21Z",
+          "conclusion": "failure",
+          "name": "Prove shared dual-WG budget, idle borrowing, withdrawal and peer isolation",
+          "number": 5,
+          "startedAt": "2026-11-09T16:03:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:03:21Z",
+          "conclusion": "skipped",
+          "name": "Test actual backend-only controller, unchanged entry and fixed original gates",
+          "number": 6,
+          "startedAt": "2026-11-09T16:03:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:03:22Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 7,
+          "startedAt": "2026-11-09T16:03:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:03:23Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "startedAt": "2026-11-09T16:03:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:03:23Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-11-09T16:03:23Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42650600426/job/129276013032"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-09T16:03:26Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42650600426"
+}
