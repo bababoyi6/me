@@ -23,6 +23,7 @@ from core_install import archive_payload
 from release_pins import NATIVE_BASES, RELEASES
 from queue_analysis import VARIANTS as QUEUE_VARIANTS, ORDERS as QUEUE_ORDERS
 from queue_probe import LatencyProbe, original_wg_policy, configure_wg_fq
+from legacy_queue_analysis import VARIANTS as LEGACY_VARIANTS, ORDERS as LEGACY_ORDERS
 
 HERE=Path(__file__).resolve()
 VARIANTS=('balanced2','stable','stable-auto')
@@ -115,10 +116,22 @@ class Child:
         if not self.process.stdout.closed:self.process.stdout.close()
 
 
-def shape(rtt):
+def shape(rtt,packet_limit=10000):
+    if packet_limit not in (1500,10000):raise RuntimeError('unregistered private router queue limit')
     for dev in ('tdh-la1','tdh-lb0'):
         command('ip','netns','exec',NAMES[1],'tc','qdisc','replace','dev',dev,'root',
-                'netem','delay',f'{rtt/2:g}ms','rate','200mbit','limit','10000')
+                'netem','delay',f'{rtt/2:g}ms','rate','200mbit','limit',str(packet_limit))
+
+
+def verified_router_limits(packet_limit):
+    limits={}
+    for dev in ('tdh-la1','tdh-lb0'):
+        rows=json.loads(command('ip','netns','exec',NAMES[1],'tc','-j','qdisc','show','dev',dev))
+        roots=[r for r in rows if r.get('root')]
+        if len(roots)!=1 or roots[0].get('kind')!='netem' or roots[0].get('options',{}).get('limit')!=packet_limit:
+            raise RuntimeError('actual private router queue limit mismatch')
+        limits[dev]=packet_limit
+    return limits
 
 
 def main(args):
@@ -135,15 +148,17 @@ def main(args):
     output=Path(args.output)
     native=bool(args.native_directory)
     equal=args.equal_load_study
-    queue=args.queue_study or equal
+    legacy=args.legacy_queue_study
+    queue=args.queue_study or equal or legacy
     stress=args.sustained_stress
     if stress and (not native or queue):raise RuntimeError('stress requires the native-only layout')
-    if args.queue_study and equal:raise RuntimeError('choose one study layout')
+    if sum((args.queue_study,equal,legacy,stress))>1:raise RuntimeError('choose one study layout')
     if queue and not native:raise RuntimeError('queue study requires pinned native pair')
-    variants=QUEUE_VARIANTS if queue and not equal else ('control','balanced') if native else VARIANTS
+    if legacy and not args.balanced2_archive:raise RuntimeError('legacy study requires exact balanced2 fixture')
+    variants=LEGACY_VARIANTS if legacy else QUEUE_VARIANTS if queue and not equal else ('control','balanced') if native else VARIANTS
     profiles=(100,) if native else (0,100)
     report={'scope':'split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only',
-        'plan':'sustained' if stress else 'equal-load' if equal else 'queue' if queue else 'native' if native else 'official',
+        'plan':'legacy-queue' if legacy else 'sustained' if stress else 'equal-load' if equal else 'queue' if queue else 'native' if native else 'official',
         'transfer_rate_per_stream':2500000 if equal else 125000000,
         'official_release':args.official_release,
         'source_commit':os.environ['TDH_SOURCE_COMMIT'],'complete':False,'accepted':False,
@@ -174,6 +189,11 @@ def main(args):
                         if not 0<len(payload)<=64*1024**2 or hashlib.sha256(payload).hexdigest()!=native_manifest['binaries'][kind]['sha256']:
                             raise RuntimeError('native binary mismatch')
                         path=root/kind;path.write_bytes(payload);path.chmod(0o755);binaries[kind]=str(path)
+                    if legacy:
+                        pins=PINS['balanced2']
+                        payload,_=archive_payload(args.balanced2_archive,pins[0],pins[2].removeprefix('telemt '),pins[1],False)
+                        path=root/'balanced2';path.write_bytes(payload);path.chmod(0o755);binaries['balanced2']=str(path)
+                        report['legacy_binary']={'sha256':pins[1],'version':pins[2]}
                 else:
                     for kind,pins in PINS.items():
                         if kind=='stable':pins=RELEASES[args.official_release]
@@ -204,31 +224,36 @@ backend telemt
                 time.sleep(.3)
                 if front.poll() is not None:raise RuntimeError('private frontend startup failed')
                 for rtt in profiles:
-                    shape(rtt)
-                    for reverse in (False,True):
-                        argv=['ip','netns','exec',NAMES[0],'iperf3','-c','10.77.1.2','-t','8' if native else '4','-O','3' if native else '1',
-                              '-b','200M','-P','1','-J','--connect-timeout','3000']
-                        if reverse:argv.append('-R')
-                        try:control=json.loads(command(*argv,timeout=30))
-                        except subprocess.TimeoutExpired:
-                            report['control_error']={'type':'TimeoutExpired','deadline_seconds':30,
-                                'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U'}
-                            raise
-                        if control.get('error'):raise RuntimeError('TCP path control failed')
-                        report['controls'].append({'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U',
-                            'seconds':8 if native else 4,'omit_seconds':3 if native else 1,
-                            'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
+                    for packet_limit in ((10000,1500) if legacy else (10000,)):
+                        shape(rtt,packet_limit)
+                        if legacy:verified_router_limits(packet_limit)
+                        for reverse in (False,True):
+                            argv=['ip','netns','exec',NAMES[0],'iperf3','-c','10.77.1.2','-t','8' if native else '4','-O','3' if native else '1',
+                                  '-b','200M','-P','1','-J','--connect-timeout','3000']
+                            if reverse:argv.append('-R')
+                            try:control=json.loads(command(*argv,timeout=30))
+                            except subprocess.TimeoutExpired:
+                                report['control_error']={'type':'TimeoutExpired','deadline_seconds':30,
+                                    'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U'}
+                                raise
+                            if control.get('error'):raise RuntimeError('TCP path control failed')
+                            report['controls'].append({'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U','queue_packet_limit':packet_limit,
+                                'seconds':8 if native else 4,'omit_seconds':3 if native else 1,
+                                'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
                     for turn in range(1 if stress else 4 if native else 3):
                         offset=turn%len(variants)
-                        order=QUEUE_ORDERS[turn] if queue and not equal else variants[offset:]+variants[:offset]
+                        order=LEGACY_ORDERS[turn] if legacy else QUEUE_ORDERS[turn] if queue and not equal else variants[offset:]+variants[:offset]
                         for variant in order:
+                            if legacy:
+                                shape(rtt,1500 if variant.endswith('bounded') else 10000)
+                                router_limits=verified_router_limits(1500 if variant.endswith('bounded') else 10000)
                             if queue:
                                 configure_wg_fq(variant=='wg-fq',original_wg)
                                 applied_wg=original_wg_policy()
                                 if variant!='wg-fq' and applied_wg!=original_wg:raise RuntimeError('WG baseline restoration drift')
-                            kind='balanced' if queue and not equal else variant if native else 'balanced2' if variant=='balanced2' else 'stable'
+                            kind=('balanced2' if variant.startswith('legacy-') else 'balanced') if legacy else 'balanced' if queue and not equal else variant if native else 'balanced2' if variant=='balanced2' else 'stable'
                             options={'kind':kind,'binary':binaries[kind]}
-                            if native:
+                            if native and kind!='balanced2':
                                 pin=native_manifest['binaries'][kind]
                                 options['experimental_binary']=[pin['sha256'],pin['version']]
                             if variant=='stable-auto':options.update(library=str(library),policy='auto')
@@ -281,6 +306,7 @@ backend telemt
                                         'sampled_backend_peak_rss_bytes':max(rss_samples),
                                         'harness_limited':cpu['client']+cpu['haproxy']+cpu['controller']>=70 or cpu['dc']>=70}
                                     if queue:row.update(path_probe=path_probe,qdisc_samples=qdisc_samples,wg_policy=applied_wg)
+                                    if legacy:row.update(queue_packet_limit=1500 if variant.endswith('bounded') else 10000,router_packet_limits=router_limits)
                                     report['rows'].append(row);expected+=len(result['rows'])
                                     write(output,report)
                                     if row['errors'] or row['completed']!=streams:raise RuntimeError('synthetic integrity/ACK failure')
@@ -340,6 +366,7 @@ if __name__=='__main__':
     parser.add_argument('--queue-study',action='store_true')
     parser.add_argument('--equal-load-study',action='store_true')
     parser.add_argument('--sustained-stress',action='store_true')
+    parser.add_argument('--legacy-queue-study',action='store_true')
     parser.add_argument('--official-release',choices=tuple(RELEASES),default='3.5.16')
     args=parser.parse_args()
     if args.role:worker(args.role,args.cpu)

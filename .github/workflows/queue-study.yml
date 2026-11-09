@@ -6,7 +6,7 @@ on:
         description: Counterfactuals or equal offered-load mechanism check
         type: choice
         default: candidates
-        options: [candidates, equal-load, sustained]
+        options: [candidates, equal-load, sustained, legacy-parity]
 permissions:
   contents: read
   actions: read
@@ -34,6 +34,14 @@ jobs:
           done
           test "$ready" = true
           gh run download 42495175073 --repo bababoyi6/me --name native-pair --dir "$RUNNER_TEMP/native-pair"
+      - name: Fetch exact legacy fixture only for the old/new parity layout
+        if: inputs.layout == 'legacy-parity'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
+          echo 'b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5  '"$RUNNER_TEMP/balanced2.tar.gz" | sha256sum --check
       - name: Prepare bounded disposable dependencies and verify socket oracle
         run: |
           sudo timeout 120 apt-get update -qq
@@ -52,6 +60,7 @@ jobs:
             candidates) ;;
             equal-load) flags=(--equal-load-study); analyzer=tests/long_path_analysis.py ;;
             sustained) flags=(--sustained-stress); analyzer=tests/stress_analysis.py; memory=768; high=640 ;;
+            legacy-parity) flags=(--legacy-queue-study --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz"); analyzer=tests/legacy_queue_analysis.py ;;
             *) exit 2 ;;
           esac
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-queue-${GITHUB_RUN_ID}" -p CPUQuota=300% -p "MemoryMax=${memory}M" -p "MemoryHigh=${high}M" -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=900 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/long_path_lab.py "${flags[@]}" --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/queue-evidence/metrics.json"
