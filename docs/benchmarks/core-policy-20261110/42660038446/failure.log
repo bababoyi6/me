@@ -1,0 +1,358 @@
+validate	Test diagnostics, configuration and rollback	﻿2026-11-09T16:58:43.2544014Z ##[group]Run python3 -m unittest discover -s tests -p 'test_*.py' -v
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:43.2544931Z ^[[36;1mpython3 -m unittest discover -s tests -p 'test_*.py' -v^[[0m
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:43.2613092Z shell: /usr/bin/bash -e {0}
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:43.2613385Z ##[endgroup]
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:44.1059490Z test_authentication_header_never_appears_in_curl_arguments (test_api_privacy.ApiPrivacyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:44.6258742Z test_current_helper_bypasses_proxies_and_ignores_curlrc (test_api_privacy.ApiPrivacyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:45.6279888Z test_header_control_characters_are_rejected_before_network (test_api_privacy.ApiPrivacyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:46.6301762Z test_invalid_port_is_rejected_before_network (test_api_privacy.ApiPrivacyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:47.6329951Z test_legacy_counterexample_reaches_environment_proxy (test_api_privacy.ApiPrivacyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:48.6347470Z test_link_readiness_failure_never_dumps_service_logs (test_api_privacy.ApiPrivacyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1547496Z test_quotes_and_backslashes_preserve_the_exact_header (test_api_privacy.ApiPrivacyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1550730Z test_actual_backend_namespace_sockets_and_legacy_scope_rejection (test_backend_observer.BackendObserverTests) ... skipped 'requires root on the ephemeral Linux CI runner'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1690427Z test_determinism_complete_replay_sources_and_real_install_format (test_candidate_bundle.CandidateBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1721911Z test_unpinned_pair_is_rejected_before_output (test_candidate_bundle.CandidateBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1795319Z test_wrong_provenance_or_extra_members_are_refused (test_candidate_bundle.CandidateBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1796843Z test_both_tunnels_need_bidirectional_payload_sized_counters (test_candidate_contract.CandidatePathContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1798354Z test_complete_protocol_route_and_measured_high_rtt (test_candidate_contract.CandidatePathContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1801098Z test_incomplete_or_wrong_route_or_oversized_payload_is_refused (test_candidate_contract.CandidatePathContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1804343Z test_low_or_unknown_rtt_and_wrong_candidate_do_not_pass (test_candidate_contract.CandidatePathContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1815427Z test_bootstrap_pins_ref_digest_and_https_without_main (test_candidate_system_contract.CandidateSystemContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1831771Z test_candidate_requires_all_roles_reinstalls_and_cli_stages (test_candidate_system_contract.CandidateSystemContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1838323Z test_unpinned_source_and_changed_reboot_files_are_rejected (test_candidate_system_contract.CandidateSystemContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1840312Z test_custom_permissions_group_and_symlink_are_refused (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1841684Z test_interrupted_access_only_recovery_refuses_changed_core (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1842956Z test_modified_record_cannot_redirect_permission_changes (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1844508Z test_newer_core_never_receives_legacy_directory_permissions (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1845787Z test_old_search_only_mode_rejects_upstream_style_directory_open (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1847142Z test_preflight_failure_restores_permissions_without_spending_snapshot_budget (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1848567Z test_real_transaction_migrates_before_preflight_and_restores_after_rollback (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1849924Z test_record_publication_sigkill_remains_single_link_and_resumable (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1851544Z test_repeated_upgrade_and_rollback_resume_from_same_immutable_record (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1852853Z test_state_saves_preserve_legacy_mode_until_explicit_migration (test_config_access.ConfigAccessTests) ... skipped 'needs isolated root test'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1877525Z test_config_edit_during_preflight_cannot_become_the_approved_baseline (test_connect_policy.ConnectPolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1937140Z test_config_size_and_backup_growth_are_bounded_before_service_changes (test_connect_policy.ConnectPolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.1946397Z test_custom_values_duplicate_keys_and_multiline_layout_refused (test_connect_policy.ConnectPolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2024627Z test_external_secret_or_permission_changes_block_rollback (test_connect_policy.ConnectPolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2106622Z test_failed_readiness_restores_exact_bytes_and_private_mode (test_connect_policy.ConnectPolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2209119Z test_migration_only_changes_three_defaults_and_is_idempotent (test_connect_policy.ConnectPolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2308899Z test_partial_transaction_requires_rollback_even_if_candidate_bytes_present (test_connect_policy.ConnectPolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2318919Z test_changed_patch_or_provenance_rejected (test_core_bundle.CoreBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2377954Z test_deterministic_archive_integrity_and_license (test_core_bundle.CoreBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2382490Z test_exact_binary_gate_before_output (test_core_bundle.CoreBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2391142Z test_existing_output_and_symlink_inputs_are_not_followed (test_core_bundle.CoreBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2399165Z test_wrong_architecture_rejected_even_with_fixture_digest (test_core_bundle.CoreBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2429115Z test_binary_hash_and_elf_architecture_are_bound (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2443941Z test_embedded_source_matches_tested_module (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2449901Z test_existing_core_and_symlinks_are_preserved (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2530837Z test_fresh_install_runs_as_telemt_and_retains_license (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2588516Z test_manifest_version_architecture_and_member_hash_are_bound (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2629897Z test_member_count_and_size_are_bounded (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2672536Z test_missing_duplicate_or_extra_members_rejected (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2730770Z test_traversal_symlink_and_hardlink_rejected (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2743978Z test_untrusted_archive_checksum_stops_before_tar_parsing (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2759385Z test_valid_bundle_returns_binary_and_original_notices (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2789543Z test_wrong_runtime_version_leaves_no_installed_core (test_core_install.CoreInstallTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2792039Z test_patch_helper_matches_rust_regression_source (test_core_patch.CorePatchTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.2793874Z test_patch_scope_and_unofficial_marking (test_core_patch.CorePatchTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.3066562Z test_arm_default_download_stays_official_for_unset_and_empty_selection (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.3165374Z test_arm_never_receives_the_x86_candidate (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.3366397Z test_baseline_switch_binds_audited_archive_and_version_to_existing_transaction (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.3555791Z test_baseline_switch_rejects_arm_and_missing_maintenance_before_mutation (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.4101962Z test_both_legacy_official_architectures_require_the_exact_binary (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.6279234Z test_core_panel_requires_explicit_maintenance_and_keeps_default_readonly (test_core_selection.CoreSelectionTests) ... test_default_and_explicit_fallback_bind_version_archive_binary_and_url (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.7937401Z test_new_manager_accepts_both_pinned_cores_and_rejects_version_hash_mismatch (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.9361920Z test_previous_release_both_architectures_and_join_codes_remain_compatible (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.9491840Z test_unknown_channel_rejected_before_download (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.9857192Z test_unknown_or_writable_existing_core_is_never_executed (test_core_selection.CoreSelectionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.9931060Z test_atomic_rename_failure_restores_and_cleans_staging (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:49.9990300Z test_backup_and_prepared_journal_exist_before_stop (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0009504Z test_checksum_version_and_baseline_fail_before_service_change (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0086119Z test_commit_and_explicit_rollback_keep_configuration (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0150241Z test_corrupt_previous_binary_is_rejected_before_stopping (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0317790Z test_failed_later_upgrade_preserves_successful_rollback_history (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0382301Z test_foreign_binary_change_is_not_overwritten_on_recovery (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0410665Z test_incomplete_backup_copy_cannot_replace_a_valid_previous_file (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0487777Z test_journal_target_and_backup_traversal_are_rejected (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0582793Z test_pending_transaction_recovers_after_process_loss (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0658427Z test_readiness_failure_restores_previous_binary_and_service (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0726005Z test_same_content_does_not_replace_history_or_restart (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0739610Z test_second_operator_is_rejected_without_service_calls (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0814679Z test_start_failure_restores_previous_binary (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0830909Z test_symlink_candidate_and_binary_are_rejected (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0844507Z test_symlink_lock_cannot_modify_unrelated_file (test_core_transaction.CoreTransactionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0882294Z test_audited_cache_limit_is_enforced_before_stopping_service (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.0904836Z test_audited_cache_tamper_symlink_and_hardlink_are_not_replaced (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1046946Z test_audited_source_archive_is_private_and_survives_exact_rollback (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1091151Z test_config_incompatibility_and_archive_tamper_do_not_stop_old_service (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1218257Z test_crash_recovery_uses_the_snapshot_bound_to_the_journal (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1443432Z test_failed_second_upgrade_preserves_prior_snapshot_identity (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1465512Z test_generated_single_file_contains_exact_reviewed_sources (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1596845Z test_health_refresh_is_atomic_idempotent_and_reversible (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1707622Z test_old_config_and_credentials_are_backed_up_without_rewriting (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1808826Z test_readiness_failure_auto_restores_old_binary (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1858565Z test_repeat_audited_upgrade_attaches_missing_source_without_restart (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.1951674Z test_repeat_upgrade_is_noop_and_keeps_rollback (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2053767Z test_retry_after_partial_activation_cannot_report_unchanged (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2161400Z test_rollback_refuses_changed_config_and_tampered_snapshot (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2171373Z test_special_file_backup_roots_are_never_silently_omitted (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2181015Z test_symlinks_and_public_transaction_storage_are_rejected (test_core_upgrade.UpgradeTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2183124Z test_namespace_identity_mismatch_is_preserved_and_fails_acceptance (test_endurance_cleanup.EnduranceCleanupTests) ... skipped 'private namespace check requires Linux root'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2185540Z test_owned_orphan_is_removed_and_unrelated_file_is_kept (test_endurance_cleanup.EnduranceCleanupTests) ... skipped 'private namespace check requires Linux root'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2187119Z test_day_is_below_the_payload_cap (test_endurance_contract.EnduranceContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2189094Z test_interrupted_or_restarted_connections_cannot_pass (test_endurance_contract.EnduranceContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2190494Z test_missing_probe_or_extra_payload_is_rejected (test_endurance_contract.EnduranceContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2191752Z test_arbitrary_inputs_never_reach_socket (test_entry_maintenance.EntryMaintenanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2193060Z test_drain_requires_healthy_peer_on_both_lines (test_entry_maintenance.EntryMaintenanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2194561Z test_resume_and_rejected_runtime_command (test_entry_maintenance.EntryMaintenanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2203402Z test_single_file_entry_control_matches_reviewed_source (test_entry_maintenance.EntryMaintenanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2324865Z test_clean_preflight_creates_nothing (test_fresh_paths.FreshPathTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.2667545Z test_existing_directory_and_customer_data_preserved_for_all_roles (test_fresh_paths.FreshPathTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3132332Z test_existing_unit_wireguard_and_tuning_files_preserved (test_fresh_paths.FreshPathTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3478560Z test_foreign_core_manager_and_broken_symlink_are_preserved (test_fresh_paths.FreshPathTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3481562Z test_old_core_or_changed_reboot_state_cannot_pass (test_full_system_contract.FullSystemAcceptanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3483935Z test_three_real_roles_and_reboots_are_required (test_full_system_contract.FullSystemAcceptanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3486111Z test_zero_exit_with_interrupted_or_incomplete_worker_is_rejected (test_full_system_contract.FullSystemAcceptanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3513784Z test_bad_health_payloads_fail_without_killing_monitor (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3530767Z test_dc_quorum_tolerates_one_or_two_unreachable_dcs (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3546722Z test_dead_monitor_exits_agent_for_systemd_recovery (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3554374Z test_embedded_agent_is_exact_reviewed_source (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3571165Z test_failure_threshold_recovery_and_cooldown (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3631854Z test_live_stalled_monitor_expires_even_before_first_result (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3653071Z test_oversized_response_is_bounded_and_rejected (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:50.3670920Z test_partial_dc_outage_does_not_flap_actual_monitor (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.3724456Z test_redirect_cannot_forward_readiness_bearer_token (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.3854999Z test_stale_or_missing_monitors_cannot_admit_connections (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.3870190Z test_unhealthy_fresh_samples_do_not_restart_agent (test_health_agent.HealthAgentTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.4247702Z test_download_and_launch_then_clean_private_temporary_file (test_install_command.InstallCommandTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.4365644Z test_download_failure_never_launches_or_leaves_partial_file (test_install_command.InstallCommandTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.4833835Z test_empty_wrong_project_and_invalid_shell_never_launch (test_install_command.InstallCommandTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.5211529Z test_nonroot_install_uses_sudo_boundary (test_install_command.InstallCommandTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.5368688Z test_original_rejects_valid_shell_with_wrong_pinned_digest (test_install_command.InstallCommandTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.6069308Z test_original_uses_frozen_channel_for_root_and_nonroot (test_install_command.InstallCommandTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.6175885Z test_command_substitution_failure_is_recovered_by_parent_once (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.6269096Z test_committed_install_is_not_rolled_back (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.7405756Z test_disconnected_panel_waits_for_active_install_cleanup (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.7501378Z test_existing_node_error_is_not_install_cleanup (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.7595216Z test_explicit_exit_rolls_back_once_preserving_failure_code (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.7701406Z test_inherited_panel_pid_cannot_terminate_an_unrelated_process (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.7807904Z test_menu_action_subshell_rolls_back_without_ending_panel (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.7900429Z test_normal_command_error_does_not_double_rollback (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.8012182Z test_successful_subshell_and_pipeline_do_not_own_parent_transaction (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:51.9126372Z test_terminated_install_rolls_back (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0255334Z test_terminating_panel_waits_for_active_install_cleanup (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0351730Z test_uncommitted_success_exit_is_failure_and_rolls_back (test_install_exit.InstallExitTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0373367Z test_forged_outside_path_and_symlinked_marker_fail_closed (test_lab_artifacts.ArtifactCleanupTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0387212Z test_live_process_token_change_and_unrelated_directory_are_not_deleted (test_lab_artifacts.ArtifactCleanupTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0711478Z test_real_sigkill_leaves_registered_directory_for_supervisor (test_lab_artifacts.ArtifactCleanupTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0712899Z test_bad_digest_unlinks_only_the_new_link (test_lab_binary.SharedLabBinaryTests) ... skipped 'private root-owned lab staging'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0714139Z test_shared_inode_preserves_source_permissions_and_cleanup (test_lab_binary.SharedLabBinaryTests) ... skipped 'private root-owned lab staging'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0715079Z test_unsafe_sources_and_roots_are_rejected (test_lab_binary.SharedLabBinaryTests) ... skipped 'private root-owned lab staging'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0717249Z test_ab_order_is_paired_and_reversed_each_round (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0733359Z test_candidate_plan_is_tiny_high_rtt_private_and_time_bounded (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0775076Z test_delivery_plan_is_ci_only_and_keeps_standard_memory_policy (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0776254Z test_escalation_rejects_actual_16_to_32_memory_high_shortfall (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0777588Z test_escalation_requires_measured_success_and_cleanup (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0779012Z test_explicit_soft_policy_keeps_all_hard_limits_and_reserves (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0791348Z test_failed_safety_queries_are_not_empty_successes (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0792476Z test_low_memory_or_disk_refuses_instead_of_enlarging_limits (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0797356Z test_memory_accounting_keeps_socket_cache_and_anonymous_pages_separate (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0801720Z test_reports_are_private_with_shell_umask_and_never_overwrite_evidence (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0803112Z test_small_vps_reserves_host_memory_and_disables_experiment_swap (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0811514Z test_stalled_worker_termination_still_returns_failure_for_retention (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0812760Z test_systemd_owns_all_descendants_with_finite_resource_limits (test_lab_runner.LabRunnerTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0823144Z test_legacy_parity_does_not_require_slow_official_control_latency (test_legacy_queue_analysis.LegacyQueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0851564Z test_missing_and_drifted_evidence_is_rejected (test_legacy_queue_analysis.LegacyQueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0877228Z test_one_bad_pair_blocks_aggregate_success (test_legacy_queue_analysis.LegacyQueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.0945048Z test_resource_capacity_and_probe_failures_suppress_parity (test_legacy_queue_analysis.LegacyQueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.1248429Z test_creates_private_regular_lock_and_no_temporary_residue (test_lock_safety.LockSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.1389593Z test_legacy_counterexample_truncates_symlink_target (test_lock_safety.LockSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.2019006Z test_legacy_holder_blocks_new_manager_until_release (test_lock_safety.LockSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.2271622Z test_preserves_legacy_inode_and_contents (test_lock_safety.LockSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.2586791Z test_rejects_fifo_and_hardlinked_file_without_blocking (test_lock_safety.LockSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.2739714Z test_rejects_symlink_without_touching_target (test_lock_safety.LockSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.3297596Z test_rejects_writable_file_or_unsafe_shared_directory (test_lock_safety.LockSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.3325365Z test_cpu_capacity_and_measured_rtt_override_apparent_speed (test_long_path_analysis.LongPathAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.3364909Z test_equal_load_has_its_own_latency_and_instrumentation_gates (test_long_path_analysis.LongPathAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.3374412Z test_exact_workload_and_exploratory_threshold (test_long_path_analysis.LongPathAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.3386481Z test_native_four_pair_plan_rejects_missing_round (test_long_path_analysis.LongPathAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.3396322Z test_new_official_release_is_explicit_and_unknown_release_is_rejected (test_long_path_analysis.LongPathAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.3510429Z test_partial_duplicate_drift_bad_cpu_missing_rtt_and_affinity_fail_closed (test_long_path_analysis.LongPathAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.6055260Z test_failed_final_rename_keeps_old_executable_and_backup (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:52.8632817Z test_failed_first_replacement_does_not_invent_previous_backup (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:53.1216610Z test_first_install_creates_working_shortcut (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:53.3806360Z test_legacy_fixed_backup_temporary_path_is_never_used (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:53.6305606Z test_real_shortcut_permission_failure_is_not_masked (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:53.8708869Z test_refuses_manager_and_backup_symlinks_without_touching_target (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:53.9393298Z test_rejects_downloaded_downgrade_and_protocol_change (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:56.1272778Z test_repeat_install_and_rollback_preserve_three_role_identities (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:56.1391982Z test_rollback_rejects_directory_target_without_copying_inside_it (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:56.1506793Z test_rollback_rejects_symlink_target_without_replacing_it (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:56.5900303Z test_rollback_stage_and_rename_failures_preserve_both_versions (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:56.6214115Z test_selftest_deadline_failure_keeps_existing_manager (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:56.8581042Z test_shortcut_failure_keeps_manager_and_removes_staged_file (test_manager_lifecycle.ManagerLifecycleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:56.8589866Z test_binary_identity_hash_is_streamed_in_small_chunks (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:57.9813963Z test_high_rtt_lab_cli_is_bounded_before_resource_creation (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:57.9814908Z test_lab_cpu_interval_separates_steal_and_rejects_resets (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:57.9828285Z test_memory_stop_closes_proxy_before_executor_waits (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:57.9838755Z test_mock_receiver_bound_is_inherited_before_accept_and_invalid_bounds_refused (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:57.9839991Z test_nonfinite_and_nonpositive_values_are_rejected (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:57.9841022Z test_real_duration_mismatch_is_not_accepted_as_path_throughput (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:57.9841806Z test_small_receiver_timing_difference_is_expected (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:58.1549916Z test_stream_probe_cli_is_bounded_before_network_setup (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:58.1555239Z test_synthetic_reader_pause_is_bounded_before_connection (test_measurement_quality.MeasurementQualityTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:58.1687740Z test_cpu_capacity_and_sample_limits_cannot_be_called_an_improvement (test_mixed_experience_analysis.MixedExperienceAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:58.1728215Z test_full_joint_parity_is_separate_from_production_approval (test_mixed_experience_analysis.MixedExperienceAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:58.1796426Z test_missing_evidence_or_silent_corruption_is_rejected (test_mixed_experience_analysis.MixedExperienceAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:58.1996483Z test_one_bad_pair_or_absolute_queue_delay_blocks_joint_parity (test_mixed_experience_analysis.MixedExperienceAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:58.8079534Z test_idle_connections_finish_before_their_peer_deadline (test_mixed_workload.MixedWorkloadTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0244465Z test_crypto_stream_keeps_counter_across_fragmented_reads (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0258577Z test_experimental_policy_is_confined_before_any_resource_creation (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0259852Z test_invalid_nonce_is_rejected (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0262302Z test_nist_aes256_ctr_vector_and_partial_updates (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0264029Z test_packet_stream_preserves_boundaries_and_partial_reads (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0269407Z test_packet_stream_rejects_unbounded_frames_before_body_read (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0272735Z test_synthetic_transfer_cannot_use_public_dc_mode (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0274180Z test_tls_stream_handles_ccs_and_partial_records (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0275477Z test_tls_stream_rejects_bad_type_version_or_oversized_record (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0276584Z test_truncated_packet_is_an_error (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0286178Z test_unknown_binary_is_rejected_before_any_process_or_temp_resource (test_mtproto_transport.TransportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0307408Z test_cleanup_only_removes_created_resources (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0321786Z test_different_roots_cannot_race_fixed_namespace_names (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0332891Z test_lock_symlink_never_truncates_target (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0349339Z test_namespace_delete_failure_does_not_skip_keys_or_locks (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0367221Z test_secondary_backend_collision_refuses_and_releases_locks (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0377345Z test_unprivileged_run_is_refused_before_any_command (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0387125Z test_world_accessible_directory_is_refused (test_network_lab_safety.NetworkLabSafetyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.0566060Z test_installer_does_not_repeat_failed_package_configuration (test_package_recovery.PackageRecoveryTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.1147949Z test_invalid_signature_and_unknown_key_fail_without_retry (test_package_recovery.PackageRecoveryTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.1579641Z test_lock_wait_and_mirror_retry_both_obey_deadline (test_package_recovery.PackageRecoveryTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.1855116Z test_persistent_checksum_mismatch_stops_after_three_attempts (test_package_recovery.PackageRecoveryTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2040652Z test_real_mirror_size_error_retries_with_full_apt_validation (test_package_recovery.PackageRecoveryTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2317242Z test_transient_resolution_failure_is_bounded (test_package_recovery.PackageRecoveryTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2324624Z test_failure_suppresses_ratios_without_dropping_pairs (test_paired_analysis.PairedAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2366505Z test_incomplete_drift_duplicate_unknown_version_and_asymmetric_timeout_fail_closed (test_paired_analysis.PairedAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2370120Z test_matched_speed_is_not_declared_a_win (test_paired_analysis.PairedAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2378736Z test_missing_or_invalid_generator_cpu_cannot_hide_a_bottleneck (test_paired_analysis.PairedAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2383836Z test_nan_and_load_generator_saturation_cannot_become_core_advantage (test_paired_analysis.PairedAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2387465Z test_orders_balanced_and_reversed_on_other_replica (test_paired_analysis.PairedAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.2396975Z test_repeatable_advantage_and_regression_use_predeclared_threshold (test_paired_analysis.PairedAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3267220Z test_cli_exit_status_matches_protocol_result_without_losing_failed_report (test_paired_report.PairedReportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3282255Z test_failed_protocol_remains_failure_in_cross_job_summary (test_paired_report.PairedReportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3307789Z test_only_replicated_ratio_advantage_is_reported (test_paired_report.PairedReportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3500597Z test_oom_wrong_commit_duplicate_replica_missing_profile_and_affinity_are_rejected (test_paired_report.PairedReportTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3502452Z test_actual_stalled_receiver_rollup_rejected (test_path_capacity.CapacityValidation) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3506885Z test_no_remote_or_missing_interval_fallback (test_path_capacity.CapacityValidation) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3507979Z test_receiver_local_complete (test_path_capacity.CapacityValidation) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3524669Z test_non_block_aligned_rate_preserves_the_complete_byte_pattern (test_payload_pacing.PayloadPacingTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3548423Z test_one_kib_per_second_does_not_create_idle_timeout_gaps (test_payload_pacing.PayloadPacingTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3561017Z test_unpaced_and_high_rate_integrity_is_preserved (test_payload_pacing.PayloadPacingTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3621319Z test_api_sampling_uses_fixed_loopback_and_numeric_allowlist (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.3642688Z test_iperf_aggregate_cap_and_no_raw_error_output (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.4034052Z test_manager_rollback_preserves_state (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:58:59.9337612Z test_manager_update_and_failure_preserve_running_configuration (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:00.0532430Z test_oversized_manager_download_is_stopped_and_cleaned_before_execution (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:00.1341120Z test_real_generated_config_and_telemt_security (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:00.8150335Z test_real_legacy_updater_preserves_all_connection_information (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:00.8167831Z test_release_has_no_production_performance_apply_path (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:02.8488251Z test_report_command_timeout_and_output_limit (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:02.8547479Z test_report_distinguishes_cpu_steal_and_memory_pressure (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.1924672Z test_report_has_no_state_evaluation_or_secret_output (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.1986168Z test_report_preserves_unofficial_core_label_and_rejects_unbounded_output (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.2633777Z test_report_rejects_unbounded_load (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.2769677Z test_resources_and_legacy_schema (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.2789555Z test_runtime_templates_match_production_baseline (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.5282610Z test_shortcut_failure_does_not_replace_manager (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.5350494Z test_socket_summary_aggregates_without_endpoint_disclosure (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.5922348Z test_stalled_selftest_cannot_replace_manager_or_rollback (test_performance.PerformanceTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.5934703Z test_classless_empty_output_is_valid (test_private_queue_snapshot.QueueSnapshot) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.5937968Z test_missing_qdisc_must_not_be_silently_accepted (test_private_queue_snapshot.QueueSnapshot) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.5947302Z test_joint_gain_requires_all_four_pairs_and_balanced_order (test_queue_analysis.QueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.5967559Z test_load_saturation_and_probe_loss_suppress_wins (test_queue_analysis.QueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.5975386Z test_missing_ping_process_cpu_never_promotes_an_apparent_latency_win (test_queue_analysis.QueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6054551Z test_partial_missing_metrics_wrong_order_and_unknown_upstream_fail_closed (test_queue_analysis.QueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6056909Z test_ping_parser_does_not_turn_missing_reply_into_zero_latency (test_queue_analysis.QueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6080180Z test_throughput_loss_or_ping_tail_regression_defeats_tcp_only_gain (test_queue_analysis.QueueAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6085928Z test_active_drift_cannot_be_deleted_as_partial_install (test_queue_control.QueuePolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6108067Z test_fresh_noqueue_does_not_assume_zero_txqlen (test_queue_control.QueuePolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6109995Z test_no_entry_oversubscription_or_implicit_link_guess (test_queue_control.QueuePolicyTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6112022Z test_disabled_status_does_not_create_files_or_hooks (test_queue_control.QueueStateTests) ... skipped 'root-owned state boundary'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6113419Z test_hook_failure_cannot_fail_tunnel_and_marker_blocks_incompatible_manager (test_queue_control.QueueStateTests) ... skipped 'root-owned state boundary'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6115173Z test_manager_replacement_guard_preserves_legacy_when_feature_off (test_queue_control.QueueStateTests) ... skipped 'root-owned state boundary'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6116742Z test_ordinary_apply_failure_restores_disabled_persistence (test_queue_control.QueueStateTests) ... skipped 'root-owned state boundary'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6118200Z test_pending_disable_prevents_boot_reenable (test_queue_control.QueueStateTests) ... skipped 'root-owned state boundary'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6119400Z test_publish_is_single_link_and_never_replaces_a_concurrent_target (test_queue_control.QueueStateTests) ... skipped 'root-owned state boundary'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6120687Z test_symlink_hardlink_and_world_readable_policy_refused (test_queue_control.QueueStateTests) ... skipped 'root-owned state boundary'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6121675Z test_acceptance_and_native_builder_pin_the_same_active_source (test_release_lock.ReleaseLockTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6141997Z test_installer_and_release_lock_cannot_silently_diverge (test_release_lock.ReleaseLockTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6149132Z test_partial_or_oom_or_unclosed_processes_cannot_pass (test_resource_churn_contract.ResourceChurnContractTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6150880Z test_backend_endpoints_preserve_process_inode_and_role_filtering (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6196259Z test_dump_bounds_and_deadline_fail_without_partial_results (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6250851Z test_dump_completion_errors_sender_and_truncation (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6265328Z test_late_kernel_reply_is_not_accepted_as_a_valid_sample (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6277940Z test_late_qdisc_sample_is_rejected_after_namespace_restored (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6280534Z test_malformed_attributes_and_messages_rejected (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6285267Z test_namespace_allowlist_and_thread_rejection_before_open (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6313100Z test_namespace_restore_runs_on_query_failure_and_restore_failure_is_fatal (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6317988Z test_qdisc_nested_statistics_match_tc_fields (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6319137Z test_socket_memory_tcp_units_and_inode_ownership (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6327644Z test_socket_namespace_mismatch_and_host_scope_refused_before_query (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6336448Z test_whole_socket_observation_includes_descriptor_and_decode_time (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6359422Z test_worker_delegates_process_scope_without_subprocess (test_socket_observer.SocketObserverTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6361272Z test_complete_same_binary_cases_can_compare (test_socket_policy_analysis.SocketPolicyAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6364101Z test_declared_two_policy_subsets_are_counterbalanced (test_socket_policy_analysis.SocketPolicyAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6367926Z test_missing_failed_duplicate_and_invalid_measurement_suppress_all_ratios (test_socket_policy_analysis.SocketPolicyAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6369801Z test_workload_or_binary_mismatch_is_rejected (test_socket_policy_analysis.SocketPolicyAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6371072Z test_missing_added_source_or_changed_line_endings_are_refused (test_stable_core_bundle.StableCoreBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6372142Z test_new_helpers_are_in_the_actual_distributed_patch (test_stable_core_bundle.StableCoreBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6378268Z test_unpinned_input_never_creates_an_output (test_stable_core_bundle.StableCoreBundleTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6387676Z test_diagnostic_output_has_a_hard_text_bound (test_startup_diagnostics.StartupDiagnosticsTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6388938Z test_startup_reason_survives_without_synthetic_credentials_or_long_hex (test_startup_diagnostics.StartupDiagnosticsTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6390251Z test_unsafe_state_is_refused_before_any_content_executes (test_state_safety.StateSafetyTests) ... skipped 'state ownership requires root'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6392237Z test_all_payloads_and_resource_bounds_pass_without_speed_claim (test_stress_analysis.StressAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6400807Z test_missing_failed_duplicate_and_configuration_drift_are_rejected (test_stress_analysis.StressAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6403243Z test_oom_wrong_budget_residual_process_or_descriptor_growth_is_rejected (test_stress_analysis.StressAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6447013Z test_in_load_socket_failure_preserves_payload_and_invalidates_measurement (test_trial_retention.TrialRetentionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6482335Z test_post_load_timeout_preserves_transfer_and_marks_measurement_invalid (test_trial_retention.TrialRetentionTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6484048Z test_queue_floor_matches_listener_and_preserves_larger_operator_values (test_tuning_preflight.TuningPreflightTests) ... skipped 'private mount namespace requires root'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6607450Z test_supported_kernel_passes_readiness_without_applying_tuning (test_tuning_preflight.TuningPreflightTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6800554Z test_trimmed_or_missing_modules_reject_before_state_is_changed (test_tuning_preflight.TuningPreflightTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6919276Z test_unregistered_bbr_is_not_silently_accepted (test_tuning_preflight.TuningPreflightTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6922601Z test_failed_or_duplicate_or_missing_pair_suppresses_ratio (test_upload_analysis.UploadAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6924912Z test_incomplete_batch_does_not_publish_a_ratio_even_with_successful_rows (test_upload_analysis.UploadAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6926608Z test_negative_results_are_preserved (test_upload_analysis.UploadAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6928769Z test_same_toolchain_pair_is_named_without_relabeling_as_historical_core (test_upload_analysis.UploadAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6930613Z test_unlike_workloads_and_nonfinite_values_are_rejected (test_upload_analysis.UploadAnalysisTests) ... ok
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6931662Z 
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6932299Z ======================================================================
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6933454Z FAIL: test_core_panel_requires_explicit_maintenance_and_keeps_default_readonly (test_core_selection.CoreSelectionTests) (reply='1\nMAINTENANCE\n')
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6934792Z ----------------------------------------------------------------------
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6935335Z Traceback (most recent call last):
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6936264Z   File "/home/runner/work/me/me/tests/test_core_selection.py", line 162, in test_core_panel_requires_explicit_maintenance_and_keeps_default_readonly
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6937384Z     self.assertEqual(called.read_text() if called.exists() else '',expected)
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6938388Z AssertionError: '' != 'upgrade --maintenance balanced2'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6938888Z + upgrade --maintenance balanced2
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6939137Z 
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6939300Z ======================================================================
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6940311Z FAIL: test_core_panel_requires_explicit_maintenance_and_keeps_default_readonly (test_core_selection.CoreSelectionTests) (reply='2\nMAINTENANCE\n')
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6941374Z ----------------------------------------------------------------------
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6941876Z Traceback (most recent call last):
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6942768Z   File "/home/runner/work/me/me/tests/test_core_selection.py", line 162, in test_core_panel_requires_explicit_maintenance_and_keeps_default_readonly
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6947535Z     self.assertEqual(called.read_text() if called.exists() else '',expected)
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6948188Z AssertionError: '' != 'upgrade --maintenance'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6948662Z + upgrade --maintenance
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6948872Z 
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6949318Z ======================================================================
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6950303Z FAIL: test_core_panel_requires_explicit_maintenance_and_keeps_default_readonly (test_core_selection.CoreSelectionTests) (reply='3\nMAINTENANCE\n')
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6951354Z ----------------------------------------------------------------------
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6951839Z Traceback (most recent call last):
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6952788Z   File "/home/runner/work/me/me/tests/test_core_selection.py", line 162, in test_core_panel_requires_explicit_maintenance_and_keeps_default_readonly
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6954233Z     self.assertEqual(called.read_text() if called.exists() else '',expected)
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6954887Z AssertionError: '' != 'rollback --maintenance'
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6955340Z + rollback --maintenance
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6955567Z 
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6955782Z ----------------------------------------------------------------------
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6956291Z Ran 322 tests in 22.111s
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6956522Z 
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.6956687Z FAILED (failures=3, skipped=25)
+validate	Test diagnostics, configuration and rollback	2026-11-09T16:59:05.7231604Z ##[error]Process completed with exit code 1.

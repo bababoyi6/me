@@ -1,8 +1,10 @@
 # 1.7 安装、迁移与回退
 
+11月10日默认策略调整：兼容目标仍为官方17；x86新安装默认已发布balanced2，ARM默认官方17。高RTT生产优先保留已验证基线，不把下面“官方兼容升级”步骤当作每次维护必做动作。[完整策略与实际验证](CORE-POLICY-20261110.md)。
+
 候选目标：官方 Telemt **3.5.17**，固定 tag/commit/包及二进制 SHA256 见 [版本锁](telemt-stable-lock.json)。本分支未发布、未部署生产；`a update` 当前跟随远程 main，不能在候选分支尚未合并时假定它会下载 1.7。3.5.16 既有核心和同协议加入码仍被精确识别，迁移及新 API 审查见 [3.5.17 说明](UPSTREAM-3.5.17.md)。
 
-后续共享排队筛选只修改隔离实验接口，**没有新增生产整形开关、隐式tc操作或默认限速**；安装器、配置迁移与回退不因该实验变化。不要把实验脚本或180Mbps参数复制到生产节点。测量修正和原始失败见[定位报告](PATH-CAPACITY-20261109.md)。
+队列研究没有进入默认网络配置；后端仅保留显式、默认关闭的实验控制器，共享入口IFB已撤回。不要把实验脚本或180Mbps复制到生产节点。[后端边界](MANAGED-QUEUE-20261109.md)、[共享IFB否决](SHARED-ENTRY-20261109.md)保留原始记录。
 
 11 月 8 日长链路补测已确认官方核心的 100ms 单流吞吐退化，当前不推荐据本分支批量升级高延迟生产线路。`3.5.17+tdh.balanced1`（前阶段为3.5.16）仅为独立原生实验候选，虽已恢复吞吐并通过有限维护/资源验收，四流下载排队延迟仍需优化；尚不接受作为安装器的版本选项。详见[最新收益、代价与验收边界](FINAL-ACCEPTANCE-20261109.md)，不要将实验产物当作正式 Release。
 
@@ -16,7 +18,7 @@
 
 ## 安装与旧节点保护
 
-新安装执行本分支审核后的 `telemt-dual-hop.sh`，仍按入口、backend1、backend2、回执注册的原流程部署。支持范围仍为 Ubuntu 22.04 / x86_64、ARM64。两架构均固定官方 3.5.17；ARM64 已在 Ubuntu 22.04.5 原生 runner 验证正式包安装、API 及双 SNI 协议传输，不代表完整 ARM 三系统或官方客户端验收。
+新安装执行本分支审核后的`telemt-dual-hop.sh`，仍按入口、backend1、backend2、回执注册的原流程部署。支持Ubuntu22.04/x86_64、ARM64；x86默认已发布`3.5.5+tdh.balanced2`，ARM默认官方3.5.17。ARM首次安装/API/双SNI功能通过，不代表ARM高RTT性能或完整三系统验收。
 
 ```bash
 sudo bash ./telemt-dual-hop.sh
@@ -24,14 +26,22 @@ sudo bash ./telemt-dual-hop.sh
 
 下载途径必须是已审查的提交或交付包，并在执行前核对交付摘要。正式发布前不提供冒充已存在的 `v1.7.0` 下载 URL。原历史版本安装入口仍可用于各自历史部署；禁止把另一份安装命令当作运行中节点的重新初始化。
 
-确实要保留旧 x86_64 核心的新安装，可显式选择：
+x86后端新安装默认是balanced2；需要官方兼容目标或历史audit2备选时显式选择：
 
 ```bash
-sudo env TDH_NEW_INSTALL_CORE=balanced2 bash ./telemt-dual-hop.sh
+sudo env TDH_NEW_INSTALL_CORE=official bash ./telemt-dual-hop.sh
 sudo env TDH_NEW_INSTALL_CORE=audit2 bash ./telemt-dual-hop.sh
 ```
 
 这是两个独立备选命令；不要在同一节点顺序执行。核心选择不接受任意 URL 或版本字符串。
+
+环境变量只影响本次运行的后端安装；入口生成Join Code不会替两个独立后端决定核心渠道。兼容目标版本不等于实际运行二进制，中文维护面板显示经过摘要/权限核验的实际版本。已有节点不应为了换核心重新执行安装。
+
+## 已有节点切换到稳定基线
+
+仅x86_64/amd64，先按下文入口排空/健康核对流程维护一个后端，再执行`a core-baseline --maintenance`。中文后端菜单7也可选择；默认返回，输入`MAINTENANCE`才执行。命令不要求该节点曾通过`core-upgrade`升级，因此新安装的官方17节点也有保留配置的切换路径。它使用固定balanced2包、审计清单和原事务，先备份/预检、再替换/就绪检查；旧配置有不兼容的新版定制字段时停在预检，不删除或猜测迁移字段。
+
+重复已是基线时不重启、不覆盖原备份；切换成功后`a core-rollback --maintenance`恢复本次切换前的核心。若之后又修改连接/健康配置，回退须先反向恢复它们，使受保护配置与快照一致。未完成事务先按错误提示恢复；不删除账本绕过保护。ARM拒绝此命令，未知核心拒绝维护。Secret/SNI/链接不重生成，现有TCP仍会因核心重启断开，不能迁移。
 
 已有节点只安装新版管理器时，仍保存 manager.previous，不修改核心、配置、密钥、隧道或用户链接。支持 schema 5 / 协议 1.2.1；历史 1.3.1 与 1.6.0 均使用此配置架构，但其管理器版本和核心不能混称为当前版本。原 `a update-rollback` 仅回退管理器。
 
@@ -41,7 +51,7 @@ sudo env TDH_NEW_INSTALL_CORE=audit2 bash ./telemt-dual-hop.sh
 
 1. **入口**运行 `a backend-drain 1`。只有 backend2 在两条逻辑线路均为 UP 才允许排空；此操作停止向 backend1 分配新连接，不主动终止已有会话。
 2. 查看 HAProxy `scur` 等待旧会话结束，或接受后端重启将断开这些会话。`--maintenance` 是操作者对维护条件的明确确认，后端不能独立证明入口已排空。
-3. **backend1** 执行 `a core-upgrade --maintenance`，再执行 `a connect-refresh --maintenance` 和 `a health-refresh --maintenance`。
+3. **backend1** 只在明确选择官方兼容升级时执行`a core-upgrade --maintenance`；保留balanced2则跳过这一步。按实际需要独立执行`a connect-refresh --maintenance`和`a health-refresh --maintenance`，不要把管理器更新当作更换核心的理由。
 4. **backend1** 执行 `a diagnose`；确认服务、隧道和协议抽检。健康代理冷启动通常至少需要三轮 DC 采样。
 5. **入口**执行 `a backend-resume 1`，检查两条线路，完成后再以相同步骤维护 backend2。
 

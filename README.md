@@ -14,7 +14,9 @@
 
 ---
 
-## 1.7.0 / Telemt 3.5.17 候选（2026-11-09）
+## 1.7.0 / Telemt 3.5.17 兼容候选（2026-11-10）
+
+**默认速度保护已落地：** x86_64新安装默认沿用已发布`3.5.5+tdh.balanced2`，避免无意进入官方17已复现的高RTT单流退化路径；ARM默认官方17。需要官方版的x86新后端可显式`TDH_NEW_INSTALL_CORE=official`。运行中x86后端新增`a core-baseline --maintenance`，复用原事务切回基线并保留配置/链接，不要求重装；中文后端菜单“7 核心维护与回退”可操作，默认返回，维护需明确确认。兼容新版不代表新版默认更快。[策略、实际安装与回退证据](docs/CORE-POLICY-20261110.md)。
 
 **11月10日更新：** 修复队列记录、核心首次安装与配置权限迁移的首次发布强杀窗口，保留不覆盖与硬链接保护；实际队列发布后SIGKILL恢复通过，核心迁移新增同类针对性回归。入口共享预算原型虽将新连接p95从554降到426ms，但上传73→64Mbps、四对均回退超过5%，已撤回全部活跃原型/参数，不调低门槛继续刷分。生产默认和原链接保持，详见[本轮修复、否决与原始数据](docs/SHARED-ENTRY-20261109.md)。
 
@@ -38,7 +40,7 @@
 
 **3.5.16阶段长链路结论（历史）：** 两个独立任务确认 100ms 单流下载的官方 3.5.16 约 21Mbps、balanced2 约 105Mbps 的退化。已复用 1.6 的保护策略实现原生实验候选，恢复到约 106Mbps，并通过 720 条并发协议及单核/768MiB 资源、实际升级回滚验收；但四流下载 RTT 升高，**实验候选尚未发布或加入安装器，官方默认候选也不作为高延迟生产升级推荐**。271 项回归通过，完整收益、代价和限制见[长链路报告](docs/LONG-PATH-20261108.md)。
 
-- 新安装默认固定官方 **3.5.17**；tag、commit、两架构包及二进制 SHA256 均已锁定。保留 balanced2/audit2 备选及 3.5.16/3.5.5 旧核心识别。
+- 兼容目标锁定官方 **3.5.17**；x86新安装默认已发布balanced2，官方17/audit2可显式选择；ARM默认官方17。各核心包/二进制SHA256固定，保留旧核心识别，实际运行版本以身份核验为准。
 - 原入口 TCP 443、双 SNI、双 WG、独立主备后端、Secret 和代理链接保留；不启用 WEB。
 - 增加核心升级/回退、入口维护排空、健康代理更新/回退和后端恢复命令。管理器更新仍不隐式替换核心。
 - 增加 `a connect-refresh --maintenance` / `a connect-rollback --maintenance`，仅显式迁移三个默认连接参数；备份私有、配置仍为 root:telemt 0640，保留 Secret/SNI，拒绝覆盖定制值。应用会重启本后端，按迁移文档逐台排空维护。
@@ -67,7 +69,7 @@
 bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --proto-redir "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
 ```
 
-该命令下载远程 `main`，不固定管理器版本。本次核对远程仍为 1.6.0；1.7 候选正式合并后，新安装默认将是官方 3.5.16。需要完整保留历史 1.6.0 请使用其正式 Release 资产，不要把跟随 main 当作版本锁定。
+该命令下载远程 `main`，不固定管理器版本。本次核对远程仍为1.6.0，不会取得未合并的候选；本候选x86默认继续balanced2、ARM为官方17。需要完整保留历史1.6.0请使用其正式Release资产，不要把跟随main当作版本锁定。
 
 ### 原始稳定版：一键部署
 

@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "production_approval": false,
+  "default_selection_qualified": true,
+  "baseline_switch_qualified": true,
+  "panel_qualified": true,
+  "new_install_defaults": {
+    "x86_64": "3.5.5+tdh.balanced2",
+    "aarch64": "3.5.17"
+  },
+  "official_compatibility_target": "3.5.17",
+  "no_new_throughput_claim": true,
+  "no_core_build_or_qdisc_tuning": true,
+  "selection": {
+    "run": 42657447265,
+    "source_commit": "dc93316c7ca003078a1b8be348ef9571158f845d",
+    "network_boundary_substituted": true,
+    "archives_fetched_from_actual_public_urls": true,
+    "cases": [
+      {
+        "channel": "balanced2",
+        "accepted": true,
+        "existing_preserved": false,
+        "archive_sha256": "b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5",
+        "binary_sha256": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+        "url": "https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz"
+      },
+      {
+        "channel": "balanced2",
+        "accepted": false,
+        "existing_preserved": false,
+        "archive_sha256": "b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5",
+        "binary_sha256": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+        "url": "https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz"
+      },
+      {
+        "channel": "balanced2",
+        "accepted": false,
+        "existing_preserved": true,
+        "archive_sha256": "b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5",
+        "binary_sha256": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+        "url": "https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz"
+      },
+      {
+        "channel": "official",
+        "accepted": true,
+        "existing_preserved": false,
+        "archive_sha256": "0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e",
+        "binary_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+        "url": "https://github.com/telemt/telemt/releases/download/3.5.17/telemt-x86_64-linux-gnu.tar.gz"
+      },
+      {
+        "channel": "official",
+        "accepted": false,
+        "existing_preserved": false,
+        "archive_sha256": "0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e",
+        "binary_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+        "url": "https://github.com/telemt/telemt/releases/download/3.5.17/telemt-x86_64-linux-gnu.tar.gz"
+      },
+      {
+        "channel": "official",
+        "accepted": false,
+        "existing_preserved": true,
+        "archive_sha256": "0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e",
+        "binary_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+        "url": "https://github.com/telemt/telemt/releases/download/3.5.17/telemt-x86_64-linux-gnu.tar.gz"
+      }
+    ],
+    "streams": 40,
+    "bytes": 8421376,
+    "channels": {
+      "balanced2": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "binary_sha256": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+        "unauthenticated_api_status": 401,
+        "readonly_write_status": 403,
+        "config_unchanged": true,
+        "processes_closed": true,
+        "accepted": true
+      },
+      "official": {
+        "version": "telemt 3.5.17",
+        "binary_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+        "unauthenticated_api_status": 401,
+        "readonly_write_status": 403,
+        "config_unchanged": true,
+        "processes_closed": true,
+        "accepted": true
+      }
+    },
+    "group_peak_mib": 166.17578125,
+    "oom_delta": {
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "pids_after": 1
+  },
+  "baseline_switch": {
+    "run": 42659213985,
+    "source_commit": "8fb78c361a4581141c761433a87d985545b00dc3",
+    "from": "telemt 3.5.17",
+    "to": "telemt 3.5.5+tdh.balanced2",
+    "no_prior_transaction": true,
+    "same_target_does_not_restart": true,
+    "original_binary_config_token_restored": true,
+    "private_audited_archive_preserved": true,
+    "unit_removed": true,
+    "systemd_process_recovery_seconds": 1.080413,
+    "protocol_streams": 4
+  },
+  "arm": {
+    "run": 42657160889,
+    "source_commit": "a9efa1e8eabbb683fadedb0779798f7c5d1572ab",
+    "completed": 20,
+    "accepted": true
+  },
+  "root_validation": {
+    "run": 42660775206,
+    "source_commit": "0474ff34778577b2241fc2c4b6a7fd98edbfc605",
+    "checkout_commit": "310d74e41e7173a71ced40cb3e8ef4ecbeb2112f",
+    "tree_equal": true,
+    "count": 322,
+    "seconds": 23.357,
+    "skipped": 0
+  },
+  "failed_runs": [
+    42657160975,
+    42659861161,
+    42660038446
+  ],
+  "limits": [
+    "new binary performance not measured; released baseline retained",
+    "selection uses actual archive with curl boundary substitution",
+    "transaction core and controller have separate bounded systemd cgroups",
+    "no official clients/public three VPS/1Gbps/24h/anti-blocking qualification"
+  ]
+}
