@@ -4448,6 +4448,33 @@ menu_fresh() {
   done
 }
 
+core_panel() {
+  load_state || die "未安装节点。"
+  require_current_state
+  [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "核心维护只能在后端运行。"
+  local confirmation
+  printf '\n当前核心：%s\n' "$(get_telemt_version)"
+  printf '  1) 切换到已发布 balanced2 稳定基线（x86_64）\n'
+  printf '  2) 切换到兼容的官方核心（高 RTT 已知速度代价）\n'
+  printf '  3) 回退上一核心事务\n'
+  printf '  0) 返回（默认）\n'
+  read_panel_choice '请选择' 0 || return 0
+  case $PANEL_CHOICE in
+    1|2|3) ;;
+    0) return 0 ;;
+    *) warn "无效选择。"; return 0 ;;
+  esac
+  warn "请先在入口排空本后端并确认备用健康；核心重启会中断本后端现有会话。"
+  printf '已完成维护准备才输入 MAINTENANCE，其他输入取消：' >&2
+  read -r confirmation || return 0
+  [[ $confirmation == MAINTENANCE ]] || { info "已取消核心维护。"; return 0; }
+  case $PANEL_CHOICE in
+    1) manage_core upgrade --maintenance balanced2 ;;
+    2) manage_core upgrade --maintenance ;;
+    3) manage_core rollback --maintenance ;;
+  esac
+}
+
 menu_existing() {
   local PANEL_CHOICE progress
   while [[ -f $TDH_STATE ]]; do
@@ -4509,6 +4536,7 @@ menu_existing() {
       printf '  4) 安全更新管理脚本\n'
       printf '  5) 只读脱敏性能采样（5 秒）\n'
       printf '  6) 后端实验队列（默认关闭，可撤销）\n'
+      printf '  7) 核心维护与回退\n'
       printf '  9) 卸载\n'
       printf '  0) 退出\n\n'
       read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
@@ -4519,6 +4547,7 @@ menu_existing() {
         4) run_panel_action update_manager ;;
         5) run_panel_action performance_report ;;
         6) run_panel_action queue_panel ;;
+        7) run_panel_action core_panel ;;
         9) run_panel_action uninstall_all ;;
         0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
         *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
