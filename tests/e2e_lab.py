@@ -166,6 +166,7 @@ class MockDc(socketserver.ThreadingTCPServer):
 
 
 class FullLab:
+    EXPERIMENTAL_VERSIONS=("telemt 3.5.5", "telemt 3.5.5+tdh.audit1", "telemt 3.5.5+tdh.audit2", "telemt 3.5.5+tdh.fair1", "telemt 3.5.5+tdh.queue1", "telemt 3.5.5+tdh.balanced1", "telemt 3.5.5+tdh.balanced2", "telemt 3.5.16+tdh.control1", "telemt 3.5.16+tdh.balanced1", "telemt 3.5.17", "telemt 3.5.17+tdh.control1", "telemt 3.5.17+tdh.balanced1", "telemt 3.5.17+tdh.fair1")
     def __init__(self, binary, haproxy="haproxy", fast=True, real_dc=False, splice=False,
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
                  listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None,
@@ -196,7 +197,7 @@ class FullLab:
         expected = BINARIES.get(binary_hash)
         if experimental_binary is not None:
             checksum, version = experimental_binary
-            if checksum != binary_hash or version not in ("telemt 3.5.5", "telemt 3.5.5+tdh.audit1", "telemt 3.5.5+tdh.audit2", "telemt 3.5.5+tdh.fair1", "telemt 3.5.5+tdh.queue1", "telemt 3.5.5+tdh.balanced1", "telemt 3.5.5+tdh.balanced2", "telemt 3.5.16+tdh.control1", "telemt 3.5.16+tdh.balanced1", "telemt 3.5.17", "telemt 3.5.17+tdh.control1", "telemt 3.5.17+tdh.balanced1"):
+            if checksum != binary_hash or version not in self.EXPERIMENTAL_VERSIONS:
                 raise ValueError("explicit experimental build checksum/version mismatch")
             expected = version
         if expected is None:

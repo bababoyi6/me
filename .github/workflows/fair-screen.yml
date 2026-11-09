@@ -31,20 +31,23 @@ jobs:
           timeout 90 gh run download 42495175073 --repo bababoyi6/me --name native-pair --dir "$RUNNER_TEMP/native-pair"
           timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
           timeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821981 > "$RUNNER_TEMP/stable.tar.gz"
+          test "$(gh run view 42574699893 --repo bababoyi6/me --json headSha --jq .headSha)" = 5aa61d00a855b26b04b87c149dbaa102bfe02359
+          timeout 90 gh run download 42574699893 --repo bababoyi6/me --name fair-screen-evidence --dir "$RUNNER_TEMP/verified-fair"
+          echo 'e89fcde95fb09556883fc7ef7105b9ab4cc38ce688fa31205a034b4050d4f31f  '"$RUNNER_TEMP/verified-fair/manifest.json" | sha256sum --check
           rustup toolchain install 1.99.1 --profile minimal --no-self-update
           rustup default 1.99.1
           mkdir -m 700 "$RUNNER_TEMP/fair-evidence"
-      - name: Verify flush, bounded polls and exact-quantum EOF before compilation
-        run: timeout 120 cargo +1.99.1 test --locked --manifest-path tests/relay-flush-regression/Cargo.toml
-      - name: Build only the new copy candidate under a hard budget
-        run: |
-          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-build-fair-${GITHUB_RUN_ID}" -p "User=$(id -u)" -p "Group=$(id -g)" -p CPUQuota=300% -p MemoryMax=6G -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=1500 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="PATH=$PATH" --setenv=GITHUB_ACTIONS=true --setenv="GITHUB_SHA=$GITHUB_SHA" python3 tests/build_fair_candidate.py --source upstream --reference "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/fair-pair" > "$RUNNER_TEMP/fair-evidence/build.log" 2>&1
-          cp "$RUNNER_TEMP/fair-pair/manifest.json" "$RUNNER_TEMP/fair-pair/"*.patch "$RUNNER_TEMP/fair-evidence/"
-      - name: Prepare the maintained private path
+      - name: Prepare the maintained private path before compilation
         run: |
           sudo timeout 120 apt-get update -qq
           sudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 wireguard-tools ethtool iperf3 python3-cryptography
           sudo modprobe tcp_bbr
+      - name: Verify flush, bounded polls and exact-quantum EOF before compilation
+        run: timeout 120 cargo +1.99.1 test --locked --manifest-path tests/relay-flush-regression/Cargo.toml
+      - name: Build only the new copy candidate under a hard budget
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-build-fair-${GITHUB_RUN_ID}" -p "User=$(id -u)" -p "Group=$(id -g)" -p CPUQuota=300% -p MemoryMax=6G -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=1500 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="PATH=$PATH" --setenv=GITHUB_ACTIONS=true --setenv="GITHUB_SHA=$GITHUB_SHA" python3 tests/build_fair_candidate.py --source upstream --reference "$RUNNER_TEMP/native-pair" --verified-manifest "$RUNNER_TEMP/verified-fair/manifest.json" --output "$RUNNER_TEMP/fair-pair" > "$RUNNER_TEMP/fair-evidence/build.log" 2>&1
+          cp "$RUNNER_TEMP/fair-pair/manifest.json" "$RUNNER_TEMP/fair-pair/"*.patch "$RUNNER_TEMP/fair-evidence/"
       - name: Screen one mixed case in four AB BA pairs
         run: |
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-fair-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=360 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/mixed_path_lab.py --profile rtt100 --fair-directory "$RUNNER_TEMP/fair-pair" --native-directory "$RUNNER_TEMP/native-pair" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --stable-archive "$RUNNER_TEMP/stable.tar.gz" --output "$RUNNER_TEMP/fair-evidence/metrics.json"

@@ -23,6 +23,10 @@ def sample():
 
 
 class FairScreenTests(unittest.TestCase):
+    def test_candidate_version_is_registered_before_expensive_build(self):
+        from build_fair_candidate import VERSION
+        from e2e_lab import FullLab
+        self.assertIn(VERSION,FullLab.EXPERIMENTAL_VERSIONS)
     def test_all_four_joint_wins_only_advance_to_qualification(self):
         result=analyze(sample())
         self.assertTrue(result['advance_to_qualification']);self.assertFalse(result['production_approved'])
