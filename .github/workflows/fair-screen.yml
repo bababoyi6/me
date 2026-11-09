@@ -34,7 +34,7 @@ jobs:
           rustup toolchain install 1.99.1 --profile minimal --no-self-update
           rustup default 1.99.1
           mkdir -m 700 "$RUNNER_TEMP/fair-evidence"
-      - name: Verify existing flush contracts and the bounded ready poll
+      - name: Verify flush, bounded polls and exact-quantum EOF before compilation
         run: timeout 120 cargo +1.99.1 test --locked --manifest-path tests/relay-flush-regression/Cargo.toml
       - name: Build only the new copy candidate under a hard budget
         run: |

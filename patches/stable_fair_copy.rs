@@ -45,6 +45,13 @@ where
             if remaining == 0 {
                 ready!(Pin::new(&mut *writer).poll_flush(cx))?;
                 need_flush = false;
+                // Preserve upstream's immediate EOF completion at the exact
+                // quantum boundary. Peek once without copying more bytes.
+                match Pin::new(&mut *reader).poll_fill_buf(cx) {
+                    Poll::Ready(Ok(buffer)) if buffer.is_empty() => return Poll::Ready(Ok(copied)),
+                    Poll::Ready(Err(error)) => return Poll::Ready(Err(error)),
+                    _ => {}
+                }
                 cx.waker().wake_by_ref();
                 return Poll::Pending;
             }

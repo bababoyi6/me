@@ -228,4 +228,20 @@ mod fairness_tests {
         assert_eq!(output.flushes, 1);
         assert_eq!(payload.len() - input.len(), output.bytes);
     }
+
+    #[test]
+    fn stable_copy_exact_quantum_eof_finishes_without_an_extra_wakeup() {
+        let payload = vec![17; 64 * 1024];
+        let mut input = &payload[..];
+        let mut output = Sink::default();
+        let wakeups = Arc::new(Counter::default());
+        let waker = Waker::from(Arc::clone(&wakeups));
+        let mut context = Context::from_waker(&waker);
+        let mut transfer = Box::pin(super::stable_fair_copy::copy_with_flush(&mut input, &mut output));
+        assert!(matches!(transfer.as_mut().poll(&mut context), Poll::Ready(Ok(65536))));
+        drop(transfer);
+        assert_eq!(wakeups.0.load(Ordering::Relaxed), 0);
+        assert_eq!(output.bytes, payload.len());
+        assert_eq!(output.flushes, 1);
+    }
 }
