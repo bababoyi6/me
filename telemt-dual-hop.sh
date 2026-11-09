@@ -156,6 +156,7 @@ usage() {
   a update                                  安全更新管理脚本（可简写为 a u）
   a update-rollback                         恢复上次 a update 前的管理脚本
   a core-upgrade --maintenance               后端固定版本核心升级（需先排空）
+  a core-baseline --maintenance              x86_64 切回已发布稳定基线（需先排空）
   a core-rollback --maintenance              后端核心回滚（配置变更时拒绝）
   a backend-drain 1|2                       入口排空后端的新连接
   a backend-resume 1|2                      入口恢复后端接收新连接
@@ -1223,8 +1224,12 @@ PY
 # A core restart interrupts this backend's existing TCP sessions. Upgrade one
 # backend at a time after checking the peer and draining from the entry node.
 manage_core() {
-  local action=$1 acknowledgement=${2:-} tmp="" asset expected binary_sha url directory result=0
+  local action=$1 acknowledgement=${2:-} target=${3:-official} tmp="" asset expected binary_sha url directory version result=0
   [[ $acknowledgement == --maintenance ]] || die "请先确认另一个后端正常并在入口排空本后端，按升级文档添加 --maintenance；现有会话可能断开。"
+  [[ $target == official || ( $target == balanced2 && $action == upgrade ) ]] || die "核心维护目标无效。"
+  if [[ $target == balanced2 ]]; then
+    case $(uname -m) in x86_64|amd64) ;; *) die "已发布 balanced2 稳定基线仅支持 x86_64；ARM 不会安装其他架构核心。" ;; esac
+  fi
   load_state || die "未安装节点。"
   require_current_state
   [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "核心事务只能在后端运行。"
@@ -1249,15 +1254,22 @@ manage_core() {
     [[ ! -e $directory && ! -L $directory ]] || args+=(--protect "$directory")
   done
   if [[ $action == upgrade ]]; then
-    case $(uname -m) in
-      x86_64|amd64) asset=telemt-x86_64-linux-gnu.tar.gz expected=$TELEMT_SHA256_AMD64 binary_sha=$TELEMT_BINARY_SHA256_AMD64 ;;
-      aarch64|arm64) asset=telemt-aarch64-linux-gnu.tar.gz expected=$TELEMT_SHA256_ARM64 binary_sha=$TELEMT_BINARY_SHA256_ARM64 ;;
-      *) die "不支持当前架构。" ;;
-    esac
-    url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
-    info "目标 Telemt ${TELEMT_VERSION}，提交 ${TELEMT_COMMIT}；保留配置与链接。"
-    if [[ $asset == telemt-x86_64-linux-gnu.tar.gz ]]; then
-      warn "官方核心在已验证的高 RTT 单流场景存在吞吐退化；兼容升级不等于提速，原核心按事务备份。"
+    if [[ $target == balanced2 ]]; then
+      asset=${TELEMT_CORE_URL_AMD64##*/} expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64
+      binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 version=$TELEMT_CORE_VERSION_AMD64 url=$TELEMT_CORE_URL_AMD64
+      args+=(--audited)
+      info "目标为已发布稳定基线 ${version}；保留配置与链接，当前核心按事务备份。"
+    else
+      case $(uname -m) in
+        x86_64|amd64) asset=telemt-x86_64-linux-gnu.tar.gz expected=$TELEMT_SHA256_AMD64 binary_sha=$TELEMT_BINARY_SHA256_AMD64 ;;
+        aarch64|arm64) asset=telemt-aarch64-linux-gnu.tar.gz expected=$TELEMT_SHA256_ARM64 binary_sha=$TELEMT_BINARY_SHA256_ARM64 ;;
+        *) die "不支持当前架构。" ;;
+      esac
+      version=$TELEMT_VERSION url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
+      info "目标 Telemt ${version}，提交 ${TELEMT_COMMIT}；保留配置与链接。"
+      if [[ $asset == telemt-x86_64-linux-gnu.tar.gz ]]; then
+        warn "官方核心在已验证的高 RTT 单流场景存在吞吐退化；兼容升级不等于提速，原核心按事务备份。"
+      fi
     fi
     tmp=$(mktemp -d "${TDH_BASE}/core-fetch.XXXXXX")
     if ! curl -q -fL --retry 2 --connect-timeout 10 --max-time 120 --max-filesize 67108864 \
@@ -1265,7 +1277,7 @@ manage_core() {
       rm -rf -- "$tmp"
       die "核心下载失败；现有服务未改动。"
     fi
-    args+=(--archive "${tmp}/core.tar.gz" --archive-sha "$expected" --binary-sha "$binary_sha" --version "$TELEMT_VERSION")
+    args+=(--archive "${tmp}/core.tar.gz" --archive-sha "$expected" --binary-sha "$binary_sha" --version "$version")
   fi
   python3 - "${args[@]}" <<'TDH_CORE_UPGRADE_PY' || result=$?
 # BEGIN GENERATED CORE UPGRADE
@@ -4615,6 +4627,9 @@ main() {
     core-upgrade|core-rollback)
       (( $# == 2 )) || die "用法：a $1 --maintenance"
       manage_core "${1#core-}" "$2" ;;
+    core-baseline)
+      (( $# == 2 )) || die "用法：a core-baseline --maintenance"
+      manage_core upgrade "$2" balanced2 ;;
     backend-drain|backend-resume)
       (( $# == 2 )) || die "用法：a $1 1|2"
       backend_maintenance "${1#backend-}" "$2" ;;

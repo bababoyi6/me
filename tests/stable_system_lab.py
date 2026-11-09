@@ -65,11 +65,19 @@ def main():
     baseline.add_argument('--previous-stable-archive')
     parser.add_argument('--output', required=True)
     parser.add_argument('--stable-release',choices=tuple(RELEASES),default='3.5.16')
+    parser.add_argument('--baseline-switch',action='store_true',help='start official with no transaction; target published balanced2, then roll back')
     args = parser.parse_args()
     if args.candidate_package and not args.candidate_directory:
         parser.error('candidate package requires the pinned native directory')
+    if args.baseline_switch and (not args.stable_archive or not args.balanced2_archive):
+        parser.error('baseline switch requires official and balanced2 archives')
+    if args.baseline_switch and (os.environ.get('GITHUB_ACTIONS')!='true' or
+            os.stat('/proc/self/ns/net').st_ino==os.stat('/proc/1/ns/net').st_ino):
+        parser.error('baseline switch requires owned private CI namespace')
     baseline_pins=RELEASES['3.5.16'] if args.previous_stable_archive else PINS['balanced2']
     baseline_archive=args.previous_stable_archive or args.balanced2_archive
+    if args.baseline_switch:
+        baseline_pins=RELEASES[args.stable_release];baseline_archive=args.stable_archive
     if os.geteuid() != 0:
         raise RuntimeError('root required')
     unit = 'tdh-upgrade-test-'+uuid.uuid4().hex+'.service'
@@ -88,6 +96,9 @@ def main():
             candidate_archive=args.stable_archive
             candidate_pins=RELEASES[args.stable_release]
             candidate_version=args.stable_release
+            if args.baseline_switch:
+                candidate_archive=args.balanced2_archive;candidate_pins=PINS['balanced2']
+                candidate_version=candidate_pins[2].removeprefix('telemt ')
             if args.candidate_directory:
                 if os.environ.get('GITHUB_ACTIONS')!='true' or os.stat('/proc/self/ns/net').st_ino==os.stat('/proc/1/ns/net').st_ino:
                     raise RuntimeError('native candidate requires owned CI namespace')
@@ -108,7 +119,7 @@ def main():
                 report['native_manifest']=manifest
             binary = root/'telemt'
             content, _ = archive_payload(baseline_archive, baseline_pins[0],
-                                          baseline_pins[2].removeprefix('telemt '), baseline_pins[1], not bool(args.previous_stable_archive))
+                                          baseline_pins[2].removeprefix('telemt '), baseline_pins[1], not bool(args.previous_stable_archive or args.baseline_switch))
             durable_file(binary, content, 0o755)
             store = root/'transaction'
             store.mkdir(mode=0o700)
@@ -117,10 +128,11 @@ def main():
             # Map the installer identity lookup to an existing unprivileged UID;
             # do not create a host account just for a test. All other install
             # operations, archive validation and --version execution are real.
+            fresh_label='fresh_baseline' if args.baseline_switch else 'fresh_candidate' if args.candidate_directory else 'fresh_official'
             with patch('core_install.pwd.getpwnam', return_value=SimpleNamespace(pw_uid=65534, pw_gid=65534)):
-                report['fresh_candidate_install' if args.candidate_directory else 'fresh_official_install'] = fresh_install(candidate_archive, fresh/'telemt',
-                    candidate_pins[0], candidate_version, candidate_pins[1], bool(args.candidate_package))
-            report['fresh_candidate_binary_sha256_match' if args.candidate_directory else 'fresh_official_binary_sha256_match'] = digest(fresh/'telemt') == candidate_pins[1]
+                report[fresh_label+'_install'] = fresh_install(candidate_archive, fresh/'telemt',
+                    candidate_pins[0], candidate_version, candidate_pins[1], bool(args.candidate_package or args.baseline_switch))
+            report[fresh_label+'_binary_sha256_match'] = digest(fresh/'telemt') == candidate_pins[1]
             listen, api, health_port = port(), port(), port()
             config = generate_telemt(root/'config', root/'work', listen, api)
             text = config.read_text().replace('tls_emulation = true', 'tls_emulation = false')
@@ -168,11 +180,14 @@ StandardError=null
                 raise RuntimeError('baseline service not ready')
             protected = [root/'config', unit_path]
             old_config = digest(config)
+            if args.baseline_switch:
+                report['baseline_switch_started_without_transaction']=not (store/'transaction.json').exists()
+                report['target_core_version']=candidate_pins[2]
             stage = 'core_upgrade'
             report['upgrade'] = upgrade(binary, store, candidate_archive, candidate_pins[0],
-                                         candidate_pins[1], candidate_version, protected, service, audited=bool(args.candidate_package))
+                                         candidate_pins[1], candidate_version, protected, service, audited=bool(args.candidate_package or args.baseline_switch))
             report['repeat_upgrade'] = upgrade(binary, store, candidate_archive, candidate_pins[0],
-                                                candidate_pins[1], candidate_version, protected, service, audited=bool(args.candidate_package))
+                                                candidate_pins[1], candidate_version, protected, service, audited=bool(args.candidate_package or args.baseline_switch))
             stage = 'connect_policy'
             report['connect_refresh'] = refresh_connect_policy(root,service)
             report['repeat_connect_refresh'] = refresh_connect_policy(root,service)
@@ -224,7 +239,7 @@ StandardError=null
             report['connect_rollback'] = refresh_connect_policy(root,service,True)
             report['connect_original_bytes_restored'] = digest(config)==old_config
             report['rollback'] = rollback(binary, store, protected, service)
-            if args.candidate_package:
+            if args.candidate_package or args.baseline_switch:
                 cached=store/('audited-core-'+candidate_pins[1]+'.tar.gz')
                 report['audited_archive_private_and_preserved_after_rollback']=(cached.is_file() and
                     (cached.stat().st_mode & 0o777)==0o600 and digest(cached)==candidate_pins[0])

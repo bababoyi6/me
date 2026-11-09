@@ -107,6 +107,33 @@ telemt_binary_is_expected'''
             self.assertNotEqual(result.returncode,0)
             self.assertFalse((Path(folder)/'executed').exists())
 
+    def test_baseline_switch_binds_audited_archive_and_version_to_existing_transaction(self):
+        with tempfile.TemporaryDirectory() as folder:
+            body='''load_state() { TDH_ROLE=backend1; WG_INTERFACE=tdh-b1; LOCAL_WG_IP=10.77.1.2; return 0; }
+require_current_state() { :; }
+telemt_binary_is_expected() { return 0; }
+uname() { echo x86_64; }
+curl() { printf '%s\\n' "$@" > "$TDH_BASE/fetch"; }
+python3() { printf '%s\\n' "$@" > "$TDH_BASE/args"; cat >/dev/null; }
+manage_core upgrade --maintenance balanced2
+'''
+            result=self.shell(body,TDH_BASE=folder,TDH_BIN=folder+'/telemt',TDH_CONFIG_DIR=folder+'/config',TDH_STATE=folder+'/state')
+            self.assertEqual(result.returncode,0,result.stderr)
+            args=(Path(folder)/'args').read_text().splitlines()
+            self.assertEqual(args[1],'upgrade');self.assertIn('--audited',args)
+            for key,expected in (('--version',PINS['balanced2'][0]),('--archive-sha',PINS['balanced2'][1]),('--binary-sha',PINS['balanced2'][2])):
+                self.assertEqual(args[args.index(key)+1],expected)
+            self.assertIn('https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz',
+                (Path(folder)/'fetch').read_text().splitlines())
+
+    def test_baseline_switch_rejects_arm_and_missing_maintenance_before_mutation(self):
+        for arch,ack in (('aarch64','--maintenance'),('x86_64','')):
+            with self.subTest(arch=arch,ack=ack),tempfile.TemporaryDirectory() as folder:
+                result=self.shell('uname() { echo "$TEST_ARCH"; }; manage_core upgrade "$TEST_ACK" balanced2',
+                    TDH_BASE=folder,TEST_ARCH=arch,TEST_ACK=ack)
+                self.assertNotEqual(result.returncode,0)
+                self.assertEqual(list(Path(folder).iterdir()),[])
+
     def test_both_legacy_official_architectures_require_the_exact_binary(self):
         with tempfile.TemporaryDirectory() as folder:
             binary=Path(folder)/'telemt';binary.write_text('fixture');binary.chmod(0o755)

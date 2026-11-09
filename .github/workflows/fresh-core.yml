@@ -1,9 +1,11 @@
 name: Bounded fresh core selection
 on:
   workflow_dispatch:
-  push:
-    branches: [dev/telemt-stable-compat-20261107]
-    paths: [.github/workflows/fresh-core.yml]
+    inputs:
+      skip_selection:
+        description: Reuse completed install/40-stream selection proof when only baseline-switch code changed
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -28,8 +30,12 @@ jobs:
           curl -q -fL --connect-timeout 10 --max-time 90 --max-filesize 67108864 --proto '=https' --proto-redir '=https' --tlsv1.2 https://github.com/telemt/telemt/releases/download/3.5.17/telemt-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/official.tar.gz"
           printf '%s  %s\n' b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5 "$RUNNER_TEMP/balanced2.tar.gz" 0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e "$RUNNER_TEMP/official.tar.gz" | sha256sum --check
       - name: Verify default and explicit real install, both links, auth and refusal boundaries
+        if: inputs.skip_selection != true
         run: |
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-fresh-core-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=180 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- sh -c 'ip link set lo up; exec python3 tests/fresh_core_lab.py --balanced2-archive "$1/balanced2.tar.gz" --official-archive "$1/official.tar.gz" --output "$1/fresh-core/result.json"' lab "$RUNNER_TEMP"
+      - name: Verify official without upgrade history switches to baseline and back with real systemd
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-baseline-switch-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=180 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --stable-release 3.5.17 --stable-archive "$1/official.tar.gz" --balanced2-archive "$1/balanced2.tar.gz" --baseline-switch --output "$1/fresh-core/baseline-switch.json"' lab "$RUNNER_TEMP"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
