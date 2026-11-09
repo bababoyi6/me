@@ -4468,7 +4468,7 @@ core_panel() {
   esac
   warn "请先在入口排空本后端并确认备用健康；核心重启会中断本后端现有会话。"
   printf '已完成维护准备才输入 MAINTENANCE，其他输入取消：' >&2
-  read -r confirmation || return 0
+  read -r confirmation </dev/tty || return 0
   [[ $confirmation == MAINTENANCE ]] || { info "已取消核心维护。"; return 0; }
   case $PANEL_CHOICE in
     1) manage_core upgrade --maintenance balanced2 ;;

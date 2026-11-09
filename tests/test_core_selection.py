@@ -1,8 +1,12 @@
 """Fresh-install channel pins and existing-core compatibility through the real Bash functions."""
 import os
 from pathlib import Path
+import pty
+import select
+import signal
 import subprocess
 import tempfile
+import time
 import unittest
 
 SCRIPT=Path(__file__).resolve().parents[1]/'telemt-dual-hop.sh'
@@ -37,6 +41,32 @@ telemt_binary_is_expected'''
         env=dict(os.environ,TDH_SELECTION_SCRIPT=str(SCRIPT),**variables)
         return subprocess.run(['bash','-c','set -Eeuo pipefail\nTDH_SOURCE_ONLY=1 source "$TDH_SELECTION_SCRIPT"\n'+body],
                               env=env,capture_output=True,text=True,timeout=5)
+
+    def tty_shell(self,body,reply,**variables):
+        env=dict(os.environ,TDH_SELECTION_SCRIPT=str(SCRIPT),**variables)
+        pid,fd=pty.fork()
+        if pid==0:
+            try:
+                null=os.open('/dev/null',os.O_RDONLY);os.dup2(null,0);os.close(null)
+                os.execve('/bin/bash',['bash','-c','set -Eeuo pipefail\nTDH_SOURCE_ONLY=1 source "$TDH_SELECTION_SCRIPT"\n'+body],env)
+            finally:os._exit(127)
+        output=b'';status=None
+        try:
+            os.write(fd,(reply or '\x04').encode())
+            deadline=time.monotonic()+8
+            while time.monotonic()<deadline:
+                done,value=os.waitpid(pid,os.WNOHANG)
+                if done:status=value;break
+                if select.select([fd],[],[],.05)[0]:
+                    try:output+=os.read(fd,4096)
+                    except OSError:time.sleep(.01)
+                self.assertLess(len(output),65536)
+            self.assertIsNotNone(status,'owned PTY child deadline')
+            return os.waitstatus_to_exitcode(status),output.decode(errors='replace')
+        finally:
+            os.close(fd)
+            if status is None:
+                os.kill(pid,signal.SIGKILL);os.waitpid(pid,0)
 
     def test_default_and_explicit_fallback_bind_version_archive_binary_and_url(self):
         for channel in (None,'','official','balanced2','audit2'):
@@ -73,6 +103,9 @@ telemt_binary_is_expected'''
                 for actual_sha,accepted in ((sha,True),('0'*64,False)):
                     result=self.shell(body,TDH_BIN=str(binary),TEST_VERSION='telemt '+version,TEST_HASH=actual_sha)
                     self.assertEqual(result.returncode==0,accepted,(channel,result.stderr))
+                    printed=self.shell(body+' --print-version',TDH_BIN=str(binary),TEST_VERSION='telemt '+version,TEST_HASH=actual_sha)
+                    self.assertEqual(printed.returncode==0,accepted)
+                    self.assertEqual(printed.stdout.strip(),'telemt '+version if accepted else '')
 
     def test_arm_never_receives_the_x86_candidate(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -152,12 +185,12 @@ telemt_binary_is_expected''', TDH_BIN=str(binary),TEST_ARCH=arch,TEST_HASH=sha)
                 body='''load_state() { TDH_ROLE=backend1; return 0; }
 require_current_state() { :; }
 manage_core() { printf '%s' "$*" > "$TDH_BASE/called"; }
-printf '%b' "$TEST_REPLY" | core_panel
+core_panel
 '''
                 binary=Path(folder)/'unknown-core'
                 binary.write_text('#!/bin/sh\ntouch "$TDH_BASE/executed"\n');binary.chmod(0o755)
-                result=self.shell(body,TDH_BASE=folder,TDH_BIN=str(binary),TEST_REPLY=reply)
-                self.assertEqual(result.returncode,0,result.stderr)
+                code,output=self.tty_shell(body,reply,TDH_BASE=folder,TDH_BIN=str(binary))
+                self.assertEqual(code,0,output)
                 called=Path(folder)/'called'
                 self.assertEqual(called.read_text() if called.exists() else '',expected)
                 self.assertFalse((Path(folder)/'executed').exists())
