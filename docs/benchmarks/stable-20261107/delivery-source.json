@@ -4,8 +4,8 @@
   "branch": "dev/telemt-stable-compat-20261107",
   "files": {
     ".gitattributes": {
-      "bytes": 2282,
-      "sha256": "02d55759d20931dac3b37ece4c41148cae139645d70bbf15296361020b253118"
+      "bytes": 2342,
+      "sha256": "5aadbd6d93cdf70e029827dce7b7c41ae640eedee7eb3450ec3d8754d71cf56c"
     },
     ".github/workflows/arm-compat.yml": {
       "bytes": 2005,
@@ -66,6 +66,10 @@
     ".github/workflows/paired-performance.yml": {
       "bytes": 2611,
       "sha256": "10bc6713c1a851db1984e046339d23292d9324d946e4b69aca1bed3e530e1d88"
+    },
+    ".github/workflows/private-shaper.yml": {
+      "bytes": 3067,
+      "sha256": "f4eeca741043df025eda8442c56c9c0223bcf17d4ccb684506b766a6a5932e3a"
     },
     ".github/workflows/queue-study.yml": {
       "bytes": 3924,
@@ -304,8 +308,8 @@
       "sha256": "878ecea725fbe84a71784924f98171d49fd9abaf31d592f37976a5dcfe973411"
     },
     "tests/mixed_path_lab.py": {
-      "bytes": 13741,
-      "sha256": "d7e151caddd0ac090bf77f5f34d143d7c3444324e13bddfea3cdc0e9bf2b027c"
+      "bytes": 15965,
+      "sha256": "192ddba82c45e067e32466d9f28ca085516059ea230935ebc4d4f86c5c99669d"
     },
     "tests/mixed_workload.py": {
       "bytes": 6376,
@@ -343,6 +347,10 @@
       "bytes": 4340,
       "sha256": "a92fc89631e277ed617aaec9ed96651a342825c54f792e76dfe78961d83715c1"
     },
+    "tests/path_capacity.py": {
+      "bytes": 3153,
+      "sha256": "53a8bc4d0d405e6d96fc94dd0586bf21cfaf6c7aa9c649b7c92c4259f172ed08"
+    },
     "tests/persistent_relay_lab.py": {
       "bytes": 3407,
       "sha256": "06cdfcc4b9fada84a6f4ef00e8eca9fe78995663d289bcfa3ebcd99aff82c5e5"
@@ -351,13 +359,17 @@
       "bytes": 4748,
       "sha256": "b60ddca5f6803c2cb0ece1795b662b4f7af51a94b23d86babd8ebf614c72d9bd"
     },
+    "tests/private_shaper_analysis.py": {
+      "bytes": 4712,
+      "sha256": "c32496c293ab82fc7157988e0eed5056edc435f46ebb76cb454d301c502e823a"
+    },
     "tests/queue_analysis.py": {
       "bytes": 6466,
       "sha256": "f5ac0af1c254063bd15acc6164f76d7628e9b5f7b5800d21fe2e87ee977e3c9f"
     },
     "tests/queue_probe.py": {
-      "bytes": 3019,
-      "sha256": "9ad6ba9624138247c309508988988781d382a952d7821da5b6f99be5dd39db5b"
+      "bytes": 5481,
+      "sha256": "f47abd3e40ef2b65d088c8f9c838c462acd6c3fb7e742c1850a1c2ffd3a596b7"
     },
     "tests/relay-flush-regression/Cargo.lock": {
       "bytes": 2193,
@@ -579,6 +591,10 @@
       "bytes": 3711,
       "sha256": "1c71cec90fffaef070398319cbd467dcc1f20c8ae2c1484fe4b8c03d23e25675"
     },
+    "tests/test_path_capacity.py": {
+      "bytes": 1774,
+      "sha256": "a35083adff8effdce885f3227f8c9b8fb3268db67129e3baefda6e0538e477bc"
+    },
     "tests/test_payload_pacing.py": {
       "bytes": 1621,
       "sha256": "f9b15c8506d6f51b1ee57b189e988be3c6d8515785cb998b464b40d458888ac4"
@@ -586,6 +602,10 @@
     "tests/test_performance.py": {
       "bytes": 20516,
       "sha256": "dd24321df4c718cf55c3d56fb4d98e7ad1b56aad3932a7aebc17533f283f4fb3"
+    },
+    "tests/test_private_queue_snapshot.py": {
+      "bytes": 831,
+      "sha256": "f514e767c2c16041b83b38c7f00c1538e15299ca5a105293ccbf664eec6eadf3"
     },
     "tests/test_queue_analysis.py": {
       "bytes": 4435,
@@ -728,6 +748,6 @@
       "sha256": "e360fb048bd3e1d9a849e79664b43f7fca98321e185621fa259c7f4856419966"
     }
   },
-  "source_commit": "fbbfd3d43c1ddd803a895be6451a3d5c9f8d3da0",
+  "source_commit": "1afeccba0ee6887d7f9443b0b3adc5e5749e13d4",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }

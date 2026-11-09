@@ -167,6 +167,10 @@
     "bytes": 144,
     "sha256": "3fc7d67e294353dd1a34221242f99f79b04b1ab7a43c457a64a38a6005e9fd33"
   },
+  "new-commits-secrets.json": {
+    "bytes": 324,
+    "sha256": "aa4dff2156669f9d1403f792baf96a2391f482e462c64f7b87be1d802192100a"
+  },
   "qualification.json": {
     "bytes": 7438,
     "sha256": "85b032dae8e593a32f13834528079a9c2eb51d914ef0355f11928f6abaa0535d"
