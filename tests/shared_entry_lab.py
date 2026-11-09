@@ -51,7 +51,12 @@ def second_tunnel(net):
         endpoint=('endpoint','198.51.100.6:51822','persistent-keepalive','25') if index==0 else ()
         command('ip','netns','exec',where,'wg','set',dev,'listen-port','51822','private-key',str(keys[index][0]),
             'peer',keys[1-index][1],'allowed-ips',f'10.77.2.{2-index}/32',*endpoint)
-        command('ip','-n',where,'link','set',dev,'mtu','1420','up')
+        command('ip','-n',where,'link','set',dev,'mtu','1420')
+    # Bring up the listening endpoint before the initiating entry. Otherwise
+    # PersistentKeepalive can send the initial handshake while B2 does not yet
+    # exist, and a short readiness ping expires inside WG's 5-second retry.
+    command('ip','-n',ns,'link','set','wg-lab','up')
+    command('ip','-n',NAMES[0],'link','set','wg-lab2','up')
     result=subprocess.run(['ip','netns','exec',NAMES[0],'ping','-n','-c','2','-W','2','10.77.2.2'],capture_output=True,text=True,timeout=8)
     if result.returncode:
         diagnostic={'ping':result.stdout,'routes':{},'wg':{},'underlay':underlay,'router_settings':settings,'key_binding':{}}
