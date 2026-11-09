@@ -1256,6 +1256,9 @@ manage_core() {
     esac
     url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
     info "目标 Telemt ${TELEMT_VERSION}，提交 ${TELEMT_COMMIT}；保留配置与链接。"
+    if [[ $asset == telemt-x86_64-linux-gnu.tar.gz ]]; then
+      warn "官方核心在已验证的高 RTT 单流场景存在吞吐退化；兼容升级不等于提速，原核心按事务备份。"
+    fi
     tmp=$(mktemp -d "${TDH_BASE}/core-fetch.XXXXXX")
     if ! curl -q -fL --retry 2 --connect-timeout 10 --max-time 120 --max-filesize 67108864 \
         --proto '=https' --proto-redir '=https' --tlsv1.2 "$url" -o "${tmp}/core.tar.gz"; then
@@ -2655,7 +2658,9 @@ queue_panel() {
 
 select_amd64_core() {
   local version expected binary_sha url
-  case ${TDH_NEW_INSTALL_CORE:-official} in
+  # Preserve the released high-RTT baseline until a newer core passes the
+  # joint throughput/latency gate; latest-compatible is not latest-by-default.
+  case ${TDH_NEW_INSTALL_CORE:-balanced2} in
     official)
       version=$TELEMT_VERSION expected=$TELEMT_SHA256_AMD64
       binary_sha=$TELEMT_BINARY_SHA256_AMD64
@@ -2680,6 +2685,9 @@ download_telemt() {
       mode=audited
       [[ $version != "$TELEMT_VERSION" ]] || mode=official
       info "安装固定版本 Telemt ${version}（${mode}）。"
+      if [[ $mode == official ]]; then
+        warn "官方 ${version} 在已验证的高 RTT 单流场景存在吞吐退化；x86_64 默认稳定基线为 balanced2。"
+      fi
       ;;
     aarch64|arm64)
       [[ ${TDH_NEW_INSTALL_CORE:-official} == official ]] || die "自选核心仅支持 x86_64；ARM 使用官方核心。"

@@ -39,13 +39,16 @@ telemt_binary_is_expected'''
                               env=env,capture_output=True,text=True,timeout=5)
 
     def test_default_and_explicit_fallback_bind_version_archive_binary_and_url(self):
-        for channel in ('','official','balanced2','audit2'):
-            result=self.shell('select_amd64_core',TDH_NEW_INSTALL_CORE=channel)
+        for channel in (None,'','official','balanced2','audit2'):
+            if channel is None:
+                result=self.shell('unset TDH_NEW_INSTALL_CORE; select_amd64_core')
+            else:
+                result=self.shell('select_amd64_core',TDH_NEW_INSTALL_CORE=channel)
             self.assertEqual(result.returncode,0,result.stderr)
             asset,version,archive,binary,url=result.stdout.strip().split('\t')
-            expected=PINS[channel or 'official']
+            expected=PINS[channel or 'balanced2']
             self.assertEqual((version,archive,binary),expected)
-            if channel in ('', 'official'):
+            if channel=='official':
                 self.assertEqual(asset,'telemt-x86_64-linux-gnu.tar.gz')
                 self.assertEqual(url,f'https://github.com/telemt/telemt/releases/download/{version}/{asset}')
                 continue
@@ -77,6 +80,18 @@ telemt_binary_is_expected'''
                               TDH_NEW_INSTALL_CORE='balanced2',TDH_BASE=folder,TDH_BIN=folder+'/telemt')
             self.assertNotEqual(result.returncode,0)
             self.assertEqual(list(Path(folder).iterdir()),[])
+
+    def test_arm_default_download_stays_official_for_unset_and_empty_selection(self):
+        for channel in (None,''):
+            with self.subTest(channel=channel),tempfile.TemporaryDirectory() as folder:
+                body='''uname() { echo aarch64; }
+curl() { printf '%s\\n' "$@" > "$TDH_BASE/fetch"; return 1; }
+'''+('unset TDH_NEW_INSTALL_CORE\n' if channel is None else 'export TDH_NEW_INSTALL_CORE=\n')+'download_telemt'
+                result=self.shell(body,TDH_BASE=folder,TDH_BIN=folder+'/telemt')
+                self.assertNotEqual(result.returncode,0)
+                self.assertIn('https://github.com/telemt/telemt/releases/download/3.5.17/telemt-aarch64-linux-gnu.tar.gz',
+                              (Path(folder)/'fetch').read_text().splitlines())
+                self.assertEqual(sorted(p.name for p in Path(folder).iterdir()),['fetch'])
 
     def test_unknown_or_writable_existing_core_is_never_executed(self):
         with tempfile.TemporaryDirectory() as folder:
