@@ -59,3 +59,30 @@ def configure_wg_fq(enabled,original):
             command('ip','-n',namespace,'link','set','dev','wg-lab','txqueuelen',str(before['txqlen']))
             if any(q.get('root') and q['kind']=='fq' for q in current):
                 command('ip','netns','exec',namespace,'tc','qdisc','del','dev','wg-lab','root')
+
+
+def configure_private_shaper(enabled, original):
+    """One preregistered CI counterfactual: 180Mbps before 200Mbps encapsulation.
+
+    Only fresh, owned private WG links; never a production tuning command.
+    Keep flow visibility before encryption instead of shortening netem delay.
+    """
+    if os.geteuid()!=0 or os.environ.get('GITHUB_ACTIONS')!='true':
+        raise RuntimeError('owned CI network required')
+    for namespace in (NAMES[0],NAMES[2]):
+        if original[namespace]['kind']!='noqueue':
+            raise RuntimeError('shaper study requires fresh noqueue WireGuard links')
+        current=json.loads(command('ip','netns','exec',namespace,'tc','-j','qdisc','show','dev','wg-lab'))
+        roots=[q for q in current if q.get('root')]
+        if len(roots)!=1 or roots[0]['kind'] not in ('noqueue','htb'):
+            raise RuntimeError('refusing to replace unknown private queue')
+        if roots[0]['kind']=='htb':
+            command('ip','netns','exec',namespace,'tc','qdisc','del','dev','wg-lab','root')
+        if enabled:
+            command('ip','-n',namespace,'link','set','dev','wg-lab','txqueuelen','1000')
+            command('ip','netns','exec',namespace,'tc','qdisc','add','dev','wg-lab','root','handle','1:','htb','default','10')
+            command('ip','netns','exec',namespace,'tc','class','add','dev','wg-lab','parent','1:','classid','1:10',
+                'htb','rate','180mbit','ceil','180mbit','quantum','1514')
+            command('ip','netns','exec',namespace,'tc','qdisc','add','dev','wg-lab','parent','1:10','handle','10:','fq_codel')
+        else:
+            command('ip','-n',namespace,'link','set','dev','wg-lab','txqueuelen',str(original[namespace]['txqlen']))
