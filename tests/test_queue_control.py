@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from queue_control import KernelQueue, QueueControl, QueueError, policy, encoded, durable, read_file
+from queue_control import KernelQueue, QueueControl, QueueError, policy, encoded, durable, read_file, publish_new
 
 
 class QueuePolicyTests(unittest.TestCase):
@@ -52,6 +52,16 @@ class QueueStateTests(unittest.TestCase):
         self.assertEqual(self.control.status(),{'enabled':False})
         self.assertFalse(self.control.directory.exists())
         self.assertFalse(self.control.dropin.exists())
+
+    def test_publish_is_single_link_and_never_replaces_a_concurrent_target(self):
+        source=self.root/'source';source.write_bytes(b'original');source.chmod(0o600)
+        target=self.root/'published'
+        publish_new(source,target)
+        self.assertFalse(source.exists());self.assertEqual(target.stat().st_nlink,1)
+        source.write_bytes(b'changed');source.chmod(0o600)
+        with self.assertRaises(FileExistsError):publish_new(source,target)
+        self.assertEqual(read_file(target),b'original')
+        self.assertEqual(source.read_bytes(),b'changed')
 
     def test_ordinary_apply_failure_restores_disabled_persistence(self):
         with patch.object(self.control.kernel,'fresh',return_value=True),patch('queue_control.run'),\

@@ -78,6 +78,23 @@ TasksMax=64
             except qc.QueueError:pass
         report['checks']['partial_failure_rolled_back']=(control.kernel.fresh() and
             control.kernel.link()['txqlen']==report['initial_link']['txqlen'] and not control.config.exists() and not dropin.exists())
+        stage='publication_crash'
+        publish_child='''import os,signal,sys
+sys.path.insert(0,sys.argv[1])
+import queue_control as q
+actual=q.publish_new
+def die_after_publish(source,target):
+    actual(source,target)
+    os.kill(os.getpid(),signal.SIGKILL)
+q.publish_new=die_after_publish
+c=q.QueueControl(sys.argv[2],'tdh-b1',sys.argv[3],sys.argv[4])
+c.enable(180,200)
+'''
+        killed=subprocess.run(['python3','-c',publish_child,str(root),str(root/'queue'),str(manager),str(dropin)],capture_output=True,timeout=20)
+        report['checks']['publication_crash_resumable']=(killed.returncode==-signal.SIGKILL and
+            control.config.stat().st_nlink==1 and qc.read_file(control.config)==qc.encoded(qc.policy('tdh-b1',180,200)) and
+            control.enable(180,200)=='applied' and control.status()['active'])
+        control.disable()
         stage='crash_resume'
         child='''import os,signal,sys
 sys.path.insert(0,sys.argv[1])

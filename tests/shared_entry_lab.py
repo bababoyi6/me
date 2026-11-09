@@ -43,7 +43,16 @@ def second_tunnel(net):
         command('ip','netns','exec',where,'wg','set',dev,'listen-port','51822','private-key',str(keys[index][0]),
             'peer',keys[1-index][1],'allowed-ips',f'10.77.2.{2-index}/32',*endpoint)
         command('ip','-n',where,'link','set',dev,'mtu','1420','up')
-    command('ip','netns','exec',NAMES[0],'ping','-n','-c','2','-W','2','10.77.2.2',timeout=8)
+    result=subprocess.run(['ip','netns','exec',NAMES[0],'ping','-n','-c','2','-W','2','10.77.2.2'],capture_output=True,text=True,timeout=8)
+    if result.returncode:
+        diagnostic={'ping':result.stdout,'routes':{},'wg':{}}
+        for where in (NAMES[0],NAMES[1],ns):
+            diagnostic['routes'][where]=command('ip','-n',where,'route','show')
+        for where,dev in ((NAMES[0],'wg-lab2'),(ns,'wg-lab')):
+            diagnostic['wg'][where]={key:[row.split()[1:] for row in command('ip','netns','exec',where,'wg','show',dev,key).splitlines()]
+                for key in ('latest-handshakes','transfer')}
+        print(json.dumps({'second_tunnel_diagnostic':diagnostic}),flush=True)
+        raise RuntimeError('second WG setup failed before shared queue/load; diagnostics contain no keys')
 
 
 class Worker:

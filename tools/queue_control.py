@@ -6,6 +6,7 @@ Failure of the optional hook must not fail the tunnel or Telemt dependency.
 """
 import argparse
 from contextlib import contextmanager
+import ctypes
 from decimal import Decimal
 import fcntl
 import hashlib
@@ -57,9 +58,21 @@ def durable(path, data, mode=0o600):
         with os.fdopen(fd,'wb') as stream:
             stream.write(data);os.fchmod(stream.fileno(),mode);stream.flush();os.fsync(stream.fileno())
         if exists:os.replace(name,path)
-        else:os.link(name,path)
+        else:publish_new(name,path)
         sync(path.parent)
     finally:Path(name).unlink(missing_ok=True)
+
+
+def publish_new(source,target):
+    # link()+unlink() leaves nlink=2 on SIGKILL between the two operations;
+    # read_file must then reject our own published recovery file. Linux's
+    # atomic no-replace rename preserves both exclusivity and nlink=1.
+    rename=ctypes.CDLL(None,use_errno=True).renameat2
+    rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint)
+    rename.restype=ctypes.c_int
+    if rename(-100,os.fsencode(source),-100,os.fsencode(target),1)!=0:
+        code=ctypes.get_errno()
+        raise OSError(code,os.strerror(code))
 
 
 def sync(path):
