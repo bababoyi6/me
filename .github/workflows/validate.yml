@@ -33,7 +33,7 @@ jobs:
           shellcheck -x -S style legacy/telemt-dual-hop-1.3.1.sh
           sudo timeout 30 bash legacy/telemt-dual-hop-1.3.1.sh --self-test
       - name: Check Python tools
-        run: python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check && python3 tools/embed_core_upgrade.py --check
+        run: python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check && python3 tools/embed_core_upgrade.py --check && python3 tools/embed_queue.py --check
       - name: Test diagnostics, configuration and rollback
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Run complete bounded root regression in disposable CI

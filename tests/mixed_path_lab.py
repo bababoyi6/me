@@ -38,6 +38,8 @@ def main(args):
     rtt,rate,loss=PROFILES[args.profile]
     queue_screen=getattr(args,'queue_screen',False)
     queue_core=getattr(args,'queue_core','balanced2')
+    managed=getattr(args,'managed_backend_queue',False)
+    if managed and not queue_screen:raise RuntimeError('managed backend queue requires registered screening mode')
     if queue_screen and (args.client_diagnostic or args.profile!='rtt100'):
         raise RuntimeError('shaper screen is registered only for the 100ms mixed workload')
     output=Path(args.output)
@@ -50,10 +52,11 @@ def main(args):
     if args.client_diagnostic:
         report['scope']='one client TCP_NODELAY variable; sequential new FakeTLS+1KiB/ACK, four AB/BA rounds per pinned core; no bulk/idle workload or throughput claim'
     if queue_screen:
-        report['plan']='private-shaper-screen-v1'
+        report['plan']='managed-backend-screen-v1' if managed else 'private-shaper-screen-v1'
         report['queue_core']=queue_core
         report['queue_telemetry']='plain-tc-v2'
         report['scope']='one pinned core only; four AB/BA mixed pairs, 30 logical connections; pre-encryption 180Mbps HTB/fq_codel versus unchanged 200Mbps WAN'
+        if managed:report['scope']='exact opt-in controller on backend WG only; entry unchanged; four AB/BA mixed pairs, 30 logical connections'
     children=[];net=None;front=None;dc=None;expected=0
     write(output,report)
     try:
@@ -78,12 +81,25 @@ def main(args):
             capacity_controls(net,rate,report['controls'])
             if queue_screen and any(c['mbps']<rate*.5 for c in report['controls']):
                 raise RuntimeError('capacity control below unchanged 100Mbps gate; no screening load permitted')
-            wg_original=original_wg_policy() if queue_screen else None
+            wg_original=original_wg_policy() if queue_screen and not managed else None
+            def configure_queue(enabled):
+                if managed:
+                    command('ip','netns','exec',NAMES[2],'python3',str(Path(__file__).with_name('managed_queue_worker.py')),
+                        str(root),'enable' if enabled else 'disable',timeout=30)
+                else:configure_private_shaper(enabled,wg_original)
+            def snapshot_queue():
+                if managed:
+                    return {NAMES[2]:{kind:command('ip','netns','exec',NAMES[2],
+                        'tc','-s','-d',kind,'show','dev','tdh-b1') for kind in ('qdisc','class')}}
+                return private_wg_snapshot()
+            if managed:
+                command('ip','-n',NAMES[2],'link','set','dev','wg-lab','name','tdh-b1')
+                manager=root/'managed-manager';manager.write_bytes((Path(__file__).resolve().parents[1]/'telemt-dual-hop.sh').read_bytes());manager.chmod(0o755)
             if queue_screen:
-                report['initial_wireguard']=private_wg_snapshot()
-                configure_private_shaper(True,wg_original)
-                report['shaped_preflight']=private_wg_snapshot()
-                configure_private_shaper(False,wg_original)
+                report['initial_wireguard']=snapshot_queue()
+                configure_queue(True)
+                report['shaped_preflight']=snapshot_queue()
+                configure_queue(False)
             dc=Child('dc',NAMES[2],dc_cpu,{'mixed':True},children)
             client=Child('client',NAMES[0],frontend_cpu,{},children)
             config=root/'haproxy.cfg'
@@ -138,9 +154,9 @@ backend line_b
                         for position,cohort in enumerate(cohorts):
                             shaped=bool(position if turn%2==0 else 1-position)
                             if queue_screen:
-                                configure_private_shaper(shaped,wg_original)
+                                configure_queue(shaped)
                                 time.sleep(1)
-                                queue_before=private_wg_snapshot()
+                                queue_before=snapshot_queue()
                             group_cpu_before=resources()['cpu']['usage_usec']
                             ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
                             snapshots={k:stats(pid) for k,pid in ids.items()}
@@ -177,12 +193,12 @@ backend line_b
                                 report['rows'][-1]['queue_policy']='shaped180' if shaped else 'original'
                                 report['rows'][-1]['group_cpu_seconds']=(resources()['cpu']['usage_usec']-group_cpu_before)/1e6
                                 report['rows'][-1]['wireguard_before']=queue_before
-                                report['rows'][-1]['wireguard_after']=private_wg_snapshot()
+                                report['rows'][-1]['wireguard_after']=snapshot_queue()
                             write(output,report)
                             if not result['complete'] or result['errors']:raise RuntimeError('mixed integrity or completion failure')
                             expected+=result['dc_connections']
                             if queue_screen:
-                                configure_private_shaper(False,wg_original)
+                                configure_queue(False)
                                 time.sleep(1)
                         time.sleep(2)
                         idle_after=stats(backend.ready['pid'])
@@ -225,5 +241,6 @@ if __name__=='__main__':
     parser.add_argument('--client-diagnostic',action='store_true')
     parser.add_argument('--queue-screen',action='store_true')
     parser.add_argument('--queue-core',choices=('balanced2','native17'),default='balanced2')
+    parser.add_argument('--managed-backend-queue',action='store_true')
     signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
     raise SystemExit(main(parser.parse_args()))
