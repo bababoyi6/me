@@ -772,6 +772,6 @@
       "sha256": "e360fb048bd3e1d9a849e79664b43f7fca98321e185621fa259c7f4856419966"
     }
   },
-  "source_commit": "60fa707e8a6de9da8873bdbd45088cde283c4349",
+  "source_commit": "c79afe2067d4f8f41e6d325866873b8cd0499778",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }
