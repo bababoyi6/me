@@ -353,7 +353,7 @@ backend telemt
     def identity(self):
         return {"user": self.uid, "group": self.gid, "extra_groups": []} if os.geteuid() == 0 else {}
 
-    def transfer(self, domain, direction, size, rate, direct=False, fragment=False, io_timeout=8, persistent=False, read_pause=0, receive_buffer=0, send_buffer=0):
+    def transfer(self, domain, direction, size, rate, direct=False, fragment=False, io_timeout=8, persistent=False, read_pause=0, receive_buffer=0, send_buffer=0, client_nodelay=False):
         if self.real_dc:
             raise ValueError("synthetic file operations are confined to the mock DC")
         if not 2 <= io_timeout <= 30:
@@ -364,12 +364,17 @@ backend telemt
             raise ValueError("bounded lab receive buffer required")
         if send_buffer not in (0,262144):
             raise ValueError('bounded lab send buffer required')
+        if type(client_nodelay) is not bool:
+            raise ValueError('explicit lab client socket policy required')
         started = time.monotonic()
         phase, observed = "connect", None
         client_port = None
         try:
             with socket.create_connection(("127.0.0.1", self.listen if direct else self.front), timeout=8) as sock:
                 client_port = sock.getsockname()[1]
+                if client_nodelay:
+                    sock.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
+                actual_nodelay=sock.getsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY)
                 if receive_buffer:
                     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, receive_buffer)
                 if send_buffer:
@@ -408,7 +413,7 @@ backend telemt
         return {"direction": direction, "domain_index": list(SECRETS).index(domain) + 1,
                 "path": "telemt" if direct else "haproxy-telemt", "bytes": size,
                 "elapsed_seconds": time.monotonic() - started, "handshake_ms": (ready - started) * 1000,
-                "sha256_verified": True, "persistent_dc": persistent}
+                "sha256_verified": True, "persistent_dc": persistent,"client_nodelay":actual_nodelay}
 
     def real_probe(self, dc=2):
         if not self.real_dc:
