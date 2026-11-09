@@ -1,0 +1,8 @@
+{
+  "42589798524/managed-queue/metrics.json": {
+    "bytes": 1852861,
+    "sha256": "53a2de3334558c0a7bbb9511d1aefdd6db3ceda8015750f15a35f557fa8faa84",
+    "gzip_path": "42589798524/managed-queue/metrics.json.gz",
+    "gzip_sha256": "b1406add6595db4687f0344b0b06cd009db77bbc10dbb2ee113c572d26ce5293"
+  }
+}

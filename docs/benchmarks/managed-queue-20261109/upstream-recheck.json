@@ -1,0 +1,9 @@
+{
+  "tag_name": "3.5.17",
+  "published_at": "2026-11-08T12:08:51Z",
+  "target_commitish": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+  "html_url": "https://github.com/telemt/telemt/releases/tag/3.5.17",
+  "checked_date": "2026-11-09",
+  "filter": "not draft and not prerelease; maximum published_at",
+  "core_changed": false
+}

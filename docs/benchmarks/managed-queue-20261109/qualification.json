@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "production_approval": false,
+  "model_gate_pass": false,
+  "feature": "backend queue controller; explicit experimental + maintenance; default off",
+  "measurement_run": 42589798524,
+  "measurement_source_commit": "fa0541d76da406ff0933479c1d4cef03232b30ab",
+  "plan": "managed-backend-screen-v1",
+  "pairs": [
+    {
+      "round": 1,
+      "download_ratio": 0.9563815706826277,
+      "upload_ratio": 2.160490047448252,
+      "message_p95_ratio": 0.4389495858245899,
+      "new_connection_p95_ratio": 0.5255583819292933,
+      "rss_ratio": 1.0279605263157894,
+      "group_cpu_seconds_ratio": 0.9807521849108617,
+      "eligible": true,
+      "absolute_queue_budget_ok": false,
+      "joint_gain": false
+    },
+    {
+      "round": 2,
+      "download_ratio": 0.9574324254031621,
+      "upload_ratio": 2.2943830616341345,
+      "message_p95_ratio": 0.5157977348296414,
+      "new_connection_p95_ratio": 0.5535210430866703,
+      "rss_ratio": 0.9545855379188712,
+      "group_cpu_seconds_ratio": 0.9816851826561763,
+      "eligible": true,
+      "absolute_queue_budget_ok": false,
+      "joint_gain": false
+    },
+    {
+      "round": 3,
+      "download_ratio": 0.9602459143828692,
+      "upload_ratio": 1.9464221062404288,
+      "message_p95_ratio": 0.4331249419333526,
+      "new_connection_p95_ratio": 0.471618039911009,
+      "rss_ratio": 1.0589238641649867,
+      "group_cpu_seconds_ratio": 0.9929145173935118,
+      "eligible": true,
+      "absolute_queue_budget_ok": false,
+      "joint_gain": false
+    },
+    {
+      "round": 4,
+      "download_ratio": 0.9540411374307933,
+      "upload_ratio": 2.1133677453878548,
+      "message_p95_ratio": 0.42872413258219577,
+      "new_connection_p95_ratio": 0.5197448599875822,
+      "rss_ratio": 0.9434288181949043,
+      "group_cpu_seconds_ratio": 0.9977330346483522,
+      "eligible": true,
+      "absolute_queue_budget_ok": false,
+      "joint_gain": false
+    }
+  ],
+  "summary": {
+    "original": {
+      "D_mbps": 139.86844708395904,
+      "U_mbps": 34.12753193297748,
+      "peak_backend_rss": 27631616.0,
+      "group_cpu_seconds": 1.6505415,
+      "message_p95_ms": 299.23240549999264,
+      "new_connection_p95_ms": 1054.2885165000087
+    },
+    "shaped180": {
+      "D_mbps": 133.7033296966112,
+      "U_mbps": 72.95712654310339,
+      "peak_backend_rss": 27408384.0,
+      "group_cpu_seconds": 1.6376115,
+      "message_p95_ms": 130.42224949998626,
+      "new_connection_p95_ms": 552.465442500008
+    }
+  },
+  "counts": {
+    "files": 40,
+    "new_connections": 384,
+    "recorded_messages": 448,
+    "loaded_messages": 288,
+    "dc_sessions": 608
+  },
+  "capacity": [
+    {
+      "direction": "U",
+      "mbps": 183.12356021885574,
+      "receiver_local": true
+    },
+    {
+      "direction": "D",
+      "mbps": 183.12597276143012,
+      "receiver_local": true
+    }
+  ],
+  "binary_sha256": {
+    "balanced2": "5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100",
+    "official17": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+    "native17": "cd4c5ff500d956a8a7059e3e536ff139983a0c5897b4c410ea0e53c68a6cfa14"
+  },
+  "metrics_sha256": "53a2de3334558c0a7bbb9511d1aefdd6db3ceda8015750f15a35f557fa8faa84",
+  "group_peak_mib": 349.23828125,
+  "oom_delta": {
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "cleanup_pass": true,
+  "lifecycle": {
+    "run": 42592010385,
+    "source_commit": "532d7b68e1736d162b0f6c485438d8edca6a44b2",
+    "checks": {
+      "default_off": true,
+      "repeat_no_reset": true,
+      "active": true,
+      "drift_preserved": true,
+      "partial_failure_rolled_back": true,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "wg_recreated_and_policy_restored": true,
+      "hook_failure_keeps_wg_up": true,
+      "hung_hook_keeps_wg_up": true,
+      "disable_crash_injected": true,
+      "disable_crash_resumed": true,
+      "hook_drift_preserved": true,
+      "failed_disable_cannot_reenable": true,
+      "disable_idempotent": true,
+      "foreign_queue_preserved": true,
+      "wg_key_bytes_unchanged": true,
+      "state_private": true
+    },
+    "hook_timeout_seconds": 12.179179286000007,
+    "cleanup_pass": true
+  },
+  "root_validation": {
+    "run": 42592016609,
+    "source_commit": "532d7b68e1736d162b0f6c485438d8edca6a44b2",
+    "checkout_commit": "9cece9d0402dd7996ee5e5e666e80b25d95c311b",
+    "tree_equal": true,
+    "count": 316,
+    "seconds": 17.354,
+    "skipped": 0
+  },
+  "failed_runs": [
+    42589395708,
+    42589402901
+  ],
+  "method": "Display per-batch p95 medians; qualify every preregistered pair; no changed thresholds or discarded failures",
+  "not_run": [
+    "entry shared bandwidth budget",
+    "1Gbps queue",
+    "0/200ms queue",
+    "loss/jitter queue",
+    "50/100 logical queue",
+    "ARM queue lifecycle",
+    "full VM reboot with new drop-in",
+    "real Telegram clients",
+    "public three-VPS",
+    "24h endurance",
+    "anti-blocking"
+  ]
+}

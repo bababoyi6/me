@@ -1,0 +1,12 @@
+validate	Run ShellCheck	﻿2026-11-09T08:55:21.9984790Z ##[group]Run shellcheck -x -S style telemt-dual-hop.sh tests/fixtures/*.sh
+validate	Run ShellCheck	2026-11-09T08:55:21.9985354Z ^[[36;1mshellcheck -x -S style telemt-dual-hop.sh tests/fixtures/*.sh^[[0m
+validate	Run ShellCheck	2026-11-09T08:55:22.0043365Z shell: /usr/bin/bash -e {0}
+validate	Run ShellCheck	2026-11-09T08:55:22.0043612Z ##[endgroup]
+validate	Run ShellCheck	2026-11-09T08:55:23.8790776Z 
+validate	Run ShellCheck	2026-11-09T08:55:23.8791314Z In telemt-dual-hop.sh line 4525:
+validate	Run ShellCheck	2026-11-09T08:55:23.8792402Z     (( $# == 2 )) && [[ $2 == apply || $2 == remove ]] || die "内部队列钩子参数无效。"
+validate	Run ShellCheck	2026-11-09T08:55:23.8793182Z                   ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+validate	Run ShellCheck	2026-11-09T08:55:23.8793623Z 
+validate	Run ShellCheck	2026-11-09T08:55:23.8794133Z For more information:
+validate	Run ShellCheck	2026-11-09T08:55:23.8794833Z   https://www.shellcheck.net/wiki/SC2015 -- Note that A && B || C is not if-t...
+validate	Run ShellCheck	2026-11-09T08:55:23.8864440Z ##[error]Process completed with exit code 1.

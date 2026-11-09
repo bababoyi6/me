@@ -75,6 +75,12 @@ HAProxy 使用 master-worker USR2 校验后重载，旧 worker 排空原连接�
 
 后端 Direct-DC 显式使用 4 秒单次、两次尝试、9000ms 总连接预算。它允许弱网重传和有限重试，不改变入口或隧道，不保证所有客户端都会等待完整预算。严重故障时新连接可能等待更久；已建立 TCP 不因这些参数获得迁移能力。新安装默认生成，旧配置仅由显式维护命令迁移，且可原字节回退。证据见配对报告中的确定性 SYN 延迟与 2400 条弱网传输。
 
-## WEB 模式结论
+## 可选队列实验的边界
+
+正常安装不创建队列或启动钩子。新后端单隧道实验只在显式预算、`--experimental --maintenance`下应用HTB/fq_codel，入口双WG尚无共享整机预算方案，因此拒绝入口启用。没有新增协议层、守护进程、全局sysctl或公网端口。仅后端模式虽改善上传/消息延迟，新连接绝对预算仍失败，不作为生产优化推荐。
+
+队列状态使用独立root私有锁与耐久日志；原txqueuelen按实际快照恢复，已有自定义队列/配置漂移拒绝覆盖。WG专用systemd drop-in钩子有12秒截止、2秒强杀及失败忽略，不修改WG密钥/配置；18项真实WG检查已验证崩溃/重建/限时恢复，尚未验证新钩子的整机重启或ARM。已有TCP不能跨后端迁移，队列变更也不是无损承诺。详见[实现和失败门槛](MANAGED-QUEUE-20261109.md)。
+
+## WEB 模式结论（保持关闭）
 
 维持关闭。WEB 需要 TLS 终止、HTTP listener、Carrier 与对应客户端支持，和当前原生 Fake TLS TCP 透传是不同入口。官方要求 WEB listener `proxy_protocol=false`；不能把 `send-proxy-v2` 原样接到 WEB listener。没有 Desktop/Android/iOS 实机证据，因此本分支不生成 WEB listener，不生成 WEB 链接，也不修改旧原生链接。

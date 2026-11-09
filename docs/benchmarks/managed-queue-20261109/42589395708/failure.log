@@ -1,0 +1,13 @@
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	﻿2026-11-09T08:55:19.4953952Z ##[group]Run sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-queue-life-${GITHUB_RUN_ID}" -p CPUQuota=200% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=240 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; exec python3 tests/queue_control_lab.py --output "$1"' queue "$RUNNER_TEMP/queue-lifecycle/result.json"
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:19.4956292Z ^[[36;1msudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-queue-life-${GITHUB_RUN_ID}" -p CPUQuota=200% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=240 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; exec python3 tests/queue_control_lab.py --output "$1"' queue "$RUNNER_TEMP/queue-lifecycle/result.json"^[[0m
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:19.5014482Z shell: /usr/bin/bash -e {0}
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:19.5014758Z ##[endgroup]
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2488434Z Traceback (most recent call last):
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2489091Z   File "/home/runner/work/me/me/tests/queue_control_lab.py", line 155, in <module>
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2489586Z     raise SystemExit(main(args.output))
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2490060Z   File "/home/runner/work/me/me/tests/queue_control_lab.py", line 59, in main
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2490590Z     control.enable(180,200);first=control.journal.read_bytes()
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2491090Z   File "/home/runner/work/me/me/tools/queue_control.py", line 266, in enable
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2492017Z     elif not self.kernel.fresh():raise QueueError('接口未就绪或已有自定义队列；未接管')
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2492703Z queue_control.QueueError: 接口未就绪或已有自定义队列；未接管
+lifecycle	Real wg-quick hooks, crash recovery and drift rejection	2026-11-09T08:55:20.2729779Z ##[error]Process completed with exit code 1.

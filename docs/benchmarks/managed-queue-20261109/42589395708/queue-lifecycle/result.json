@@ -1,0 +1,73 @@
+{
+  "source_commit": "2c3bf83f596773392384d2bfbc7f8c005392e613",
+  "accepted": false,
+  "checks": {
+    "default_off": false
+  },
+  "resources_before": {
+    "memory_current": 17027072,
+    "memory_peak": 17027072,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 83220,
+      "user_usec": 58154,
+      "system_usec": 25066,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 2,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "536870912",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "controller_sha256": "af480d004b081c5f09df74c929e690fd049d0d24c38ba1f0cfd38519d3268610",
+  "failure": {
+    "stage": "enable_repeat",
+    "type": "QueueError",
+    "message": "\u63a5\u53e3\u672a\u5c31\u7eea\u6216\u5df2\u6709\u81ea\u5b9a\u4e49\u961f\u5217\uff1b\u672a\u63a5\u7ba1"
+  },
+  "private_keys_removed": true,
+  "cleanup_errors": [],
+  "resources_after": {
+    "memory_current": 17416192,
+    "memory_peak": 18800640,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 118458,
+      "user_usec": 69188,
+      "system_usec": 49270,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 7,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "536870912",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "oom_delta": {
+    "oom": 0,
+    "oom_kill": 0
+  }
+}
