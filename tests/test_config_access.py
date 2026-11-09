@@ -5,6 +5,7 @@ import io
 import os
 from pathlib import Path
 import subprocess
+import signal
 import sys
 import tempfile
 import tarfile
@@ -54,6 +55,26 @@ class ConfigAccessTests(unittest.TestCase):
         # Simulate a crash after the record was saved but before chmod.
         self.base.chmod(0o710)
         self.assertTrue(self.access.prepare())
+
+    def test_record_publication_sigkill_remains_single_link_and_resumable(self):
+        code='''import os,signal,sys
+sys.path.insert(0,sys.argv[1])
+import core_upgrade as m
+actual=m.publish_new
+def stop_after_publication(source,target):
+    actual(source,target)
+    os.kill(os.getpid(),signal.SIGKILL)
+m.publish_new=stop_after_publication
+m.ConfigAccessMigration(sys.argv[2],sys.argv[3],sys.argv[4],65534).prepare()
+'''
+        result=subprocess.run([sys.executable,'-c',code,str(Path(__file__).resolve().parents[1]/'tools'),
+            str(self.base),str(self.store),str(self.binary)],capture_output=True,timeout=5)
+        self.assertEqual(result.returncode,-signal.SIGKILL)
+        self.assertEqual(self.base.stat().st_mode & 0o777,0o710)
+        self.assertEqual(self.access.record.stat().st_nlink,1)
+        self.assertTrue(self.access.prepare())
+        self.assertEqual(self.base.stat().st_mode & 0o777,0o750)
+        self.assertEqual(self.secret.read_bytes(),b'SYNTHETIC_SECRET')
 
     def test_newer_core_never_receives_legacy_directory_permissions(self):
         self.access.prepare()

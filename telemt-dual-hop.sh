@@ -1273,6 +1273,7 @@ HEALTH_AGENT_SOURCE = '#!/usr/bin/env python3\nimport concurrent.futures, json, 
 This source is embedded verbatim in the single-file Bash installer. All archive
 bytes and members are verified before any executable is run or installed.
 """
+import ctypes
 import hashlib
 import json
 import os
@@ -1287,6 +1288,16 @@ import tempfile
 
 class InstallError(RuntimeError):
     pass
+
+
+def publish_new(source,target):
+    """Atomic Linux no-replace publication without a transient second link."""
+    rename=ctypes.CDLL(None,use_errno=True).renameat2
+    rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint)
+    rename.restype=ctypes.c_int
+    if rename(-100,os.fsencode(source),-100,os.fsencode(target),1)!=0:
+        code=ctypes.get_errno()
+        raise OSError(code,os.strerror(code))
 
 
 AUDIT_FILES = {'telemt','TELEMT-LICENSE.txt','NOTICE.txt','source.patch','build-provenance.json','manifest.json'}
@@ -1394,9 +1405,10 @@ def fresh_install(archive, target, expected_archive, version, expected_binary=''
             destination = parent/'core-source-notice'
             if destination.exists() or destination.is_symlink():
                 raise InstallError('refusing to replace existing core notice')
-            os.rename(legal, destination)
-        # Exclusive link cannot clobber a concurrent or pre-existing executable.
-        os.link(candidate, target)
+            publish_new(legal, destination)
+        # A hardlink would retain nlink=2 if killed before stage cleanup. Publish
+        # exclusively without that gap; existing/concurrent targets stay intact.
+        publish_new(candidate, target)
         directory = os.open(parent, os.O_RDONLY|os.O_DIRECTORY)
         try:
             os.fsync(directory)
@@ -1731,7 +1743,7 @@ class ConfigAccessMigration:
             with tempfile.TemporaryDirectory(prefix='.config-access-', dir=self.record.parent) as name:
                 staged = Path(name)/'record'
                 durable_file(staged, (json.dumps(value, sort_keys=True)+'\n').encode(), 0o600)
-                os.link(staged, self.record)
+                publish_new(staged, self.record)
             sync_directory(self.record.parent)
         elif digest(self.binary) != value['legacy_binary_sha256']:
             raise CoreError('config access baseline changed; review required')
@@ -2693,6 +2705,7 @@ download_telemt() {
 This source is embedded verbatim in the single-file Bash installer. All archive
 bytes and members are verified before any executable is run or installed.
 """
+import ctypes
 import hashlib
 import json
 import os
@@ -2707,6 +2720,16 @@ import tempfile
 
 class InstallError(RuntimeError):
     pass
+
+
+def publish_new(source,target):
+    """Atomic Linux no-replace publication without a transient second link."""
+    rename=ctypes.CDLL(None,use_errno=True).renameat2
+    rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint)
+    rename.restype=ctypes.c_int
+    if rename(-100,os.fsencode(source),-100,os.fsencode(target),1)!=0:
+        code=ctypes.get_errno()
+        raise OSError(code,os.strerror(code))
 
 
 AUDIT_FILES = {'telemt','TELEMT-LICENSE.txt','NOTICE.txt','source.patch','build-provenance.json','manifest.json'}
@@ -2814,9 +2837,10 @@ def fresh_install(archive, target, expected_archive, version, expected_binary=''
             destination = parent/'core-source-notice'
             if destination.exists() or destination.is_symlink():
                 raise InstallError('refusing to replace existing core notice')
-            os.rename(legal, destination)
-        # Exclusive link cannot clobber a concurrent or pre-existing executable.
-        os.link(candidate, target)
+            publish_new(legal, destination)
+        # A hardlink would retain nlink=2 if killed before stage cleanup. Publish
+        # exclusively without that gap; existing/concurrent targets stay intact.
+        publish_new(candidate, target)
         directory = os.open(parent, os.O_RDONLY|os.O_DIRECTORY)
         try:
             os.fsync(directory)

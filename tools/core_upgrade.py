@@ -18,7 +18,7 @@ import sys
 import tempfile
 import time
 
-from core_install import InstallError, archive_payload, durable_file
+from core_install import InstallError, archive_payload, durable_file, publish_new
 from core_transaction import CoreError, CoreTransaction, atomic_copy, digest, safe_directory, safe_file, sync_directory
 
 
@@ -77,7 +77,7 @@ class ConfigAccessMigration:
             with tempfile.TemporaryDirectory(prefix='.config-access-', dir=self.record.parent) as name:
                 staged = Path(name)/'record'
                 durable_file(staged, (json.dumps(value, sort_keys=True)+'\n').encode(), 0o600)
-                os.link(staged, self.record)
+                publish_new(staged, self.record)
             sync_directory(self.record.parent)
         elif digest(self.binary) != value['legacy_binary_sha256']:
             raise CoreError('config access baseline changed; review required')
