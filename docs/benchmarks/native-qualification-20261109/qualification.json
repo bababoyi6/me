@@ -1236,5 +1236,13 @@
   ],
   "no_production_access": true,
   "no_main_merge": true,
-  "native_default_enabled": false
+  "native_default_enabled": false,
+  "vm_preparation_recovery": {
+    "run": 42548403731,
+    "stage": "private base guest readiness",
+    "event": "early SSH reset",
+    "existing_bounded_retry_recovered": true,
+    "raw_failure_preserved": true,
+    "complete_worker_finally_accepted": true
+  }
 }
