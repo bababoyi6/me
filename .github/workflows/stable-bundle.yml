@@ -1,0 +1,42 @@
+name: Qualify audited native candidate package
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths: [.github/workflows/stable-bundle.yml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stable-native-bundle
+  cancel-in-progress: false
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: telemt/telemt
+          ref: 66708d2866f3f3a4541c4fa67984d408e71a8af4
+          path: upstream
+          persist-credentials: false
+      - name: Fetch exact reviewed build without recompilation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh run view 42495175073 --repo bababoyi6/me --json headSha --jq .headSha)" = dec285fbdf5b42dd8be3e9e879bc0c2ad8994bc8
+          gh run download 42495175073 --repo bababoyi6/me --name native-pair --dir "$RUNNER_TEMP/native-pair"
+      - name: Package, verify full source patch, and use the real audited installer
+        run: |
+          sudo env GITHUB_ACTIONS=true GITHUB_SHA="$GITHUB_SHA" timeout --kill-after=10 180 unshare --net -- python3 tests/stable_bundle_lab.py --directory "$RUNNER_TEMP/native-pair" --upstream "$GITHUB_WORKSPACE/upstream" --output "$RUNNER_TEMP/bundle-evidence"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/bundle-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audited-native-candidate
+          path: ${{ runner.temp }}/bundle-evidence/
+          retention-days: 7
+          if-no-files-found: error
