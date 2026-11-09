@@ -1996,7 +1996,27 @@ def unchanged_snapshot(folder, roots):
             raise CoreError('protected backup checksum mismatch')
 
 
-def upgrade(binary, directory, archive, archive_sha, binary_sha, version, roots, service):
+def preserve_audited_archive(directory, archive, archive_sha, binary_sha):
+    """Keep exact source/license bytes without changing rollback-protected files."""
+    if not re.fullmatch(r'[a-f0-9]{64}', binary_sha):
+        raise CoreError('invalid audited core identity')
+    directory=Path(directory)
+    safe_directory(directory)
+    if directory.stat().st_mode & 0o077:
+        raise CoreError('audited archive storage must be private')
+    target=directory/('audited-core-'+binary_sha+'.tar.gz')
+    if target.exists() or target.is_symlink():
+        safe_file(target)
+        if stat.S_IMODE(target.stat().st_mode)!=0o600 or digest(target)!=archive_sha:
+            raise CoreError('audited archive cache changed; review required')
+    else:
+        if len(list(directory.glob('audited-core-*.tar.gz')))>=8:
+            raise CoreError('audited archive retention limit reached; archive old notices first')
+        atomic_copy(archive,target,0o600,archive_sha)
+    return target
+
+
+def upgrade(binary, directory, archive, archive_sha, binary_sha, version, roots, service, *, audited=False):
     safe_directory(directory)
     if Path(directory).stat().st_mode & 0o077:
         raise CoreError('transaction storage must be private')
@@ -2013,7 +2033,9 @@ def upgrade(binary, directory, archive, archive_sha, binary_sha, version, roots,
         return 'unchanged'
     if len(list(Path(directory).glob('snapshot-*'))) >= 8:
         raise CoreError('snapshot retention limit reached; archive old backups before upgrading')
-    payload, _ = archive_payload(archive, archive_sha, version, binary_sha, False)
+    payload, _ = archive_payload(archive, archive_sha, version, binary_sha, audited)
+    if audited:
+        preserve_audited_archive(directory,archive,archive_sha,binary_sha)
     # Stage on an executable root-owned filesystem, readable by telemt only
     # through the temporary 0755 directory; no credentials are staged here.
     with tempfile.TemporaryDirectory(prefix='.core-candidate-', dir=Path(binary).parent) as temp:
@@ -2082,8 +2104,11 @@ def main():
     parser.add_argument('--archive-sha')
     parser.add_argument('--binary-sha')
     parser.add_argument('--version')
+    parser.add_argument('--audited',action='store_true')
     parser.add_argument('--bind')
     args = parser.parse_args()
+    if args.audited and args.action!='upgrade':
+        parser.error('audited package validation is only available for upgrade')
     if os.geteuid() != 0:
         raise CoreError('root required')
     if args.action in ('refresh-health', 'rollback-health'):
@@ -2096,7 +2121,7 @@ def main():
         return
     if args.action == 'upgrade':
         result = upgrade(args.binary, args.directory, args.archive, args.archive_sha,
-                         args.binary_sha, args.version, args.protect, service)
+                         args.binary_sha, args.version, args.protect, service, audited=args.audited)
     else:
         result = rollback(args.binary, args.directory, args.protect, service)
     print('核心事务结果：'+result)

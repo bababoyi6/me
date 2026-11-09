@@ -59,12 +59,15 @@ def main():
     candidate=parser.add_mutually_exclusive_group(required=True)
     candidate.add_argument('--stable-archive')
     candidate.add_argument('--candidate-directory')
+    parser.add_argument('--candidate-package')
     baseline=parser.add_mutually_exclusive_group(required=True)
     baseline.add_argument('--balanced2-archive')
     baseline.add_argument('--previous-stable-archive')
     parser.add_argument('--output', required=True)
     parser.add_argument('--stable-release',choices=tuple(RELEASES),default='3.5.16')
     args = parser.parse_args()
+    if args.candidate_package and not args.candidate_directory:
+        parser.error('candidate package requires the pinned native directory')
     baseline_pins=RELEASES['3.5.16'] if args.previous_stable_archive else PINS['balanced2']
     baseline_archive=args.previous_stable_archive or args.balanced2_archive
     if os.geteuid() != 0:
@@ -96,9 +99,10 @@ def main():
                         pin['version']!='telemt '+base+'+tdh.balanced1' or
                         digest(bundle/'telemt-balanced')!=pin['sha256']):
                     raise RuntimeError('native candidate identity mismatch')
-                candidate_archive=root/'native.tar.gz'
-                with tarfile.open(candidate_archive,'x:gz') as archive:
-                    archive.add(bundle/'telemt-balanced',arcname='telemt',recursive=False)
+                candidate_archive=Path(args.candidate_package) if args.candidate_package else root/'native.tar.gz'
+                if not args.candidate_package:
+                    with tarfile.open(candidate_archive,'x:gz') as archive:
+                        archive.add(bundle/'telemt-balanced',arcname='telemt',recursive=False)
                 candidate_version=pin['version'].removeprefix('telemt ')
                 candidate_pins=(digest(candidate_archive),pin['sha256'],pin['version'])
                 report['native_manifest']=manifest
@@ -115,7 +119,7 @@ def main():
             # operations, archive validation and --version execution are real.
             with patch('core_install.pwd.getpwnam', return_value=SimpleNamespace(pw_uid=65534, pw_gid=65534)):
                 report['fresh_candidate_install' if args.candidate_directory else 'fresh_official_install'] = fresh_install(candidate_archive, fresh/'telemt',
-                    candidate_pins[0], candidate_version, candidate_pins[1], False)
+                    candidate_pins[0], candidate_version, candidate_pins[1], bool(args.candidate_package))
             report['fresh_candidate_binary_sha256_match' if args.candidate_directory else 'fresh_official_binary_sha256_match'] = digest(fresh/'telemt') == candidate_pins[1]
             listen, api, health_port = port(), port(), port()
             config = generate_telemt(root/'config', root/'work', listen, api)
@@ -166,9 +170,9 @@ StandardError=null
             old_config = digest(config)
             stage = 'core_upgrade'
             report['upgrade'] = upgrade(binary, store, candidate_archive, candidate_pins[0],
-                                         candidate_pins[1], candidate_version, protected, service)
+                                         candidate_pins[1], candidate_version, protected, service, audited=bool(args.candidate_package))
             report['repeat_upgrade'] = upgrade(binary, store, candidate_archive, candidate_pins[0],
-                                                candidate_pins[1], candidate_version, protected, service)
+                                                candidate_pins[1], candidate_version, protected, service, audited=bool(args.candidate_package))
             stage = 'connect_policy'
             report['connect_refresh'] = refresh_connect_policy(root,service)
             report['repeat_connect_refresh'] = refresh_connect_policy(root,service)
@@ -220,6 +224,12 @@ StandardError=null
             report['connect_rollback'] = refresh_connect_policy(root,service,True)
             report['connect_original_bytes_restored'] = digest(config)==old_config
             report['rollback'] = rollback(binary, store, protected, service)
+            if args.candidate_package:
+                cached=store/('audited-core-'+candidate_pins[1]+'.tar.gz')
+                report['audited_archive_private_and_preserved_after_rollback']=(cached.is_file() and
+                    (cached.stat().st_mode & 0o777)==0o600 and digest(cached)==candidate_pins[0])
+                if not report['audited_archive_private_and_preserved_after_rollback']:
+                    raise RuntimeError('audited source/license cache failed rollback preservation')
             report['old_binary_restored'] = digest(binary) == baseline_pins[1]
             report['config_and_token_unchanged'] = digest(config) == old_config and token.read_text() == TOKEN+'\n'
             report['accepted'] = (report['old_binary_restored'] and report['config_and_token_unchanged']

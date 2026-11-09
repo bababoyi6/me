@@ -13,7 +13,7 @@ concurrency:
 jobs:
   package:
     runs-on: ubuntu-22.04
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -29,9 +29,14 @@ jobs:
           set -euo pipefail
           test "$(gh run view 42495175073 --repo bababoyi6/me --json headSha --jq .headSha)" = dec285fbdf5b42dd8be3e9e879bc0c2ad8994bc8
           gh run download 42495175073 --repo bababoyi6/me --name native-pair --dir "$RUNNER_TEMP/native-pair"
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
       - name: Package, verify full source patch, and use the real audited installer
         run: |
           sudo env GITHUB_ACTIONS=true GITHUB_SHA="$GITHUB_SHA" timeout --kill-after=10 180 unshare --net -- python3 tests/stable_bundle_lab.py --directory "$RUNNER_TEMP/native-pair" --upstream "$GITHUB_WORKSPACE/upstream" --output "$RUNNER_TEMP/bundle-evidence"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/bundle-evidence"
+      - name: Verify packaged systemd upgrade, repeat, crash recovery and exact rollback
+        run: |
+          sudo env GITHUB_ACTIONS=true timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --candidate-package "$1/bundle-evidence/telemt-3.5.17-tdh.balanced1-x86_64-linux-gnu.tar.gz" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/bundle-evidence/system.json"' native "$RUNNER_TEMP"
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/bundle-evidence"
       - uses: actions/upload-artifact@v4
         if: always()

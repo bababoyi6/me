@@ -56,6 +56,53 @@ class UpgradeTests(unittest.TestCase):
         return upgrade.upgrade(self.binary, self.store, self.archive, digest(self.archive),
                                self.new_sha, '3.5.16', [self.config], self.service)
 
+    def audited_fixture(self):
+        data=bytearray(128);data[:6]=b'\x7fELF\x02\x01';data[18:20]=b'\x3e\x00'
+        self.payload=bytes(data);self.new_sha=hashlib.sha256(self.payload).hexdigest()
+        files={'telemt':self.payload,'TELEMT-LICENSE.txt':b'synthetic license','NOTICE.txt':b'synthetic notice',
+            'source.patch':b'synthetic patch','build-provenance.json':b'{}'}
+        manifest={'schema':1,'version':'3.5.16','architecture':'x86_64','os':'linux','libc':'gnu',
+            'minimum_glibc':'2.35','unofficial':True,'files':{n:{'sha256':hashlib.sha256(b).hexdigest(),
+            'bytes':len(b),'mode':'0755' if n=='telemt' else '0644'} for n,b in files.items()}}
+        files['manifest.json']=json.dumps(manifest).encode()
+        with tarfile.open(self.archive,'w:gz') as archive:
+            for name,content in files.items():
+                member=tarfile.TarInfo(name);member.size=len(content);archive.addfile(member,io.BytesIO(content))
+
+    def test_audited_source_archive_is_private_and_survives_exact_rollback(self):
+        self.audited_fixture();original=self.config.read_bytes();archive_bytes=self.archive.read_bytes()
+        result=upgrade.upgrade(self.binary,self.store,self.archive,digest(self.archive),self.new_sha,'3.5.16',
+            [self.config],self.service,audited=True)
+        self.assertEqual(result,'committed')
+        cached=self.store/('audited-core-'+self.new_sha+'.tar.gz')
+        self.assertEqual(cached.read_bytes(),archive_bytes)
+        self.assertEqual(cached.stat().st_mode & 0o777,0o600)
+        self.assertEqual(upgrade.rollback(self.binary,self.store,[self.config],self.service),'recovered')
+        self.assertEqual(self.binary.read_bytes(),b'OLD_CORE')
+        self.assertEqual(self.config.read_bytes(),original)
+        self.assertEqual(cached.read_bytes(),archive_bytes)
+
+    def test_audited_cache_tamper_symlink_and_hardlink_are_not_replaced(self):
+        self.audited_fixture();cached=self.store/('audited-core-'+self.new_sha+'.tar.gz')
+        for kind in ('content','symlink','hardlink'):
+            if kind=='content':cached.write_bytes(b'changed');cached.chmod(0o600)
+            elif kind=='symlink':cached.symlink_to(self.archive)
+            else:os.link(self.archive,cached)
+            with self.subTest(kind=kind),self.assertRaises(CoreError):
+                upgrade.preserve_audited_archive(self.store,self.archive,digest(self.archive),self.new_sha)
+            cached.unlink()
+        self.assertEqual(self.service.calls,[])
+
+    def test_audited_cache_limit_is_enforced_before_stopping_service(self):
+        self.audited_fixture()
+        for n in range(8):
+            cached=self.store/('audited-core-'+str(n).zfill(64)+'.tar.gz');cached.write_bytes(b'kept');cached.chmod(0o600)
+        with self.assertRaisesRegex(CoreError,'audited archive retention limit'):
+            upgrade.upgrade(self.binary,self.store,self.archive,digest(self.archive),self.new_sha,'3.5.16',
+                [self.config],self.service,audited=True)
+        self.assertEqual(self.service.calls,[])
+        self.assertEqual(self.binary.read_bytes(),b'OLD_CORE')
+
     def test_old_config_and_credentials_are_backed_up_without_rewriting(self):
         before = self.config.read_bytes()
         self.assertEqual(self.activate(), 'committed')
