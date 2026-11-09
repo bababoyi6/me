@@ -3457,7 +3457,8 @@ telemt_binary_is_expected() {
     *) return 1 ;;
   esac
   version=$(timeout 5 "$TDH_BIN" --version 2>/dev/null) || return 1
-  [[ $version == "$expected" ]]
+  [[ $version == "$expected" ]] || return 1
+  if [[ ${1:-} == --print-version ]]; then printf '%s\n' "$version"; fi
 }
 
 write_haproxy_config() {
@@ -4452,8 +4453,9 @@ core_panel() {
   load_state || die "未安装节点。"
   require_current_state
   [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "核心维护只能在后端运行。"
-  local confirmation
-  printf '\n当前核心：%s\n' "$(get_telemt_version)"
+  local confirmation current
+  current=$(telemt_binary_is_expected --print-version) || current="未知或未通过身份校验"
+  printf '\n当前核心：%s\n' "$current"
   printf '  1) 切换到已发布 balanced2 稳定基线（x86_64）\n'
   printf '  2) 切换到兼容的官方核心（高 RTT 已知速度代价）\n'
   printf '  3) 回退上一核心事务\n'

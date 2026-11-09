@@ -151,11 +151,13 @@ telemt_binary_is_expected''', TDH_BIN=str(binary),TEST_ARCH=arch,TEST_HASH=sha)
             with self.subTest(reply=reply),tempfile.TemporaryDirectory() as folder:
                 body='''load_state() { TDH_ROLE=backend1; return 0; }
 require_current_state() { :; }
-get_telemt_version() { echo 'telemt 3.5.5+tdh.balanced2'; }
 manage_core() { printf '%s' "$*" > "$TDH_BASE/called"; }
 printf '%b' "$TEST_REPLY" | core_panel
 '''
-                result=self.shell(body,TDH_BASE=folder,TEST_REPLY=reply)
+                binary=Path(folder)/'unknown-core'
+                binary.write_text('#!/bin/sh\ntouch "$TDH_BASE/executed"\n');binary.chmod(0o755)
+                result=self.shell(body,TDH_BASE=folder,TDH_BIN=str(binary),TEST_REPLY=reply)
                 self.assertEqual(result.returncode,0,result.stderr)
                 called=Path(folder)/'called'
                 self.assertEqual(called.read_text() if called.exists() else '',expected)
+                self.assertFalse((Path(folder)/'executed').exists())
