@@ -1,0 +1,29 @@
+name: Bounded health monitor trickle recovery
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fault:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare fixed baseline and disposable prerequisites
+        run: |
+          set -euo pipefail
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends iproute2 python3-cryptography
+          git show 0bf297bdc338724d2aa733d0e68dc61e2ca73b2e:tools/health_agent.py > "$RUNNER_TEMP/old-agent.py"
+          mkdir -m 700 "$RUNNER_TEMP/health-progress"
+      - name: Reproduce old stuck worker and recover the new worker through systemd
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-health-progress-${GITHUB_RUN_ID}" -p CPUQuota=200% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=240 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net sh -c 'ip link set lo up; exec python3 tests/health_progress_lab.py --baseline-source "$1/old-agent.py" --output "$1/health-progress/result.json"' lab "$RUNNER_TEMP"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: health-progress-evidence
+          path: ${{ runner.temp }}/health-progress/*.json
+          retention-days: 14

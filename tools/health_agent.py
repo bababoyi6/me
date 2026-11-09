@@ -15,6 +15,10 @@ API_CHECKED = None
 DC_CHECKED = None
 API_MAX_AGE = 5
 DC_MAX_AGE = 25
+# Progress deadlines cover the complete check, not each socket read. A peer
+# sending a byte before every urllib timeout can otherwise strand a live thread.
+API_PROGRESS_TIMEOUT = 15
+DC_PROGRESS_TIMEOUT = 45
 READY_LOCK = threading.Lock()
 sel = selectors.DefaultSelector()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -128,6 +132,14 @@ def ready(now=None):
                 and 0 <= now - API_CHECKED <= API_MAX_AGE and 0 <= now - DC_CHECKED <= DC_MAX_AGE)
 
 
+def monitors_progressing(now, started):
+    with READY_LOCK:
+        return all(0 <= now - (checked if checked is not None else started) <= limit
+                   for checked, limit in ((API_CHECKED, API_PROGRESS_TIMEOUT),
+                                          (DC_CHECKED, DC_PROGRESS_TIMEOUT)))
+
+
+started = time.monotonic()
 monitors = [threading.Thread(target=target, daemon=True) for target in (monitor_api, monitor_dcs)]
 for monitor in monitors:
     monitor.start()
@@ -136,7 +148,12 @@ while True:
     if any(not monitor.is_alive() for monitor in monitors):
         # Let the existing systemd restart policy replace a failed monitor thread.
         raise SystemExit("health monitor stopped")
-    for key, _ in sel.select(timeout=30):
+    if not monitors_progressing(time.monotonic(), started):
+        # Staleness already closes admission. Recover the stuck worker through
+        # the existing service restart policy; ordinary unhealthy votes do not
+        # trigger restarts, and no check is silently declared healthy.
+        raise SystemExit("health monitor progress deadline")
+    for key, _ in sel.select(timeout=1):
         listener = key.fileobj
         try:
             conn, _ = listener.accept()

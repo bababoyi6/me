@@ -20,11 +20,27 @@ def functions():
     tree.body = [node for node in tree.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))]
     env = dict(json=json, urllib=urllib, API_TOKEN="synthetic-test-token", API_READY=True, DC_READY=True,
                API_CHECKED=99, DC_CHECKED=80, API_MAX_AGE=5, DC_MAX_AGE=25, READY_LOCK=threading.Lock())
+    env.update(API_PROGRESS_TIMEOUT=15, DC_PROGRESS_TIMEOUT=45)
     exec(compile(tree, "health-agent-functions", "exec"), env)
     return env
 
 
 class HealthAgentTests(unittest.TestCase):
+    def test_live_stalled_monitor_expires_even_before_first_result(self):
+        env=functions()
+        self.assertTrue(env['monitors_progressing'](100,80))
+        for key,value in (('API_CHECKED',84),('DC_CHECKED',54),('API_CHECKED',101)):
+            sample=functions();sample[key]=value
+            self.assertFalse(sample['monitors_progressing'](100,80))
+        env.update(API_CHECKED=None,DC_CHECKED=None)
+        self.assertTrue(env['monitors_progressing'](94,80))
+        self.assertFalse(env['monitors_progressing'](96,80))
+
+    def test_unhealthy_fresh_samples_do_not_restart_agent(self):
+        env=functions();env.update(API_READY=False,DC_READY=False)
+        self.assertFalse(env['ready'](100))
+        self.assertTrue(env['monitors_progressing'](100,80))
+
     def test_dead_monitor_exits_agent_for_systemd_recovery(self):
         tree=ast.parse((ROOT/'tools/health_agent.py').read_text(encoding='utf-8'))
         tree.body=[tree.body[-1]]
