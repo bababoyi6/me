@@ -1,0 +1,174 @@
+{
+  "scope": "real HAProxy/FakeTLS/MTProto and synthetic DC/payload only; shared Linux host",
+  "conditions": "Ubuntu22.04_private_loopback_netem25ms_rate100Mbps_CPU100pct_Memory1GiB",
+  "kernel": "6.8.0-1070-azure",
+  "results": [
+    {
+      "version": "telemt 3.5.17",
+      "rows": [
+        {
+          "concurrency": 30,
+          "direction": "U",
+          "successes": 30,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 21.97665375188744,
+          "wall_seconds": 2.8627907009999944,
+          "handshake_ms": {
+            "p50": 215.0168670000312,
+            "p95": 220.78346300003204
+          },
+          "completion_ms": {
+            "p50": 2796.547003000029,
+            "p95": 2815.2164490000473
+          },
+          "backend_cpu_one_core_percent": 0.34930950406213507,
+          "controller_and_mock_cpu_one_core_percent": 1.6741016373728985,
+          "haproxy_cpu_one_core_percent": 0.0,
+          "backend_peak_rss_bytes": 20684800,
+          "backend_fds_before": 16,
+          "backend_fds_after": 22
+        },
+        {
+          "concurrency": 30,
+          "direction": "D",
+          "successes": 30,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 21.23779831892664,
+          "wall_seconds": 2.9623861690000126,
+          "handshake_ms": {
+            "p50": 217.00829300002056,
+            "p95": 223.2783089999657
+          },
+          "completion_ms": {
+            "p50": 2888.797593499987,
+            "p95": 2934.697276999998
+          },
+          "backend_cpu_one_core_percent": 0.3375657132296028,
+          "controller_and_mock_cpu_one_core_percent": 1.7482611666892294,
+          "haproxy_cpu_one_core_percent": 0.0,
+          "backend_peak_rss_bytes": 20684800,
+          "backend_fds_before": 22,
+          "backend_fds_after": 32
+        },
+        {
+          "concurrency": 50,
+          "direction": "U",
+          "successes": 50,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 24.85052107958864,
+          "wall_seconds": 4.219533250999973,
+          "handshake_ms": {
+            "p50": 216.78642450001462,
+            "p95": 224.78315000000748
+          },
+          "completion_ms": {
+            "p50": 4146.073256000022,
+            "p95": 4165.61931800004
+          },
+          "backend_cpu_one_core_percent": 0.473986074058316,
+          "controller_and_mock_cpu_one_core_percent": 1.9340877093612097,
+          "haproxy_cpu_one_core_percent": 0.236993037029158,
+          "backend_peak_rss_bytes": 23269376,
+          "backend_fds_before": 32,
+          "backend_fds_after": 16
+        },
+        {
+          "concurrency": 50,
+          "direction": "D",
+          "successes": 50,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 23.99675737664455,
+          "wall_seconds": 4.369657047999965,
+          "handshake_ms": {
+            "p50": 216.35787599998935,
+            "p95": 221.99471300001505
+          },
+          "completion_ms": {
+            "p50": 4281.53017400001,
+            "p95": 4325.804172000006
+          },
+          "backend_cpu_one_core_percent": 0.45770182374276247,
+          "controller_and_mock_cpu_one_core_percent": 2.070599408743365,
+          "haproxy_cpu_one_core_percent": 0.22885091187138126,
+          "backend_peak_rss_bytes": 23269376,
+          "backend_fds_before": 16,
+          "backend_fds_after": 24
+        },
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 27.44248379973322,
+          "wall_seconds": 7.641990481999983,
+          "handshake_ms": {
+            "p50": 222.2069794999868,
+            "p95": 239.61029599996664
+          },
+          "completion_ms": {
+            "p50": 7602.292813499986,
+            "p95": 7615.225056999975
+          },
+          "backend_cpu_one_core_percent": 0.5234238395640035,
+          "controller_and_mock_cpu_one_core_percent": 2.663531202759754,
+          "haproxy_cpu_one_core_percent": 0.2617119197820017,
+          "backend_peak_rss_bytes": 28991488,
+          "backend_fds_before": 24,
+          "backend_fds_after": 214
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 25.25717401767048,
+          "wall_seconds": 8.303193375999967,
+          "handshake_ms": {
+            "p50": 219.33247599997685,
+            "p95": 227.09214500002872
+          },
+          "completion_ms": {
+            "p50": 8210.932119000006,
+            "p95": 8241.170167000007
+          },
+          "backend_cpu_one_core_percent": 0.3613067724848339,
+          "controller_and_mock_cpu_one_core_percent": 2.404587752672386,
+          "haproxy_cpu_one_core_percent": 0.24087118165655588,
+          "backend_peak_rss_bytes": 28991488,
+          "backend_fds_before": 214,
+          "backend_fds_after": 20
+        }
+      ],
+      "before_load": {
+        "cpu_seconds": 0.0,
+        "rss_bytes": 17743872,
+        "fds": 16
+      },
+      "after_idle": {
+        "cpu_seconds": 0.13,
+        "rss_bytes": 22200320,
+        "fds": 14
+      },
+      "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+      "config_policy_sha256": "29750af6c3d894f3e7a958b765c2637e8e8847997fda31c126bd7c618541051b",
+      "mock_dc_socket_timeout_seconds": 25,
+      "client_io_timeout_seconds": 25,
+      "offline_bootstrap": false,
+      "payload_bytes": 262144,
+      "transfer_rate": 12500000,
+      "mock_dc_completed": 364,
+      "mock_dc_errors": [],
+      "validation_error": null,
+      "config_unchanged": true,
+      "accepted": true,
+      "private_processes_closed": true
+    }
+  ],
+  "accepted": true
+}

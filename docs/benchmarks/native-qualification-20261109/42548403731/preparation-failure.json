@@ -1,0 +1,7 @@
+{
+  "exit": 255,
+  "public_os_preparation_log": "",
+  "ssh_stderr": "kex_exchange_identification: read: Connection reset by peer\nConnection reset by 127.0.0.1 port 22040\n",
+  "overlay_file_bytes": 13828096,
+  "qemu_public_error": ""
+}

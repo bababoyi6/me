@@ -4,8 +4,8 @@
   "branch": "dev/telemt-stable-compat-20261107",
   "files": {
     ".gitattributes": {
-      "bytes": 2094,
-      "sha256": "1766f3ee4364405e3e1aae783f5fb989e4d4f07d1e270a183e0a87412a561542"
+      "bytes": 2161,
+      "sha256": "f57159583817532db43b99cb373bbc8cfe34a8ff2ab1f9091a66cb270d689388"
     },
     ".github/workflows/arm-compat.yml": {
       "bytes": 2005,
@@ -52,8 +52,8 @@
       "sha256": "10bc6713c1a851db1984e046339d23292d9324d946e4b69aca1bed3e530e1d88"
     },
     ".github/workflows/queue-study.yml": {
-      "bytes": 3260,
-      "sha256": "44ce04f1910c7d5996558c19a1f67265ce300dfce9abd72704cea16db8b06ce0"
+      "bytes": 3924,
+      "sha256": "40da57cb656235b89545336fc5975472a08fb343e599fc1526009d4ef1919abd"
     },
     ".github/workflows/relay-candidate.yml": {
       "bytes": 2600,
@@ -71,6 +71,10 @@
       "bytes": 2153,
       "sha256": "ef6050500cc866da1e2e302a78fd5eb130920b4cbf08327c40fe83c5441206dc"
     },
+    ".github/workflows/stable-bundle.yml": {
+      "bytes": 2394,
+      "sha256": "1b49cac2c2ad6a0c9b1597ef0f1a58d1bd6fe840f5d96f81ec2c1a8ae5b27058"
+    },
     ".github/workflows/stable-candidate.yml": {
       "bytes": 3971,
       "sha256": "0598c0f92d7cf945c6cd018d34f6f7e6c12c3e002d1a6790d7fa26a2dbd19b71"
@@ -78,6 +82,10 @@
     ".github/workflows/stable-compat.yml": {
       "bytes": 5102,
       "sha256": "4f1509770871d628013d1d2fa28d497aefa3d4a8d786dd1076119caa2714cc58"
+    },
+    ".github/workflows/stable-native-arm.yml": {
+      "bytes": 3556,
+      "sha256": "aaee001a3969a0c3c7c802116c917ba07e269229007e1853933a7bb14fa35296"
     },
     ".github/workflows/validate.yml": {
       "bytes": 3672,
@@ -124,8 +132,8 @@
       "sha256": "b711a4bf9f3bd8296cb1182e7d956250371f54088264c514a483525f13fef3ca"
     },
     "telemt-dual-hop.sh": {
-      "bytes": 188769,
-      "sha256": "c3613708e5bc097c1d0b757a7edc5e3fe278848aea2289626400e3bacb348482"
+      "bytes": 190395,
+      "sha256": "ee5daad4333073bf1d94fa48e8e5246e9025c5465de4797b8722d8d11f8e9f3c"
     },
     "tests/arm_compat_lab.py": {
       "bytes": 4349,
@@ -251,13 +259,17 @@
       "bytes": 1664,
       "sha256": "21d224c59f016bc44c34fd49d45eaa730918a627aaac4f7f12d572ce64ed4ab7"
     },
+    "tests/legacy_queue_analysis.py": {
+      "bytes": 8301,
+      "sha256": "5479490a855d8ee510dfde8fc7396544bd2f0047e422bcde83d69a8e4026cc77"
+    },
     "tests/long_path_analysis.py": {
       "bytes": 8556,
       "sha256": "f8c00a276ecea1afe56c0c1b03e6d5c6f8df2a7f86c5c667d0a5947b63438023"
     },
     "tests/long_path_lab.py": {
-      "bytes": 22182,
-      "sha256": "3b225bf274230ae4977506d338ff7e975110c30bbb8383ec0830bba9bd1aaa61"
+      "bytes": 24400,
+      "sha256": "ab4d5cf88a86e7b221a19a0ba2168b2664ec78beb543ce9446b85e2565aa2419"
     },
     "tests/mixed_clients.py": {
       "bytes": 4627,
@@ -351,9 +363,13 @@
       "bytes": 10352,
       "sha256": "5f51e80a918d88e0e1efdcda6f018ca9f75a9a1ec953e520d53534e02baed462"
     },
+    "tests/stable_bundle_lab.py": {
+      "bytes": 3586,
+      "sha256": "29ebb5c00d8b142e203cc27777eab64c6a47f04f3a9b4d37c12023728797c91e"
+    },
     "tests/stable_system_lab.py": {
-      "bytes": 13652,
-      "sha256": "2b3af6b0f7dcccd679dd33a979a404df43ffc099c2dbaa60061dedadca504d98"
+      "bytes": 14556,
+      "sha256": "fdd376af938060e85ec649ab37a003c13d2fc58f13f8a9f0632f9d548dcd06d7"
     },
     "tests/stream_matrix.py": {
       "bytes": 4039,
@@ -432,8 +448,8 @@
       "sha256": "398ce853fe039a5e5cf6ef7495cf15f8a4845456e4c6c40d300ae2ec99e66eb8"
     },
     "tests/test_core_upgrade.py": {
-      "bytes": 8639,
-      "sha256": "fcc43d00ca778d7627e8691f743016a164fa6151f2c9167cf27dd3c16232dd80"
+      "bytes": 12643,
+      "sha256": "e9a9bbc53e864f737def82be6aa451e73828980ae2f25279654874bdd6148b6d"
     },
     "tests/test_endurance_cleanup.py": {
       "bytes": 2560,
@@ -478,6 +494,10 @@
     "tests/test_lab_runner.py": {
       "bytes": 10233,
       "sha256": "33cab2e73e376185aa28d65a6b729486091a981c77c9732bf2877dc29821b0e3"
+    },
+    "tests/test_legacy_queue_analysis.py": {
+      "bytes": 4916,
+      "sha256": "7717711d38c65aab916fb6845d30ae53287141c8f4746ce907262c7350782b3e"
     },
     "tests/test_lock_safety.py": {
       "bytes": 3949,
@@ -542,6 +562,10 @@
     "tests/test_socket_policy_analysis.py": {
       "bytes": 3177,
       "sha256": "1c53da5f78f5fafa22620a7bcfae149f402b16826ea18c86315d9c7b79c6ecac"
+    },
+    "tests/test_stable_core_bundle.py": {
+      "bytes": 1535,
+      "sha256": "bf127c2f1110434de80e1202b3b9e98234d271a7b2af6a1faf54d8c91790a417"
     },
     "tests/test_startup_diagnostics.py": {
       "bytes": 803,
@@ -612,8 +636,8 @@
       "sha256": "7b453f7ed27d36aa8f40c068c62eaec41d39a1b2a26712299b8503d979ac9148"
     },
     "tools/core_upgrade.py": {
-      "bytes": 22708,
-      "sha256": "4c56cd9c7e3fd3cc4474f5119e39105f116d2071b3969669dd932523a37682c6"
+      "bytes": 24334,
+      "sha256": "9eb13161b79df6fd57a6f0a40bb51bd05e8ff5aaea62a44b6e0eddec010a232d"
     },
     "tools/embed_core_install.py": {
       "bytes": 1076,
@@ -654,8 +678,12 @@
     "tools/lab_runner.py": {
       "bytes": 20370,
       "sha256": "954af489e1dc6ddce8afa99c11387e930c83a6c91a438879d7449069790c2328"
+    },
+    "tools/stable_core_bundle.py": {
+      "bytes": 4428,
+      "sha256": "e360fb048bd3e1d9a849e79664b43f7fca98321e185621fa259c7f4856419966"
     }
   },
-  "source_commit": "fe034db54b04a1e0f48f538b57426ee0e930d611",
+  "source_commit": "dd29827747844b7409863e58ddc2bab9411438c8",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }

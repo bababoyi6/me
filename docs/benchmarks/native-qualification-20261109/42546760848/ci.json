@@ -1,0 +1,118 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-11-09T01:40:00Z",
+  "databaseId": 42546760848,
+  "headSha": "8cada6fa4df038d9d6d369e5f9aa0b924cada9e0",
+  "jobs": [
+    {
+      "completedAt": "2026-11-09T01:56:41Z",
+      "conclusion": "success",
+      "databaseId": 128933319270,
+      "name": "build-and-protocol",
+      "startedAt": "2026-11-09T01:40:04Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T01:40:06Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T01:40:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:40:07Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T01:40:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:40:08Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 3,
+          "startedAt": "2026-11-09T01:40:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:40:43Z",
+          "conclusion": "success",
+          "name": "Prepare pinned Rust and disposable protocol dependencies",
+          "number": 4,
+          "startedAt": "2026-11-09T01:40:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:55:28Z",
+          "conclusion": "success",
+          "name": "Build and socket-test identical upstream and helper policies on ARM",
+          "number": 5,
+          "startedAt": "2026-11-09T01:40:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:55:28Z",
+          "conclusion": "success",
+          "name": "Verify ARM ELF identity and preserve fixed build metadata",
+          "number": 6,
+          "startedAt": "2026-11-09T01:55:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:56:35Z",
+          "conclusion": "success",
+          "name": "Verify 30 50 100 protocol load and idle recovery in 768MiB without swap",
+          "number": 7,
+          "startedAt": "2026-11-09T01:55:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:56:36Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 8,
+          "startedAt": "2026-11-09T01:56:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:56:39Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 9,
+          "startedAt": "2026-11-09T01:56:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:56:39Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 17,
+          "startedAt": "2026-11-09T01:56:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:56:39Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 18,
+          "startedAt": "2026-11-09T01:56:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T01:56:39Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-11-09T01:56:39Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42546760848/job/128933319270"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-09T01:56:41Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42546760848"
+}
