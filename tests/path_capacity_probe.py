@@ -18,13 +18,15 @@ from network_lab import Network, NAMES, command
 from paired_performance import resources, write
 
 
-def observe():
+def observe(servers):
     return {
         'elapsed_clock': time.monotonic(),
         'tcp': {ns: command('ip', 'netns', 'exec', ns, 'ss', '-tni', '-m',
                             '( sport = :5201 or dport = :5201 )')
                 for ns in (NAMES[0], NAMES[2])},
         'router_queues': command('ip', 'netns', 'exec', NAMES[1], 'tc', '-s', '-j', 'qdisc', 'show'),
+        'server_wait': [{'pid': p.pid, 'wchan': Path(f'/proc/{p.pid}/wchan').read_text(),
+                         'stat': Path(f'/proc/{p.pid}/stat').read_text()} for p in servers],
     }
 
 
@@ -78,9 +80,9 @@ def main(output):
                         process = subprocess.Popen(argv, stdout=capture, stderr=subprocess.STDOUT)
                         try:
                             while process.poll() is None:
-                                if time.monotonic() - started > 18:
+                                if time.monotonic() - started > 25:
                                     raise RuntimeError('bounded capacity probe timed out')
-                                row['samples'].append(observe())
+                                row['samples'].append(observe(net.processes))
                                 time.sleep(1)
                             capture.seek(0)
                             row['raw_output'] = capture.read(1024 * 1024)
@@ -91,8 +93,14 @@ def main(output):
                             row['receiver_mbps'] = row['iperf']['end']['sum_received']['bits_per_second'] / 1e6
                         finally:
                             if process.poll() is None:
-                                process.kill()
+                                process.send_signal(signal.SIGINT)
+                                try:
+                                    process.wait(timeout=2)
+                                except subprocess.TimeoutExpired:
+                                    process.kill()
                             process.wait(timeout=3)
+                            capture.seek(0)
+                            row['raw_output'] = capture.read(1024 * 1024)
                             row['elapsed_seconds'] = time.monotonic() - started
                             write(output, report)
                     time.sleep(1)

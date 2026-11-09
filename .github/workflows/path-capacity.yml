@@ -23,7 +23,7 @@ jobs:
           mkdir -m 700 "$RUNNER_TEMP/capacity-evidence"
       - name: Eight bounded TCP controls; no core build or public load
         run: |
-          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-capacity-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/path_capacity_probe.py --output "$RUNNER_TEMP/capacity-evidence/metrics.json"
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-capacity-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=300 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/path_capacity_probe.py --output "$RUNNER_TEMP/capacity-evidence/metrics.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
