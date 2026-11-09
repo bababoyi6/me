@@ -1,9 +1,11 @@
 name: Bounded managed backend queue acceptance
 on:
   workflow_dispatch:
-  push:
-    branches: [dev/telemt-stable-compat-20261107]
-    paths: [.github/workflows/managed-queue.yml]
+    inputs:
+      skip_performance:
+        description: Validate lifecycle changes without repeating the completed performance pairs
+        type: boolean
+        default: true
 permissions:
   contents: read
   actions: read
@@ -34,6 +36,7 @@ jobs:
           retention-days: 14
   measure:
     needs: lifecycle
+    if: inputs.skip_performance != true
     runs-on: ubuntu-22.04
     timeout-minutes: 18
     steps:

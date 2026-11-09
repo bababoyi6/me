@@ -166,7 +166,8 @@ usage() {
   a recover                                 后端隧道与服务恢复
   a perf [2-30]                             只读脱敏性能采样（默认 5 秒）
   a queue status                            查看后端实验队列（默认关闭）
-  a queue enable 180 200 --maintenance       后端发送预算/实测路径Mbps（示例，勿直接照抄）
+  a queue enable 180 200 --experimental --maintenance
+                                            开发实验，尚未生产放行；数字仅示例，勿直接照抄
   a queue disable --maintenance              撤销本管理器创建的队列与启动钩子
   sudo bash telemt-dual-hop.sh entry        初始化入口 VPS
   sudo bash telemt-dual-hop.sh backend1     安装后端 VPS1
@@ -554,6 +555,9 @@ assert_fresh_install_paths() {
     reserved+=("${root}/systemd/system/${unit}.service")
   done
   for unit in tdh1 tdh2 tdh-b1 tdh-b2; do reserved+=("${root}/wireguard/${unit}.conf"); done
+  for unit in tdh-b1 tdh-b2; do
+    reserved+=("${root}/systemd/system/wg-quick@${unit}.service.d/90-telemt-queue.conf")
+  done
   for path in "${reserved[@]}"; do
     [[ ! -e $path && ! -L $path ]] || \
       die "新安装路径已存在：${path}。已保留原内容；请先确认其来源，不会自动覆盖或清理。"
@@ -1238,6 +1242,10 @@ manage_core() {
   for directory in /etc/systemd/system/telemt-dual-hop-{telemt,health-agent}.service.d \
       /run/systemd/system/telemt-dual-hop-{telemt,health-agent}.service.d \
       "$(dirname "$TDH_BIN")/core-source-notice"; do
+    [[ ! -e $directory && ! -L $directory ]] || args+=(--protect "$directory")
+  done
+  for directory in "${TDH_BASE}/queue/policy.json" \
+      "/etc/systemd/system/wg-quick@${WG_INTERFACE}.service.d/90-telemt-queue.conf"; do
     [[ ! -e $directory && ! -L $directory ]] || args+=(--protect "$directory")
   done
   if [[ $action == upgrade ]]; then
@@ -2242,7 +2250,7 @@ manage_queue() {
   [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "队列控制目前仅支持后端单隧道；不自动切分入口两条隧道的共享带宽。"
   [[ ( $TDH_ROLE == backend1 && $WG_INTERFACE == tdh-b1 ) || \
      ( $TDH_ROLE == backend2 && $WG_INTERFACE == tdh-b2 ) ]] || die "后端接口与角色不符。"
-  python3 - "$TDH_BASE" "$WG_INTERFACE" "$TDH_MANAGER" "$@" <<'TDH_QUEUE_PY'
+  timeout --kill-after=2 45 python3 - "$TDH_BASE" "$WG_INTERFACE" "$TDH_MANAGER" "$@" <<'TDH_QUEUE_PY'
 # BEGIN GENERATED QUEUE CONTROL
 """Opt-in backend WG egress shaping; no daemon, downloads or global networking.
 
@@ -2397,7 +2405,7 @@ class KernelQueue:
         if expected is not None and link['txqlen']!=1000:raise QueueError('接口队列长度发生漂移')
         shape=self.shape()
         if len(shape['qdisc'])==1 and shape['qdisc'][0].startswith('qdisc noqueue 0: root') and not shape['class']:
-            if expected is not None or link['txqlen'] not in (0,1000):raise QueueError('原队列已经变化，保留现场')
+            if expected is not None or link['txqlen'] not in (baseline,1000):raise QueueError('原队列已经变化，保留现场')
             run('ip','link','set','dev',self.interface,'txqueuelen',str(baseline))
             return
         self.owned(shape,rate,complete=expected is not None)
@@ -2495,8 +2503,8 @@ class QueueControl:
     def hook(self):
         if not re.fullmatch(r'/[A-Za-z0-9_./-]+',str(self.manager)):raise QueueError('管理器路径不安全')
         return ('# Managed by Telemt Dual-Hop queue protocol 1\n[Service]\n'
-            f'ExecStartPost=-{self.manager} --queue-service apply\n'
-            f'ExecStopPost=-{self.manager} --queue-service remove\n').encode()
+            f'ExecStartPost=-/usr/bin/timeout --kill-after=2 12 {self.manager} --queue-service apply\n'
+            f'ExecStopPost=-/usr/bin/timeout --kill-after=2 12 {self.manager} --queue-service remove\n').encode()
 
     def check_hook(self):
         if self.dropin.exists() or self.dropin.is_symlink():
@@ -2574,9 +2582,11 @@ def main():
     parser.add_argument('action',choices=('enable','disable','status','apply','remove'))
     parser.add_argument('rate',nargs='?',type=int);parser.add_argument('path_mbps',nargs='?',type=int)
     parser.add_argument('--maintenance',action='store_true')
+    parser.add_argument('--experimental',action='store_true')
     args=parser.parse_args();os.umask(0o077)
     if os.geteuid()!=0:raise QueueError('需要root权限')
     if args.action in ('enable','disable') and not args.maintenance:raise QueueError('请先排空本后端并添加--maintenance')
+    if args.action=='enable' and not args.experimental:raise QueueError('尚未通过完整尾延迟门槛；只允许显式--experimental实验，不能默认用于生产')
     if args.action!='enable' and (args.rate is not None or args.path_mbps is not None):raise QueueError('参数数量无效')
     if args.interface not in ('tdh-b1','tdh-b2'):raise QueueError('只支持后端单隧道，入口共享整形尚未开放')
     control=QueueControl(Path(args.base)/'queue',args.interface,args.manager)
@@ -2595,17 +2605,13 @@ TDH_QUEUE_PY
 }
 
 queue_panel() {
-  local action rate path_capacity
+  local action
   manage_queue status
   printf '\n实验功能默认关闭，仅控制本后端向入口的发送队列；不会重启代理。\n'
-  printf '请先在入口排空本后端，并确认另一节点正常。不要用端口标称带宽代替实测路径容量。\n'
-  printf '1) 启用  2) 撤销  0) 返回\n'
+  printf '尚未通过新连接尾延迟的绝对门槛；本面板只提供查看和撤销，不提供生产启用。\n'
+  printf '2) 撤销（请先排空本后端）  0) 返回\n'
   read -r -p '请选择 [0]: ' action </dev/tty || return 0
   case ${action:-0} in
-    1)
-      read -r -p '本后端到入口的已测路径容量（整数Mbps，无默认）: ' path_capacity </dev/tty || return 0
-      read -r -p '留给该隧道的发送预算（整数Mbps，须预留至少10%）: ' rate </dev/tty || return 0
-      manage_queue enable "$rate" "$path_capacity" --maintenance ;;
     2) manage_queue disable --maintenance ;;
     0) ;;
     *) warn "无效选择。" ;;
@@ -4564,7 +4570,12 @@ main() {
       (( $# == 2 )) || die "用法：a $1 --maintenance"
       if [[ $1 == connect-refresh ]]; then manage_core refresh-connect "$2"; else manage_core rollback-connect "$2"; fi ;;
     recover) recover_backend ;;
-    queue) shift; manage_queue "$@" ;;
+    queue)
+      shift
+      case ${1:-} in
+        enable|disable|status) manage_queue "$@" ;;
+        *) die "用法：a queue status | enable <发送Mbps> <路径Mbps> --experimental --maintenance | disable --maintenance" ;;
+      esac ;;
     uninstall) uninstall_all ;;
     menu|panel) control_panel ;;
     "") control_panel ;;

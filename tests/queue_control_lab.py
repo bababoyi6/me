@@ -8,6 +8,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 import uuid
 from unittest.mock import patch
 
@@ -101,6 +102,16 @@ c.enable(180,200)
         qc.durable(control.config,qc.encoded(changed));qc.run('systemctl','restart',unit)
         report['checks']['hook_failure_keeps_wg_up']=qc.run('systemctl','is-active',unit)=='active' and control.kernel.fresh()
         qc.durable(control.config,original);control.service('apply')
+        stage='hook_timeout'
+        original_manager=manager.read_bytes()
+        stalled=original_manager.replace(b'print(c.service(sys.argv[2]))',
+            b'import time\nif sys.argv[2]=="apply":time.sleep(60)\nprint(c.service(sys.argv[2]))')
+        qc.durable(manager,stalled,0o755)
+        started=time.monotonic();subprocess.run(['systemctl','restart',unit],check=True,capture_output=True,timeout=20)
+        elapsed=time.monotonic()-started
+        report['hook_timeout_seconds']=elapsed
+        report['checks']['hung_hook_keeps_wg_up']=(12<=elapsed<18 and qc.run('systemctl','is-active',unit)=='active' and control.kernel.fresh())
+        qc.durable(manager,original_manager,0o755);control.service('apply')
         stage='hook_drift'
         qc.durable(dropin,control.hook()+b'# operator change\n',0o644)
         try:control.disable();raise AssertionError('hook drift overwritten')

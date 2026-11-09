@@ -151,7 +151,7 @@ class KernelQueue:
         if expected is not None and link['txqlen']!=1000:raise QueueError('接口队列长度发生漂移')
         shape=self.shape()
         if len(shape['qdisc'])==1 and shape['qdisc'][0].startswith('qdisc noqueue 0: root') and not shape['class']:
-            if expected is not None or link['txqlen'] not in (0,1000):raise QueueError('原队列已经变化，保留现场')
+            if expected is not None or link['txqlen'] not in (baseline,1000):raise QueueError('原队列已经变化，保留现场')
             run('ip','link','set','dev',self.interface,'txqueuelen',str(baseline))
             return
         self.owned(shape,rate,complete=expected is not None)
@@ -249,8 +249,8 @@ class QueueControl:
     def hook(self):
         if not re.fullmatch(r'/[A-Za-z0-9_./-]+',str(self.manager)):raise QueueError('管理器路径不安全')
         return ('# Managed by Telemt Dual-Hop queue protocol 1\n[Service]\n'
-            f'ExecStartPost=-{self.manager} --queue-service apply\n'
-            f'ExecStopPost=-{self.manager} --queue-service remove\n').encode()
+            f'ExecStartPost=-/usr/bin/timeout --kill-after=2 12 {self.manager} --queue-service apply\n'
+            f'ExecStopPost=-/usr/bin/timeout --kill-after=2 12 {self.manager} --queue-service remove\n').encode()
 
     def check_hook(self):
         if self.dropin.exists() or self.dropin.is_symlink():
@@ -328,9 +328,11 @@ def main():
     parser.add_argument('action',choices=('enable','disable','status','apply','remove'))
     parser.add_argument('rate',nargs='?',type=int);parser.add_argument('path_mbps',nargs='?',type=int)
     parser.add_argument('--maintenance',action='store_true')
+    parser.add_argument('--experimental',action='store_true')
     args=parser.parse_args();os.umask(0o077)
     if os.geteuid()!=0:raise QueueError('需要root权限')
     if args.action in ('enable','disable') and not args.maintenance:raise QueueError('请先排空本后端并添加--maintenance')
+    if args.action=='enable' and not args.experimental:raise QueueError('尚未通过完整尾延迟门槛；只允许显式--experimental实验，不能默认用于生产')
     if args.action!='enable' and (args.rate is not None or args.path_mbps is not None):raise QueueError('参数数量无效')
     if args.interface not in ('tdh-b1','tdh-b2'):raise QueueError('只支持后端单隧道，入口共享整形尚未开放')
     control=QueueControl(Path(args.base)/'queue',args.interface,args.manager)

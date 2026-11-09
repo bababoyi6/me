@@ -32,6 +32,9 @@ class QueuePolicyTests(unittest.TestCase):
             with self.subTest(length=length),patch.object(kernel,'link',return_value={'txqlen':length}),\
                 patch.object(kernel,'shape',return_value={'qdisc':['qdisc noqueue 0: root'],'class':[]}):
                 self.assertTrue(kernel.fresh())
+                with patch('queue_control.run') as calls:
+                    kernel.restore(180,length)
+                    calls.assert_called_once_with('ip','link','set','dev','tdh-b1','txqueuelen',str(length))
 
 
 @unittest.skipUnless(os.geteuid()==0,'root-owned state boundary')
@@ -70,7 +73,14 @@ class QueueStateTests(unittest.TestCase):
     def test_hook_failure_cannot_fail_tunnel_and_marker_blocks_incompatible_manager(self):
         self.assertIn(b'ExecStartPost=-',self.control.hook())
         self.assertIn(b'ExecStopPost=-',self.control.hook())
+        self.assertEqual(self.control.hook().count(b'/usr/bin/timeout --kill-after=2 12'),2)
         self.assertEqual(read_file(self.manager,False,1048576),self.manager.read_bytes())
+        module=Path(__file__).resolve().parents[1]/'tools/queue_control.py'
+        result=subprocess.run(['python3',str(module),str(self.root),'tdh-b1',str(self.manager),
+            'enable','180','200','--maintenance'],capture_output=True,text=True,timeout=5)
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn('--experimental',result.stderr)
+        self.assertFalse(self.control.directory.exists())
         self.manager.write_bytes(b'old manager\n')
         with self.assertRaises(QueueError):self.control.enable(180,200)
         self.assertFalse(self.control.directory.exists())
