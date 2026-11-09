@@ -1,0 +1,16 @@
+screen	Screen one mixed case in four AB BA pairs	﻿2026-11-09T06:52:51.2729424Z ##[group]Run sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-fair-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=360 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/mixed_path_lab.py --profile rtt100 --fair-directory "$RUNNER_TEMP/fair-pair" --native-directory "$RUNNER_TEMP/native-pair" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --stable-archive "$RUNNER_TEMP/stable.tar.gz" --output "$RUNNER_TEMP/fair-evidence/metrics.json"
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:52:51.2734323Z ^[[36;1msudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-fair-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=360 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/mixed_path_lab.py --profile rtt100 --fair-directory "$RUNNER_TEMP/fair-pair" --native-directory "$RUNNER_TEMP/native-pair" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --stable-archive "$RUNNER_TEMP/stable.tar.gz" --output "$RUNNER_TEMP/fair-evidence/metrics.json"^[[0m
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:52:51.2736944Z ^[[36;1mpython3 tests/fair_screen_analysis.py "$RUNNER_TEMP/fair-evidence/metrics.json" "$RUNNER_TEMP/fair-evidence/analysis.json"^[[0m
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:52:51.2801252Z shell: /usr/bin/bash -e {0}
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:52:51.2801534Z ##[endgroup]
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1368640Z Traceback (most recent call last):
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1369287Z   File "/home/runner/work/me/me/tests/mixed_path_lab.py", line 212, in <module>
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1390768Z     raise SystemExit(main(parser.parse_args()))
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1391335Z   File "/home/runner/work/me/me/tests/mixed_path_lab.py", line 117, in main
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1391924Z     backend=Child('core',NAMES[2],backend_cpu,options,children)
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1392511Z   File "/home/runner/work/me/me/tests/long_path_lab.py", line 104, in __init__
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1393059Z     self.ready=self.receive(45)
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1393525Z   File "/home/runner/work/me/me/tests/long_path_lab.py", line 111, in receive
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1394111Z     if not line:raise RuntimeError('private worker exited')
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1394551Z RuntimeError: private worker exited
+screen	Screen one mixed case in four AB BA pairs	2026-11-09T06:53:58.1677663Z ##[error]Process completed with exit code 1.

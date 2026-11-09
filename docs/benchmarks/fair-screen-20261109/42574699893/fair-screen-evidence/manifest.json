@@ -1,0 +1,14 @@
+{
+  "upstream_commit": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+  "manager_commit": "5aa61d00a855b26b04b87c149dbaa102bfe02359",
+  "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "reference_binary_sha256": "cd4c5ff500d956a8a7059e3e536ff139983a0c5897b4c410ea0e53c68a6cfa14",
+  "version": "telemt 3.5.17+tdh.fair1",
+  "binary_sha256": "7799e488ef7f32f5f1fa9a7b25988f6fd21b91b67a1e313ab673c4d0268feec0",
+  "copy_before_sha256": "45f4bab471a2b98405a809cc1be7740b635c74149e6687854f5a89b2df9140cd",
+  "copy_after_sha256": "323bfbd535944d49bea7505f03be73c25df2ab77de7fc6d929741e15f6dfc721",
+  "quantum_bytes": 65536,
+  "production_enabled": false,
+  "lto": "thin",
+  "codegen_units": 8
+}

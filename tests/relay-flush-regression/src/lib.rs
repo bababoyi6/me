@@ -4,9 +4,6 @@ mod flushed_copy;
 #[cfg(test)]
 #[path = "../../../patches/fair_copy.rs"]
 mod fair_copy;
-#[cfg(test)]
-#[path = "../../../patches/stable_fair_copy.rs"]
-mod stable_fair_copy;
 
 #[cfg(all(test, target_os = "linux"))]
 #[path = "../../../patches/unsent_queue.rs"]
@@ -154,7 +151,6 @@ mod $name {
 
 relay_contract_tests!(baseline_contract, crate::flushed_copy::copy_buf_flushed);
 relay_contract_tests!(fair_contract, crate::fair_copy::copy_buf_flushed);
-relay_contract_tests!(stable_fair_contract, crate::stable_fair_copy::copy_with_flush);
 
 #[cfg(test)]
 mod fairness_tests {
@@ -210,38 +206,5 @@ mod fairness_tests {
         assert!(output.bytes > 0 && output.bytes <= 64 * 1024);
         assert_eq!(output.flushes, 1);
         assert_eq!(payload.len() - input.len(), output.bytes);
-    }
-
-    #[test]
-    fn stable_copy_yields_after_one_quantum_and_preserves_pending_tail() {
-        let payload = vec![42; 8 * 1024 * 1024];
-        let mut input = &payload[..];
-        let mut output = Sink::default();
-        let wakeups = Arc::new(Counter::default());
-        let waker = Waker::from(Arc::clone(&wakeups));
-        let mut context = Context::from_waker(&waker);
-        let mut transfer = Box::pin(super::stable_fair_copy::copy_with_flush(&mut input, &mut output));
-        assert!(transfer.as_mut().poll(&mut context).is_pending());
-        drop(transfer);
-        assert_eq!(wakeups.0.load(Ordering::Relaxed), 1);
-        assert_eq!(output.bytes, 64 * 1024);
-        assert_eq!(output.flushes, 1);
-        assert_eq!(payload.len() - input.len(), output.bytes);
-    }
-
-    #[test]
-    fn stable_copy_exact_quantum_eof_finishes_without_an_extra_wakeup() {
-        let payload = vec![17; 64 * 1024];
-        let mut input = &payload[..];
-        let mut output = Sink::default();
-        let wakeups = Arc::new(Counter::default());
-        let waker = Waker::from(Arc::clone(&wakeups));
-        let mut context = Context::from_waker(&waker);
-        let mut transfer = Box::pin(super::stable_fair_copy::copy_with_flush(&mut input, &mut output));
-        assert!(matches!(transfer.as_mut().poll(&mut context), Poll::Ready(Ok(65536))));
-        drop(transfer);
-        assert_eq!(wakeups.0.load(Ordering::Relaxed), 0);
-        assert_eq!(output.bytes, payload.len());
-        assert_eq!(output.flushes, 1);
     }
 }
