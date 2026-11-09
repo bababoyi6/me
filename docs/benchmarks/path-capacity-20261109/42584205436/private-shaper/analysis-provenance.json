@@ -1,0 +1,7 @@
+{
+  "kind": "Windows reanalysis only; no local Linux execution",
+  "source_commit": "fc350b2869ee76e74c351b600574a4c1b02f4db2",
+  "analyzer_sha256": "c32496c293ab82fc7157988e0eed5056edc435f46ebb76cb454d301c502e823a",
+  "raw_sha256": "342109a8249f8113d9722b5e71ada436ac01f8deff5faf0a49511fc5deeaf7f4",
+  "ci_analysis_preserved": true
+}

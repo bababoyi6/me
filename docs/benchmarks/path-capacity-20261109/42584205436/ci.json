@@ -1,0 +1,86 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-11-09T08:12:00Z",
+  "databaseId": 42584205436,
+  "headSha": "fc350b2869ee76e74c351b600574a4c1b02f4db2",
+  "jobs": [
+    {
+      "completedAt": "2026-11-09T08:15:52Z",
+      "conclusion": "success",
+      "databaseId": 129049987556,
+      "name": "screen",
+      "startedAt": "2026-11-09T08:12:03Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T08:12:04Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T08:12:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T08:12:06Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T08:12:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T08:12:10Z",
+          "conclusion": "success",
+          "name": "Fetch immutable existing binaries; no core build",
+          "number": 3,
+          "startedAt": "2026-11-09T08:12:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T08:12:25Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable tools",
+          "number": 4,
+          "startedAt": "2026-11-09T08:12:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T08:15:50Z",
+          "conclusion": "success",
+          "name": "Confirm the same fixed shaper on native17; no parameter search",
+          "number": 5,
+          "startedAt": "2026-11-09T08:12:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T08:15:51Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 6,
+          "startedAt": "2026-11-09T08:15:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T08:15:51Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 12,
+          "startedAt": "2026-11-09T08:15:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T08:15:51Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-11-09T08:15:51Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42584205436/job/129049987556"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-09T08:15:53Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42584205436"
+}

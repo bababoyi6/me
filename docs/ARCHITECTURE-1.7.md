@@ -21,6 +21,8 @@ Telegram 官方客户端
 
 两台后端互为备份，数据不依次经过两台后端。仍使用 HAProxy、WireGuard、systemd；生产安装没有 Docker、Xray、WebSocket 或额外公网管理服务。
 
+后续已在已知200Mbps/100ms隔离路径上验证加密前分流排队的收益线索，详见[容量与共享队列定位](PATH-CAPACITY-20261109.md)。这是实验内的既有WG接口队列策略，不新增转发层；尚未接入生产安装、重启持久化或默认配置。端口标称1Gbps不能用来自动计算运营商实际瓶颈，也不能直接套实验180Mbps。
+
 ## 数据与信任边界
 
 - Telemt 仅绑定本后端 WireGuard IPv4 地址；两个 SNI 在同一 Telemt 进程中服务。

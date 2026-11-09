@@ -31,3 +31,51 @@
 原生确认首轮42583243638/sourcef68a04a：容量U/D183.124/183.126Mbps通过，但在第一批负载之前，正常noqueue设备的`tc -j class show`返回空文本，采集器JSON解析退出。仅4次预热DC、零计量批次，清理/OOM检查通过；不能记为原生性能通过或失败。已只修复空class列表处理并补两项回归，缺失qdisc依旧拒绝；前置采样移到核心启动之前。不更改整形参数、计量样本或门槛。
 
 42583673480/sourceb036404又遇到HTB统计JSON不兼容，保留已完成的一批原始负载，不能当作完整确认。核对iproute2 v5.15.0 `tc/q_htb.c`发现`htb_print_xstats`直接fprintf，`-s -j`会混入非JSON文本；因此改为保留受支持的`tc -s -d`原始文本及所有计数，不宽松截取JSON或丢弃统计。两种队列的采样预检都移到核心/负载前，测量参数不变。本轮有这些工具失败，不称一次成功。
+
+## 原生确认与实际收益
+
+[42584205436](https://github.com/bababoyi6/me/actions/runs/42584205436)/source `fc350b2869ee76e74c351b600574a4c1b02f4db2`完成原定八批。原生核心SHA仍为`cd4c5ff500d956a8a7059e3e536ff139983a0c5897b4c410ea0e53c68a6cfa14`，没有重编译Telemt。四对D比0.990/0.977/0.973/0.966，U比2.047/2.014/2.087/2.012，消息p95比0.346/0.343/0.347/0.347，新连接p95比0.374/0.373/0.404/0.374，全部达到预登记门槛；RSS比0.944–1.048、整组CPU秒比0.958–1.004。新连接满载样本每批20–32，消息30–40，未放松至少20条规则。
+
+以下是各四批指标的中位数，晋级判断仍逐对执行，不能用中位数掩盖失败：
+
+| 同一任务内的核心/策略 | D Mbps | U Mbps | 消息p95 ms | 新连接p95 ms | 核心RSS MiB |
+|---|---:|---:|---:|---:|---:|
+| balanced2 原队列 | 137.36 | 34.51 | 299.18 | 1108.62 | 24.03 |
+| balanced2 加密前整形 | 134.87 | 72.35 | 102.33 | 426.30 | 24.06 |
+| 原生17 原队列 | 138.23 | 35.41 | 298.19 | 1146.16 | 26.36 |
+| 原生17 加密前整形 | 134.53 | 71.97 | 103.03 | 428.88 | 26.28 |
+
+两种核心分别处于不同CI主机，不能直接跨表行认定哪个核心更快。原生整组CPU秒中位数1.522→1.508，旧版0.845→0.840；不同任务CPU绝对值不直接比较，也未完整归因全部宿主WG/softirq CPU。原生任务实验组峰值344.39MiB，旧版342.54MiB，OOM均0、FD回落、cgroup剩余仅控制进程、命名空间/临时密钥清理通过。不能当成三台各1GB机器的独立内存硬限验收。
+
+原生确认两端开始/结束`tc -s -d`逐批保存：原策略确为noqueue、无class；候选确为180Mbit rate/ceil的HTB及fq_codel，两端已记录drop均0。HTB的overlimits是正常限速等待，不是丢包。路由最大backlog的批中位数6.22MB→1.25MB，消息恢复至接近100ms传播基线，说明此模型的共享瓶颈排队确实参与了高尾延迟；没有证明Rust调度是唯一问题，也未单独分离平滑发送与公平调度各自贡献。
+
+两个完整任务共**80个16MiB文件、762次新连接、888条记录消息、1210个合成DC会话**通过。另有失败任务的一批5文件保留，未混入上述完整任务统计。全部为真实核心、HAProxy、WireGuard、Fake TLS/MTProto协议和合成DC，不是Telegram官方客户端或真实业务文件。
+
+## 实现、回归与可复现证据
+
+- `tests/path_capacity.py`、`test_path_capacity.py`：两个方向均本地接收、保留完整JSON、拒绝时长/字节/速率不一致，真实16秒反例回归。没有默认取消内部限速。
+- `tests/mixed_path_lab.py`：复用已有工作负载，增加显式实验开关和四对调度；普通旧矩阵不自动扩展。新容量配方有独立标识，旧原始JSON和失败不改写。
+- `tests/queue_probe.py`、`test_private_queue_snapshot.py`：只允许CI专用WG接口上的固定180Mbps反事实；保留原始tc配置/计数，覆盖空class输出并拒绝缺失qdisc。
+- `tests/private_shaper_analysis.py`：每对U/D≥95%、两类p95≤90%且≤空载+100ms、RSS/整组CPU秒≤110%、足够样本/容量/完整性。额外复核原始容量、CPU预算及亲和性；`production_approval=false`固定保留。
+- `.github/workflows/private-shaper.yml`：复用精确摘要二进制，无新Telemt编译；最终仅手动触发，不因文档或普通推送重跑。已经回答的单独iperf诊断脚本/工作流从活跃树移除，源码仍可在`450ca09`审查，不扩充长期测试平台。
+- [307项root回归42584177202](https://github.com/bababoyi6/me/actions/runs/42584177202)：无跳过、22.202秒，PR合并检查tree与fc350b2相同；Bash/ShellCheck/内嵌一致性、旧版保护、权限/配置/升级/回退和现有HAProxy功能检查通过。本轮没重新跑ARM、三KVM或大矩阵；已有功能证据按原source引用，不冒称重新验收。
+
+原始数据、CI source和文件摘要见[证据索引](benchmarks/path-capacity-20261109/README.md)。Windows只做Git、数据分析和无损归档，不运行本地Linux构建或网络测试。[iproute2 5.15 HTB统计源码](https://github.com/iproute2/iproute2/blob/v5.15.0/tc/q_htb.c#L361)解释本次采集兼容问题；没有把未知工具故障归因于Telemt。
+
+实际实验入口如下，**仅由CI执行，不在生产复制运行**：
+
+```text
+python3 tests/mixed_path_lab.py --queue-screen --queue-core native17 --profile rtt100 --balanced2-archive <verified> --stable-archive <verified> --native-directory <pinned-build> --output <owned-result>
+python3 tests/private_shaper_analysis.py <owned-result> <analysis>
+sudo timeout --kill-after=10 180 python3 -m unittest discover -s tests -p 'test_*.py' -v
+```
+
+网络负载完全留在runner私有命名空间；构建/下载、执行时限、CPU/内存、实际命令和清理由各提交工作流记录。早期18秒超时、空class和HTB统计格式失败均保留；没有降低门槛、补选有利样本或把工作流绿色当作生产通过。上游API再次筛选的稳定版仍是3.5.17，准确原版本锁不改。
+
+## 放行边界与下一步
+
+**已达到这一个100ms/200Mbps/30逻辑连接模型的优化筛选门槛，尚未达到整体生产放行。** 安装器、核心默认策略、已有配置、密钥、链接、宿主sysctl、防火墙和生产服务均未改；没有登录任何VPS或合并/发布。
+
+以下保持NOT RUN：1Gbps及不同RTT/丢包下的该策略、50/100逻辑混合、持续慢接收/长连接资源、ARM策略、生产开关/权限/重复执行/撤销及重启持久化、官方客户端、公网三VPS跨地区/多运营商、24小时和抗封锁。此前官方17的高RTT单流退化仍未消失，不能因为这次队列收益就改为官方生产默认。
+
+下一步优先做**最小、默认关闭、带明确带宽输入与配置漂移拒绝的可回滚接入**：先确认真实角色/多WG接口共享总带宽的预算方式，再只补持久化、撤销及目标负载边界，避免把每条隧道都分配整机全部带宽。未验证前不提供让用户直接照抄的生产tc命令，也不自动按1Gbps端口标称值启用限速。本轮不再加测或调参寻找更好数字。

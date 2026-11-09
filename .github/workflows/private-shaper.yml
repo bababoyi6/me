@@ -1,9 +1,12 @@
 name: Bounded pre-encryption queue screen
 on:
   workflow_dispatch:
-  push:
-    branches: [dev/telemt-stable-compat-20261107]
-    paths: [.github/workflows/private-shaper.yml]
+    inputs:
+      core:
+        description: Exact already-built core for this bounded screen
+        type: choice
+        default: native17
+        options: [balanced2, native17]
 permissions:
   contents: read
   actions: read
@@ -34,9 +37,11 @@ jobs:
           mkdir -m 700 "$RUNNER_TEMP/shaper-evidence"
           timeout 20 python3 -m unittest discover -s tests -p 'test_path_capacity.py' -v
           timeout 20 python3 -m unittest discover -s tests -p 'test_private_queue_snapshot.py' -v
-      - name: Confirm the same fixed shaper on native17; no parameter search
+      - name: Measure the registered core and fixed shaper; no parameter search
+        env:
+          QUEUE_CORE: ${{ inputs.core || 'native17' }}
         run: |
-          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-shaper-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=780 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/mixed_path_lab.py --queue-screen --queue-core native17 --profile rtt100 --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --stable-archive "$RUNNER_TEMP/stable.tar.gz" --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/shaper-evidence/metrics.json"
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-shaper-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=780 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/mixed_path_lab.py --queue-screen --queue-core "$QUEUE_CORE" --profile rtt100 --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --stable-archive "$RUNNER_TEMP/stable.tar.gz" --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/shaper-evidence/metrics.json"
           python3 tests/private_shaper_analysis.py "$RUNNER_TEMP/shaper-evidence/metrics.json" "$RUNNER_TEMP/shaper-evidence/analysis.json"
       - uses: actions/upload-artifact@v4
         if: always()
