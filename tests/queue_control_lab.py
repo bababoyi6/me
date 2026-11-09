@@ -54,6 +54,7 @@ MemorySwapMax=0
 TasksMax=64
 ''');unit_file.chmod(0o644)
         qc.run('systemctl','daemon-reload');qc.run('systemctl','start',unit)
+        report['initial_link']=control.kernel.link();report['initial_shape']=control.kernel.shape()
         report['checks']['default_off']=control.status()=={'enabled':False} and control.kernel.fresh()
         stage='enable_repeat'
         control.enable(180,200);first=control.journal.read_bytes()
@@ -74,7 +75,8 @@ TasksMax=64
         with patch('queue_control.run',side_effect=fail_leaf):
             try:control.enable(180,200);raise AssertionError('fault not injected')
             except qc.QueueError:pass
-        report['checks']['partial_failure_rolled_back']=control.kernel.fresh() and not control.config.exists() and not dropin.exists()
+        report['checks']['partial_failure_rolled_back']=(control.kernel.fresh() and
+            control.kernel.link()['txqlen']==report['initial_link']['txqlen'] and not control.config.exists() and not dropin.exists())
         stage='crash_resume'
         child='''import os,signal,sys
 sys.path.insert(0,sys.argv[1])

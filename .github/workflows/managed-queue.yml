@@ -23,7 +23,7 @@ jobs:
           mkdir -m 700 "$RUNNER_TEMP/queue-lifecycle"
           python3 tools/embed_queue.py --check
           sudo timeout 30 python3 -m unittest discover -s tests -p 'test_queue_control.py' -v
-      - name: Real wg-quick hooks, crash recovery and drift rejection
+      - name: Real wg-quick hooks, preserved queue baseline, crash recovery and drift rejection
         run: |
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-queue-life-${GITHUB_RUN_ID}" -p CPUQuota=200% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=240 -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; exec python3 tests/queue_control_lab.py --output "$1"' queue "$RUNNER_TEMP/queue-lifecycle/result.json"
       - uses: actions/upload-artifact@v4

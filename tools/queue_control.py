@@ -111,7 +111,7 @@ class KernelQueue:
 
     def fresh(self):
         link=self.link()
-        if link is None or link['txqlen']!=0:return False
+        if link is None:return False
         shape=self.shape()
         return len(shape['qdisc'])==1 and shape['qdisc'][0].startswith('qdisc noqueue 0: root') and not shape['class']
 
@@ -158,7 +158,7 @@ class KernelQueue:
         if expected is not None and digest(shape)!=expected:raise QueueError('队列配置发生漂移，保留现场')
         run('tc','qdisc','del','dev',self.interface,'root')
         run('ip','link','set','dev',self.interface,'txqueuelen',str(baseline))
-        if not self.fresh():raise QueueError('队列恢复未完成，保留记录')
+        if not self.fresh() or self.link()['txqlen']!=baseline:raise QueueError('队列恢复未完成，保留记录')
 
 
 class QueueControl:
@@ -197,7 +197,7 @@ class QueueControl:
         if not self.journal.exists() and not self.journal.is_symlink():return None
         record=json.loads(read_file(self.journal))
         if (type(record) is not dict or type(record.get('schema')) is not int or record.get('schema')!=1 or record.get('policy')!=digest(value) or
-            record.get('baseline_txqlen')!=0 or record.get('phase') not in ('applying','active') or
+            type(record.get('baseline_txqlen')) is not int or not 0<=record['baseline_txqlen']<=10000 or record.get('phase') not in ('applying','active') or
             type(record.get('epoch')) is not dict):raise QueueError('恢复记录与策略不一致')
         epoch=record['epoch']
         if (set(epoch)!={'boot','netns','ifindex'} or not isinstance(epoch['boot'],str) or
@@ -218,16 +218,18 @@ class QueueControl:
                 self.kernel.owned(shape,value['rate_mbps'])
                 if digest(shape)!=record['fingerprint'] or link['txqlen']!=1000:raise QueueError('队列配置发生漂移')
                 return 'unchanged'
-            self.kernel.restore(value['rate_mbps'],0)
+            self.kernel.restore(value['rate_mbps'],record['baseline_txqlen'])
         if not self.kernel.fresh():raise QueueError('接口已有自定义队列；拒绝接管')
-        record={'schema':1,'policy':digest(value),'baseline_txqlen':0,'epoch':epoch,'phase':'applying'}
+        baseline=self.kernel.link()['txqlen']
+        if type(baseline) is not int or not 0<=baseline<=10000:raise QueueError('原接口队列长度超出安全恢复范围')
+        record={'schema':1,'policy':digest(value),'baseline_txqlen':baseline,'epoch':epoch,'phase':'applying'}
         self.record(record)
         try:
             self.kernel.create(value['rate_mbps'])
             shape=self.kernel.shape();self.kernel.owned(shape,value['rate_mbps'])
             record.update(phase='active',fingerprint=digest(shape));self.record(record)
         except BaseException:
-            self.kernel.restore(value['rate_mbps'],0)
+            self.kernel.restore(value['rate_mbps'],baseline)
             self.journal.unlink(missing_ok=True);sync(self.directory)
             raise
         return 'applied'
@@ -238,7 +240,7 @@ class QueueControl:
         if record and link is not None:
             epoch={k:link[k] for k in ('boot','netns','ifindex')}
             if record['epoch']==epoch:
-                self.kernel.restore(value['rate_mbps'],0,record.get('fingerprint'))
+                self.kernel.restore(value['rate_mbps'],record['baseline_txqlen'],record.get('fingerprint'))
             elif not self.kernel.fresh():raise QueueError('接口身份变化且有自定义队列，保留现场')
         elif link is not None and not self.kernel.fresh():
             raise QueueError('缺少归属记录，拒绝删除队列')

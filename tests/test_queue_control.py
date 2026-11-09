@@ -26,6 +26,13 @@ class QueuePolicyTests(unittest.TestCase):
             return_value={'qdisc':['qdisc noqueue 0: root'],'class':[]}):
             with self.assertRaises(QueueError):kernel.restore(180,0,'a'*64)
 
+    def test_fresh_noqueue_does_not_assume_zero_txqlen(self):
+        kernel=KernelQueue('tdh-b1')
+        for length in (0,1000,2000):
+            with self.subTest(length=length),patch.object(kernel,'link',return_value={'txqlen':length}),\
+                patch.object(kernel,'shape',return_value={'qdisc':['qdisc noqueue 0: root'],'class':[]}):
+                self.assertTrue(kernel.fresh())
+
 
 @unittest.skipUnless(os.geteuid()==0,'root-owned state boundary')
 class QueueStateTests(unittest.TestCase):
