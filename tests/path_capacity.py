@@ -35,7 +35,7 @@ def validate(payload, seconds=6):
     return received['bits_per_second'] / 1e6
 
 
-def controls(network, rate_mbps):
+def controls(network, rate_mbps, rows=None):
     """Use the existing B server plus an owned A server, always reverse mode.
 
     Network.close owns both servers and namespaces, including exceptional exits.
@@ -49,10 +49,12 @@ def controls(network, rate_mbps):
     time.sleep(.4)
     if server.poll() is not None:
         raise RuntimeError('private capacity server startup failed')
-    rows = []
+    rows = [] if rows is None else rows
     for direction, receiver, sender in (('U', NAMES[2], '10.77.1.1'), ('D', NAMES[0], '10.77.1.2')):
         payload = json.loads(command('ip', 'netns', 'exec', receiver, 'iperf3', '-c', sender,
             '-t', '6', '-O', '2', '-b', str(rate_mbps) + 'M', '-P', '1', '-J', '-R',
             '--connect-timeout', '3000', timeout=25))
-        rows.append({'direction': direction, 'mbps': validate(payload), 'receiver_local': True, 'raw': payload})
+        row = {'direction': direction, 'receiver_local': True, 'raw': payload}
+        rows.append(row)
+        row['mbps'] = validate(payload)
     return rows

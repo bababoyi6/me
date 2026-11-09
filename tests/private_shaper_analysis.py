@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from mixed_experience_analysis import trial, number
-from legacy_queue_analysis import LEGACY_SHA
+from legacy_queue_analysis import LEGACY_SHA, NATIVE_SHA
 
 
 def analyze(report):
@@ -23,7 +23,10 @@ def analyze(report):
     expected=[(t+1,p) for t in range(4) for p in (('original','shaped180') if t%2==0 else ('shaped180','original'))]
     if [(r.get('round'),r.get('queue_policy')) for r in rows]!=expected:
         raise ValueError('registered AB/BA schedule incomplete')
-    if any(r.get('variant')!='balanced2' or r.get('cohort')!=30 for r in rows):
+    core=report.get('queue_core','balanced2')
+    if core not in ('balanced2','native17') or report.get('binary_sha256',{}).get(core)!=({'balanced2':LEGACY_SHA,'native17':NATIVE_SHA}[core]):
+        raise ValueError('selected core identity mismatch')
+    if any(r.get('variant')!=core or r.get('cohort')!=30 for r in rows):
         raise ValueError('workload or core drift')
     if len({r['config_policy_sha256'] for r in rows})!=1:
         raise ValueError('configuration mismatch')
@@ -47,7 +50,7 @@ def analyze(report):
             max(pair['message_p95_ratio'],pair['new_connection_p95_ratio'])<=.90 and
             pair['rss_ratio']<=1.10 and pair['group_cpu_seconds_ratio']<=1.10)
         pairs.append(pair)
-    return {'pairs':pairs,'trials':derived,'all_pairs_joint_gain':all(p['joint_gain'] for p in pairs),
+    return {'core':core,'pairs':pairs,'trials':derived,'all_pairs_joint_gain':all(p['joint_gain'] for p in pairs),
             'production_approval':False,'next_core_confirmation_permitted':all(p['joint_gain'] for p in pairs)}
 
 

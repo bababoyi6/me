@@ -37,6 +37,7 @@ def main(args):
     backend_cpu,frontend_cpu,dc_cpu=cpus[:3];os.sched_setaffinity(0,{frontend_cpu})
     rtt,rate,loss=PROFILES[args.profile]
     queue_screen=getattr(args,'queue_screen',False)
+    queue_core=getattr(args,'queue_core','balanced2')
     if queue_screen and (args.client_diagnostic or args.profile!='rtt100'):
         raise RuntimeError('shaper screen is registered only for the 100ms mixed workload')
     output=Path(args.output)
@@ -50,7 +51,9 @@ def main(args):
         report['scope']='one client TCP_NODELAY variable; sequential new FakeTLS+1KiB/ACK, four AB/BA rounds per pinned core; no bulk/idle workload or throughput claim'
     if queue_screen:
         report['plan']='private-shaper-screen-v1'
-        report['scope']='released balanced2 only; four AB/BA mixed pairs, 30 logical connections; pre-encryption 180Mbps HTB/fq_codel versus unchanged 200Mbps WAN'
+        report['queue_core']=queue_core
+        report['queue_telemetry']='raw-tc-v1'
+        report['scope']='one pinned core only; four AB/BA mixed pairs, 30 logical connections; pre-encryption 180Mbps HTB/fq_codel versus unchanged 200Mbps WAN'
     children=[];net=None;front=None;dc=None;expected=0
     write(output,report)
     try:
@@ -72,7 +75,7 @@ def main(args):
             net.setup()
             command('ip','-n',NAMES[2],'address','add','198.18.0.1/32','dev','lo')
             report['capacity_recipe']='receiver-local-v2; full JSON, matched windows and bytes required'
-            report['controls']=capacity_controls(net,rate)
+            capacity_controls(net,rate,report['controls'])
             if queue_screen and any(c['mbps']<rate*.5 for c in report['controls']):
                 raise RuntimeError('capacity control below unchanged 100Mbps gate; no screening load permitted')
             wg_original=original_wg_policy() if queue_screen else None
@@ -102,7 +105,7 @@ backend line_b
             time.sleep(.3)
             if front.poll() is not None:raise RuntimeError('private SNI frontend startup failed')
             for turn in range(4 if queue_screen else (1 if args.client_diagnostic else 3)):
-                order=('balanced2',) if queue_screen else VARIANTS[turn:]+VARIANTS[:turn]
+                order=(queue_core,) if queue_screen else VARIANTS[turn:]+VARIANTS[:turn]
                 for variant in order:
                     options={'kind':'balanced2' if variant=='balanced2' else 'balanced','binary':binaries[variant]}
                     if variant!='balanced2':options['experimental_binary']=[report['binary_sha256'][variant],
@@ -132,6 +135,9 @@ backend line_b
                             if queue_screen:
                                 configure_private_shaper(shaped,wg_original)
                                 time.sleep(1)
+                                queue_before={ns:{kind:json.loads(command('ip','netns','exec',ns,
+                                    'tc','-s','-j',kind,'show','dev','wg-lab')) for kind in ('qdisc','class')}
+                                    for ns in (NAMES[0],NAMES[2])}
                             group_cpu_before=resources()['cpu']['usage_usec']
                             ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
                             snapshots={k:stats(pid) for k,pid in ids.items()}
@@ -167,7 +173,10 @@ backend line_b
                             if queue_screen:
                                 report['rows'][-1]['queue_policy']='shaped180' if shaped else 'original'
                                 report['rows'][-1]['group_cpu_seconds']=(resources()['cpu']['usage_usec']-group_cpu_before)/1e6
-                                report['rows'][-1]['wireguard_qdiscs']={ns:qdiscs_in_namespace(ns) for ns in (NAMES[0],NAMES[2])}
+                                report['rows'][-1]['wireguard_before']=queue_before
+                                report['rows'][-1]['wireguard_after']={ns:{kind:json.loads(command('ip','netns','exec',ns,
+                                    'tc','-s','-j',kind,'show','dev','wg-lab')) for kind in ('qdisc','class')}
+                                    for ns in (NAMES[0],NAMES[2])}
                             write(output,report)
                             if not result['complete'] or result['errors']:raise RuntimeError('mixed integrity or completion failure')
                             expected+=result['dc_connections']
@@ -214,5 +223,6 @@ if __name__=='__main__':
     parser.add_argument('--native-directory',required=True);parser.add_argument('--output',required=True)
     parser.add_argument('--client-diagnostic',action='store_true')
     parser.add_argument('--queue-screen',action='store_true')
+    parser.add_argument('--queue-core',choices=('balanced2','native17'),default='balanced2')
     signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
     raise SystemExit(main(parser.parse_args()))
