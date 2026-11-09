@@ -43,6 +43,12 @@ def trial(row):
           'download_jain':sum(rates)**2/(len(rates)*sum(v*v for v in rates)),
           'bulk_completion_ms':quantiles([v['elapsed_seconds']*1000 for v in bulk]),
           'idle_recovery_ms':quantiles(r['idle_recovery_ms'])}
+    # Full duplex aggregate can exceed one direction's shaped rate and can
+    # conceal a slower upload. Require each direction independently as well.
+    for direction in ('D','U'):
+        flows=[v for v in bulk if v['direction']==direction]
+        data[direction+'_mbps']=sum(v['bytes'] for v in flows)*8/1e6/(
+            max(v['end_offset_seconds'] for v in flows)-min(v['start_offset_seconds'] for v in flows))
     for phase in ('baseline','loaded'):
         for name in ('message','new_connection'):
             samples=r.get(phase,{}).get(name,[])
@@ -104,11 +110,12 @@ def analyze(report):
             for turn in (1,2,3):
                 old=derived[turn,'balanced2',n];new=derived[turn,variant,n]
                 pair={'round':turn,'throughput_ratio':new['bulk_mbps']/old['bulk_mbps'],
+                    'download_ratio':new['D_mbps']/old['D_mbps'],'upload_ratio':new['U_mbps']/old['U_mbps'],
                     'message_p95_ratio':new['loaded_message_ms']['p95']/old['loaded_message_ms']['p95'],
                     'new_connection_p95_ratio':new['loaded_new_connection_ms']['p95']/old['loaded_new_connection_ms']['p95'],
                     'rss_ratio':new['peak_backend_rss']/old['peak_backend_rss']}
                 pair['absolute_queue_budget_ok']=all(new['loaded_'+k+'_ms']['p95']<=new['baseline_'+k+'_ms']['p95']+100 for k in ('message','new_connection'))
-                pair['parity']=(pair['throughput_ratio']>=.95 and pair['message_p95_ratio']<=1.10 and
+                pair['parity']=(min(pair['throughput_ratio'],pair['download_ratio'],pair['upload_ratio'])>=.95 and pair['message_p95_ratio']<=1.10 and
                     pair['new_connection_p95_ratio']<=1.10 and pair['rss_ratio']<=1.10 and pair['absolute_queue_budget_ok'])
                 pair['qualified']=(not capacity_limited and not old['harness_limited'] and not new['harness_limited']
                     and not old['sample_limited'] and not new['sample_limited'])

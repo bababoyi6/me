@@ -67,10 +67,15 @@ class MixedExperienceAnalysisTests(unittest.TestCase):
             self.assertFalse(analyze(data)['performance_parity_all_cases'])
 
     def test_one_bad_pair_or_absolute_queue_delay_blocks_joint_parity(self):
-        for mutation in ('throughput','latency','rss','queue'):
+        for mutation in ('throughput','upload','latency','rss','queue'):
             data=fixture();row=next(r for r in data['rows'] if r['variant']=='native17')
             if mutation=='throughput':
                 for v in row['result']['bulk']:v.update(elapsed_seconds=2,end_offset_seconds=3)
+            if mutation=='upload':
+                for other in data['rows']:
+                    for v in other['result']['bulk']:
+                        if v['direction']=='D':v.update(elapsed_seconds=2,end_offset_seconds=3)
+                row['result']['bulk'][-1].update(elapsed_seconds=1.1,end_offset_seconds=2.1)
             if mutation=='latency':
                 for v in row['result']['loaded']['message']:v['elapsed_ms']=111
             if mutation=='rss':row['sampled_backend_peak_rss']*=2
