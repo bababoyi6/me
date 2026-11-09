@@ -23,13 +23,23 @@ def exchange(stream, sequence):
     return (time.monotonic()-started)*1000
 
 
+def finish_idle(streams):
+    def finish(item):
+        elapsed=exchange(item,2)
+        item.sendall(END)
+        if exact(item,64)!=END:raise RuntimeError('persistent final frame mismatch')
+        return elapsed
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+        return list(pool.map(finish,streams))
+
+
 def run_mixed(endpoint, logical_clients):
     if logical_clients not in (30,50,100):raise ValueError('unregistered cohort')
     held=[];lock=threading.Lock();stop=threading.Event()
     result={'logical_clients':logical_clients,'idle_connections':logical_clients-11,
             'baseline':{'message':[],'new_connection':[]},'loaded':{'message':[],'new_connection':[]},
             'bulk':[],'errors':[],'new_connections_completed':0,'complete':False}
-    origin=time.monotonic()
+    origin=time.monotonic();phase='idle_setup'
     def connect(index):
         sock=socket.create_connection(('127.0.0.1',endpoint.front),timeout=8)
         with lock:held.append(sock)
@@ -40,7 +50,7 @@ def run_mixed(endpoint, logical_clients):
         exchange(stream,0)
         return stream
     def error(exc):
-        result['errors'].append({'type':type(exc).__name__,'reason':sanitize_startup_log(str(exc))[:160]})
+        result['errors'].append({'type':type(exc).__name__,'phase':phase,'reason':sanitize_startup_log(str(exc))[:160]})
     def probes(phase,streams,bulk=None):
         def message(stream):
             for index in range(10 if phase=='baseline' else 100):
@@ -83,6 +93,7 @@ def run_mixed(endpoint, logical_clients):
                 except Exception as exc:error(exc);stop.set();break
         keeper=threading.Thread(target=keepalive,name='synthetic-idle-keepalive');keeper.start()
         result['setup_seconds']=time.monotonic()-origin
+        phase='baseline'
         probes('baseline',streams)
         if result['errors']:raise RuntimeError('baseline probes failed')
         def bulk_transfer(index):
@@ -91,6 +102,7 @@ def run_mixed(endpoint, logical_clients):
                                  125000000,persistent=True,io_timeout=25)
             row.update(start_offset_seconds=start-origin,end_offset_seconds=time.monotonic()-origin)
             return row
+        phase='loaded'
         with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
             jobs=[pool.submit(bulk_transfer,i) for i in range(5)]
             probe=pool.submit(probes,'loaded',streams,jobs)
@@ -100,10 +112,13 @@ def run_mixed(endpoint, logical_clients):
             stop.set();probe.result(timeout=30)
         keeper.join(timeout=30)
         if keeper.is_alive():raise RuntimeError('keepalive worker did not finish')
-        result['idle_recovery_ms']=[exchange(item,2) for item in idle]
-        for item in idle+streams:
-            item.sendall(END)
-            if exact(item,64)!=END:raise RuntimeError('persistent final frame mismatch')
+        phase='idle_recovery_and_close'
+        # Serial teardown at 200ms can spend >35s walking 100 sockets and
+        # violate the DC fixture's 25s idle timeout. Validate and finish each
+        # connection together, bounded in parallel; do not blame that EOF on
+        # a core or lengthen the production/fixture idle timeout.
+        result['idle_recovery_ms']=finish_idle(idle)
+        finish_idle(streams)
         result['dc_connections']=len(idle)+2+5+result['new_connections_completed']
         result['complete']=not result['errors'] and len(result['bulk'])==5
     except Exception as exc:error(exc)

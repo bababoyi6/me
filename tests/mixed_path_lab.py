@@ -41,7 +41,7 @@ def main(args):
         'complete':False,'accepted':False,'rows':[],'controls':[],'resources_before':before,
         'cpu_assignment':{'core':backend_cpu,'client_haproxy_observer':frontend_cpu,'dc':dc_cpu},
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name'))}
-    children=[];net=None;front=None;expected=0
+    children=[];net=None;front=None;dc=None;expected=0
     write(output,report)
     try:
         with tempfile.TemporaryDirectory(prefix='tdh-audit-mixed-') as folder:
@@ -149,6 +149,9 @@ backend line_b
             report['mock_dc']=dc.call({'command':'stats'});report['complete']=True
     finally:
         report['cleanup_errors']=[]
+        if dc is not None and dc.process.poll() is None:
+            try:report['mock_dc']=dc.call({'command':'stats'})
+            except Exception as exc:report['dc_observation_error']=type(exc).__name__
         for child in reversed(children):
             try:child.close()
             except Exception as exc:report['cleanup_errors'].append(type(exc).__name__)
