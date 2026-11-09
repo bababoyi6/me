@@ -1,0 +1,110 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-11-09T02:44:55Z",
+  "databaseId": 42552612475,
+  "headSha": "82b86609c39b4aa12407e628b64b7c42d862a922",
+  "jobs": [
+    {
+      "completedAt": "2026-11-09T02:51:36Z",
+      "conclusion": "success",
+      "databaseId": 128952100910,
+      "name": "acceptance",
+      "startedAt": "2026-11-09T02:47:45Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T02:47:46Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T02:47:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:47:48Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T02:47:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:48:08Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable runner dependencies",
+          "number": 3,
+          "startedAt": "2026-11-09T02:47:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:48:10Z",
+          "conclusion": "success",
+          "name": "Fetch exact archives and verify before extraction",
+          "number": 4,
+          "startedAt": "2026-11-09T02:48:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:48:52Z",
+          "conclusion": "success",
+          "name": "Verify actual install, upgrade, rollback, systemd and production health agent",
+          "number": 5,
+          "startedAt": "2026-11-09T02:48:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:49:28Z",
+          "conclusion": "success",
+          "name": "Verify 30, 50 and 100 native protocol sessions under bounded resources",
+          "number": 6,
+          "startedAt": "2026-11-09T02:48:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:50:07Z",
+          "conclusion": "success",
+          "name": "Verify previous official 3.5.16 to 3.5.17 and reverse rollback with original config",
+          "number": 7,
+          "startedAt": "2026-11-09T02:49:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:51:33Z",
+          "conclusion": "success",
+          "name": "Verify WireGuard, SNI, reload and real process/tunnel failure recovery",
+          "number": 8,
+          "startedAt": "2026-11-09T02:50:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:51:34Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 9,
+          "startedAt": "2026-11-09T02:51:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:51:34Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 18,
+          "startedAt": "2026-11-09T02:51:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:51:34Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-11-09T02:51:34Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42552612475/job/128952100910"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-09T02:51:36Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42552612475"
+}

@@ -1,0 +1,11 @@
+{
+  "complete": true,
+  "kernel": "5.15.0-203-generic",
+  "factory_clean": false,
+  "prepared_once_then_cloned": true,
+  "guest_logical_mib_each": 1024,
+  "guest_vcpus_each": 1,
+  "preinstalled_packages": true,
+  "kernel_meta_package": "linux-image-virtual",
+  "production_installer_changes_kernel": false
+}

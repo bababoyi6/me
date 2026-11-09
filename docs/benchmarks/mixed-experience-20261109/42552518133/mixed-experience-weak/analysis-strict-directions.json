@@ -1,0 +1,2135 @@
+{
+  "profile": "weak",
+  "protocol_passed": true,
+  "capacity_limited": false,
+  "sample_limited_trials": 0,
+  "harness_limited_trials": 0,
+  "comparisons": [
+    {
+      "cohort": 30,
+      "variant": "official17",
+      "pairs": [
+        {
+          "round": 1,
+          "throughput_ratio": 0.8073719555250297,
+          "download_ratio": 1.0272327374314127,
+          "upload_ratio": 0.7307244514921638,
+          "message_p95_ratio": 0.3533879790056842,
+          "new_connection_p95_ratio": 0.3673341824407011,
+          "rss_ratio": 0.9517412935323383,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "throughput_ratio": 0.8273322617206218,
+          "download_ratio": 0.9716130912921128,
+          "upload_ratio": 0.7317568268045094,
+          "message_p95_ratio": 0.3528675241596251,
+          "new_connection_p95_ratio": 0.35382438075287703,
+          "rss_ratio": 0.9296623794212219,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "throughput_ratio": 1.0786118266907947,
+          "download_ratio": 1.1240213327423318,
+          "upload_ratio": 0.9312014947122118,
+          "message_p95_ratio": 0.40909112768633993,
+          "new_connection_p95_ratio": 0.4119015768757378,
+          "rss_ratio": 0.9166111850865513,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        }
+      ],
+      "all_pairs_qualified_and_parity": false
+    },
+    {
+      "cohort": 30,
+      "variant": "native17",
+      "pairs": [
+        {
+          "round": 1,
+          "throughput_ratio": 0.9180510172400773,
+          "download_ratio": 1.0042087675214395,
+          "upload_ratio": 0.8309224203720293,
+          "message_p95_ratio": 1.0490043361165213,
+          "new_connection_p95_ratio": 1.0810404972520002,
+          "rss_ratio": 1.0661691542288558,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "throughput_ratio": 0.9410091057631162,
+          "download_ratio": 0.9410091057631161,
+          "upload_ratio": 1.0312334097433735,
+          "message_p95_ratio": 0.9814553089957665,
+          "new_connection_p95_ratio": 1.0134707612827996,
+          "rss_ratio": 1.0489013933547695,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "throughput_ratio": 1.0598087979655848,
+          "download_ratio": 1.1949877607298716,
+          "upload_ratio": 0.9149701397952571,
+          "message_p95_ratio": 1.0997637101121187,
+          "new_connection_p95_ratio": 1.0883588238270059,
+          "rss_ratio": 1.060918774966711,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        }
+      ],
+      "all_pairs_qualified_and_parity": false
+    },
+    {
+      "cohort": 50,
+      "variant": "official17",
+      "pairs": [
+        {
+          "round": 1,
+          "throughput_ratio": 0.8809232468108508,
+          "download_ratio": 0.9739498591325363,
+          "upload_ratio": 0.6853562362128135,
+          "message_p95_ratio": 0.3537679371406758,
+          "new_connection_p95_ratio": 0.3362443785435899,
+          "rss_ratio": 0.9856192979743312,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "throughput_ratio": 0.8111679765632488,
+          "download_ratio": 0.8694774753884514,
+          "upload_ratio": 0.7052483673132934,
+          "message_p95_ratio": 0.34078290290909213,
+          "new_connection_p95_ratio": 0.351725516233767,
+          "rss_ratio": 0.9432125473228772,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "throughput_ratio": 0.8888838467507036,
+          "download_ratio": 1.0456368007357986,
+          "upload_ratio": 0.7137789662375523,
+          "message_p95_ratio": 0.3757606463659833,
+          "new_connection_p95_ratio": 0.36989455336112104,
+          "rss_ratio": 0.9910410874266296,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        }
+      ],
+      "all_pairs_qualified_and_parity": false
+    },
+    {
+      "cohort": 50,
+      "variant": "native17",
+      "pairs": [
+        {
+          "round": 1,
+          "throughput_ratio": 0.8639974156725299,
+          "download_ratio": 0.8639974156725297,
+          "upload_ratio": 0.9644445418789492,
+          "message_p95_ratio": 0.851307405275428,
+          "new_connection_p95_ratio": 0.8269688113937194,
+          "rss_ratio": 1.081490644812123,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "throughput_ratio": 0.9724518272739382,
+          "download_ratio": 0.9724518272739382,
+          "upload_ratio": 0.9662032888132278,
+          "message_p95_ratio": 0.9359849730042281,
+          "new_connection_p95_ratio": 0.9709564064004587,
+          "rss_ratio": 1.0469172525689563,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "throughput_ratio": 0.9921342114225998,
+          "download_ratio": 1.0541148804094225,
+          "upload_ratio": 0.7966983333591782,
+          "message_p95_ratio": 1.0264556584838775,
+          "new_connection_p95_ratio": 1.020975700041665,
+          "rss_ratio": 1.078931109051591,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        }
+      ],
+      "all_pairs_qualified_and_parity": false
+    },
+    {
+      "cohort": 100,
+      "variant": "official17",
+      "pairs": [
+        {
+          "round": 1,
+          "throughput_ratio": 0.8656910723784358,
+          "download_ratio": 1.0530914585927214,
+          "upload_ratio": 0.6425008701635612,
+          "message_p95_ratio": 0.34872307372472083,
+          "new_connection_p95_ratio": 0.3728326023871636,
+          "rss_ratio": 0.9727224576271186,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "throughput_ratio": 0.9383035437117738,
+          "download_ratio": 1.1315937611512885,
+          "upload_ratio": 0.6491231699605794,
+          "message_p95_ratio": 0.38915680517728124,
+          "new_connection_p95_ratio": 0.38806832052581114,
+          "rss_ratio": 0.964369239235108,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "throughput_ratio": 0.9551058093629157,
+          "download_ratio": 1.0161863314085968,
+          "upload_ratio": 0.771656980591848,
+          "message_p95_ratio": 0.40831589922397,
+          "new_connection_p95_ratio": 0.39155135555846415,
+          "rss_ratio": 0.9789112956372743,
+          "absolute_queue_budget_ok": true,
+          "parity": false,
+          "qualified": true
+        }
+      ],
+      "all_pairs_qualified_and_parity": false
+    },
+    {
+      "cohort": 100,
+      "variant": "native17",
+      "pairs": [
+        {
+          "round": 1,
+          "throughput_ratio": 1.1443324728296835,
+          "download_ratio": 1.1443324728296835,
+          "upload_ratio": 0.8968437194452922,
+          "message_p95_ratio": 0.8426875266365091,
+          "new_connection_p95_ratio": 0.9550244497318348,
+          "rss_ratio": 1.0497881355932204,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "throughput_ratio": 1.0898354670589558,
+          "download_ratio": 1.1312842596513706,
+          "upload_ratio": 0.7539787130123363,
+          "message_p95_ratio": 1.0133559725548829,
+          "new_connection_p95_ratio": 1.0105826815473629,
+          "rss_ratio": 1.0689228229467602,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "throughput_ratio": 0.9137815930841562,
+          "download_ratio": 0.9137815930841561,
+          "upload_ratio": 0.9567596214957605,
+          "message_p95_ratio": 0.9897302903200694,
+          "new_connection_p95_ratio": 0.9826279446537486,
+          "rss_ratio": 1.0500856728614736,
+          "absolute_queue_budget_ok": false,
+          "parity": false,
+          "qualified": true
+        }
+      ],
+      "all_pairs_qualified_and_parity": false
+    }
+  ],
+  "trials": [
+    {
+      "round": 1,
+      "variant": "balanced2",
+      "cohort": 30,
+      "bulk_mbps": 88.28699290572355,
+      "download_jain": 0.9909103044144821,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6801.447171000007,
+        "p95": 7600.639932000007,
+        "p99": 7600.639932000007,
+        "p99_population_inference": false,
+        "max": 7600.639932000007
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.69301399997244,
+        "p95": 101.04940700000498,
+        "p99": 101.04940700000498,
+        "p99_population_inference": false,
+        "max": 101.04940700000498
+      },
+      "D_mbps": 70.62959432457883,
+      "U_mbps": 19.512633538324394,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.71784050001042,
+        "p95": 101.02643199999761,
+        "p99": 101.09593900000391,
+        "p99_population_inference": false,
+        "max": 101.09593900000391
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.0700555000053,
+        "p95": 421.2753029999874,
+        "p99": 423.5846339999796,
+        "p99_population_inference": false,
+        "max": 423.5846339999796
+      },
+      "loaded_message_ms": {
+        "n": 52,
+        "p50": 129.09672149999096,
+        "p95": 337.57049499999425,
+        "p99": 341.70073300001036,
+        "p99_population_inference": false,
+        "max": 341.70073300001036
+      },
+      "loaded_new_connection_ms": {
+        "n": 36,
+        "p50": 494.84639099999583,
+        "p95": 1311.4556500000276,
+        "p99": 1313.8463539999918,
+        "p99_population_inference": false,
+        "max": 1313.8463539999918
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 24698880,
+      "cpu": {
+        "backend": 1.4402211125806026,
+        "client": 3.14230060926677,
+        "dc": 1.1783627284750384,
+        "haproxy": 2.487654649002859,
+        "controller": 0.16649480432845942,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3596840
+    },
+    {
+      "round": 1,
+      "variant": "balanced2",
+      "cohort": 50,
+      "bulk_mbps": 93.19830246952132,
+      "download_jain": 0.9929389153323062,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6048.322452000008,
+        "p95": 7199.785435000023,
+        "p99": 7199.785435000023,
+        "p99_population_inference": false,
+        "max": 7199.785435000023
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.64592899999525,
+        "p95": 100.91048900000033,
+        "p99": 101.25987500001088,
+        "p99_population_inference": false,
+        "max": 101.25987500001088
+      },
+      "D_mbps": 74.55864197561705,
+      "U_mbps": 23.963018355757796,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.65444449999461,
+        "p95": 100.89396399999373,
+        "p99": 100.9483219999936,
+        "p99_population_inference": false,
+        "max": 100.9483219999936
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 416.77685200001235,
+        "p95": 424.5539860000065,
+        "p99": 424.7216299999934,
+        "p99_population_inference": false,
+        "max": 424.7216299999934
+      },
+      "loaded_message_ms": {
+        "n": 48,
+        "p50": 185.4851955000072,
+        "p95": 348.8790420000214,
+        "p99": 356.56718800001386,
+        "p99_population_inference": false,
+        "max": 356.56718800001386
+      },
+      "loaded_new_connection_ms": {
+        "n": 34,
+        "p50": 466.7177839999965,
+        "p95": 1416.3769490000107,
+        "p99": 1555.7538459999876,
+        "p99_population_inference": false,
+        "max": 1555.7538459999876
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 26488832,
+      "cpu": {
+        "backend": 1.121697077140162,
+        "client": 2.3453666158385205,
+        "dc": 1.0197246155819655,
+        "haproxy": 1.7335318464893412,
+        "controller": 0.17381128063661483,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3745320
+    },
+    {
+      "round": 1,
+      "variant": "balanced2",
+      "cohort": 100,
+      "bulk_mbps": 83.16617734113457,
+      "download_jain": 0.9828144683016817,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 5987.936160000004,
+        "p95": 8068.036977999981,
+        "p99": 8068.036977999981,
+        "p99_population_inference": false,
+        "max": 8068.036977999981
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.6233399999985,
+        "p95": 100.8227819999945,
+        "p99": 103.21461899999917,
+        "p99_population_inference": false,
+        "max": 103.21461899999917
+      },
+      "D_mbps": 66.53294187290766,
+      "U_mbps": 22.414638182862966,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.55717299999856,
+        "p95": 100.88825900001552,
+        "p99": 100.9960099999887,
+        "p99_population_inference": false,
+        "max": 100.9960099999887
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 418.61654699998496,
+        "p95": 424.13150300001234,
+        "p99": 428.41219499999283,
+        "p99_population_inference": false,
+        "max": 428.41219499999283
+      },
+      "loaded_message_ms": {
+        "n": 58,
+        "p50": 100.66107600000862,
+        "p95": 353.659571999998,
+        "p99": 359.21186000001626,
+        "p99_population_inference": false,
+        "max": 359.21186000001626
+      },
+      "loaded_new_connection_ms": {
+        "n": 43,
+        "p50": 424.2236670000068,
+        "p95": 1233.7932869999975,
+        "p99": 1242.0231270000102,
+        "p99_population_inference": false,
+        "max": 1242.0231270000102
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 30932992,
+      "cpu": {
+        "backend": 0.7634395966961836,
+        "client": 1.5586891765880413,
+        "dc": 0.6680096471091607,
+        "haproxy": 1.1451593950442753,
+        "controller": 0.2221661553808251,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3722394
+    },
+    {
+      "round": 1,
+      "variant": "official17",
+      "cohort": 30,
+      "bulk_mbps": 71.28044210971845,
+      "download_jain": 0.9999396674026348,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7390.646054000001,
+        "p95": 9413.25306500002,
+        "p99": 9413.25306500002,
+        "p99_population_inference": false,
+        "max": 9413.25306500002
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.64624500000718,
+        "p95": 100.9661939999944,
+        "p99": 100.9661939999944,
+        "p99_population_inference": false,
+        "max": 100.9661939999944
+      },
+      "D_mbps": 72.55303152170728,
+      "U_mbps": 14.258358439459693,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.61101200000167,
+        "p95": 100.86363300001722,
+        "p99": 101.06378300000074,
+        "p99_population_inference": false,
+        "max": 101.06378300000074
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.75818200000003,
+        "p95": 424.96678400001997,
+        "p99": 425.377750000024,
+        "p99_population_inference": false,
+        "max": 425.377750000024
+      },
+      "loaded_message_ms": {
+        "n": 92,
+        "p50": 101.26653299998623,
+        "p95": 119.29335499999638,
+        "p99": 138.1980829999918,
+        "p99_population_inference": false,
+        "max": 138.1980829999918
+      },
+      "loaded_new_connection_ms": {
+        "n": 69,
+        "p50": 435.63593299998615,
+        "p95": 481.7424889999984,
+        "p99": 1453.3266850000075,
+        "p99_population_inference": false,
+        "max": 1453.3266850000075
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 23506944,
+      "cpu": {
+        "backend": 1.489470856841468,
+        "client": 3.0935163949784337,
+        "dc": 1.145746812954976,
+        "haproxy": 2.8643670323874386,
+        "controller": 0.14792269064488547,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 763300
+    },
+    {
+      "round": 1,
+      "variant": "official17",
+      "cohort": 50,
+      "bulk_mbps": 82.10055120871046,
+      "download_jain": 0.9998161252190387,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7362.420842000006,
+        "p95": 8172.433042000022,
+        "p99": 8172.433042000022,
+        "p99_population_inference": false,
+        "max": 8172.433042000022
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.67366699996683,
+        "p95": 100.87562000001071,
+        "p99": 100.95520200002284,
+        "p99_population_inference": false,
+        "max": 100.95520200002284
+      },
+      "D_mbps": 72.61637884926543,
+      "U_mbps": 16.423204068600725,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.64910750000422,
+        "p95": 100.97337100000914,
+        "p99": 101.11905600001592,
+        "p99_population_inference": false,
+        "max": 101.11905600001592
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.4333510000281,
+        "p95": 420.25453399998014,
+        "p99": 421.4679230000229,
+        "p99_population_inference": false,
+        "max": 421.4679230000229
+      },
+      "loaded_message_ms": {
+        "n": 80,
+        "p50": 104.12494599998467,
+        "p95": 123.42221899996275,
+        "p99": 128.03452499997547,
+        "p99_population_inference": false,
+        "max": 128.03452499997547
+      },
+      "loaded_new_connection_ms": {
+        "n": 62,
+        "p50": 440.08787550001216,
+        "p95": 476.2487869999745,
+        "p99": 575.1579640000273,
+        "p99_population_inference": false,
+        "max": 575.1579640000273
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 26107904,
+      "cpu": {
+        "backend": 1.3118388938063024,
+        "client": 2.7208510390056646,
+        "dc": 0.9717325139305948,
+        "haproxy": 2.477917910523015,
+        "controller": 0.17009844837969,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 839174
+    },
+    {
+      "round": 1,
+      "variant": "official17",
+      "cohort": 100,
+      "bulk_mbps": 71.99621724806195,
+      "download_jain": 0.999123905405585,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7404.434634999972,
+        "p95": 9319.736368999998,
+        "p99": 9319.736368999998,
+        "p99_population_inference": false,
+        "max": 9319.736368999998
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.66464199996972,
+        "p95": 100.83426699998199,
+        "p99": 100.94046200003959,
+        "p99_population_inference": false,
+        "max": 100.94046200003959
+      },
+      "D_mbps": 70.06527280140507,
+      "U_mbps": 14.401424536890838,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.49989000000892,
+        "p95": 100.60192599996753,
+        "p99": 100.67765200000167,
+        "p99_population_inference": false,
+        "max": 100.67765200000167
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.7454430000296,
+        "p95": 427.55807699995785,
+        "p99": 546.4325300000041,
+        "p99_population_inference": false,
+        "max": 546.4325300000041
+      },
+      "loaded_message_ms": {
+        "n": 89,
+        "p50": 102.45314700000563,
+        "p95": 123.32925300000852,
+        "p99": 408.0559619999917,
+        "p99_population_inference": false,
+        "max": 408.0559619999917
+      },
+      "loaded_new_connection_ms": {
+        "n": 72,
+        "p50": 436.15822000001003,
+        "p95": 459.99836200002164,
+        "p99": 466.3737939999919,
+        "p99_population_inference": false,
+        "max": 466.3737939999919
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 30089216,
+      "cpu": {
+        "backend": 0.9638687733015109,
+        "client": 1.837374849106005,
+        "dc": 0.7831433783074777,
+        "haproxy": 1.6265285549462998,
+        "controller": 0.21431764646212134,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 888414
+    },
+    {
+      "round": 1,
+      "variant": "native17",
+      "cohort": 30,
+      "bulk_mbps": 81.051963646167,
+      "download_jain": 0.9898679284918326,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6833.068118000028,
+        "p95": 8278.140844000007,
+        "p99": 8278.140844000007,
+        "p99_population_inference": false,
+        "max": 8278.140844000007
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.61990999997761,
+        "p95": 100.82113900000422,
+        "p99": 100.82113900000422,
+        "p99_population_inference": false,
+        "max": 100.82113900000422
+      },
+      "D_mbps": 70.92685786722457,
+      "U_mbps": 16.21348468749694,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.54790949999415,
+        "p95": 100.79279100000349,
+        "p99": 100.9677949999741,
+        "p99_population_inference": false,
+        "max": 100.9677949999741
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.9020460000231,
+        "p95": 427.14751099998693,
+        "p99": 728.1823069999973,
+        "p99_population_inference": false,
+        "max": 728.1823069999973
+      },
+      "loaded_message_ms": {
+        "n": 57,
+        "p50": 100.75257199997623,
+        "p95": 354.1129129999945,
+        "p99": 600.1209209999843,
+        "p99_population_inference": false,
+        "max": 600.1209209999843
+      },
+      "loaded_new_connection_ms": {
+        "n": 42,
+        "p50": 427.8874575000202,
+        "p95": 1417.736667999975,
+        "p99": 2095.5618599999752,
+        "p99_population_inference": false,
+        "max": 2095.5618599999752
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 26333184,
+      "cpu": {
+        "backend": 1.3242426551790343,
+        "client": 2.829063854246117,
+        "dc": 1.0834712633283003,
+        "haproxy": 2.2873282225819676,
+        "controller": 0.14849548505612417,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3736950
+    },
+    {
+      "round": 1,
+      "variant": "native17",
+      "cohort": 50,
+      "bulk_mbps": 80.52309247873318,
+      "download_jain": 0.9831072531251691,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6023.160540999981,
+        "p95": 8333.58506999997,
+        "p99": 8333.58506999997,
+        "p99_population_inference": false,
+        "max": 8333.58506999997
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.59459100000367,
+        "p95": 100.89127800000597,
+        "p99": 100.91151500000706,
+        "p99_population_inference": false,
+        "max": 100.91151500000706
+      },
+      "D_mbps": 64.41847398298653,
+      "U_mbps": 23.11100226015568,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.59604049999393,
+        "p95": 100.91065800003207,
+        "p99": 100.98981900000581,
+        "p99_population_inference": false,
+        "max": 100.98981900000581
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.7566780000177,
+        "p95": 422.3468459999822,
+        "p99": 722.1618510000098,
+        "p99_population_inference": false,
+        "max": 722.1618510000098
+      },
+      "loaded_message_ms": {
+        "n": 64,
+        "p50": 108.81269400002225,
+        "p95": 297.0033120000153,
+        "p99": 298.69957700003624,
+        "p99_population_inference": false,
+        "max": 298.69957700003624
+      },
+      "loaded_new_connection_ms": {
+        "n": 48,
+        "p50": 437.7818094999668,
+        "p95": 1171.2995620000015,
+        "p99": 1173.2235450000417,
+        "p99_population_inference": false,
+        "max": 1173.2235450000417
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 28647424,
+      "cpu": {
+        "backend": 1.0458742799537752,
+        "client": 2.3769869998949456,
+        "dc": 0.9507947999579772,
+        "haproxy": 1.9491293399138545,
+        "controller": 0.16559869902941565,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 2865864
+    },
+    {
+      "round": 1,
+      "variant": "native17",
+      "cohort": 100,
+      "bulk_mbps": 95.16975737257252,
+      "download_jain": 0.9987496949147692,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6676.6790169999695,
+        "p95": 7051.470515000005,
+        "p99": 7051.470515000005,
+        "p99_population_inference": false,
+        "max": 7051.470515000005
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.69575900001837,
+        "p95": 100.93359199998986,
+        "p99": 102.03565099999423,
+        "p99_population_inference": false,
+        "max": 102.03565099999423
+      },
+      "D_mbps": 76.13580589805801,
+      "U_mbps": 20.102427477939287,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.63296850000825,
+        "p95": 101.01061699998581,
+        "p99": 101.10497699997723,
+        "p99_population_inference": false,
+        "max": 101.10497699997723
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.43588149998345,
+        "p95": 422.908877999987,
+        "p99": 424.019009999995,
+        "p99_population_inference": false,
+        "max": 424.019009999995
+      },
+      "loaded_message_ms": {
+        "n": 52,
+        "p50": 162.8886224999917,
+        "p95": 298.02451000000474,
+        "p99": 298.0820470000367,
+        "p99_population_inference": false,
+        "max": 298.0820470000367
+      },
+      "loaded_new_connection_ms": {
+        "n": 36,
+        "p50": 648.7269339999955,
+        "p95": 1178.3027550000043,
+        "p99": 1182.092990000001,
+        "p99_population_inference": false,
+        "max": 1182.092990000001
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 32473088,
+      "cpu": {
+        "backend": 0.8312971741247136,
+        "client": 1.7956018961093818,
+        "dc": 0.7980452871597252,
+        "haproxy": 1.463083026459496,
+        "controller": 0.22145906352173766,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3093146
+    },
+    {
+      "round": 2,
+      "variant": "official17",
+      "cohort": 100,
+      "bulk_mbps": 75.72680997857032,
+      "download_jain": 0.9999810514631718,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7312.450285000012,
+        "p95": 8860.401018999994,
+        "p99": 8860.401018999994,
+        "p99_population_inference": false,
+        "max": 8860.401018999994
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.62754300003007,
+        "p95": 100.86011900000358,
+        "p99": 100.92725300000893,
+        "p99_population_inference": false,
+        "max": 100.92725300000893
+      },
+      "D_mbps": 73.06120608659833,
+      "U_mbps": 15.148024443829827,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.64204249999875,
+        "p95": 100.87082299997974,
+        "p99": 100.88989199999787,
+        "p99_population_inference": false,
+        "max": 100.88989199999787
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.3110559999884,
+        "p95": 419.7347690000015,
+        "p99": 426.6752830000087,
+        "p99_population_inference": false,
+        "max": 426.6752830000087
+      },
+      "loaded_message_ms": {
+        "n": 88,
+        "p50": 102.4868025000103,
+        "p95": 122.95806899999207,
+        "p99": 130.58166500002244,
+        "p99_population_inference": false,
+        "max": 130.58166500002244
+      },
+      "loaded_new_connection_ms": {
+        "n": 66,
+        "p50": 436.83398049998345,
+        "p95": 472.3655980000103,
+        "p99": 1470.115848999967,
+        "p99_population_inference": false,
+        "max": 1470.115848999967
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 28712960,
+      "cpu": {
+        "backend": 0.9629538275914221,
+        "client": 1.894844628486345,
+        "dc": 0.8076386941089346,
+        "haproxy": 1.6774034416108659,
+        "controller": 0.21550791417666948,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 701164
+    },
+    {
+      "round": 2,
+      "variant": "official17",
+      "cohort": 50,
+      "bulk_mbps": 74.23952691474331,
+      "download_jain": 0.9955539664545721,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7407.78990199999,
+        "p95": 9037.963959000024,
+        "p99": 9037.963959000024,
+        "p99_population_inference": false,
+        "max": 9037.963959000024
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.68415799997865,
+        "p95": 100.8333579999885,
+        "p99": 101.0131659999729,
+        "p99_population_inference": false,
+        "max": 101.0131659999729
+      },
+      "D_mbps": 63.660892245127634,
+      "U_mbps": 14.85041569052441,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.6293560000131,
+        "p95": 100.84559400002036,
+        "p99": 100.94390500000827,
+        "p99_population_inference": false,
+        "max": 100.94390500000827
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.09572049998656,
+        "p95": 422.0510119999972,
+        "p99": 424.5885089999888,
+        "p99_population_inference": false,
+        "max": 424.5885089999888
+      },
+      "loaded_message_ms": {
+        "n": 90,
+        "p50": 100.81851099999994,
+        "p95": 116.84727200002953,
+        "p99": 119.0707040000234,
+        "p99_population_inference": false,
+        "max": 119.0707040000234
+      },
+      "loaded_new_connection_ms": {
+        "n": 68,
+        "p50": 435.67376650000256,
+        "p95": 472.41878599999154,
+        "p99": 473.8070800000287,
+        "p99_population_inference": false,
+        "max": 473.8070800000287
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 28573696,
+      "cpu": {
+        "backend": 1.2809600151835379,
+        "client": 2.656805957417711,
+        "dc": 0.9963022340316406,
+        "haproxy": 2.3721481762658114,
+        "controller": 0.16925037650690905,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 776212
+    },
+    {
+      "round": 2,
+      "variant": "official17",
+      "cohort": 30,
+      "bulk_mbps": 75.50726157970114,
+      "download_jain": 0.9995542689119779,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7562.535773000036,
+        "p95": 8886.19236300002,
+        "p99": 8886.19236300002,
+        "p99_population_inference": false,
+        "max": 8886.19236300002
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.62192700002015,
+        "p95": 100.84335199996985,
+        "p99": 100.84335199996985,
+        "p99_population_inference": false,
+        "max": 100.84335199996985
+      },
+      "D_mbps": 70.94015039218138,
+      "U_mbps": 15.104052795015102,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.63758649999954,
+        "p95": 100.88176299996121,
+        "p99": 100.92083500001081,
+        "p99_population_inference": false,
+        "max": 100.92083500001081
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 418.22655850000956,
+        "p95": 427.38673999997445,
+        "p99": 825.7897189999994,
+        "p99_population_inference": false,
+        "max": 825.7897189999994
+      },
+      "loaded_message_ms": {
+        "n": 88,
+        "p50": 102.82422599999563,
+        "p95": 120.26062600000387,
+        "p99": 129.65205400001878,
+        "p99_population_inference": false,
+        "max": 129.65205400001878
+      },
+      "loaded_new_connection_ms": {
+        "n": 68,
+        "p50": 447.3854325000275,
+        "p95": 479.0934779999816,
+        "p99": 493.7341119999701,
+        "p99_population_inference": false,
+        "max": 493.7341119999701
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 28422144,
+      "cpu": {
+        "backend": 1.5087492781775693,
+        "client": 3.0755273747465797,
+        "dc": 1.1605763678289005,
+        "haproxy": 2.7853832827893563,
+        "controller": 0.15850802698320549,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 876156
+    },
+    {
+      "round": 2,
+      "variant": "native17",
+      "cohort": 100,
+      "bulk_mbps": 87.95635897889277,
+      "download_jain": 0.9953718733718171,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6672.1581059999835,
+        "p95": 7628.182805999927,
+        "p99": 7628.182805999927,
+        "p99_population_inference": false,
+        "max": 7628.182805999927
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.6976039999472,
+        "p95": 100.9328469999673,
+        "p99": 101.05673300006401,
+        "p99_population_inference": false,
+        "max": 101.05673300006401
+      },
+      "D_mbps": 73.04122316194292,
+      "U_mbps": 17.59494731259066,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.64993849999837,
+        "p95": 100.93590500002847,
+        "p99": 101.1899299999186,
+        "p99_population_inference": false,
+        "max": 101.1899299999186
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 416.9260830000212,
+        "p95": 425.20237999997335,
+        "p99": 428.62623799999255,
+        "p99_population_inference": false,
+        "max": 428.62623799999255
+      },
+      "loaded_message_ms": {
+        "n": 54,
+        "p50": 200.09227649995864,
+        "p95": 320.1801740000292,
+        "p99": 334.63327299989487,
+        "p99_population_inference": false,
+        "max": 334.63327299989487
+      },
+      "loaded_new_connection_ms": {
+        "n": 40,
+        "p50": 498.46516550002207,
+        "p95": 1230.1042560000042,
+        "p99": 1245.6785059999902,
+        "p99_population_inference": false,
+        "max": 1245.6785059999902
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 31825920,
+      "cpu": {
+        "backend": 0.8586651952440802,
+        "client": 1.6537255612108197,
+        "dc": 0.763257951328072,
+        "haproxy": 1.2720965855467867,
+        "controller": 0.23956855626650186,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3363522
+    },
+    {
+      "round": 2,
+      "variant": "native17",
+      "cohort": 50,
+      "bulk_mbps": 89.00050999309349,
+      "download_jain": 0.990975136963974,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6256.762852000065,
+        "p95": 7539.688177000016,
+        "p99": 7539.688177000016,
+        "p99_population_inference": false,
+        "max": 7539.688177000016
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.66578700002538,
+        "p95": 100.850553999976,
+        "p99": 100.89576199993644,
+        "p99_population_inference": false,
+        "max": 100.89576199993644
+      },
+      "D_mbps": 71.20040799447479,
+      "U_mbps": 20.34534377596678,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.74240549994329,
+        "p95": 101.16592199995011,
+        "p99": 101.18768799998179,
+        "p99_population_inference": false,
+        "max": 101.18768799998179
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.0721025000148,
+        "p95": 423.0351960000007,
+        "p99": 424.4917419999865,
+        "p99_population_inference": false,
+        "max": 424.4917419999865
+      },
+      "loaded_message_ms": {
+        "n": 54,
+        "p50": 130.33408449996386,
+        "p95": 320.9295120000206,
+        "p99": 321.9761440000184,
+        "p99_population_inference": false,
+        "max": 321.9761440000184
+      },
+      "loaded_new_connection_ms": {
+        "n": 40,
+        "p50": 485.2728749999642,
+        "p95": 1304.1363950000004,
+        "p99": 1311.6229269999167,
+        "p99_population_inference": false,
+        "max": 1311.6229269999167
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 31715328,
+      "cpu": {
+        "backend": 1.1530563241277996,
+        "client": 2.5066441828865207,
+        "dc": 0.9525247894968775,
+        "haproxy": 1.9551824626514847,
+        "controller": 0.1714989099240898,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3444700
+    },
+    {
+      "round": 2,
+      "variant": "native17",
+      "cohort": 30,
+      "bulk_mbps": 85.88208629742745,
+      "download_jain": 0.991764909683989,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6305.583202999969,
+        "p95": 7814.05109100001,
+        "p99": 7814.05109100001,
+        "p99_population_inference": false,
+        "max": 7814.05109100001
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.6127219999371,
+        "p95": 100.90341199997965,
+        "p99": 100.90341199997965,
+        "p99_population_inference": false,
+        "max": 100.90341199997965
+      },
+      "D_mbps": 68.70566903794195,
+      "U_mbps": 21.285491701888102,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.5702539999902,
+        "p95": 100.87249800005793,
+        "p99": 101.0844840000118,
+        "p99_population_inference": false,
+        "max": 101.0844840000118
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.05799449994174,
+        "p95": 422.0734000000448,
+        "p99": 426.2578489999669,
+        "p99_population_inference": false,
+        "max": 426.2578489999669
+      },
+      "loaded_message_ms": {
+        "n": 56,
+        "p50": 155.0926599999798,
+        "p95": 334.48935299998084,
+        "p99": 359.44149599993125,
+        "p99_population_inference": false,
+        "max": 359.44149599993125
+      },
+      "loaded_new_connection_ms": {
+        "n": 40,
+        "p50": 519.3151364999835,
+        "p95": 1372.2831389999328,
+        "p99": 1381.5830999999434,
+        "p99_population_inference": false,
+        "max": 1381.5830999999434
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 32067584,
+      "cpu": {
+        "backend": 1.2074664844403307,
+        "client": 3.241094247708256,
+        "dc": 1.1439156168382068,
+        "haproxy": 2.7962381744934013,
+        "controller": 0.15072673845989845,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3850268
+    },
+    {
+      "round": 2,
+      "variant": "balanced2",
+      "cohort": 100,
+      "bulk_mbps": 80.70608971485663,
+      "download_jain": 0.9660415392363594,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 5751.484470999912,
+        "p95": 8314.306557999998,
+        "p99": 8314.306557999998,
+        "p99_population_inference": false,
+        "max": 8314.306557999998
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.62756900003933,
+        "p95": 100.81736999995883,
+        "p99": 100.87895100002697,
+        "p99_population_inference": false,
+        "max": 100.87895100002697
+      },
+      "D_mbps": 64.5648717718853,
+      "U_mbps": 23.33613271692297,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.6244595000112,
+        "p95": 100.81712299995615,
+        "p99": 100.83201899999494,
+        "p99_population_inference": false,
+        "max": 100.83201899999494
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.323088000046,
+        "p95": 422.557285000039,
+        "p99": 426.2241650000078,
+        "p99_population_inference": false,
+        "max": 426.2241650000078
+      },
+      "loaded_message_ms": {
+        "n": 68,
+        "p50": 100.6418695000093,
+        "p95": 315.9602179999865,
+        "p99": 319.0849889999754,
+        "p99_population_inference": false,
+        "max": 319.0849889999754
+      },
+      "loaded_new_connection_ms": {
+        "n": 52,
+        "p50": 421.6639594999947,
+        "p95": 1217.222774999982,
+        "p99": 1223.0170899999848,
+        "p99_population_inference": false,
+        "max": 1223.0170899999848
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 29773824,
+      "cpu": {
+        "backend": 0.8243431562494011,
+        "client": 1.6486863124988023,
+        "dc": 0.7327494722216905,
+        "haproxy": 1.2517803483787207,
+        "controller": 0.2174348937754164,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 2978948
+    },
+    {
+      "round": 2,
+      "variant": "balanced2",
+      "cohort": 50,
+      "bulk_mbps": 91.5217674510289,
+      "download_jain": 0.990557150234182,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6374.005153999974,
+        "p95": 7332.538373000034,
+        "p99": 7332.538373000034,
+        "p99_population_inference": false,
+        "max": 7332.538373000034
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.6341990000692,
+        "p95": 100.77406000004885,
+        "p99": 100.89250600003652,
+        "p99_population_inference": false,
+        "max": 100.89250600003652
+      },
+      "D_mbps": 73.21741396082311,
+      "U_mbps": 21.057001162722848,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.5600445000141,
+        "p95": 100.93272199992498,
+        "p99": 100.96851299999798,
+        "p99_population_inference": false,
+        "max": 100.96851299999798
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 418.25053299999126,
+        "p95": 428.4495130000323,
+        "p99": 428.86944700001095,
+        "p99_population_inference": false,
+        "max": 428.86944700001095
+      },
+      "loaded_message_ms": {
+        "n": 50,
+        "p50": 123.37537350003913,
+        "p95": 342.8789150000284,
+        "p99": 356.19600099994386,
+        "p99_population_inference": false,
+        "max": 356.19600099994386
+      },
+      "loaded_new_connection_ms": {
+        "n": 36,
+        "p50": 469.4269645000304,
+        "p95": 1343.146187000002,
+        "p99": 1343.9069590000372,
+        "p99_population_inference": false,
+        "max": 1343.9069590000372
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 30294016,
+      "cpu": {
+        "backend": 1.0254569157900044,
+        "client": 2.358550906317015,
+        "dc": 0.9229112242110049,
+        "haproxy": 1.8970952942115094,
+        "controller": 0.1683274862876412,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3397924
+    },
+    {
+      "round": 2,
+      "variant": "balanced2",
+      "cohort": 30,
+      "bulk_mbps": 91.26594606943885,
+      "download_jain": 0.9899252607636086,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6502.527536000002,
+        "p95": 7352.2510320000265,
+        "p99": 7352.2510320000265,
+        "p99_population_inference": false,
+        "max": 7352.2510320000265
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.61266100001376,
+        "p95": 474.1409069999918,
+        "p99": 474.1409069999918,
+        "p99_population_inference": false,
+        "max": 474.1409069999918
+      },
+      "D_mbps": 73.01275685555107,
+      "U_mbps": 20.640808861288814,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.55426049996186,
+        "p95": 100.82426799999666,
+        "p99": 100.91360400008398,
+        "p99_population_inference": false,
+        "max": 100.91360400008398
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 418.09913399998777,
+        "p95": 423.6999489999107,
+        "p99": 430.03753499999675,
+        "p99_population_inference": false,
+        "max": 430.03753499999675
+      },
+      "loaded_message_ms": {
+        "n": 50,
+        "p50": 119.55296550002004,
+        "p95": 340.8095610000146,
+        "p99": 342.60299300001407,
+        "p99_population_inference": false,
+        "max": 342.60299300001407
+      },
+      "loaded_new_connection_ms": {
+        "n": 36,
+        "p50": 456.42523499998333,
+        "p95": 1354.043147000084,
+        "p99": 1356.9921880000493,
+        "p99_population_inference": false,
+        "max": 1356.9921880000493
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 30572544,
+      "cpu": {
+        "backend": 1.217106580450297,
+        "client": 2.946679089511238,
+        "dc": 1.0889900982976333,
+        "haproxy": 2.3701549198242566,
+        "controller": 0.15670329217846277,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3572506
+    },
+    {
+      "round": 3,
+      "variant": "native17",
+      "cohort": 30,
+      "bulk_mbps": 85.2553238642492,
+      "download_jain": 0.997407262160199,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6714.757312000074,
+        "p95": 7869.90340400007,
+        "p99": 7869.90340400007,
+        "p99_population_inference": false,
+        "max": 7869.90340400007
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.61813499999062,
+        "p95": 100.93287899996994,
+        "p99": 100.93287899996994,
+        "p99_population_inference": false,
+        "max": 100.93287899996994
+      },
+      "D_mbps": 76.90373490041357,
+      "U_mbps": 17.05452924997098,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.72009449999086,
+        "p95": 100.9434909999527,
+        "p99": 101.1220839999396,
+        "p99_population_inference": false,
+        "max": 101.1220839999396
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 416.45429049998484,
+        "p95": 423.92182099990805,
+        "p99": 821.3915500000439,
+        "p99_population_inference": false,
+        "max": 821.3915500000439
+      },
+      "loaded_message_ms": {
+        "n": 56,
+        "p50": 155.41676450004616,
+        "p95": 330.676750000066,
+        "p99": 332.17321999995875,
+        "p99_population_inference": false,
+        "max": 332.17321999995875
+      },
+      "loaded_new_connection_ms": {
+        "n": 40,
+        "p50": 500.5534299999681,
+        "p95": 1269.535377000011,
+        "p99": 1273.4913959999403,
+        "p99_population_inference": false,
+        "max": 1273.4913959999403
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 26107904,
+      "cpu": {
+        "backend": 1.2486833416150656,
+        "client": 2.871971685714656,
+        "dc": 1.1862491745343118,
+        "haproxy": 2.3100641819878773,
+        "controller": 0.14809271425712314,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3131280
+    },
+    {
+      "round": 3,
+      "variant": "native17",
+      "cohort": 50,
+      "bulk_mbps": 85.64245573668939,
+      "download_jain": 0.9924536502030649,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6535.291196999992,
+        "p95": 7834.344536999993,
+        "p99": 7834.344536999993,
+        "p99_population_inference": false,
+        "max": 7834.344536999993
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.67563399991286,
+        "p95": 100.91316000000461,
+        "p99": 100.91779399999723,
+        "p99_population_inference": false,
+        "max": 100.91779399999723
+      },
+      "D_mbps": 72.79417316526428,
+      "U_mbps": 17.131931913598088,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.60395400000743,
+        "p95": 100.79653100001451,
+        "p99": 100.8229339998934,
+        "p99_population_inference": false,
+        "max": 100.8229339998934
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 419.4756150000103,
+        "p95": 424.38463300004514,
+        "p99": 552.8872259999389,
+        "p99_population_inference": false,
+        "max": 552.8872259999389
+      },
+      "loaded_message_ms": {
+        "n": 58,
+        "p50": 126.71689600000491,
+        "p95": 332.21160300001884,
+        "p99": 339.4980220000434,
+        "p99_population_inference": false,
+        "max": 339.4980220000434
+      },
+      "loaded_new_connection_ms": {
+        "n": 44,
+        "p50": 471.748606999995,
+        "p95": 1300.2220939999916,
+        "p99": 1303.8092279999773,
+        "p99_population_inference": false,
+        "max": 1303.8092279999773
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 28610560,
+      "cpu": {
+        "backend": 1.1735541160146752,
+        "client": 2.3471082320293437,
+        "dc": 0.9779617633455636,
+        "haproxy": 1.8092292621892871,
+        "controller": 0.17440176960514772,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3613226
+    },
+    {
+      "round": 3,
+      "variant": "native17",
+      "cohort": 100,
+      "bulk_mbps": 80.16517717690076,
+      "download_jain": 0.9836598512553884,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6087.880136000081,
+        "p95": 8370.349789999978,
+        "p99": 8370.349789999978,
+        "p99_population_inference": false,
+        "max": 8370.349789999978
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.65675199996349,
+        "p95": 100.85750700000062,
+        "p99": 100.89920799998708,
+        "p99_population_inference": false,
+        "max": 100.89920799998708
+      },
+      "D_mbps": 64.1321417415206,
+      "U_mbps": 20.781992199205167,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.5668609999475,
+        "p95": 100.8382069999243,
+        "p99": 403.57509499995103,
+        "p99_population_inference": false,
+        "max": 403.57509499995103
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 418.145971499996,
+        "p95": 428.3141199999818,
+        "p99": 555.973273999939,
+        "p99_population_inference": false,
+        "max": 555.973273999939
+      },
+      "loaded_message_ms": {
+        "n": 66,
+        "p50": 131.12431150000248,
+        "p95": 302.96982499999103,
+        "p99": 304.72050699995634,
+        "p99_population_inference": false,
+        "max": 304.72050699995634
+      },
+      "loaded_new_connection_ms": {
+        "n": 46,
+        "p50": 476.0973004999869,
+        "p95": 1223.5223690000794,
+        "p99": 1521.448652999993,
+        "p99_population_inference": false,
+        "max": 1521.448652999993
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 32632832,
+      "cpu": {
+        "backend": 0.821851261917917,
+        "client": 1.738531515595596,
+        "dc": 0.6954126062382368,
+        "haproxy": 1.3908252124764735,
+        "controller": 0.21942288532630522,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3131254
+    },
+    {
+      "round": 3,
+      "variant": "balanced2",
+      "cohort": 30,
+      "bulk_mbps": 80.44406125699827,
+      "download_jain": 0.9830046769768819,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6232.896474000086,
+        "p95": 8342.286345000048,
+        "p99": 8342.286345000048,
+        "p99_population_inference": false,
+        "max": 8342.286345000048
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.6545070000584,
+        "p95": 100.87163900004725,
+        "p99": 100.87163900004725,
+        "p99_population_inference": false,
+        "max": 100.87163900004725
+      },
+      "D_mbps": 64.35524900559861,
+      "U_mbps": 18.639438062740794,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.68121100005101,
+        "p95": 100.88670099992214,
+        "p99": 100.96925599998485,
+        "p99_population_inference": false,
+        "max": 100.96925599998485
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 415.4859915000202,
+        "p95": 423.2810130000644,
+        "p99": 427.2317779999639,
+        "p99_population_inference": false,
+        "max": 427.2317779999639
+      },
+      "loaded_message_ms": {
+        "n": 68,
+        "p50": 110.44068699999343,
+        "p95": 300.6798160000699,
+        "p99": 301.25482300002204,
+        "p99_population_inference": false,
+        "max": 301.25482300002204
+      },
+      "loaded_new_connection_ms": {
+        "n": 47,
+        "p50": 493.4646659999089,
+        "p95": 1166.4676660000168,
+        "p99": 1178.3187129999533,
+        "p99_population_inference": false,
+        "max": 1178.3187129999533
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 24608768,
+      "cpu": {
+        "backend": 1.3068793690439318,
+        "client": 3.2360822471564,
+        "dc": 1.1201823163233682,
+        "haproxy": 2.5515263871810103,
+        "controller": 0.15053872507137564,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3149626
+    },
+    {
+      "round": 3,
+      "variant": "balanced2",
+      "cohort": 50,
+      "bulk_mbps": 86.32144194875461,
+      "download_jain": 0.9846557735551347,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6241.6087320000315,
+        "p95": 7773.107027000037,
+        "p99": 7773.107027000037,
+        "p99_population_inference": false,
+        "max": 7773.107027000037
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.70940100001735,
+        "p95": 100.90727600004357,
+        "p99": 101.05568699998457,
+        "p99_population_inference": false,
+        "max": 101.05568699998457
+      },
+      "D_mbps": 69.05715355900368,
+      "U_mbps": 21.50366229757687,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.67762500005983,
+        "p95": 101.70577700000649,
+        "p99": 101.85375899993687,
+        "p99_population_inference": false,
+        "max": 101.85375899993687
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 419.25806050005576,
+        "p95": 424.27920800002994,
+        "p99": 424.43804900005944,
+        "p99_population_inference": false,
+        "max": 424.43804900005944
+      },
+      "loaded_message_ms": {
+        "n": 56,
+        "p50": 108.42111249996833,
+        "p95": 323.64924899991365,
+        "p99": 333.61149600000317,
+        "p99_population_inference": false,
+        "max": 333.61149600000317
+      },
+      "loaded_new_connection_ms": {
+        "n": 40,
+        "p50": 440.6223695000335,
+        "p95": 1273.50934399999,
+        "p99": 1286.5016640000704,
+        "p99_population_inference": false,
+        "max": 1286.5016640000704
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 26517504,
+      "cpu": {
+        "backend": 1.2624618879843437,
+        "client": 2.4239268249299424,
+        "dc": 1.0604679859068487,
+        "haproxy": 1.9694405452555794,
+        "controller": 0.17612946663979903,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3401910
+    },
+    {
+      "round": 3,
+      "variant": "balanced2",
+      "cohort": 100,
+      "bulk_mbps": 87.72903479739695,
+      "download_jain": 0.9928067335433822,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 6188.642737000009,
+        "p95": 7649.027772999943,
+        "p99": 7649.027772999943,
+        "p99_population_inference": false,
+        "max": 7649.027772999943
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.67947400000321,
+        "p95": 100.86531399997511,
+        "p99": 100.94303899995793,
+        "p99_population_inference": false,
+        "max": 100.94303899995793
+      },
+      "D_mbps": 70.18322783791756,
+      "U_mbps": 21.7212262435526,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.67913849997012,
+        "p95": 100.85523700001886,
+        "p99": 100.89196700005232,
+        "p99_population_inference": false,
+        "max": 100.89196700005232
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 417.5299149999887,
+        "p95": 424.5166399999789,
+        "p99": 425.0371249999034,
+        "p99_population_inference": false,
+        "max": 425.0371249999034
+      },
+      "loaded_message_ms": {
+        "n": 54,
+        "p50": 189.01088400002664,
+        "p95": 306.1135220000324,
+        "p99": 329.89812800008167,
+        "p99_population_inference": false,
+        "max": 329.89812800008167
+      },
+      "loaded_new_connection_ms": {
+        "n": 40,
+        "p50": 571.8208220000065,
+        "p95": 1245.1532399999223,
+        "p99": 1250.0450939999155,
+        "p99_population_inference": false,
+        "max": 1250.0450939999155
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 31076352,
+      "cpu": {
+        "backend": 0.7121025200690886,
+        "client": 1.7155197074391662,
+        "dc": 0.7121025200690879,
+        "haproxy": 1.3271001510378475,
+        "controller": 0.21911144659278337,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 3329912
+    },
+    {
+      "round": 3,
+      "variant": "official17",
+      "cohort": 30,
+      "bulk_mbps": 86.76791585883709,
+      "download_jain": 0.9997778198430571,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7392.778140999894,
+        "p95": 7732.725138999967,
+        "p99": 7732.725138999967,
+        "p99_population_inference": false,
+        "max": 7732.725138999967
+      },
+      "idle_recovery_ms": {
+        "n": 19,
+        "p50": 100.64790000001267,
+        "p95": 100.80523800002084,
+        "p99": 100.80523800002084,
+        "p99_population_inference": false,
+        "max": 100.80523800002084
+      },
+      "D_mbps": 72.33667275623758,
+      "U_mbps": 17.35707258461992,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.60009300002548,
+        "p95": 100.81848400000126,
+        "p99": 100.96563800004787,
+        "p99_population_inference": false,
+        "max": 100.96563800004787
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 418.02241800002093,
+        "p95": 424.3146379999416,
+        "p99": 425.1307810000071,
+        "p99_population_inference": false,
+        "max": 425.1307810000071
+      },
+      "loaded_message_ms": {
+        "n": 76,
+        "p50": 105.61586199997919,
+        "p95": 123.00544499998978,
+        "p99": 130.90125899998384,
+        "p99_population_inference": false,
+        "max": 130.90125899998384
+      },
+      "loaded_new_connection_ms": {
+        "n": 58,
+        "p50": 445.5102864999958,
+        "p95": 480.4698709999684,
+        "p99": 749.1010219999907,
+        "p99_population_inference": false,
+        "max": 749.1010219999907
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 22556672,
+      "cpu": {
+        "backend": 1.7139515087589814,
+        "client": 3.55486238853715,
+        "dc": 1.3330733957014298,
+        "haproxy": 3.3009436464987765,
+        "controller": 0.15916618938449023,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 829114
+    },
+    {
+      "round": 3,
+      "variant": "official17",
+      "cohort": 50,
+      "bulk_mbps": 76.72973537647655,
+      "download_jain": 0.9999324506316116,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7382.8114420000475,
+        "p95": 8744.456492000041,
+        "p99": 8744.456492000041,
+        "p99_population_inference": false,
+        "max": 8744.456492000041
+      },
+      "idle_recovery_ms": {
+        "n": 39,
+        "p50": 100.75818400002845,
+        "p95": 100.9753969999565,
+        "p99": 101.01633900001161,
+        "p99_population_inference": false,
+        "max": 101.01633900001161
+      },
+      "D_mbps": 72.20870111535737,
+      "U_mbps": 15.348861845085848,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.5204530000583,
+        "p95": 101.06079100000898,
+        "p99": 101.38283499998124,
+        "p99_population_inference": false,
+        "max": 101.38283499998124
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 418.4803059999922,
+        "p95": 428.15192299997307,
+        "p99": 547.8208980000545,
+        "p99_population_inference": false,
+        "max": 547.8208980000545
+      },
+      "loaded_message_ms": {
+        "n": 86,
+        "p50": 102.80965399999786,
+        "p95": 121.61465100007263,
+        "p99": 128.48365299998932,
+        "p99_population_inference": false,
+        "max": 128.48365299998932
+      },
+      "loaded_new_connection_ms": {
+        "n": 67,
+        "p50": 439.38133999995443,
+        "p95": 471.0641700000906,
+        "p99": 744.7879469999634,
+        "p99_population_inference": false,
+        "max": 744.7879469999634
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 26279936,
+      "cpu": {
+        "backend": 1.3475672530228646,
+        "client": 2.6951345060457306,
+        "dc": 1.0687602351560674,
+        "haproxy": 2.462795324490069,
+        "controller": 0.1828549925264197,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 699122
+    },
+    {
+      "round": 3,
+      "variant": "official17",
+      "cohort": 100,
+      "bulk_mbps": 83.7905107847952,
+      "download_jain": 0.999755879976589,
+      "bulk_completion_ms": {
+        "n": 5,
+        "p50": 7431.638478000082,
+        "p95": 8007.5595810000095,
+        "p99": 8007.5595810000095,
+        "p99_population_inference": false,
+        "max": 8007.5595810000095
+      },
+      "idle_recovery_ms": {
+        "n": 89,
+        "p50": 100.72581199995057,
+        "p95": 100.94689400000334,
+        "p99": 404.50560099998256,
+        "p99_population_inference": false,
+        "max": 404.50560099998256
+      },
+      "D_mbps": 71.31923682302715,
+      "U_mbps": 16.761335857852206,
+      "baseline_message_ms": {
+        "n": 20,
+        "p50": 100.74671450001915,
+        "p95": 101.99930399994628,
+        "p99": 102.14944500000911,
+        "p99_population_inference": false,
+        "max": 102.14944500000911
+      },
+      "baseline_new_connection_ms": {
+        "n": 20,
+        "p50": 418.2996229999958,
+        "p95": 424.2081040000585,
+        "p99": 425.71545500004504,
+        "p99_population_inference": false,
+        "max": 425.71545500004504
+      },
+      "loaded_message_ms": {
+        "n": 78,
+        "p50": 101.64422649995686,
+        "p95": 124.99101800005974,
+        "p99": 125.64084600001024,
+        "p99_population_inference": false,
+        "max": 125.64084600001024
+      },
+      "loaded_new_connection_ms": {
+        "n": 60,
+        "p50": 436.3350490000357,
+        "p95": 487.54143899998326,
+        "p99": 579.04006199999,
+        "p99_population_inference": false,
+        "max": 579.04006199999
+      },
+      "harness_limited": false,
+      "sample_limited": false,
+      "peak_backend_rss": 30420992,
+      "cpu": {
+        "backend": 1.0471726946461082,
+        "client": 1.9039503539020135,
+        "dc": 0.7933126474591727,
+        "haproxy": 1.650090306715078,
+        "controller": 0.2364110815608146,
+        "observer_children": 0.0
+      },
+      "max_router_backlog_bytes": 1021358
+    }
+  ],
+  "performance_parity_all_cases": false,
+  "production_approval": false,
+  "p99_note": "finite-sample nearest rank only; no stable population tail claim"
+}

@@ -41,6 +41,8 @@ def main(args):
         'complete':False,'accepted':False,'rows':[],'controls':[],'resources_before':before,
         'cpu_assignment':{'core':backend_cpu,'client_haproxy_observer':frontend_cpu,'dc':dc_cpu},
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name'))}
+    if args.client_diagnostic:
+        report['scope']='one client TCP_NODELAY variable; sequential new FakeTLS+1KiB/ACK, four AB/BA rounds per pinned core; no bulk/idle workload or throughput claim'
     children=[];net=None;front=None;dc=None;expected=0
     write(output,report)
     try:

@@ -1,0 +1,50 @@
+{
+  "42552518133/mixed-experience-low/metrics.json": {
+    "bytes": 6866875,
+    "sha256": "4b9a473b8e6008e6466af4a6b8e0ea788222cbab9a15a92f83c94a14d58b4cce",
+    "gzip_path": "42552518133/mixed-experience-low/metrics.json.gz",
+    "gzip_sha256": "ebaec4fbd4c8294d0de224906469d3f7a8c51a9a7a03f3bab1e5219bdd16fa4d"
+  },
+  "42552518133/mixed-experience-rtt100/metrics.json": {
+    "bytes": 28698987,
+    "sha256": "d4e6fe598bc02bd83a46e7dc1ddb570e365012ae5a79a9726b26c4ffc40ab69c",
+    "gzip_path": "42552518133/mixed-experience-rtt100/metrics.json.gz",
+    "gzip_sha256": "1164659a11feb0b4de1f9a9d952c048684144d033ad74dc9f7e4061e160e3c58"
+  },
+  "42552518133/mixed-experience-rtt200/metrics.json": {
+    "bytes": 5314370,
+    "sha256": "20e9f5ddab080a10b9728ac2ff85539f86b7a8afbe2af4bcd5518ef12e221a69",
+    "gzip_path": "42552518133/mixed-experience-rtt200/metrics.json.gz",
+    "gzip_sha256": "c934291404297c6a412178d1a314d84db17d20457be5dd31b6003c4736361e57"
+  },
+  "42552518133/mixed-experience-weak/metrics.json": {
+    "bytes": 34586323,
+    "sha256": "22d79524eb2b1f472f9797927f86f3fd42e4a165976569dcacd76d9014ce2eab",
+    "gzip_path": "42552518133/mixed-experience-weak/metrics.json.gz",
+    "gzip_sha256": "e16f0be3edacebe56b45edf2d6c49054af42006ab6abac82dc48fa956f935c6b"
+  },
+  "42553072367/mixed-experience-low/metrics.json": {
+    "bytes": 6571435,
+    "sha256": "4be6dbf6bfb08694481c7d38f7d353b1ceca0f8ebd3544fdc312d05956e19e90",
+    "gzip_path": "42553072367/mixed-experience-low/metrics.json.gz",
+    "gzip_sha256": "2977aa3d542b54562ae2808416bb7ac719f81bb68136d0938205b92525b5482d"
+  },
+  "42553072367/mixed-experience-rtt100/metrics.json": {
+    "bytes": 15525161,
+    "sha256": "cebfb25e28f14b3622ad8551e704eb545e031be7a8679fc26a451becf1bc67c4",
+    "gzip_path": "42553072367/mixed-experience-rtt100/metrics.json.gz",
+    "gzip_sha256": "ad063f528a3a23e930368b715920846ed38efe14ece9c4dd1dc61f98011406dc"
+  },
+  "42553072367/mixed-experience-rtt200/metrics.json": {
+    "bytes": 26889978,
+    "sha256": "4269848d94c4e774c66b7ee0aed2f6af5c9097b607771a397578bc044de74902",
+    "gzip_path": "42553072367/mixed-experience-rtt200/metrics.json.gz",
+    "gzip_sha256": "6bcd653507fa304cc90a9324edeecb7fb266d061128c73f135d0c9c011d5849a"
+  },
+  "42553072367/mixed-experience-weak/metrics.json": {
+    "bytes": 20701765,
+    "sha256": "ae4454023075c5483dafce27e69a771a264e15f6c7e4b01dfa2d036c4bddfbff",
+    "gzip_path": "42553072367/mixed-experience-weak/metrics.json.gz",
+    "gzip_sha256": "596af3330101fb62f8a976c113826128af805c942ba4422355180867dab79d2a"
+  }
+}

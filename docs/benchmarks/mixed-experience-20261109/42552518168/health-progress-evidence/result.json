@@ -1,0 +1,24 @@
+{
+  "source_commit": "d0f761a18839f8c740a242fbcfa30c905cf31f62",
+  "complete": true,
+  "rows": [
+    {
+      "kind": "baseline",
+      "agent_sha256": "8321cf9a524b0aa0436a67dab65cad54f6ae245989119554e9321bc973d9eba3",
+      "cold_up_seconds": 20.074603454999988,
+      "stale_admission_down_seconds": 4.011489146000002,
+      "stalled_live_monitor_unrecovered": true
+    },
+    {
+      "kind": "candidate",
+      "agent_sha256": "46b9ed8f567efb2df11ef6134f179f8153d98c9d4501fa6023b915fb9f00bf7a",
+      "cold_up_seconds": 20.07100109800001,
+      "stale_admission_down_seconds": 4.012383891000013,
+      "restart_after_down_seconds": 11.055735862999995,
+      "recovered_up_seconds": 20.077960126999983,
+      "restart_count": 1
+    }
+  ],
+  "scope": "real HTTP body trickle / real old and new agent / actual systemd restart; synthetic local DC",
+  "temporary_unit_removed": true
+}

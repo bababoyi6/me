@@ -1,0 +1,94 @@
+{
+  "conclusion": "cancelled",
+  "createdAt": "2026-11-09T02:43:50Z",
+  "databaseId": 42552518059,
+  "headSha": "d0f761a18839f8c740a242fbcfa30c905cf31f62",
+  "jobs": [
+    {
+      "completedAt": "2026-11-09T02:44:59Z",
+      "conclusion": "cancelled",
+      "databaseId": 128951018488,
+      "name": "system",
+      "startedAt": "2026-11-09T02:43:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T02:43:54Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T02:43:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:43:55Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T02:43:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:43:55Z",
+          "conclusion": "success",
+          "name": "Require actual KVM before package or image downloads",
+          "number": 3,
+          "startedAt": "2026-11-09T02:43:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:20Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable host dependencies",
+          "number": 4,
+          "startedAt": "2026-11-09T02:43:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:58Z",
+          "conclusion": "cancelled",
+          "name": "Fetch official Ubuntu 22.04 minimal image and signed checksums",
+          "number": 5,
+          "startedAt": "2026-11-09T02:44:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:58Z",
+          "conclusion": "skipped",
+          "name": "Verify pinned candidate installs, native maintenance and three normal reboots",
+          "number": 6,
+          "startedAt": "2026-11-09T02:44:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:58Z",
+          "conclusion": "success",
+          "name": "Export fixed-name sanitized evidence only",
+          "number": 7,
+          "startedAt": "2026-11-09T02:44:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:58Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "startedAt": "2026-11-09T02:44:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:58Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-11-09T02:44:58Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42552518059/job/128951018488"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-09T02:45:00Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42552518059"
+}

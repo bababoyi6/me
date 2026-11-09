@@ -13,6 +13,7 @@
 | 认证成功、负载前关闭，日志为 DC Connection timeout | 核对实际 DC 路径与 `upstream_connect_budget_ms`，原默认总预算仅 3 秒 | 新版的 `connect-refresh --maintenance` 可应用有界重试；先排空后端并备份，定制值需审查，不重生成 Secret |
 | 核心在、代理为 down | 本机 API 就绪、WG 监听端口、DC 多数、样本新鲜度、恢复冷却 | 新健康代理冷启动至少约 20 秒；真实超时会增加等待 |
 | 健康代理退出 | 查看代理单元状态及重启计数 | systemd 自动重启；HAProxy 对代理端口的检查防止永久假 UP |
+| 健康代理报 health monitor progress deadline | 检查本机API是否零星返回但迟迟不能完成、DC探测是否有进展；不要公开API令牌或原配置 | 新版15/45秒整轮进度保护会只重启健康代理，普通不健康票不触发；需反复恢复时排空该后端并查API/资源原因，不关闭保护或循环重启Telemt |
 | 两条线路都断 | 入口监听、HAProxy、两个 WG 握手、两个后端健康 | 两后端均失效没有第三个代理；Apple 伪装回落不能转发 MTProto |
 | WG 数据面短断 | 比较握手时间与 RX/TX，检查对端 UDP 和路径 MTU | 链路恢复后允许重握手；原连接可能超时并重连 |
 | 手动 stop WG 后核心未重启 | `Requires=` 可能已停掉依赖 | 在该后端运行 `a recover`，再检查入口状态 |

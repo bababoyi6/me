@@ -1,0 +1,13 @@
+{
+  "complete": false,
+  "roles": {},
+  "download_boundary_substituted": false,
+  "production_accessed": false,
+  "shared_ci_host": true,
+  "capacity_benchmark": false,
+  "profile": "candidate",
+  "source_ref": "e8119e0c7c89cc898c3130a0515c9cec77d0025e",
+  "pinned_manager_download": true,
+  "phase": "prepare-base-os",
+  "error_type": "RuntimeError"
+}
