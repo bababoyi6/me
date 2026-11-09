@@ -35,6 +35,8 @@ def main(args):
     backend_cpu,frontend_cpu,dc_cpu=cpus[:3];os.sched_setaffinity(0,{frontend_cpu})
     rtt,rate,loss=PROFILES[args.profile]
     output=Path(args.output)
+    fair=args.fair_directory
+    if fair and (args.profile!='rtt100' or args.client_diagnostic):raise RuntimeError('fair screen is one registered 100ms case')
     report={'plan':'client-small-write-fullpath-v1' if args.client_diagnostic else 'mixed-experience-v1','source_commit':os.environ['TDH_SOURCE_COMMIT'],
         'profile':args.profile,'rtt_ms':rtt,'rate_mbps':rate,'loss_percent':loss,
         'scope':'2 persistent 64-byte echo streams, 4 new FakeTLS+1KiB/ACK workers, 4D+1U files, idle with 5s application keepalive; not Telegram users',
@@ -43,6 +45,7 @@ def main(args):
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name'))}
     if args.client_diagnostic:
         report['scope']='one client TCP_NODELAY variable; sequential new FakeTLS+1KiB/ACK, four AB/BA rounds per pinned core; no bulk/idle workload or throughput claim'
+    if fair:report['plan']='fair-quantum-screen-v1'
     children=[];net=None;front=None;dc=None;expected=0
     write(output,report)
     try:
@@ -58,6 +61,17 @@ def main(args):
             native=(bundle/'telemt-balanced').read_bytes()
             if hashlib.sha256(native).hexdigest()!=NATIVE_SHA:raise RuntimeError('native binary digest mismatch')
             target=root/'native17';target.write_bytes(native);target.chmod(0o755);binaries['native17']=str(target)
+            if fair:
+                fair_manifest=json.loads((Path(fair)/'manifest.json').read_text())
+                if (fair_manifest['upstream_commit']!=UPSTREAM or fair_manifest['reference_binary_sha256']!=NATIVE_SHA or
+                        fair_manifest['version']!='telemt 3.5.17+tdh.fair1' or fair_manifest['quantum_bytes']!=65536 or
+                        fair_manifest['manager_commit']!=os.environ['TDH_SOURCE_COMMIT']):raise RuntimeError('fair source identity drift')
+                payload=(Path(fair)/'telemt-fair').read_bytes()
+                if not 0<len(payload)<=64*1024**2 or hashlib.sha256(payload).hexdigest()!=fair_manifest['binary_sha256']:
+                    raise RuntimeError('fair binary identity drift')
+                target=root/'fair17';target.write_bytes(payload);target.chmod(0o755)
+                binaries={'native17':binaries['native17'],'fair17':str(target)}
+                report['fair_manifest']=fair_manifest
             report['binary_sha256']={key:hashlib.sha256(Path(path).read_bytes()).hexdigest() for key,path in binaries.items()}
             net=Network(SimpleNamespace(root=str(root),wg='wg',iperf='iperf3',start_iperf=True,
                 rtt_ms=rtt,rate_mbps=rate,loss_percent=loss,mtu=1420))
@@ -94,12 +108,12 @@ backend line_b
                 stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             time.sleep(.3)
             if front.poll() is not None:raise RuntimeError('private SNI frontend startup failed')
-            for turn in range(1 if args.client_diagnostic else 3):
-                order=VARIANTS[turn:]+VARIANTS[:turn]
+            for turn in range(4 if fair else 1 if args.client_diagnostic else 3):
+                order=(('native17','fair17') if turn%2==0 else ('fair17','native17')) if fair else VARIANTS[turn:]+VARIANTS[:turn]
                 for variant in order:
                     options={'kind':'balanced2' if variant=='balanced2' else 'balanced','binary':binaries[variant]}
                     if variant!='balanced2':options['experimental_binary']=[report['binary_sha256'][variant],
-                        RELEASES['3.5.17'][2] if variant=='official17' else manifest['binaries']['balanced']['version']]
+                        RELEASES['3.5.17'][2] if variant=='official17' else fair_manifest['version'] if variant=='fair17' else manifest['binaries']['balanced']['version']]
                     backend=Child('core',NAMES[2],backend_cpu,options,children)
                     try:
                         warm=client.call({'command':'warm'})
@@ -119,7 +133,7 @@ backend line_b
                             if state['completed']!=expected or state['errors']:raise RuntimeError('diagnostic DC mismatch')
                             continue
                         idle_before=stats(backend.ready['pid'])
-                        for cohort in ((30,50,100) if turn%2==0 else (100,50,30)):
+                        for cohort in ((30,) if fair else (30,50,100) if turn%2==0 else (100,50,30)):
                             ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
                             snapshots={k:stats(pid) for k,pid in ids.items()}
                             start=time.monotonic();parent_cpu=time.process_time()
@@ -193,5 +207,6 @@ if __name__=='__main__':
     parser.add_argument('--balanced2-archive',required=True);parser.add_argument('--stable-archive',required=True)
     parser.add_argument('--native-directory',required=True);parser.add_argument('--output',required=True)
     parser.add_argument('--client-diagnostic',action='store_true')
+    parser.add_argument('--fair-directory')
     signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
     raise SystemExit(main(parser.parse_args()))
