@@ -1,10 +1,12 @@
 """Fail-closed single-variable screen; not a production release qualification."""
 import argparse
 import json
+import math
 from pathlib import Path
 
 from mixed_experience_analysis import trial, number
 from legacy_queue_analysis import LEGACY_SHA, NATIVE_SHA
+from path_capacity import validate as capacity_validate
 
 
 def analyze(report):
@@ -19,6 +21,11 @@ def analyze(report):
     if (sorted(c.get('direction') for c in controls)!=['D','U'] or
         any(c.get('receiver_local') is not True or not number(c.get('mbps')) or c['mbps']<100 for c in controls)):
         raise ValueError('capacity evidence insufficient')
+    if any(not math.isclose(capacity_validate(c['raw']),c['mbps'],rel_tol=.001) for c in controls):
+        raise ValueError('capacity raw evidence mismatch')
+    budget=report.get('resources_before',{})
+    if budget.get('cpu_max')!='300000 100000' or budget.get('memory_max')!=str(1536*1024**2) or budget.get('swap_max')!='0':
+        raise ValueError('resource budget drift')
     rows=report.get('rows',[])
     expected=[(t+1,p) for t in range(4) for p in (('original','shaped180') if t%2==0 else ('shaped180','original'))]
     if [(r.get('round'),r.get('queue_policy')) for r in rows]!=expected:
@@ -28,6 +35,9 @@ def analyze(report):
         raise ValueError('selected core identity mismatch')
     if any(r.get('variant')!=core or r.get('cohort')!=30 for r in rows):
         raise ValueError('workload or core drift')
+    if any(not number(r.get('group_cpu_seconds')) or r['group_cpu_seconds']<=0 or
+        not r.get('backend_thread_affinities') or any(a!=[report['cpu_assignment']['core']] for a in r['backend_thread_affinities']) for r in rows):
+        raise ValueError('CPU measurement or affinity incomplete')
     if len({r['config_policy_sha256'] for r in rows})!=1:
         raise ValueError('configuration mismatch')
     expected_dc=sum(r['result']['dc_connections'] for r in rows)+4*4

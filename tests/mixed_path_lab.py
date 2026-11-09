@@ -52,7 +52,7 @@ def main(args):
     if queue_screen:
         report['plan']='private-shaper-screen-v1'
         report['queue_core']=queue_core
-        report['queue_telemetry']='raw-tc-v1'
+        report['queue_telemetry']='plain-tc-v2'
         report['scope']='one pinned core only; four AB/BA mixed pairs, 30 logical connections; pre-encryption 180Mbps HTB/fq_codel versus unchanged 200Mbps WAN'
     children=[];net=None;front=None;dc=None;expected=0
     write(output,report)
@@ -79,7 +79,11 @@ def main(args):
             if queue_screen and any(c['mbps']<rate*.5 for c in report['controls']):
                 raise RuntimeError('capacity control below unchanged 100Mbps gate; no screening load permitted')
             wg_original=original_wg_policy() if queue_screen else None
-            if queue_screen:report['initial_wireguard']=private_wg_snapshot()
+            if queue_screen:
+                report['initial_wireguard']=private_wg_snapshot()
+                configure_private_shaper(True,wg_original)
+                report['shaped_preflight']=private_wg_snapshot()
+                configure_private_shaper(False,wg_original)
             dc=Child('dc',NAMES[2],dc_cpu,{'mixed':True},children)
             client=Child('client',NAMES[0],frontend_cpu,{},children)
             config=root/'haproxy.cfg'

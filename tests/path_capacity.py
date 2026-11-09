@@ -4,9 +4,6 @@ import math
 import subprocess
 import time
 
-from network_lab import NAMES, command
-
-
 def validate(payload, seconds=6):
     if payload.get('error'):
         raise ValueError('capacity probe error')
@@ -42,6 +39,7 @@ def controls(network, rate_mbps, rows=None):
     Both endpoints inherit the same affinity as the original controls. No host
     routes, socket defaults, kernel pacing, or prior raw results are changed.
     """
+    from network_lab import NAMES, command
     server = subprocess.Popen(['ip', 'netns', 'exec', NAMES[0], 'iperf3',
         '-s', '-B', '10.77.1.1', '-p', '5201'],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

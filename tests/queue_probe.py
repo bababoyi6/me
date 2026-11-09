@@ -53,13 +53,13 @@ def private_wg_snapshot():
     for namespace in (NAMES[0],NAMES[2]):
         result[namespace]={}
         for kind in ('qdisc','class'):
-            raw=command('ip','netns','exec',namespace,'tc','-s','-j',kind,'show','dev','wg-lab')
-            # iproute2 5.15 prints nothing for classless/noqueue devices.
-            # Only an absent class list is valid; missing qdisc evidence is not.
-            rows=[] if kind=='class' and not raw.strip() else json.loads(raw)
-            if not isinstance(rows,list) or (kind=='qdisc' and not rows):
+            raw=command('ip','netns','exec',namespace,'tc','-s','-d',kind,'show','dev','wg-lab')
+            # iproute2 5.15 HTB xstats uses fprintf even under -j, producing
+            # invalid JSON. Preserve supported plain output, including counters.
+            # Empty classes on noqueue are valid; absent qdisc evidence is not.
+            if (kind=='qdisc' and not raw.startswith('qdisc ')) or (kind=='class' and raw and not raw.startswith('class ')):
                 raise RuntimeError('private queue observation incomplete')
-            result[namespace][kind]=rows
+            result[namespace][kind]=raw
     return result
 
 
