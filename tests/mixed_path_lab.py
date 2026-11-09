@@ -35,7 +35,7 @@ def main(args):
     backend_cpu,frontend_cpu,dc_cpu=cpus[:3];os.sched_setaffinity(0,{frontend_cpu})
     rtt,rate,loss=PROFILES[args.profile]
     output=Path(args.output)
-    report={'plan':'mixed-experience-v1','source_commit':os.environ['TDH_SOURCE_COMMIT'],
+    report={'plan':'client-small-write-fullpath-v1' if args.client_diagnostic else 'mixed-experience-v1','source_commit':os.environ['TDH_SOURCE_COMMIT'],
         'profile':args.profile,'rtt_ms':rtt,'rate_mbps':rate,'loss_percent':loss,
         'scope':'2 persistent 64-byte echo streams, 4 new FakeTLS+1KiB/ACK workers, 4D+1U files, idle with 5s application keepalive; not Telegram users',
         'complete':False,'accepted':False,'rows':[],'controls':[],'resources_before':before,
@@ -92,7 +92,7 @@ backend line_b
                 stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             time.sleep(.3)
             if front.poll() is not None:raise RuntimeError('private SNI frontend startup failed')
-            for turn in range(3):
+            for turn in range(1 if args.client_diagnostic else 3):
                 order=VARIANTS[turn:]+VARIANTS[:turn]
                 for variant in order:
                     options={'kind':'balanced2' if variant=='balanced2' else 'balanced','binary':binaries[variant]}
@@ -103,6 +103,19 @@ backend line_b
                         warm=client.call({'command':'warm'})
                         if warm['errors']:raise RuntimeError('warmup failed')
                         expected+=4
+                        if args.client_diagnostic:
+                            for repeat in range(4):
+                                for enabled in ((False,True) if repeat%2==0 else (True,False)):
+                                    client.send({'command':'probe-client-policy','nodelay':enabled})
+                                    result=client.receive(30)
+                                    if len(result['rows'])!=10 or any(row['client_nodelay']!=int(enabled) for row in result['rows']):
+                                        raise RuntimeError('client policy diagnostic incomplete')
+                                    report['rows'].append({'round':repeat+1,'variant':variant,'client_nodelay':enabled,'transfers':result['rows'],
+                                        'config_policy_sha256':backend.ready['config_policy_sha256']})
+                                    expected+=10;write(output,report)
+                            state=dc.call({'command':'stats'})
+                            if state['completed']!=expected or state['errors']:raise RuntimeError('diagnostic DC mismatch')
+                            continue
                         idle_before=stats(backend.ready['pid'])
                         for cohort in ((30,50,100) if turn%2==0 else (100,50,30)):
                             ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
@@ -177,5 +190,6 @@ if __name__=='__main__':
     parser.add_argument('--profile',choices=tuple(PROFILES),required=True)
     parser.add_argument('--balanced2-archive',required=True);parser.add_argument('--stable-archive',required=True)
     parser.add_argument('--native-directory',required=True);parser.add_argument('--output',required=True)
+    parser.add_argument('--client-diagnostic',action='store_true')
     signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
     raise SystemExit(main(parser.parse_args()))
