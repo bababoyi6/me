@@ -88,6 +88,20 @@ class DcHandler(socketserver.BaseRequestHandler):
             stream = PacketStream(CryptoStream(self.request, encoder, decoder))
             phase = "control"
             operation, size, rate = struct.unpack("!cQQ", exact(stream, 17))
+            if operation == b'e' and self.server.enable_echo:
+                # Explicit synthetic-only persistent message protocol. END is
+                # a full bounded frame; no EOF can flush or rescue its response.
+                phase = 'echo'
+                if size != 64 or rate != 128:
+                    raise ValueError('bounded echo dimensions required')
+                for _ in range(128):
+                    message = exact(stream,64)
+                    stream.sendall(message)
+                    if message == b'\xff'*64:
+                        with self.server.error_lock:
+                            self.server.completed += 1
+                        return
+                raise ValueError('echo request budget exceeded')
             persistent = operation in (b"d", b"u")
             operation = operation.upper()
             if not 0 < size <= 128 * 1024**2 or not 0 < rate <= 125000000:
@@ -129,12 +143,13 @@ class MockDc(socketserver.ThreadingTCPServer):
     # This is the synthetic DC's accept queue, never a production tuning value.
     request_queue_size = 256
 
-    def __init__(self, bind="127.0.0.1", listen=0, *, socket_timeout=8, receive_buffer=0):
+    def __init__(self, bind="127.0.0.1", listen=0, *, socket_timeout=8, receive_buffer=0, enable_echo=False):
         if socket_timeout not in (8, 25):
             raise ValueError("mock DC socket timeout must be bounded")
         if receive_buffer not in (0,262144):
             raise ValueError('bounded mock DC receive buffer required')
         self.socket_timeout = socket_timeout
+        self.enable_echo = enable_echo
         self.errors, self.error_lock = [], threading.Lock()
         self.connect_only_checks, self.completed = 0, 0
         super().__init__((bind, listen), DcHandler, bind_and_activate=False)

@@ -48,7 +48,7 @@ def worker(role,cpu):
             policy=lab.telemt_config.read_text().replace(f'127.0.0.1:{lab.api}','127.0.0.1:$API')
             ready={'pid':lab.telemt.pid,'version':lab.version,'config_policy_sha256':hashlib.sha256(policy.encode()).hexdigest()}
         elif role=='dc':
-            dc=MockDc('198.18.0.1',26000,socket_timeout=25)
+            dc=MockDc('198.18.0.1',26000,socket_timeout=25,enable_echo=options.get('mixed',False))
             ready={'pid':os.getpid()}
         else:ready={'pid':os.getpid()}
         print(json.dumps(ready),flush=True)
@@ -59,7 +59,10 @@ def worker(role,cpu):
                 with dc.error_lock:result={'completed':dc.completed,'errors':list(dc.errors)}
             elif role=='client':
                 endpoint=SimpleNamespace(real_dc=False,listen=24431,front=24443)
-                if request['command']=='warm':
+                if request['command']=='mixed':
+                    from mixed_workload import run_mixed
+                    result=run_mixed(endpoint,request['logical_clients'])
+                elif request['command']=='warm':
                     result={'rows':[FullLab.transfer(endpoint,domain,direction,4096,125000000,persistent=True,io_timeout=25)
                         for domain in ('apple.com','gs.apple.com') for direction in ('U','D')],'errors':[]}
                 else:

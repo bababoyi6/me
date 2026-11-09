@@ -1,6 +1,9 @@
 name: Bounded health monitor trickle recovery
 on:
   workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths: [.github/workflows/health-progress.yml]
 permissions:
   contents: read
 jobs:

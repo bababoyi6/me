@@ -134,6 +134,10 @@ def ready(now=None):
 
 def monitors_progressing(now, started):
     with READY_LOCK:
+        # As with ready(), sample after locking: a freshly published timestamp
+        # must not look as though it came from the future.
+        if now is None:
+            now = time.monotonic()
         return all(0 <= now - (checked if checked is not None else started) <= limit
                    for checked, limit in ((API_CHECKED, API_PROGRESS_TIMEOUT),
                                           (DC_CHECKED, DC_PROGRESS_TIMEOUT)))
@@ -148,7 +152,7 @@ while True:
     if any(not monitor.is_alive() for monitor in monitors):
         # Let the existing systemd restart policy replace a failed monitor thread.
         raise SystemExit("health monitor stopped")
-    if not monitors_progressing(time.monotonic(), started):
+    if not monitors_progressing(None, started):
         # Staleness already closes admission. Recover the stuck worker through
         # the existing service restart policy; ordinary unhealthy votes do not
         # trigger restarts, and no check is silently declared healthy.

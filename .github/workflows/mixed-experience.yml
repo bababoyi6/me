@@ -1,0 +1,50 @@
+name: Bounded three-core mixed user experience
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths: [.github/workflows/mixed-experience.yml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: mixed-experience
+  cancel-in-progress: false
+jobs:
+  measure:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 27
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [low, rtt100, rtt200, weak]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch exact three immutable binaries; no new build or release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh run view 42495175073 --repo bababoyi6/me --json headSha --jq .headSha)" = dec285fbdf5b42dd8be3e9e879bc0c2ad8994bc8
+          timeout 90 gh run download 42495175073 --repo bababoyi6/me --name native-pair --dir "$RUNNER_TEMP/native-pair"
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821981 > "$RUNNER_TEMP/stable.tar.gz"
+          printf '%s  %s\n' b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5 "$RUNNER_TEMP/balanced2.tar.gz" 0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e "$RUNNER_TEMP/stable.tar.gz" | sha256sum --check
+      - name: Prepare bounded disposable dependencies
+        run: |
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 wireguard-tools ethtool iperf3 python3-cryptography
+          sudo modprobe tcp_bbr
+          mkdir -m 700 "$RUNNER_TEMP/mixed-evidence"
+      - name: Measure preregistered mixed traffic only in owned namespaces
+        env:
+          PROFILE: ${{ matrix.profile }}
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-mixed-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=1200 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/mixed_path_lab.py --profile "$PROFILE" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --stable-archive "$RUNNER_TEMP/stable.tar.gz" --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/mixed-evidence/metrics.json"
+          python3 tests/mixed_experience_analysis.py "$RUNNER_TEMP/mixed-evidence/metrics.json" "$RUNNER_TEMP/mixed-evidence/analysis.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mixed-experience-${{ matrix.profile }}
+          path: ${{ runner.temp }}/mixed-evidence/*.json
+          retention-days: 14
