@@ -4,8 +4,8 @@
   "branch": "dev/telemt-stable-compat-20261107",
   "files": {
     ".gitattributes": {
-      "bytes": 2161,
-      "sha256": "f57159583817532db43b99cb373bbc8cfe34a8ff2ab1f9091a66cb270d689388"
+      "bytes": 2224,
+      "sha256": "8096ccfd08435e52219b496e2863fc2a45d921e3f6283bf85d8cc649f71357f1"
     },
     ".github/workflows/arm-compat.yml": {
       "bytes": 2005,
@@ -23,6 +23,14 @@
       "bytes": 2280,
       "sha256": "fda372ab97f7864eacacbe0cfa7f32e04aa189b7080b00c6c49c1ae1bec46dc1"
     },
+    ".github/workflows/client-nodelay.yml": {
+      "bytes": 2109,
+      "sha256": "4bd0dc527a4d298a6053d4e7fa2ef2ba500d092fad0de95cd92c7800e573c943"
+    },
+    ".github/workflows/client-write-path.yml": {
+      "bytes": 2262,
+      "sha256": "7eefa960a16ea08fb77c0fde580e0ef62488052e24fb1ecf9e58f90609874f37"
+    },
     ".github/workflows/core-delivery.yml": {
       "bytes": 2684,
       "sha256": "9bbad2f69e37d81042876dbe89b26e0a4f140f4e4a0b200a3caf2dd9e95242c3"
@@ -39,9 +47,17 @@
       "bytes": 1947,
       "sha256": "6e254029eb8922b02b6741f213421d087f1fdd360d284c72625042f3999c925b"
     },
+    ".github/workflows/health-progress.yml": {
+      "bytes": 1575,
+      "sha256": "2b4b03fc84c1e008e6a457bcacdfaf60cde9e8b295d0d2b50b3751e6db27a7e8"
+    },
     ".github/workflows/long-path.yml": {
       "bytes": 1986,
       "sha256": "47d4b30e154afe7b3b3c494ea8d2d517d5533d3f784f5a7927b5bc678a7110fe"
+    },
+    ".github/workflows/mixed-experience.yml": {
+      "bytes": 3056,
+      "sha256": "5baa59a7a7ec36082aa0618b10c331c1a3e92d2e0039742936dce87eb1ceaa48"
     },
     ".github/workflows/native-maintenance.yml": {
       "bytes": 2984,
@@ -132,8 +148,8 @@
       "sha256": "b711a4bf9f3bd8296cb1182e7d956250371f54088264c514a483525f13fef3ca"
     },
     "telemt-dual-hop.sh": {
-      "bytes": 190395,
-      "sha256": "ee5daad4333073bf1d94fa48e8e5246e9025c5465de4797b8722d8d11f8e9f3c"
+      "bytes": 192564,
+      "sha256": "ed530e025df08f239d9331dc8ee76c5b081ebce35e3cc85c60dbddc4194e52bb"
     },
     "tests/arm_compat_lab.py": {
       "bytes": 4349,
@@ -154,6 +170,10 @@
     "tests/candidate_path_ci.py": {
       "bytes": 1936,
       "sha256": "bb0e8e40dab06521faf10b74fab561cc18c846f9ab19f71cbe525864f5c4e71c"
+    },
+    "tests/client_nodelay_lab.py": {
+      "bytes": 4090,
+      "sha256": "2679d5fa117f9a14f949c325adfcd8ebc281039a3b68e99724e5056440a04d76"
     },
     "tests/connect_budget_lab.py": {
       "bytes": 4539,
@@ -180,8 +200,8 @@
       "sha256": "e2e9043962fbb6931bc9b57a08f98b9d440325228b0aa23cc82bf0886b0f0b5e"
     },
     "tests/e2e_lab.py": {
-      "bytes": 26098,
-      "sha256": "fd4a672ff0f2547cb7e70a50a654b4688f5d6826f4b3d8190f71f1d7aad961d2"
+      "bytes": 27277,
+      "sha256": "a8bf4767b1a7ba334c61fec4808d315ee5c1b69d635347ab29995a88aa7e8f6b"
     },
     "tests/endurance_ci.py": {
       "bytes": 1680,
@@ -212,8 +232,8 @@
       "sha256": "f7bebed97cf43aa33b2796fa4a5c43fd61dc10db47f89ef5d16b3898d54cd69b"
     },
     "tests/fixtures/runtime-template-hashes.json": {
-      "bytes": 1477,
-      "sha256": "ee73f30661ef4dcbafe33ffe8887ec5c05198d9ec544978e0052788c1818b88a"
+      "bytes": 1524,
+      "sha256": "fcc2e8d1a5ba95e685f03acf97e77c7ef65f4d400137998f2b3a0aa82fcadd33"
     },
     "tests/full_system_candidate.py": {
       "bytes": 9955,
@@ -226,6 +246,10 @@
     "tests/full_system_contract.py": {
       "bytes": 3595,
       "sha256": "55e27564ff84b03705b2c1350ad9bfb30c0d6d0d4626642bd1057b83795b52df"
+    },
+    "tests/health_progress_lab.py": {
+      "bytes": 6154,
+      "sha256": "89d607d60a07eb2c8654a90a4c5cc988ae26a7d70e582ae5ac213194822daf51"
     },
     "tests/high_rtt_matrix.py": {
       "bytes": 5969,
@@ -268,12 +292,24 @@
       "sha256": "f8c00a276ecea1afe56c0c1b03e6d5c6f8df2a7f86c5c667d0a5947b63438023"
     },
     "tests/long_path_lab.py": {
-      "bytes": 24400,
-      "sha256": "ab4d5cf88a86e7b221a19a0ba2168b2664ec78beb543ce9446b85e2565aa2419"
+      "bytes": 25026,
+      "sha256": "bf1943604ce6e60e92408bf89d961397a089954178e7867124bba0836de15d8a"
     },
     "tests/mixed_clients.py": {
       "bytes": 4627,
       "sha256": "7ec185e1b9e158327b3d383ba135c49aa0c25a37e92509a475ef0e32674a6a4f"
+    },
+    "tests/mixed_experience_analysis.py": {
+      "bytes": 9567,
+      "sha256": "878ecea725fbe84a71784924f98171d49fd9abaf31d592f37976a5dcfe973411"
+    },
+    "tests/mixed_path_lab.py": {
+      "bytes": 13741,
+      "sha256": "d7e151caddd0ac090bf77f5f34d143d7c3444324e13bddfea3cdc0e9bf2b027c"
+    },
+    "tests/mixed_workload.py": {
+      "bytes": 6376,
+      "sha256": "c99010264f4e13ec9b547bcb2d97d4cca0d736372bcd0fb008f435cdc1b759d9"
     },
     "tests/mock_dc_worker.py": {
       "bytes": 2595,
@@ -472,8 +508,8 @@
       "sha256": "1fb46cc2b07a2ad24accdc95905b031a5ba8b0554931c9c5f64832d1d85af141"
     },
     "tests/test_health_agent.py": {
-      "bytes": 6957,
-      "sha256": "b05af6288616ff7c5f1e54d21af55aafd30f2a3e00d516a1d69a74838586e46a"
+      "bytes": 7796,
+      "sha256": "d5422b71d9c8319285a9b0914e24842a905a14f8030b41b0b64edee7f2591627"
     },
     "tests/test_install_command.py": {
       "bytes": 4509,
@@ -514,6 +550,14 @@
     "tests/test_measurement_quality.py": {
       "bytes": 7589,
       "sha256": "b9530ad67a31c633774b6e9f790b964db14314d9ae2c89f9cff016c656ad94ef"
+    },
+    "tests/test_mixed_experience_analysis.py": {
+      "bytes": 5647,
+      "sha256": "2f021ba0041837632a946f3e479b96a779df49d2cae3ef1ab8451b866f797fa6"
+    },
+    "tests/test_mixed_workload.py": {
+      "bytes": 1430,
+      "sha256": "15ad6758fb398d04f0d855d7e4477065d81f2905561468746dd8148d88f36747"
     },
     "tests/test_mtproto_transport.py": {
       "bytes": 5997,
@@ -664,8 +708,8 @@
       "sha256": "609532991efbbf1ad3d41e8df009081f25bc497c0932cd1e6aea28bbdc0f4a61"
     },
     "tools/health_agent.py": {
-      "bytes": 5501,
-      "sha256": "8321cf9a524b0aa0436a67dab65cad54f6ae245989119554e9321bc973d9eba3"
+      "bytes": 6575,
+      "sha256": "46b9ed8f567efb2df11ef6134f179f8153d98c9d4501fa6023b915fb9f00bf7a"
     },
     "tools/iperf_matrix.py": {
       "bytes": 4440,
@@ -684,6 +728,6 @@
       "sha256": "e360fb048bd3e1d9a849e79664b43f7fca98321e185621fa259c7f4856419966"
     }
   },
-  "source_commit": "dd29827747844b7409863e58ddc2bab9411438c8",
+  "source_commit": "219964c93c705a61385ced0238d56f40521d4eee",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }
