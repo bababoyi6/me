@@ -36,6 +36,8 @@ jobs:
           sudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 wireguard-tools ethtool iperf3 python3-cryptography
           sudo modprobe tcp_bbr
           mkdir -m 700 "$RUNNER_TEMP/mixed-evidence"
+      - name: Verify lab peer deadlines and fail-closed analysis before loading
+        run: timeout 30 python3 -m unittest discover -s tests -p 'test_mixed*.py' -v
       - name: Measure preregistered mixed traffic only in owned namespaces
         env:
           PROFILE: ${{ matrix.profile }}
