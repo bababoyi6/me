@@ -4,8 +4,8 @@
   "branch": "dev/telemt-stable-compat-20261107",
   "files": {
     ".gitattributes": {
-      "bytes": 2461,
-      "sha256": "e7b5244496dc1ab6f2ec6eb68b5d739878235d8797639d6e0aed503e5245ae69"
+      "bytes": 2519,
+      "sha256": "af08eb4747efa6b35af1cec2b6668b150e89ea5ef1de8570866e38f36630d12c"
     },
     ".github/workflows/arm-compat.yml": {
       "bytes": 2005,
@@ -42,6 +42,10 @@
     ".github/workflows/exception-diagnostic.yml": {
       "bytes": 2299,
       "sha256": "dfdca4312a530ada228bf99d83e51eb5df0379bde3529902d810e706d3170de6"
+    },
+    ".github/workflows/fresh-core.yml": {
+      "bytes": 3359,
+      "sha256": "c5b99f1e7f5c9a4aca152daee95fc71ca6efa40314a1ba601c41e1948f9cccfb"
     },
     ".github/workflows/full-system.yml": {
       "bytes": 1947,
@@ -156,8 +160,8 @@
       "sha256": "b711a4bf9f3bd8296cb1182e7d956250371f54088264c514a483525f13fef3ca"
     },
     "telemt-dual-hop.sh": {
-      "bytes": 218153,
-      "sha256": "4366cb7ee46d982d4fd63b4a7df4a9007e64e88eac708a88b98fd67aae537e83"
+      "bytes": 221083,
+      "sha256": "81a756d9749a5f069f366a963c725a95e6a72a24c3e24e57e52a3c4905223742"
     },
     "tests/arm_compat_lab.py": {
       "bytes": 4349,
@@ -188,8 +192,8 @@
       "sha256": "72f04664308994676679e894717b7d662e7ed800dc6fd6f62cbd3ca5a50e960e"
     },
     "tests/core_delivery_ci.py": {
-      "bytes": 6988,
-      "sha256": "c090360b2e88cdc8f5b6b61de0763a1fde418785ccae4cdb217d4fef3aeeb7ec"
+      "bytes": 7223,
+      "sha256": "3bf99f3f7fdd2fb43349cf8b245def6550807b4994d31a6589656635c7fee575"
     },
     "tests/core_delivery_lab.py": {
       "bytes": 6258,
@@ -242,6 +246,10 @@
     "tests/fixtures/runtime-template-hashes.json": {
       "bytes": 1524,
       "sha256": "fcc2e8d1a5ba95e685f03acf97e77c7ef65f4d400137998f2b3a0aa82fcadd33"
+    },
+    "tests/fresh_core_lab.py": {
+      "bytes": 5073,
+      "sha256": "abcee18ad74728909d5aeefe8a825cd9157ce56c2f86440b58ffdcc1bbe4764e"
     },
     "tests/full_system_candidate.py": {
       "bytes": 9955,
@@ -428,8 +436,8 @@
       "sha256": "29ebb5c00d8b142e203cc27777eab64c6a47f04f3a9b4d37c12023728797c91e"
     },
     "tests/stable_system_lab.py": {
-      "bytes": 14556,
-      "sha256": "fdd376af938060e85ec649ab37a003c13d2fc58f13f8a9f0632f9d548dcd06d7"
+      "bytes": 15770,
+      "sha256": "110e708e8bc3adecad749c2ef6d6f14034158799ec221762c5a8f148bdfa8712"
     },
     "tests/stream_matrix.py": {
       "bytes": 4039,
@@ -500,8 +508,8 @@
       "sha256": "36750f3596cc48cf5ab459c52b58a53e0932a535bb1419a285d796af42ffbb13"
     },
     "tests/test_core_selection.py": {
-      "bytes": 6599,
-      "sha256": "f44cf30ac5a14645773a7109279b9c6aebaa5cece9dc4262df60c624187b9e1d"
+      "bytes": 12100,
+      "sha256": "8fde440cde5acbc2081c77667c2e1227224a4ad77046db8326afc528f11378fe"
     },
     "tests/test_core_transaction.py": {
       "bytes": 10105,
@@ -772,6 +780,6 @@
       "sha256": "e360fb048bd3e1d9a849e79664b43f7fca98321e185621fa259c7f4856419966"
     }
   },
-  "source_commit": "c79afe2067d4f8f41e6d325866873b8cd0499778",
+  "source_commit": "5431db554504004788cc29b83b6bbb684868f985",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }
