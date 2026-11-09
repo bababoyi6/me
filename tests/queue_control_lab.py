@@ -112,6 +112,15 @@ c.enable(180,200)
         report['hook_timeout_seconds']=elapsed
         report['checks']['hung_hook_keeps_wg_up']=(12<=elapsed<18 and qc.run('systemctl','is-active',unit)=='active' and control.kernel.fresh())
         qc.durable(manager,original_manager,0o755);control.service('apply')
+        stage='disable_crash_resume'
+        interrupted_off=child.replace("args[:3]==('tc','qdisc','add') and 'htb' in args",
+            "args[:3]==('tc','qdisc','del')").replace('c.enable(180,200)','c.disable()')
+        killed=subprocess.run(['python3','-c',interrupted_off,str(root),str(root/'queue'),str(manager),str(dropin)],capture_output=True,timeout=20)
+        report['checks']['disable_crash_injected']=(killed.returncode==-signal.SIGKILL and
+            json.loads(control.journal.read_bytes())['phase']=='removing' and control.kernel.fresh())
+        control.disable()
+        report['checks']['disable_crash_resumed']=not control.config.exists() and control.kernel.fresh()
+        control.enable(180,200)
         stage='hook_drift'
         qc.durable(dropin,control.hook()+b'# operator change\n',0o644)
         try:control.disable();raise AssertionError('hook drift overwritten')

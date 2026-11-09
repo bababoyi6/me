@@ -197,13 +197,13 @@ class QueueControl:
         if not self.journal.exists() and not self.journal.is_symlink():return None
         record=json.loads(read_file(self.journal))
         if (type(record) is not dict or type(record.get('schema')) is not int or record.get('schema')!=1 or record.get('policy')!=digest(value) or
-            type(record.get('baseline_txqlen')) is not int or not 0<=record['baseline_txqlen']<=10000 or record.get('phase') not in ('applying','active') or
+            type(record.get('baseline_txqlen')) is not int or not 0<=record['baseline_txqlen']<=10000 or record.get('phase') not in ('applying','active','removing') or
             type(record.get('epoch')) is not dict):raise QueueError('恢复记录与策略不一致')
         epoch=record['epoch']
         if (set(epoch)!={'boot','netns','ifindex'} or not isinstance(epoch['boot'],str) or
             not re.fullmatch('[a-f0-9-]{36}',epoch['boot']) or
             any(type(epoch[k]) is not int or epoch[k]<=0 for k in ('netns','ifindex'))):raise QueueError('接口身份记录无效')
-        if record['phase']=='active' and not re.fullmatch('[a-f0-9]{64}',record.get('fingerprint','')):
+        if record['phase'] in ('active','removing') and not re.fullmatch('[a-f0-9]{64}',record.get('fingerprint','')):
             raise QueueError('恢复记录缺少队列指纹')
         return record
 
@@ -212,6 +212,7 @@ class QueueControl:
         if link is None:raise QueueError('WireGuard接口未启动；未改变服务')
         epoch={k:link[k] for k in ('boot','netns','ifindex')}
         record=self.prior(value)
+        if record and record['phase']=='removing':raise QueueError('撤销未完成，请先运行queue disable --maintenance')
         if record and record['epoch']==epoch:
             shape=self.kernel.shape()
             if record['phase']=='active':
@@ -240,7 +241,16 @@ class QueueControl:
         if record and link is not None:
             epoch={k:link[k] for k in ('boot','netns','ifindex')}
             if record['epoch']==epoch:
-                self.kernel.restore(value['rate_mbps'],record['baseline_txqlen'],record.get('fingerprint'))
+                expected=record.get('fingerprint')
+                if record['phase']=='active':
+                    shape=self.kernel.shape();self.kernel.owned(shape,value['rate_mbps'])
+                    if digest(shape)!=expected or link['txqlen']!=1000:raise QueueError('队列配置发生漂移，保留现场')
+                    record['phase']='removing';self.record(record)
+                elif record['phase']=='removing' and self.kernel.fresh():
+                    # TC deletion completed before an interruption; restoring
+                    # only the recorded txqlen is safe and does not delete a tree.
+                    expected=None
+                self.kernel.restore(value['rate_mbps'],record['baseline_txqlen'],expected)
             elif not self.kernel.fresh():raise QueueError('接口身份变化且有自定义队列，保留现场')
         elif link is not None and not self.kernel.fresh():
             raise QueueError('缺少归属记录，拒绝删除队列')
