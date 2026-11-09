@@ -48,6 +48,21 @@ def original_wg_policy():
     return result
 
 
+def private_wg_snapshot():
+    result={}
+    for namespace in (NAMES[0],NAMES[2]):
+        result[namespace]={}
+        for kind in ('qdisc','class'):
+            raw=command('ip','netns','exec',namespace,'tc','-s','-j',kind,'show','dev','wg-lab')
+            # iproute2 5.15 prints nothing for classless/noqueue devices.
+            # Only an absent class list is valid; missing qdisc evidence is not.
+            rows=[] if kind=='class' and not raw.strip() else json.loads(raw)
+            if not isinstance(rows,list) or (kind=='qdisc' and not rows):
+                raise RuntimeError('private queue observation incomplete')
+            result[namespace][kind]=rows
+    return result
+
+
 def configure_wg_fq(enabled,original):
     for namespace in (NAMES[0],NAMES[2]):
         before=original[namespace]

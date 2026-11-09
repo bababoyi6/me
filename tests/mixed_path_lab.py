@@ -21,7 +21,7 @@ from stable_acceptance import PINS, stats
 from release_pins import RELEASES
 from legacy_queue_analysis import NATIVE_SHA, UPSTREAM, BUILD_SOURCE
 from path_capacity import controls as capacity_controls
-from queue_probe import original_wg_policy, configure_private_shaper
+from queue_probe import original_wg_policy, configure_private_shaper, private_wg_snapshot
 
 PROFILES={'low':(0,200,0),'rtt100':(100,200,0),'rtt200':(200,200,0),'weak':(100,100,.1)}
 VARIANTS=('balanced2','official17','native17')
@@ -79,6 +79,7 @@ def main(args):
             if queue_screen and any(c['mbps']<rate*.5 for c in report['controls']):
                 raise RuntimeError('capacity control below unchanged 100Mbps gate; no screening load permitted')
             wg_original=original_wg_policy() if queue_screen else None
+            if queue_screen:report['initial_wireguard']=private_wg_snapshot()
             dc=Child('dc',NAMES[2],dc_cpu,{'mixed':True},children)
             client=Child('client',NAMES[0],frontend_cpu,{},children)
             config=root/'haproxy.cfg'
@@ -135,9 +136,7 @@ backend line_b
                             if queue_screen:
                                 configure_private_shaper(shaped,wg_original)
                                 time.sleep(1)
-                                queue_before={ns:{kind:json.loads(command('ip','netns','exec',ns,
-                                    'tc','-s','-j',kind,'show','dev','wg-lab')) for kind in ('qdisc','class')}
-                                    for ns in (NAMES[0],NAMES[2])}
+                                queue_before=private_wg_snapshot()
                             group_cpu_before=resources()['cpu']['usage_usec']
                             ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
                             snapshots={k:stats(pid) for k,pid in ids.items()}
@@ -174,9 +173,7 @@ backend line_b
                                 report['rows'][-1]['queue_policy']='shaped180' if shaped else 'original'
                                 report['rows'][-1]['group_cpu_seconds']=(resources()['cpu']['usage_usec']-group_cpu_before)/1e6
                                 report['rows'][-1]['wireguard_before']=queue_before
-                                report['rows'][-1]['wireguard_after']={ns:{kind:json.loads(command('ip','netns','exec',ns,
-                                    'tc','-s','-j',kind,'show','dev','wg-lab')) for kind in ('qdisc','class')}
-                                    for ns in (NAMES[0],NAMES[2])}
+                                report['rows'][-1]['wireguard_after']=private_wg_snapshot()
                             write(output,report)
                             if not result['complete'] or result['errors']:raise RuntimeError('mixed integrity or completion failure')
                             expected+=result['dc_connections']
