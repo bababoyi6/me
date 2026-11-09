@@ -4,8 +4,8 @@
   "branch": "dev/telemt-stable-compat-20261107",
   "files": {
     ".gitattributes": {
-      "bytes": 2224,
-      "sha256": "8096ccfd08435e52219b496e2863fc2a45d921e3f6283bf85d8cc649f71357f1"
+      "bytes": 2282,
+      "sha256": "02d55759d20931dac3b37ece4c41148cae139645d70bbf15296361020b253118"
     },
     ".github/workflows/arm-compat.yml": {
       "bytes": 2005,
@@ -728,6 +728,6 @@
       "sha256": "e360fb048bd3e1d9a849e79664b43f7fca98321e185621fa259c7f4856419966"
     }
   },
-  "source_commit": "219964c93c705a61385ced0238d56f40521d4eee",
+  "source_commit": "fbbfd3d43c1ddd803a895be6451a3d5c9f8d3da0",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }
