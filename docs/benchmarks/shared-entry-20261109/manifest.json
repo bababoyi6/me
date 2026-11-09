@@ -123,9 +123,13 @@
     "bytes": 142,
     "sha256": "e1bba30f490e2801e0c5274d242dd1249dd4dfaca048a1233ff7fc67b53c2d1a"
   },
+  "new-commits-secrets.json": {
+    "bytes": 396,
+    "sha256": "c9e94554b880bc505ed3f9b63960fd91da7c49468bec46b1794e6d62e4cc5450"
+  },
   "qualification.json": {
-    "bytes": 4100,
-    "sha256": "e76ad29949ffaebf681c2e002a74753d3eaf6381fde731c0d321021f2ec27932"
+    "bytes": 5023,
+    "sha256": "af8a95132b1b2e8741c57a67881ceae03bb5fa2a6ca5c6b02be9ac6da90f9dca"
   },
   "raw-compression.json": {
     "bytes": 314,

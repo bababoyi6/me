@@ -4,8 +4,8 @@
   "branch": "dev/telemt-stable-compat-20261107",
   "files": {
     ".gitattributes": {
-      "bytes": 2402,
-      "sha256": "a827836d0e450847e5e7c9ed101147a830adb77995cffe1451a9068b2b94a221"
+      "bytes": 2461,
+      "sha256": "e7b5244496dc1ab6f2ec6eb68b5d739878235d8797639d6e0aed503e5245ae69"
     },
     ".github/workflows/arm-compat.yml": {
       "bytes": 2005,
@@ -156,8 +156,8 @@
       "sha256": "b711a4bf9f3bd8296cb1182e7d956250371f54088264c514a483525f13fef3ca"
     },
     "telemt-dual-hop.sh": {
-      "bytes": 216459,
-      "sha256": "c6b5447f376b1969dc7a605f2a50a68840d8e4ab0af351cdeec22e9948ca5679"
+      "bytes": 218153,
+      "sha256": "4366cb7ee46d982d4fd63b4a7df4a9007e64e88eac708a88b98fd67aae537e83"
     },
     "tests/arm_compat_lab.py": {
       "bytes": 4349,
@@ -376,8 +376,8 @@
       "sha256": "f5ac0af1c254063bd15acc6164f76d7628e9b5f7b5800d21fe2e87ee977e3c9f"
     },
     "tests/queue_control_lab.py": {
-      "bytes": 10571,
-      "sha256": "e33eb71fee8cc06a19eeaf9bbb0d153d28c5782a4b628b37d641527e5403af3f"
+      "bytes": 11421,
+      "sha256": "93f884414767e4b516433e7f9e9daa27cd18e0848ae88f8873f3fefc3b0fded4"
     },
     "tests/queue_probe.py": {
       "bytes": 5481,
@@ -480,8 +480,8 @@
       "sha256": "41a4fecf933198b0a9690f5baba5d741a74a555cb3d1aaabe21631e555edf203"
     },
     "tests/test_config_access.py": {
-      "bytes": 7878,
-      "sha256": "567d3654759fd9b8ea09b733c1b0daea0cb0de3ad07c7f49ea32cc5c2ed3576f"
+      "bytes": 8884,
+      "sha256": "d8df22980c8a57dedd38d57ea068a8bdb2657b5511b55580a29236bb893475b2"
     },
     "tests/test_connect_policy.py": {
       "bytes": 5863,
@@ -624,8 +624,8 @@
       "sha256": "0d43d5e53138993f337496d651ad7c8bc17eb2a8c2fd5008433e6b2f21130b4b"
     },
     "tests/test_queue_control.py": {
-      "bytes": 6082,
-      "sha256": "a5370a76f6e5246457cdefe9bf38e1a78f2cb1e7e133074714a99d5fcbaae2a4"
+      "bytes": 6668,
+      "sha256": "6ea7a88f23c59798755fd52147898f03977d8e09ada2fb1b6ca96fe40baeb905"
     },
     "tests/test_release_lock.py": {
       "bytes": 1754,
@@ -708,16 +708,16 @@
       "sha256": "d2b8bf405097af6c0bce3f677f73d4ed5e0c486b83bea2032ad337cc84340af2"
     },
     "tools/core_install.py": {
-      "bytes": 7113,
-      "sha256": "72b37a072e2400369ccc6ce387fe2cce0ab7da935cb3579ce05009cb4d18e11f"
+      "bytes": 7657,
+      "sha256": "e58906225e4255c7af57501c62f9e67503a3f9e08450913288bc9ea9c45764c1"
     },
     "tools/core_transaction.py": {
       "bytes": 11185,
       "sha256": "7b453f7ed27d36aa8f40c068c62eaec41d39a1b2a26712299b8503d979ac9148"
     },
     "tools/core_upgrade.py": {
-      "bytes": 24334,
-      "sha256": "9eb13161b79df6fd57a6f0a40bb51bd05e8ff5aaea62a44b6e0eddec010a232d"
+      "bytes": 24351,
+      "sha256": "7a71f295ad5927a05c33b55b66b6c8a950a94e18b7fc7ade170254749b83b605"
     },
     "tools/embed_core_install.py": {
       "bytes": 1076,
@@ -764,14 +764,14 @@
       "sha256": "954af489e1dc6ddce8afa99c11387e930c83a6c91a438879d7449069790c2328"
     },
     "tools/queue_control.py": {
-      "bytes": 20292,
-      "sha256": "9dcae9f9b72fe0655bf17110bf6167c7ae3ec5333843c5baed95d8b70c8f843d"
+      "bytes": 20894,
+      "sha256": "9a6c9c8266593d536adece626e7db77389e58ef61ce3a4ee9a2e11d64478f886"
     },
     "tools/stable_core_bundle.py": {
       "bytes": 4428,
       "sha256": "e360fb048bd3e1d9a849e79664b43f7fca98321e185621fa259c7f4856419966"
     }
   },
-  "source_commit": "213824fd511f492e38726945cd60144847c9acfe",
+  "source_commit": "60fa707e8a6de9da8873bdbd45088cde283c4349",
   "byte_scope": "Git object bytes; Windows checkout CRLF conversion is not a source change"
 }
