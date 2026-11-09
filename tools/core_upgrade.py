@@ -390,6 +390,11 @@ def upgrade(binary, directory, archive, archive_sha, binary_sha, version, roots,
     if old == binary_sha:
         if not service.ready():
             raise CoreError('installed target core is not ready; diagnose or recover it first')
+        if audited:
+            # An already-installed candidate may predate source retention.
+            # Attach or revalidate its exact archive without restarting it.
+            archive_payload(archive,archive_sha,version,binary_sha,True)
+            preserve_audited_archive(directory,archive,archive_sha,binary_sha)
         return 'unchanged'
     if len(list(Path(directory).glob('snapshot-*'))) >= 8:
         raise CoreError('snapshot retention limit reached; archive old backups before upgrading')

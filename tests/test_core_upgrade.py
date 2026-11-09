@@ -103,6 +103,21 @@ class UpgradeTests(unittest.TestCase):
         self.assertEqual(self.service.calls,[])
         self.assertEqual(self.binary.read_bytes(),b'OLD_CORE')
 
+    def test_repeat_audited_upgrade_attaches_missing_source_without_restart(self):
+        self.audited_fixture();self.binary.write_bytes(self.payload)
+        def repeat():
+            return upgrade.upgrade(self.binary,self.store,self.archive,digest(self.archive),self.new_sha,'3.5.16',
+                [self.config],self.service,audited=True)
+        self.assertEqual(repeat(),'unchanged')
+        cached=self.store/('audited-core-'+self.new_sha+'.tar.gz')
+        self.assertEqual(cached.read_bytes(),self.archive.read_bytes())
+        self.assertEqual(self.service.calls,[])
+        self.assertFalse((self.store/'transaction.json').exists())
+        cached.write_bytes(b'changed')
+        with self.assertRaisesRegex(CoreError,'cache changed'):repeat()
+        self.assertEqual(self.service.calls,[])
+        self.assertEqual(self.binary.read_bytes(),self.payload)
+
     def test_old_config_and_credentials_are_backed_up_without_rewriting(self):
         before = self.config.read_bytes()
         self.assertEqual(self.activate(), 'committed')
