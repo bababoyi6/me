@@ -29,6 +29,15 @@ def second_tunnel(net):
     command('ip','netns','exec',ns,'sysctl','-qw','net.ipv4.tcp_congestion_control=bbr')
     command('ip','netns','exec',NAMES[1],'tc','qdisc','add','dev','tdh-lc0','root','netem',
         'limit','10000','delay',f'{net.args.rtt_ms/2:g}ms','rate',f'{net.args.rate_mbps}mbit')
+    underlay={}
+    for where,target in ((NAMES[1],'198.51.100.6'),(NAMES[0],'198.51.100.6'),(ns,'192.0.2.1')):
+        probe=subprocess.run(['ip','netns','exec',where,'ping','-n','-c','1','-W','2',target],capture_output=True,text=True,timeout=4)
+        underlay[where]={'ok':probe.returncode==0,'output':probe.stdout}
+    settings={key:command('ip','netns','exec',NAMES[1],'sysctl','-n',key) for key in
+        ('net.ipv4.ip_forward','net.ipv4.conf.default.forwarding','net.ipv4.conf.tdh-la1.forwarding','net.ipv4.conf.tdh-lc0.forwarding','net.ipv4.conf.all.rp_filter')}
+    if not all(row['ok'] for row in underlay.values()):
+        print(json.dumps({'underlay_diagnostic':underlay,'router_settings':settings}),flush=True)
+        raise RuntimeError('second underlay unreachable before WG or queue setup')
     keys=[]
     for index in range(2):
         path=net.root/f'shared-wg-{index}.key';key=command('wg','genkey')+'\n'
@@ -45,12 +54,14 @@ def second_tunnel(net):
         command('ip','-n',where,'link','set',dev,'mtu','1420','up')
     result=subprocess.run(['ip','netns','exec',NAMES[0],'ping','-n','-c','2','-W','2','10.77.2.2'],capture_output=True,text=True,timeout=8)
     if result.returncode:
-        diagnostic={'ping':result.stdout,'routes':{},'wg':{}}
+        diagnostic={'ping':result.stdout,'routes':{},'wg':{},'underlay':underlay,'router_settings':settings,'key_binding':{}}
         for where in (NAMES[0],NAMES[1],ns):
             diagnostic['routes'][where]=command('ip','-n',where,'route','show')
-        for where,dev in ((NAMES[0],'wg-lab2'),(ns,'wg-lab')):
+        for index,(where,dev) in enumerate(((NAMES[0],'wg-lab2'),(ns,'wg-lab'))):
             diagnostic['wg'][where]={key:[row.split()[1:] for row in command('ip','netns','exec',where,'wg','show',dev,key).splitlines()]
                 for key in ('latest-handshakes','transfer')}
+            diagnostic['key_binding'][where]=(command('ip','netns','exec',where,'wg','show',dev,'public-key')==keys[index][1] and
+                command('ip','netns','exec',where,'wg','show',dev,'peers')==keys[1-index][1])
         print(json.dumps({'second_tunnel_diagnostic':diagnostic}),flush=True)
         raise RuntimeError('second WG setup failed before shared queue/load; diagnostics contain no keys')
 
