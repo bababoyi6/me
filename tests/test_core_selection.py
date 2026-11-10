@@ -194,3 +194,22 @@ core_panel
                 called=Path(folder)/'called'
                 self.assertEqual(called.read_text() if called.exists() else '',expected)
                 self.assertFalse((Path(folder)/'executed').exists())
+
+    def test_maintenance_panel_uses_fixed_operations_and_requires_terminal_confirmation(self):
+        for role,reply,expected in (
+            ('entry','',''),('entry','\n',''),('entry','1\nNO\n',''),
+            ('entry','1\nMAINTENANCE\n','drain 1'),('entry','2\nMAINTENANCE\n','resume 1'),
+            ('entry','3\nMAINTENANCE\n','drain 2'),('entry','4\nMAINTENANCE\n','resume 2'),
+            ('entry','5\nMAINTENANCE\n','manager'),('backend1','5\nMAINTENANCE\n','manager'),
+            ('backend2','1\nMAINTENANCE\n',''),('entry','1;shutdown\n','')):
+            with self.subTest(role=role,reply=reply),tempfile.TemporaryDirectory() as folder:
+                body='''load_state() { TDH_ROLE=$TEST_ROLE; return 0; }
+require_current_state() { :; }
+backend_maintenance() { printf '%s' "$*" > "$TDH_BASE/called"; }
+rollback_manager() { printf manager > "$TDH_BASE/called"; }
+maintenance_panel
+'''
+                code,output=self.tty_shell(body,reply,TEST_ROLE=role,TDH_BASE=folder)
+                self.assertEqual(code,0,output)
+                called=Path(folder)/'called'
+                self.assertEqual(called.read_text() if called.exists() else '',expected)

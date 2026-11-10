@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools'))
-from entry_maintenance import maintain
+from entry_maintenance import maintain, MaintenanceError
 
 
 class EntryMaintenanceTests(unittest.TestCase):
@@ -32,3 +32,15 @@ class EntryMaintenanceTests(unittest.TestCase):
         script = (root/'telemt-dual-hop.sh').read_text(encoding='utf-8')
         embedded = script.split('# BEGIN GENERATED ENTRY MAINTENANCE\n')[1].split('# END GENERATED ENTRY MAINTENANCE\n')[0]
         self.assertEqual(embedded, (root/'tools/entry_maintenance.py').read_text(encoding='utf-8'))
+
+    def test_partial_change_has_fixed_actionable_message_without_echoing_reply(self):
+        calls=[]
+        def request(command):
+            calls.append(command)
+            return '' if len(calls)==1 else 'SYNTHETIC_PRIVATE_REPLY'
+        with self.assertRaises(MaintenanceError) as caught:
+            maintain('resume','1',request)
+        self.assertEqual(len(calls),2)
+        self.assertIn('a status',str(caught.exception))
+        self.assertIn('只有一条',str(caught.exception))
+        self.assertNotIn('SYNTHETIC_PRIVATE_REPLY',str(caught.exception))

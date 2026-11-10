@@ -9,8 +9,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallCommandTests(unittest.TestCase):
-    def invoke(self, download_ok, root=True, payload=None, original=False):
-        command = (ROOT / "README.md").read_text().split("```bash\n")[2 if original else 1].split("\n```", 1)[0]
+    def invoke(self, download_ok, root=True, payload=None, original=False, public=False):
+        channel = 'original' if original else 'stable'
+        command = (ROOT / "README.md").read_text().split(f'<!-- install:{channel} -->')[1].split("```bash\n",1)[1].split("\n```", 1)[0]
         with tempfile.TemporaryDirectory(prefix="tdh-bootstrap-test-") as name:
             base = Path(name)
             commands = base / "commands"
@@ -47,6 +48,8 @@ fi
 exec /bin/bash "$@"
 ''',
             }
+            if public:
+                scripts['curl']='#!/bin/bash\nset -eu\nprintf "%s\\n" "$@" >"$TDH_BOOTSTRAP_TEST/curl-arguments"\nexec /usr/bin/curl "$@"\n'
             for executable, body in scripts.items():
                 path = commands / executable
                 path.write_text(body)
@@ -54,7 +57,7 @@ exec /bin/bash "$@"
             env = dict(os.environ, PATH=str(commands) + os.pathsep + os.environ["PATH"], TMPDIR=str(temporary),
                        TDH_BOOTSTRAP_TEST=str(base), TDH_TEST_DOWNLOAD_OK=str(int(download_ok)),
                        TDH_TEST_UID="0" if root else "1000", TDH_TEST_PAYLOAD=str(candidate))
-            result = subprocess.run(["bash", "-c", command], env=env, capture_output=True, text=True, timeout=10)
+            result = subprocess.run(["bash", "-c", command], env=env, capture_output=True, text=True, timeout=150 if public else 10)
             self.assertEqual(result.returncode == 0, expected_success, result.stdout + result.stderr)
             self.assertEqual((base / "execution").exists(), expected_success)
             self.assertEqual(list(temporary.iterdir()), [existing])
@@ -65,7 +68,7 @@ exec /bin/bash "$@"
             self.assertIn("--max-filesize", arguments)
             self.assertIn("--proto", arguments)
             self.assertIn("=https", arguments)
-            channel = 'v1.3.1-original' if original else 'main'
+            channel = 'v1.3.1-original' if original else 'v1.7.0'
             self.assertIn(f'https://raw.githubusercontent.com/bababoyi6/me/{channel}/telemt-dual-hop.sh', arguments)
             if expected_success:
                 self.assertIn("Telemt Dual-Hop " + ("1.3.1" if original else "1.7.0"), result.stdout)
@@ -84,6 +87,9 @@ exec /bin/bash "$@"
         payload=(ROOT/'legacy/telemt-dual-hop-1.3.1.sh').read_bytes()+b'\n# changed after download\n'
         self.invoke(True,payload=payload,original=True)
 
+    def test_stable_rejects_valid_shell_with_wrong_pinned_digest(self):
+        self.invoke(True,payload=(ROOT/'telemt-dual-hop.sh').read_bytes()+b'\n# altered\n')
+
     def test_download_failure_never_launches_or_leaves_partial_file(self):
         self.invoke(False)
 
@@ -95,4 +101,11 @@ exec /bin/bash "$@"
 
 
 if __name__ == "__main__":
-    unittest.main()
+    import sys
+    if sys.argv[1:]==['--public']:
+        if os.environ.get('GITHUB_ACTIONS')!='true':
+            raise SystemExit('public bootstrap smoke is confined to disposable CI')
+        InstallCommandTests().invoke(True,root=False,public=True)
+        print('Public v1.7.0 README command: HTTPS download, pinned SHA256, real --help and temporary cleanup PASS; no host installation')
+    else:
+        unittest.main()

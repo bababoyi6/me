@@ -30,7 +30,10 @@ def bootstrap(profile):
     if not re.fullmatch(r'[a-f0-9]{40}',ref):
         raise ValueError('immutable candidate source required')
     url=f'https://raw.githubusercontent.com/bababoyi6/me/{ref}/telemt-dual-hop.sh'
-    body=('set -e; tmp=$(mktemp); trap \'rm -f -- "$tmp"\' EXIT; '
+    # This cohort qualifies official-core migrations, not the independent
+    # default-channel policy. Keep its starting identity explicit when the
+    # production x86 default is balanced2.
+    body=('set -e; export TDH_NEW_INSTALL_CORE=official; tmp=$(mktemp); trap \'rm -f -- "$tmp"\' EXIT; '
           'curl -q -fL --proto "=https" --proto-redir "=https" --tlsv1.2 --connect-timeout 10 '
           f'--max-time 120 --max-filesize 1048576 {shlex.quote(url)} -o "$tmp"; '
           f'printf "%s  %s\\n" {shlex.quote(profile["manager"])} "$tmp" | sha256sum --check --status; '

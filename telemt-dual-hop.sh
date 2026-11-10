@@ -2200,6 +2200,10 @@ import socket
 import sys
 
 
+class MaintenanceError(RuntimeError):
+    """Only fixed, non-sensitive operator messages may cross the CLI boundary."""
+
+
 def exchange(command):
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
         connection.settimeout(3)
@@ -2213,7 +2217,7 @@ def exchange(command):
                 return output.decode('ascii')
             output += part
             if len(output) > 262144:
-                raise RuntimeError('HAProxy reply exceeds limit')
+                raise MaintenanceError('HAProxy 状态响应过大；请运行 a diagnose，未继续操作')
 
 
 def maintain(action, index, request=exchange):
@@ -2225,12 +2229,12 @@ def maintain(action, index, request=exchange):
         for backend in ('telemt_a', 'telemt_b'):
             matches = [row for row in rows if row.get('pxname') == backend and row.get('svname') == peer]
             if len(matches) != 1 or matches[0].get('status') != 'UP':
-                raise RuntimeError('peer is not UP on both lines; refusing drain')
+                raise MaintenanceError('备用后端未在两条线路均为 UP，已拒绝排空；请先运行 a diagnose')
     state = 'drain' if action == 'drain' else 'ready'
     for backend in ('telemt_a', 'telemt_b'):
         reply = request(f'set server {backend}/vps{index} state {state}')
         if reply.strip():
-            raise RuntimeError('HAProxy rejected state change; inspect both lines')
+            raise MaintenanceError('HAProxy 拒绝状态变更；两条线路可能只有一条已变更，请运行 a status 检查并重试原命令')
     return state
 
 
@@ -2240,7 +2244,8 @@ if __name__ == '__main__':
             raise ValueError('exact arguments required')
         print('后端维护状态：'+maintain(sys.argv[1], sys.argv[2]))
     except Exception as error:
-        print('入口维护失败：'+type(error).__name__, file=sys.stderr)
+        detail = str(error) if isinstance(error, MaintenanceError) else '无法完成 HAProxy 操作；请运行 a status 和 a diagnose，检查两条线路后重试原命令'
+        print('入口维护失败：'+detail, file=sys.stderr)
         raise SystemExit(1)
 # END GENERATED ENTRY MAINTENANCE
 TDH_ENTRY_MAINTENANCE_PY
@@ -4449,6 +4454,44 @@ menu_fresh() {
   done
 }
 
+maintenance_panel() {
+  load_state || die "未安装节点。"
+  require_current_state
+  local confirmation action index
+  printf '\n维护操作不会自动登录其他节点。\n'
+  if [[ $TDH_ROLE == entry ]]; then
+    printf '  1) 排空后端 VPS1 的新连接\n'
+    printf '  2) 恢复后端 VPS1 接收新连接\n'
+    printf '  3) 排空后端 VPS2 的新连接\n'
+    printf '  4) 恢复后端 VPS2 接收新连接\n'
+  fi
+  printf '  5) 回退上次管理脚本更新（不回退核心）\n'
+  printf '  0) 返回（默认）\n'
+  read_panel_choice '请选择' 0 || return 0
+  case $PANEL_CHOICE in
+    0) return 0 ;;
+    1|2|3|4)
+      [[ $TDH_ROLE == entry ]] || { warn "该操作只能在入口运行。"; return 0; }
+      case $PANEL_CHOICE in
+        1) action=drain index=1 ;; 2) action=resume index=1 ;;
+        3) action=drain index=2 ;; 4) action=resume index=2 ;;
+      esac
+      warn "排空只影响新连接；后端重启会断开仍未结束的旧会话。"
+      warn "排空期间不要重载或重启入口；维护完成须回来恢复该后端。"
+      ;;
+    5) action=manager; info "仅恢复上次管理脚本备份，保持服务、配置和代理链接。" ;;
+    *) warn "无效选择。"; return 0 ;;
+  esac
+  printf '确认操作请输入 MAINTENANCE，其他输入取消：' >&2
+  read -r confirmation </dev/tty || return 0
+  [[ $confirmation == MAINTENANCE ]] || { info "已取消维护。"; return 0; }
+  if [[ $action == manager ]]; then
+    rollback_manager
+  else
+    backend_maintenance "$action" "$index"
+  fi
+}
+
 core_panel() {
   load_state || die "未安装节点。"
   require_current_state
@@ -4516,6 +4559,7 @@ menu_existing() {
       printf '  7) 安全更新管理脚本\n'
       printf '  8) 只读脱敏性能采样（5 秒）\n'
       printf '  9) 卸载\n'
+      printf ' 10) 后端排空、恢复与管理脚本回退\n'
       printf '  0) 退出\n\n'
       read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
       case $PANEL_CHOICE in
@@ -4528,6 +4572,7 @@ menu_existing() {
         7) run_panel_action update_manager ;;
         8) run_panel_action performance_report ;;
         9) run_panel_action uninstall_all ;;
+        10) run_panel_action maintenance_panel ;;
         0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
         *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
       esac
@@ -4539,6 +4584,7 @@ menu_existing() {
       printf '  5) 只读脱敏性能采样（5 秒）\n'
       printf '  6) 后端实验队列（默认关闭，可撤销）\n'
       printf '  7) 核心维护与回退\n'
+      printf '  8) 管理脚本回退\n'
       printf '  9) 卸载\n'
       printf '  0) 退出\n\n'
       read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
@@ -4550,6 +4596,7 @@ menu_existing() {
         5) run_panel_action performance_report ;;
         6) run_panel_action queue_panel ;;
         7) run_panel_action core_panel ;;
+        8) run_panel_action maintenance_panel ;;
         9) run_panel_action uninstall_all ;;
         0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
         *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;

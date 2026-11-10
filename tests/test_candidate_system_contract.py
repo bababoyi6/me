@@ -61,6 +61,7 @@ class CandidateSystemContractTests(unittest.TestCase):
         self.assertIn('/'+'a'*40+'/telemt-dual-hop.sh',body)
         self.assertIn(profile['manager'],body)
         self.assertIn('sha256sum --check --status',body)
+        self.assertIn('export TDH_NEW_INSTALL_CORE=official;',body)
         self.assertIn('--proto-redir "=https"',body)
         self.assertNotIn('/main/',body)
         for ref in ('main','a'*39,'a'*40+';touch /tmp/unsafe'):
