@@ -1,0 +1,30 @@
+{
+  "repository": "telemt/telemt",
+  "tag": "3.5.17",
+  "commit": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+  "tag_object": "881210fd4c320735fad3978a291b565afae4b61e",
+  "published_at": "2026-11-08T12:08:51Z",
+  "checked_on": "2026-11-08",
+  "assets": {
+    "x86_64": {
+      "name": "telemt-x86_64-linux-gnu.tar.gz",
+      "url": "https://github.com/telemt/telemt/releases/download/3.5.17/telemt-x86_64-linux-gnu.tar.gz",
+      "asset_id": 723821981,
+      "sha256": "0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e",
+      "binary_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+      "bytes": 18713384,
+      "binary_bytes": 18713384,
+      "archive_bytes": 7390936
+    },
+    "aarch64": {
+      "name": "telemt-aarch64-linux-gnu.tar.gz",
+      "url": "https://github.com/telemt/telemt/releases/download/3.5.17/telemt-aarch64-linux-gnu.tar.gz",
+      "asset_id": 723821990,
+      "sha256": "f0d3d06d029f2b21dc66a44069bcc7bd20d32fcb34b5867c5250cee647785de6",
+      "binary_sha256": "e5ca8befdc1428fcd66537ef04f3a95e5f278ebf3c3dd0d0909ce25a390f502b",
+      "bytes": 15304488,
+      "binary_bytes": 15304488,
+      "archive_bytes": 6824198
+    }
+  }
+}

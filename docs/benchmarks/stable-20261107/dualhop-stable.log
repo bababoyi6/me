@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/dualhop_lab.py", line 509, in <module>
+    if args.role=='run': run()
+                         ~~~^^
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/dualhop_lab.py", line 464, in run
+    net=Network(SimpleNamespace(root=str(ROOT),wg=args.wg,start_iperf=False,
+                               rtt_ms=args.rtt,loss_percent=0,rate_mbps=100,mtu=1420,
+                               ownership_ledger=bool(args.endurance_seconds)))
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/network_lab.py", line 88, in __init__
+    raise RuntimeError("lab directory must be root-owned and private (0700)")
+RuntimeError: lab directory must be root-owned and private (0700)

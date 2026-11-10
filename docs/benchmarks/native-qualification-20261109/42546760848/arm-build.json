@@ -1,0 +1,32 @@
+{
+  "architecture": "aarch64",
+  "elf_machine": 183,
+  "native_manifest": {
+    "upstream_commit": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+    "manager_commit": "8cada6fa4df038d9d6d369e5f9aa0b924cada9e0",
+    "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "lto": "thin",
+    "codegen_units": 8,
+    "production_default_changed": false,
+    "binaries": {
+      "control": {
+        "sha256": "7539ffe5d78e8a3d148866c6a63b408a925c71b2fa4c933f9d1592388ff6458c",
+        "version": "telemt 3.5.17+tdh.control1",
+        "bytes": 31738096
+      },
+      "balanced": {
+        "sha256": "dc51b8ad03e0d970a7b69ee2b95dc16e548a8ea9b12131bb19bc09905cc80b6d",
+        "version": "telemt 3.5.17+tdh.balanced1",
+        "bytes": 31749912
+      }
+    },
+    "builder_sha256": "29ce5233f9b1737f674e709b135d9e03a18f467324636c2e09aff5dcd4ce77be",
+    "helpers": {
+      "low_rtt_receive": "7b6c638525d3f2f9a106ae0b6c13b8d87fa21a1224ffc32ad5960b002cbb3990",
+      "unsent_queue_bulk": "b711a4bf9f3bd8296cb1182e7d956250371f54088264c514a483525f13fef3ca"
+    },
+    "scope": "unofficial synthetic lab candidates only; no publication or deployment"
+  },
+  "installer_channel_enabled": false,
+  "scope": "native ARM build and private synthetic protocol only"
+}

@@ -1,0 +1,348 @@
+{
+  "complete": true,
+  "all_six_directed_lan_paths_verified": true,
+  "nodes": {
+    "entry": {
+      "complete": true,
+      "before": [
+        {
+          "ifindex": 1,
+          "ifname": "lo",
+          "flags": [
+            "LOOPBACK",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 65536,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "loopback",
+          "address": "00:00:00:00:00:00",
+          "broadcast": "00:00:00:00:00:00",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "127.0.0.1",
+              "prefixlen": 8,
+              "scope": "host",
+              "label": "lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "::1",
+              "prefixlen": 128,
+              "scope": "host",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 2,
+          "ifname": "ens2",
+          "flags": [
+            "BROADCAST",
+            "MULTICAST",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 1500,
+          "qdisc": "fq_codel",
+          "operstate": "UP",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "52:54:00:71:00:04",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "altnames": [
+            "enp0s2"
+          ],
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "10.0.2.15",
+              "prefixlen": 24,
+              "metric": 100,
+              "broadcast": "10.0.2.255",
+              "scope": "global",
+              "dynamic": true,
+              "label": "ens2",
+              "valid_life_time": 86377,
+              "preferred_life_time": 86377
+            },
+            {
+              "family": "inet6",
+              "local": "fe80::5054:ff:fe71:4",
+              "prefixlen": 64,
+              "scope": "link",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 3,
+          "ifname": "ens3",
+          "flags": [
+            "BROADCAST",
+            "MULTICAST"
+          ],
+          "mtu": 1500,
+          "qdisc": "noop",
+          "operstate": "DOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "52:54:01:71:01:01",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "altnames": [
+            "enp0s3"
+          ],
+          "addr_info": []
+        }
+      ],
+      "device": "ens3",
+      "route": {
+        "dst": "11.254.254.2",
+        "dev": "ens3",
+        "prefsrc": "11.254.254.1",
+        "flags": [],
+        "uid": 0,
+        "cache": []
+      },
+      "synthetic_wan_escape_blocked": true
+    },
+    "backend1": {
+      "complete": true,
+      "before": [
+        {
+          "ifindex": 1,
+          "ifname": "lo",
+          "flags": [
+            "LOOPBACK",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 65536,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "loopback",
+          "address": "00:00:00:00:00:00",
+          "broadcast": "00:00:00:00:00:00",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "127.0.0.1",
+              "prefixlen": 8,
+              "scope": "host",
+              "label": "lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "::1",
+              "prefixlen": 128,
+              "scope": "host",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 2,
+          "ifname": "ens2",
+          "flags": [
+            "BROADCAST",
+            "MULTICAST",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 1500,
+          "qdisc": "fq_codel",
+          "operstate": "UP",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "52:54:00:71:00:04",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "altnames": [
+            "enp0s2"
+          ],
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "10.0.2.15",
+              "prefixlen": 24,
+              "metric": 100,
+              "broadcast": "10.0.2.255",
+              "scope": "global",
+              "dynamic": true,
+              "label": "ens2",
+              "valid_life_time": 86380,
+              "preferred_life_time": 86380
+            },
+            {
+              "family": "inet6",
+              "local": "fe80::5054:ff:fe71:4",
+              "prefixlen": 64,
+              "scope": "link",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 3,
+          "ifname": "ens3",
+          "flags": [
+            "BROADCAST",
+            "MULTICAST"
+          ],
+          "mtu": 1500,
+          "qdisc": "noop",
+          "operstate": "DOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "52:54:01:71:01:02",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "altnames": [
+            "enp0s3"
+          ],
+          "addr_info": []
+        }
+      ],
+      "device": "ens3",
+      "route": {
+        "dst": "11.254.254.1",
+        "dev": "ens3",
+        "prefsrc": "11.254.254.2",
+        "flags": [],
+        "uid": 0,
+        "cache": []
+      },
+      "synthetic_wan_escape_blocked": true
+    },
+    "backend2": {
+      "complete": true,
+      "before": [
+        {
+          "ifindex": 1,
+          "ifname": "lo",
+          "flags": [
+            "LOOPBACK",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 65536,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "loopback",
+          "address": "00:00:00:00:00:00",
+          "broadcast": "00:00:00:00:00:00",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "127.0.0.1",
+              "prefixlen": 8,
+              "scope": "host",
+              "label": "lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "::1",
+              "prefixlen": 128,
+              "scope": "host",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 2,
+          "ifname": "ens2",
+          "flags": [
+            "BROADCAST",
+            "MULTICAST",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 1500,
+          "qdisc": "fq_codel",
+          "operstate": "UP",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "52:54:00:71:00:04",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "altnames": [
+            "enp0s2"
+          ],
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "10.0.2.15",
+              "prefixlen": 24,
+              "metric": 100,
+              "broadcast": "10.0.2.255",
+              "scope": "global",
+              "dynamic": true,
+              "label": "ens2",
+              "valid_life_time": 86383,
+              "preferred_life_time": 86383
+            },
+            {
+              "family": "inet6",
+              "local": "fe80::5054:ff:fe71:4",
+              "prefixlen": 64,
+              "scope": "link",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 3,
+          "ifname": "ens3",
+          "flags": [
+            "BROADCAST",
+            "MULTICAST"
+          ],
+          "mtu": 1500,
+          "qdisc": "noop",
+          "operstate": "DOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "52:54:01:71:01:03",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "altnames": [
+            "enp0s3"
+          ],
+          "addr_info": []
+        }
+      ],
+      "device": "ens3",
+      "route": {
+        "dst": "11.254.254.1",
+        "dev": "ens3",
+        "prefsrc": "11.254.254.3",
+        "flags": [],
+        "uid": 0,
+        "cache": []
+      },
+      "synthetic_wan_escape_blocked": true
+    }
+  }
+}

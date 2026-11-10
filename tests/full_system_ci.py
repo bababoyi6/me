@@ -21,12 +21,19 @@ import time
 import system_vm as vm
 from system_vm_ssh import SSH, ports, ssh
 from full_system_contract import validate, MANAGER, CORE
+from full_system_candidate import expectations,bootstrap,PROTECTED,maintenance
 
 ROOT = vm.ROOT
 ROLES = ('entry', 'backend1', 'backend2')
 EVIDENCE = ROOT.parent / 'tdh-full-system-evidence'
 UNIT = 'tdh-audit-fullsystem.service'
 LIMIT_SECONDS = 1500
+PROFILE=os.environ.get('TDH_FULL_SYSTEM_PROFILE','published')
+if PROFILE not in ('published','candidate'):
+    raise ValueError('unknown full-system profile')
+EXPECTED=expectations(os.environ.get('TDH_CANDIDATE_REF','')) if PROFILE=='candidate' else None
+if EXPECTED is not None:
+    MANAGER,CORE=EXPECTED['manager'],EXPECTED['core']
 
 
 def write(path, value):
@@ -203,9 +210,12 @@ def interactive(node, name, line, action):
 
 
 def install(node):
-    text = (Path(__file__).resolve().parents[1]/'README.md').read_text()
-    line = text.split('```bash\n', 1)[1].split('\n```', 1)[0]
-    assert 'https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh' in line
+    if EXPECTED is not None:
+        line=bootstrap(EXPECTED)
+    else:
+        text = (Path(__file__).resolve().parents[1]/'README.md').read_text()
+        line = text.split('```bash\n', 1)[1].split('\n```', 1)[0]
+        assert 'https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh' in line
     def action(child):
         child.expect('请选择'); child.sendline(str(ROLES.index(node)+1))
         if node != 'entry':
@@ -214,6 +224,11 @@ def install(node):
         assert child.expect(['请输入'+('入口 VPS 公网 IPv4' if node=='entry' else '后端 VPS 公网 IPv4')+': ',
                              r'\[失败\]','按 Enter 返回控制面板'])==0,'installer stopped before address input'
         child.sendline('11.254.254.'+str(ROLES.index(node)+1))
+        if node != 'entry' and EXPECTED is not None:
+            # Observe startup before a failed installer removes its owned files.
+            # Export only fixed service fields and API counts, never links/logs.
+            sampler=threading.Thread(target=startup_observer,args=(node,),daemon=True)
+            sampler.start()
         matched = child.expect(['按 Enter 返回控制面板', r'\[失败\]'], timeout=240)
         assert matched == 0, 'installer failure; private transcript excluded from artifact'
         child.sendline(''); child.expect('请选择'); child.sendline('0')
@@ -227,6 +242,40 @@ def install(node):
         codes = re.findall(r'TDHR4\.[A-Za-z0-9_-]+', transcript)
         assert len(codes) == 1
         (ROOT/'private'/(node+'-receipt')).write_text(codes[0])
+
+
+def startup_observer(node):
+    rows=[]
+    for _ in range(20):
+        try:
+            value=ssh(node,"""python3 - <<'PY'
+import json,subprocess,urllib.request,urllib.error
+from pathlib import Path
+result={}
+for unit in ('telemt-dual-hop-telemt.service','wg-quick@tdh-b1.service','wg-quick@tdh-b2.service'):
+ p=subprocess.run(['systemctl','show',unit,'--property=ActiveState,SubState,Result,ExecMainStatus,NRestarts'],capture_output=True,text=True,timeout=3)
+ result[unit]=dict(line.split('=',1) for line in p.stdout.splitlines() if '=' in line)
+token=Path('/etc/telemt-dual-hop/telemt/api.token')
+if token.is_file():
+ try:
+  opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+  request=urllib.request.Request('http://127.0.0.1:19091/v1/users',headers={'Authorization':'Bearer '+token.read_text().strip()})
+  with opener.open(request,timeout=2) as response:
+   data=json.loads(response.read(65536))
+   result['api']={'status':response.status,'users':len(data.get('data',[])),'tls_link_counts':[len(u.get('links',{}).get('tls',[])) for u in data.get('data',[])]}
+ except (OSError,ValueError,urllib.error.URLError) as e:result['api']={'error_type':type(e).__name__}
+# Map the journal to fixed booleans; no journal text leaves this process.
+p=subprocess.run(['journalctl','-u','telemt-dual-hop-telemt.service','-n','40','--no-pager','-o','cat'],capture_output=True,text=True,timeout=3)
+text=p.stdout.lower()
+result['startup_markers']={k:k in text for k in ('permission denied','os error 13','panicked','address already in use','failed to parse','unknown field','tls','error','warn')}
+print(json.dumps(result))
+PY
+""",20)
+            if value.returncode==0:
+                rows.append(json.loads(value.stdout))
+                write(ROOT/'results'/('startup-'+node+'.json'),rows)
+        except (OSError,ValueError,subprocess.SubprocessError):pass
+        time.sleep(5)
 
 
 def identity(node):
@@ -275,6 +324,23 @@ def failure_diagnostics(node):
     text=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',diag.stdout+diag.stderr)
     report['diagnose_exit']=diag.returncode
     report['diagnose']=re.sub(r'[A-Za-z0-9_+/=-]{32,}','[redacted-token]',text[-8192:])
+    if EXPECTED is not None:
+        errors=ssh(node,"""python3 - <<'PY'
+import json,re
+from pathlib import Path
+names=('core-upgrade.log','core-repeat.log','core-rollback.log','core-rollback-repeat.log','core-final-upgrade.log','health-refresh.log')
+rows={}
+for name in names:
+ p=Path('/root')/name
+ if not p.is_file():continue
+ text=p.read_text(errors='replace')[-8192:]
+ text=re.sub(r'\\x1b\\[[0-9;]*[A-Za-z]','',text)
+ lines=[s for s in text.splitlines() if '[失败]' in s or '核心事务失败' in s or s.startswith(('curl:','sha256sum:'))]
+ rows[name]=re.sub(r'[A-Za-z0-9_+/=-]{32,}','[redacted-token]','\\n'.join(lines)[-2048:])
+print(json.dumps(rows))
+PY
+""",20)
+        if errors.returncode==0:report['maintenance_errors']=json.loads(errors.stdout)
     if node!='entry':
         value=ssh(node,"""python3 - <<'PY'
 import concurrent.futures,json,socket,subprocess,time,urllib.request,urllib.error
@@ -318,6 +384,8 @@ def worker():
         (ROOT/name).mkdir(mode=0o700)
     result = {'complete': False, 'roles': {}, 'download_boundary_substituted': False,
               'production_accessed': False, 'shared_ci_host': True, 'capacity_benchmark': False}
+    if EXPECTED is not None:
+        result.update(profile='candidate',source_ref=EXPECTED['source_ref'],pinned_manager_download=True)
     def phase(name):
         result['phase'] = name; write(ROOT/'results/worker.json', result)
         print('Full-system phase: '+name, flush=True)
@@ -351,6 +419,21 @@ def worker():
                 child.expect('TDHR4 回执码: '); child.sendline((ROOT/'private'/(node+'-receipt')).read_text())
                 assert child.expect([pexpect.EOF, r'\[失败\]'], timeout=150) == 0
             interactive('entry', node+'-registration', 'a register', action)
+        if EXPECTED is not None:
+            phase('candidate-repeat-install-preservation')
+            result['repeat_installs']={}
+            for node in ROLES:
+                before=json.loads(guest(node,PROTECTED))
+                core_before=identity(node)
+                def repeat_action(child):
+                    child.expect('请选择');child.sendline('0')
+                interactive(node,node+'-repeat-install',bootstrap(EXPECTED),repeat_action)
+                after=json.loads(guest(node,PROTECTED))
+                assert before==after and identity(node)==core_before,'repeat install changed node identity or config'
+                result['repeat_installs'][node]={'files_unchanged':True,'protected_files':after['files'],
+                                                'core_unchanged':True,'manager_unchanged':True}
+            phase('candidate-native-maintenance')
+            result['native_maintenance']=maintenance(guest,EXPECTED)
         phase('real-dc-and-backend-failover')
         completed = subprocess.run([sys.executable, str(Path(__file__).with_name('system_vm_e2e.py'))], capture_output=True, timeout=220)
         (ROOT/'private/e2e.log').write_bytes(completed.stdout+completed.stderr)
@@ -441,6 +524,8 @@ def supervise():
                 '-p','MemorySwapMax=0','-p','OOMPolicy=stop','-p','TasksMax=256','-p',f'RuntimeMaxSec={LIMIT_SECONDS}',
                 '-p','TimeoutStopSec=15','-p','KillMode=control-group','-p','IOWeight=10',
                 '-p','LimitFSIZE=3221225472','--setenv=RUNNER_TEMP='+str(ROOT.parent),
+                *(['--setenv=TDH_FULL_SYSTEM_PROFILE=candidate',
+                   '--setenv=TDH_CANDIDATE_REF='+EXPECTED['source_ref']] if EXPECTED is not None else []),
                 sys.executable, str(Path(__file__).resolve()), '--worker'], stdout=log, stderr=subprocess.DEVNULL)
             cg = Path('/sys/fs/cgroup/system.slice')/UNIT
             lastsample = 0
@@ -478,7 +563,9 @@ def supervise():
                      'interaction-entry-install.json','interaction-backend1-install.json',
                      'interaction-backend2-install.json','interaction-backend1-registration.json',
                      'interaction-backend2-registration.json','diagnostics-entry.json',
-                     'diagnostics-backend1.json','diagnostics-backend2.json'):
+                     'diagnostics-backend1.json','diagnostics-backend2.json',
+                     'interaction-entry-repeat-install.json','interaction-backend1-repeat-install.json',
+                     'interaction-backend2-repeat-install.json','startup-backend1.json','startup-backend2.json'):
             source = ROOT/'results'/name
             if source.is_file() and not source.is_symlink():
                 assert source.stat().st_size<1024**2
@@ -492,7 +579,7 @@ def supervise():
         write(EVIDENCE/'supervisor.json',report)
     worker_report = json.loads((EVIDENCE/'worker.json').read_text()) if (EVIDENCE/'worker.json').exists() else {}
     try:
-        validate(worker_report,report)
+        validate(worker_report,report,EXPECTED)
         accepted = True
     except ValueError:
         accepted = False

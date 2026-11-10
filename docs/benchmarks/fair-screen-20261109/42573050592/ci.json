@@ -1,0 +1,118 @@
+{
+  "conclusion": "failure",
+  "createdAt": "2026-11-09T06:26:38Z",
+  "databaseId": 42573050592,
+  "headSha": "f6f5a5aaa1a4246f88dd01f3c3f6d4c7f0c1381b",
+  "jobs": [
+    {
+      "completedAt": "2026-11-09T06:36:54Z",
+      "conclusion": "failure",
+      "databaseId": 129014573513,
+      "name": "screen",
+      "startedAt": "2026-11-09T06:26:41Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T06:26:42Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T06:26:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:26:45Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T06:26:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:26:47Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 3,
+          "startedAt": "2026-11-09T06:26:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:26:59Z",
+          "conclusion": "success",
+          "name": "Prepare one pinned reference and compiler",
+          "number": 4,
+          "startedAt": "2026-11-09T06:26:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:27:05Z",
+          "conclusion": "success",
+          "name": "Verify existing flush contracts and the bounded ready poll",
+          "number": 5,
+          "startedAt": "2026-11-09T06:26:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:36:51Z",
+          "conclusion": "failure",
+          "name": "Build only the new copy candidate under a hard budget",
+          "number": 6,
+          "startedAt": "2026-11-09T06:27:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:36:51Z",
+          "conclusion": "skipped",
+          "name": "Prepare the maintained private path",
+          "number": 7,
+          "startedAt": "2026-11-09T06:36:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:36:51Z",
+          "conclusion": "skipped",
+          "name": "Screen one mixed case in four AB BA pairs",
+          "number": 8,
+          "startedAt": "2026-11-09T06:36:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:36:52Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 9,
+          "startedAt": "2026-11-09T06:36:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:36:53Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 17,
+          "startedAt": "2026-11-09T06:36:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:36:53Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 18,
+          "startedAt": "2026-11-09T06:36:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T06:36:53Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-11-09T06:36:53Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42573050592/job/129014573513"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-09T06:36:55Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42573050592"
+}

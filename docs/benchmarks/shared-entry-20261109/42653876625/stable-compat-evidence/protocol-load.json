@@ -1,0 +1,174 @@
+{
+  "scope": "real HAProxy/FakeTLS/MTProto and synthetic DC/payload only; shared Linux host",
+  "conditions": "Ubuntu22.04_private_loopback_netem25ms_rate100Mbps_CPU100pct_Memory1GiB",
+  "kernel": "6.8.0-1070-azure",
+  "results": [
+    {
+      "version": "telemt 3.5.17",
+      "rows": [
+        {
+          "concurrency": 30,
+          "direction": "U",
+          "successes": 30,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 22.959156672671583,
+          "wall_seconds": 2.740281835999994,
+          "handshake_ms": {
+            "p50": 224.2708324999967,
+            "p95": 235.81406499999957
+          },
+          "completion_ms": {
+            "p50": 2713.6920260000043,
+            "p95": 2731.4878069999936
+          },
+          "backend_cpu_one_core_percent": 1.8246298370895053,
+          "controller_and_mock_cpu_one_core_percent": 7.59191135987957,
+          "haproxy_cpu_one_core_percent": 0.7298519348358021,
+          "backend_peak_rss_bytes": 20557824,
+          "backend_fds_before": 16,
+          "backend_fds_after": 74
+        },
+        {
+          "concurrency": 30,
+          "direction": "D",
+          "successes": 30,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 21.359601880337383,
+          "wall_seconds": 2.9454931020000004,
+          "handshake_ms": {
+            "p50": 216.1443954999953,
+            "p95": 223.70688499999858
+          },
+          "completion_ms": {
+            "p50": 2879.622491999996,
+            "p95": 2926.654345999992
+          },
+          "backend_cpu_one_core_percent": 1.0185051860970202,
+          "controller_and_mock_cpu_one_core_percent": 6.0395548330841065,
+          "haproxy_cpu_one_core_percent": 0.6790034573980137,
+          "backend_peak_rss_bytes": 20557824,
+          "backend_fds_before": 74,
+          "backend_fds_after": 36
+        },
+        {
+          "concurrency": 50,
+          "direction": "U",
+          "successes": 50,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 24.75295152707426,
+          "wall_seconds": 4.236165529000004,
+          "handshake_ms": {
+            "p50": 225.8896329999942,
+            "p95": 241.1173339999948
+          },
+          "completion_ms": {
+            "p50": 4176.683103500003,
+            "p95": 4191.207837999997
+          },
+          "backend_cpu_one_core_percent": 2.1245628713957627,
+          "controller_and_mock_cpu_one_core_percent": 8.111993137367312,
+          "haproxy_cpu_one_core_percent": 0.7081876237985876,
+          "backend_peak_rss_bytes": 23105536,
+          "backend_fds_before": 36,
+          "backend_fds_after": 38
+        },
+        {
+          "concurrency": 50,
+          "direction": "D",
+          "successes": 50,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 23.959344221751664,
+          "wall_seconds": 4.376480384000004,
+          "handshake_ms": {
+            "p50": 218.02492350000335,
+            "p95": 225.98024799999905
+          },
+          "completion_ms": {
+            "p50": 4313.943237999993,
+            "p95": 4352.118684999994
+          },
+          "backend_cpu_one_core_percent": 1.3709646733332632,
+          "controller_and_mock_cpu_one_core_percent": 7.132275381403825,
+          "haproxy_cpu_one_core_percent": 1.1424705611110526,
+          "backend_peak_rss_bytes": 23105536,
+          "backend_fds_before": 36,
+          "backend_fds_after": 50
+        },
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 26.998593662794608,
+          "wall_seconds": 7.767634219000001,
+          "handshake_ms": {
+            "p50": 240.04168549999605,
+            "p95": 264.1577499999954
+          },
+          "completion_ms": {
+            "p50": 7715.686390000009,
+            "p95": 7727.634414999997
+          },
+          "backend_cpu_one_core_percent": 1.9310899016471825,
+          "controller_and_mock_cpu_one_core_percent": 8.965342025202283,
+          "haproxy_cpu_one_core_percent": 1.0299146142118305,
+          "backend_peak_rss_bytes": 28835840,
+          "backend_fds_before": 50,
+          "backend_fds_after": 187
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 25.069524299928442,
+          "wall_seconds": 8.36534421200001,
+          "handshake_ms": {
+            "p50": 222.12652349999473,
+            "p95": 236.1138310000115
+          },
+          "completion_ms": {
+            "p50": 8264.492449500012,
+            "p95": 8299.445062999994
+          },
+          "backend_cpu_one_core_percent": 1.5540304942086685,
+          "controller_and_mock_cpu_one_core_percent": 7.977122244925014,
+          "haproxy_cpu_one_core_percent": 0.8367856507277449,
+          "backend_peak_rss_bytes": 28835840,
+          "backend_fds_before": 184,
+          "backend_fds_after": 18
+        }
+      ],
+      "before_load": {
+        "cpu_seconds": 0.01,
+        "rss_bytes": 17666048,
+        "fds": 16
+      },
+      "after_idle": {
+        "cpu_seconds": 0.52,
+        "rss_bytes": 22052864,
+        "fds": 14
+      },
+      "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+      "config_policy_sha256": "29750af6c3d894f3e7a958b765c2637e8e8847997fda31c126bd7c618541051b",
+      "mock_dc_socket_timeout_seconds": 25,
+      "client_io_timeout_seconds": 25,
+      "offline_bootstrap": false,
+      "payload_bytes": 262144,
+      "transfer_rate": 12500000,
+      "mock_dc_completed": 364,
+      "mock_dc_errors": [],
+      "validation_error": null,
+      "config_unchanged": true,
+      "accepted": true,
+      "private_processes_closed": true
+    }
+  ],
+  "accepted": true
+}

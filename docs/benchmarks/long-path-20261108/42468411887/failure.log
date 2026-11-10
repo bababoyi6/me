@@ -1,0 +1,39 @@
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	﻿2026-11-08T09:45:11.0360933Z ##[group]Run sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativepressure-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=768M -p MemoryHigh=640M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; tc qdisc add dev lo root netem delay 25ms rate 100mbit limit 10000; exec python3 tests/native_socket_acceptance.py --directory "$1" --output "$2"' native "$RUNNER_TEMP/native-pair" "$RUNNER_TEMP/native-maintenance/pressure.json"
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:45:11.0364591Z ^[[36;1msudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativepressure-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=768M -p MemoryHigh=640M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; tc qdisc add dev lo root netem delay 25ms rate 100mbit limit 10000; exec python3 tests/native_socket_acceptance.py --directory "$1" --output "$2"' native "$RUNNER_TEMP/native-pair" "$RUNNER_TEMP/native-maintenance/pressure.json"^[[0m
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:45:11.0420311Z shell: /usr/bin/bash -e {0}
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:45:11.0420527Z ##[endgroup]
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5973335Z Traceback (most recent call last):
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5973800Z   File "/home/runner/work/me/me/tests/native_socket_acceptance.py", line 57, in <module>
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5974303Z     if __name__=='__main__':main()
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5974818Z   File "/home/runner/work/me/me/tests/native_socket_acceptance.py", line 39, in main
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5975503Z     results=list(pool.map(lambda i:lab.transfer(('apple.com','gs.apple.com')[i%2],direction,
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5976234Z   File "/usr/lib/python3.10/concurrent/futures/_base.py", line 621, in result_iterator
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5977575Z     yield _result_or_cancel(fs.pop())
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5978128Z   File "/usr/lib/python3.10/concurrent/futures/_base.py", line 319, in _result_or_cancel
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5978832Z     return fut.result(timeout)
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5979285Z   File "/usr/lib/python3.10/concurrent/futures/_base.py", line 458, in result
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5979805Z     return self.__get_result()
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5980257Z   File "/usr/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5980577Z     raise self._exception
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5980843Z   File "/usr/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5982100Z     result = self.fn(*self.args, **self.kwargs)
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5982678Z   File "/home/runner/work/me/me/tests/native_socket_acceptance.py", line 39, in <lambda>
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5983413Z     results=list(pool.map(lambda i:lab.transfer(('apple.com','gs.apple.com')[i%2],direction,
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5984061Z   File "/home/runner/work/me/me/tests/e2e_lab.py", line 378, in transfer
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5984541Z     if exact(stream, 32) != digest:
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5984948Z   File "/home/runner/work/me/me/tests/lab.py", line 30, in exact
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5985460Z     block = sock.recv(min(size - len(data), 262144))
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5985994Z   File "/home/runner/work/me/me/tests/mtproto_transport.py", line 112, in recv
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5986468Z     self.pending.extend(self.frame())
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5986886Z   File "/home/runner/work/me/me/tests/mtproto_transport.py", line 105, in frame
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5987402Z     size = struct.unpack("<I", exact(self.stream, 4))[0]
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5987825Z   File "/home/runner/work/me/me/tests/lab.py", line 30, in exact
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5988379Z     block = sock.recv(min(size - len(data), 262144))
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5988856Z   File "/home/runner/work/me/me/tests/mtproto_transport.py", line 65, in recv
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5989380Z     return self.decoder.update(self.sock.recv(count))
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5989907Z   File "/home/runner/work/me/me/tests/mtproto_transport.py", line 79, in recv
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5990801Z     header = exact(self.sock, 5)
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5991161Z   File "/home/runner/work/me/me/tests/lab.py", line 32, in exact
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5991579Z     raise RuntimeError("unexpected EOF")
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.5991907Z RuntimeError: unexpected EOF
+verify	Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget	2026-11-08T09:46:13.6277641Z ##[error]Process completed with exit code 1.

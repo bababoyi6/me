@@ -1,0 +1,68 @@
+name: Build and qualify native ARM socket candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths: [.github/workflows/stable-native-arm.yml]
+permissions:
+  contents: read
+concurrency:
+  group: stable-native-arm-candidate
+  cancel-in-progress: false
+jobs:
+  build-and-protocol:
+    runs-on: ubuntu-22.04-arm
+    timeout-minutes: 34
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: telemt/telemt
+          ref: 66708d2866f3f3a4541c4fa67984d408e71a8af4
+          path: upstream
+          persist-credentials: false
+      - name: Prepare pinned Rust and disposable protocol dependencies
+        run: |
+          test "$(uname -m)" = aarch64
+          rustup toolchain install 1.99.1 --profile minimal --no-self-update
+          rustup default 1.99.1
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy python3-cryptography iproute2
+          mkdir -m 700 "$RUNNER_TEMP/arm-evidence"
+      - name: Build and socket-test identical upstream and helper policies on ARM
+        run: timeout --kill-after=10 1700 python3 tools/build_stable_candidate.py --source upstream --output "$RUNNER_TEMP/native-arm-pair"
+      - name: Verify ARM ELF identity and preserve fixed build metadata
+        env:
+          NATIVE_DIRECTORY: ${{ runner.temp }}/native-arm-pair
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/arm-evidence
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,platform
+          from pathlib import Path
+          source=Path(os.environ['NATIVE_DIRECTORY']);out=Path(os.environ['EVIDENCE_DIRECTORY'])
+          manifest=json.loads((source/'manifest.json').read_text())
+          for name in ('control','balanced'):
+              data=(source/('telemt-'+name)).read_bytes()
+              assert data[:6]==b'\x7fELF\x02\x01' and data[18:20]==b'\xb7\x00'
+              assert hashlib.sha256(data).hexdigest()==manifest['binaries'][name]['sha256']
+          (out/'arm-build.json').write_text(json.dumps({'architecture':platform.machine(),'elf_machine':183,
+              'native_manifest':manifest,'installer_channel_enabled':False,'scope':'native ARM build and private synthetic protocol only'},indent=2)+'\n')
+          PY
+      - name: Verify 30 50 100 protocol load and idle recovery in 768MiB without swap
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativearm-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=768M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; tc qdisc add dev lo root netem delay 25ms rate 100mbit limit 10000; exec python3 tests/native_socket_acceptance.py --directory "$1" --output "$2"' arm "$RUNNER_TEMP/native-arm-pair" "$RUNNER_TEMP/arm-evidence/protocol.json"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/arm-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-arm-evidence
+          path: ${{ runner.temp }}/arm-evidence/*.json
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: native-arm-pair
+          path: ${{ runner.temp }}/native-arm-pair/
+          retention-days: 7
+          if-no-files-found: error

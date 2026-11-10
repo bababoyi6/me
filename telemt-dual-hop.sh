@@ -1,16 +1,27 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2119,SC2120
 # Telemt Dual-Hop - three VPS / two native MTProxy links
+# TDH_QUEUE_PROTOCOL=1
 # Supported OS: Ubuntu 22.04 (x86_64, aarch64)
 
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.6.0"
+readonly TDH_VERSION="1.7.0"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
-readonly TELEMT_VERSION="3.5.5"
-readonly TELEMT_SHA256_ARM64="075c9e2d3e86115af0bc47da881327375ef094c21fb6ed40bde41e4a77a261f3"
+readonly TELEMT_VERSION="3.5.17"
+readonly TELEMT_COMMIT="66708d2866f3f3a4541c4fa67984d408e71a8af4"
+readonly TELEMT_SHA256_AMD64="0570762ddcd79530d666b09e955b955bb52c9e134cc8b8ed1a0f50ad28d58a0e"
+readonly TELEMT_BINARY_SHA256_AMD64="e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4"
+readonly TELEMT_BINARY_SHA256_ARM64="e5ca8befdc1428fcd66537ef04f3a95e5f278ebf3c3dd0d0909ce25a390f502b"
+readonly TELEMT_PREVIOUS_VERSION="3.5.16"
+readonly TELEMT_PREVIOUS_BINARY_SHA256_AMD64="1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8"
+readonly TELEMT_PREVIOUS_BINARY_SHA256_ARM64="ebaec212fd5556ceca7fb0fcc4d3d23c01a8883d20a4cbc567219022d57c2a0b"
+readonly TELEMT_LEGACY_VERSION="3.5.5"
+readonly TELEMT_LEGACY_BINARY_SHA256_AMD64="cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd"
+readonly TELEMT_LEGACY_BINARY_SHA256_ARM64="5f2031447df06a393af7e271a72c5553ea83bff9611d24c441b492236101f857"
+readonly TELEMT_SHA256_ARM64="f0d3d06d029f2b21dc66a44069bcc7bd20d32fcb34b5867c5250cee647785de6"
 readonly TELEMT_CORE_VERSION_AMD64="3.5.5+tdh.balanced2"
 readonly TELEMT_CORE_ARCHIVE_SHA256_AMD64="b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5"
 readonly TELEMT_CORE_BINARY_SHA256_AMD64="5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100"
@@ -144,7 +155,21 @@ usage() {
   a status                                  快速查看状态
   a update                                  安全更新管理脚本（可简写为 a u）
   a update-rollback                         恢复上次 a update 前的管理脚本
+  a core-upgrade --maintenance               后端固定版本核心升级（需先排空）
+  a core-baseline --maintenance              x86_64 切回已发布稳定基线（需先排空）
+  a core-rollback --maintenance              后端核心回滚（配置变更时拒绝）
+  a backend-drain 1|2                       入口排空后端的新连接
+  a backend-resume 1|2                      入口恢复后端接收新连接
+  a health-refresh --maintenance            安装本管理器内置的健康代理
+  a health-rollback --maintenance           回退上一次健康代理更新
+  a connect-refresh --maintenance           备份并应用有界 DC 连接重试
+  a connect-rollback --maintenance          恢复上一次 DC 连接配置
+  a recover                                 后端隧道与服务恢复
   a perf [2-30]                             只读脱敏性能采样（默认 5 秒）
+  a queue status                            查看后端实验队列（默认关闭）
+  a queue enable 180 200 --experimental --maintenance
+                                            开发实验，尚未生产放行；数字仅示例，勿直接照抄
+  a queue disable --maintenance              撤销本管理器创建的队列与启动钩子
   sudo bash telemt-dual-hop.sh entry        初始化入口 VPS
   sudo bash telemt-dual-hop.sh backend1     安装后端 VPS1
   sudo bash telemt-dual-hop.sh backend2     安装后端 VPS2
@@ -366,6 +391,7 @@ install_self() {
 
 activate_manager() {
   local candidate=$1 staged backup="" prior_backup="" previous="${TDH_MANAGER}.previous"
+  queue_manager_guard "$candidate"
   if [[ -L $TDH_MANAGER || ( -e $TDH_MANAGER && ! -f $TDH_MANAGER ) || \
         -L $previous || ( -e $previous && ! -f $previous ) ]]; then
     die "管理器或备份文件类型异常；已停止替换。"
@@ -431,7 +457,7 @@ update_manager() {
   # Match bootstrap protections, including responses without Content-Length.
   if ! (ulimit -f 1024 || exit 1
     curl -q -fL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 --max-filesize 1048576 \
-      --proto '=https' --tlsv1.2 "$TDH_UPDATE_URL" -o "$download_tmp"); then
+      --proto '=https' --proto-redir '=https' --tlsv1.2 "$TDH_UPDATE_URL" -o "$download_tmp"); then
     rm -f "$download_tmp"
     die "下载失败；当前版本未作任何修改。"
   fi
@@ -483,6 +509,7 @@ rollback_manager() {
   [[ ! -L $TDH_MANAGER && ( ! -e $TDH_MANAGER || -f $TDH_MANAGER ) ]] || \
     die "管理器文件类型异常；已保留当前文件和回退备份。"
   [[ -f $previous && ! -L $previous ]] || die "没有上次 a update 的管理器备份。"
+  queue_manager_guard "$previous"
   [[ $(extract_release_value "$previous" TDH_CONFIG_SCHEMA) == "$TDH_CONFIG_SCHEMA" && \
      $(extract_release_value "$previous" TDH_PROTOCOL_VERSION) == "$TDH_PROTOCOL_VERSION" ]] || die "备份协议不兼容，拒绝回退。"
   if ! bash -n "$previous" || ! timeout 60 bash "$previous" --self-test >/dev/null; then
@@ -501,14 +528,21 @@ rollback_manager() {
 }
 
 init_dirs() {
+  local backend_base_mode=0750
+  # Routine state saves must not silently migrate an existing legacy node.
+  # Its 0710 -> 0750 change belongs to the explicit core maintenance transaction.
+  if [[ ( $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ) && -d $TDH_BASE && ! -L $TDH_BASE ]] && \
+     [[ $(stat -c '%a' -- "$TDH_BASE") == 710 ]]; then
+    backend_base_mode=0710
+  fi
   install -d -o root -g root -m 0700 "$TDH_BASE" "$TDH_KEY_DIR"
-  # Telemt runs unprivileged. It needs search permission on the private base
-  # directory and its work-root parent, but state and WireGuard keys stay root-only.
+  # New Telemt opens every configuration ancestor with O_RDONLY|O_DIRECTORY.
+  # The dedicated group needs read/search; state and WG keys remain root-only.
   if [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]]; then
     install -d -o root -g root -m 0750 "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
     if getent group telemt >/dev/null 2>&1; then
       chown root:telemt "$TDH_BASE" "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
-      chmod 0710 "$TDH_BASE"
+      chmod "$backend_base_mode" "$TDH_BASE"
       chmod 0750 "$TDH_CONFIG_DIR" "$TDH_WORK_ROOT"
     fi
   fi
@@ -522,6 +556,9 @@ assert_fresh_install_paths() {
     reserved+=("${root}/systemd/system/${unit}.service")
   done
   for unit in tdh1 tdh2 tdh-b1 tdh-b2; do reserved+=("${root}/wireguard/${unit}.conf"); done
+  for unit in tdh-b1 tdh-b2; do
+    reserved+=("${root}/systemd/system/wg-quick@${unit}.service.d/90-telemt-queue.conf")
+  done
   for path in "${reserved[@]}"; do
     [[ ! -e $path && ! -L $path ]] || \
       die "新安装路径已存在：${path}。已保留原内容；请先确认其来源，不会自动覆盖或清理。"
@@ -584,8 +621,18 @@ save_state() {
 }
 
 load_state() {
-  [[ -f $TDH_STATE ]] || return 1
+  [[ -f $TDH_STATE && ! -L $TDH_STATE ]] || return 1
+  local directory owner permissions
+  directory=$(dirname "$TDH_STATE")
+  while [[ $directory != / ]]; do
+    [[ -d $directory && ! -L $directory ]] || die "状态目录不得包含符号链接。"
+    read -r owner permissions < <(stat -c '%u %a' -- "$directory")
+    [[ $owner == 0 && $permissions =~ ^[0-7]{1,4}$ ]] || die "状态目录所有者异常。"
+    (( (8#$permissions & 0022) == 0 || (8#$permissions & 01000) != 0 )) || die "状态目录不得允许其他用户写入。"
+    directory=$(dirname "$directory")
+  done
   [[ $(stat -c '%u' "$TDH_STATE") -eq 0 ]] || die "状态文件所有者异常。"
+  [[ $(stat -c '%h' "$TDH_STATE") == 1 ]] || die "状态文件不得有额外硬链接。"
   local mode
   mode=$(stat -c '%a' "$TDH_STATE")
   [[ $mode == 600 ]] || die "状态文件权限必须为 600，当前为 $mode。"
@@ -1174,53 +1221,74 @@ print("https://t.me/proxy?" + urllib.parse.urlencode({
 PY
 }
 
-select_amd64_core() {
-  local version expected binary_sha url
-  case ${TDH_NEW_INSTALL_CORE:-balanced2} in
-    balanced2)
-      version=$TELEMT_CORE_VERSION_AMD64 expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64
-      binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 url=$TELEMT_CORE_URL_AMD64 ;;
-    audit2)
-      version=$TELEMT_AUDIT2_VERSION expected=$TELEMT_AUDIT2_ARCHIVE_SHA256
-      binary_sha=$TELEMT_AUDIT2_BINARY_SHA256 url=$TELEMT_AUDIT2_URL ;;
-    *) die "新安装核心选择无效；仅支持 balanced2 或 audit2。" ;;
-  esac
-  printf '%s\t%s\t%s\t%s\t%s\n' "${url##*/}" "$version" "$expected" "$binary_sha" "$url"
-}
-
-download_telemt() {
-  local asset expected url tmp version binary_sha="" mode selected
-  case $(uname -m) in
-    x86_64|amd64)
-      selected=$(select_amd64_core) || return 1
-      IFS=$'\t' read -r asset version expected binary_sha url <<<"$selected"
-      mode=audited
-      info "安装经受控测试的非官方 Telemt ${version}。"
-      ;;
-    aarch64|arm64)
-      [[ -z ${TDH_NEW_INSTALL_CORE:-} ]] || die "自选核心仅支持 x86_64；ARM 使用官方核心。"
-      asset="telemt-aarch64-linux-gnu.tar.gz" expected=$TELEMT_SHA256_ARM64
-      url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
-      version=$TELEMT_VERSION mode=official
-      info "ARM 使用官方 Telemt ${version}；本轮提速核心仅验证了 x86_64。"
-      ;;
-    *) die "Telemt 不支持当前架构。" ;;
-  esac
-  [[ ! -e $TDH_BIN && ! -L $TDH_BIN ]] || die "已存在 Telemt 核心；新安装不会覆盖它。"
-  tmp=$(mktemp -d "${TDH_BASE}/core-download.XXXXXX")
-  if ! curl -q -fL --retry 3 --retry-all-errors --connect-timeout 10 --max-time 180 --max-filesize 67108864 \
-      --proto '=https' --tlsv1.2 "$url" -o "${tmp}/${asset}"; then
-    rm -rf -- "$tmp"
-    die "核心下载失败；安装已停止，不会悄悄改用其他构建。"
+# A core restart interrupts this backend's existing TCP sessions. Upgrade one
+# backend at a time after checking the peer and draining from the entry node.
+manage_core() {
+  local action=$1 acknowledgement=${2:-} target=${3:-official} tmp="" asset expected binary_sha url directory version result=0
+  [[ $acknowledgement == --maintenance ]] || die "请先确认另一个后端正常并在入口排空本后端，按升级文档添加 --maintenance；现有会话可能断开。"
+  [[ $target == official || ( $target == balanced2 && $action == upgrade ) ]] || die "核心维护目标无效。"
+  if [[ $target == balanced2 ]]; then
+    case $(uname -m) in x86_64|amd64) ;; *) die "已发布 balanced2 稳定基线仅支持 x86_64；ARM 不会安装其他架构核心。" ;; esac
   fi
-  install -d -m 0755 "$(dirname "$TDH_BIN")"
-  if ! python3 - "${tmp}/${asset}" "$TDH_BIN" "$expected" "$version" "$binary_sha" "$mode" <<'TDH_CORE_INSTALL_PY'
-# BEGIN GENERATED CORE INSTALLER
+  load_state || die "未安装节点。"
+  require_current_state
+  [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "核心事务只能在后端运行。"
+  if [[ $action == upgrade || $action == *-connect ]]; then
+    telemt_binary_is_expected || die "现有核心身份未知；拒绝自动维护。"
+  fi
+  install -d -m 0700 "${TDH_BASE}/core-upgrade"
+  local args=("$action" --binary "$TDH_BIN" --directory "${TDH_BASE}/core-upgrade"
+    --config "${TDH_CONFIG_DIR}/telemt.toml" --work "${TDH_WORK_ROOT}/telemt"
+    --token-file "${TDH_CONFIG_DIR}/api.token" --bind "$LOCAL_WG_IP" --protect "$TDH_STATE"
+    --protect "$TDH_CONFIG_DIR" --protect "$TDH_KEY_DIR"
+    --protect "/etc/wireguard/${WG_INTERFACE}.conf"
+    --protect /etc/systemd/system/telemt-dual-hop-telemt.service
+    --protect /etc/systemd/system/telemt-dual-hop-health-agent.service)
+  for directory in /etc/systemd/system/telemt-dual-hop-{telemt,health-agent}.service.d \
+      /run/systemd/system/telemt-dual-hop-{telemt,health-agent}.service.d \
+      "$(dirname "$TDH_BIN")/core-source-notice"; do
+    [[ ! -e $directory && ! -L $directory ]] || args+=(--protect "$directory")
+  done
+  for directory in "${TDH_BASE}/queue/policy.json" \
+      "/etc/systemd/system/wg-quick@${WG_INTERFACE}.service.d/90-telemt-queue.conf"; do
+    [[ ! -e $directory && ! -L $directory ]] || args+=(--protect "$directory")
+  done
+  if [[ $action == upgrade ]]; then
+    if [[ $target == balanced2 ]]; then
+      asset=${TELEMT_CORE_URL_AMD64##*/} expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64
+      binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 version=$TELEMT_CORE_VERSION_AMD64 url=$TELEMT_CORE_URL_AMD64
+      args+=(--audited)
+      info "目标为已发布稳定基线 ${version}；保留配置与链接，当前核心按事务备份。"
+    else
+      case $(uname -m) in
+        x86_64|amd64) asset=telemt-x86_64-linux-gnu.tar.gz expected=$TELEMT_SHA256_AMD64 binary_sha=$TELEMT_BINARY_SHA256_AMD64 ;;
+        aarch64|arm64) asset=telemt-aarch64-linux-gnu.tar.gz expected=$TELEMT_SHA256_ARM64 binary_sha=$TELEMT_BINARY_SHA256_ARM64 ;;
+        *) die "不支持当前架构。" ;;
+      esac
+      version=$TELEMT_VERSION url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
+      info "目标 Telemt ${version}，提交 ${TELEMT_COMMIT}；保留配置与链接。"
+      if [[ $asset == telemt-x86_64-linux-gnu.tar.gz ]]; then
+        warn "官方核心在已验证的高 RTT 单流场景存在吞吐退化；兼容升级不等于提速，原核心按事务备份。"
+      fi
+    fi
+    tmp=$(mktemp -d "${TDH_BASE}/core-fetch.XXXXXX")
+    if ! curl -q -fL --retry 2 --connect-timeout 10 --max-time 120 --max-filesize 67108864 \
+        --proto '=https' --proto-redir '=https' --tlsv1.2 "$url" -o "${tmp}/core.tar.gz"; then
+      rm -rf -- "$tmp"
+      die "核心下载失败；现有服务未改动。"
+    fi
+    args+=(--archive "${tmp}/core.tar.gz" --archive-sha "$expected" --binary-sha "$binary_sha" --version "$version")
+  fi
+  python3 - "${args[@]}" <<'TDH_CORE_UPGRADE_PY' || result=$?
+# BEGIN GENERATED CORE UPGRADE
+HEALTH_AGENT_SOURCE = '#!/usr/bin/env python3\nimport concurrent.futures, json, os, selectors, socket, threading, time, urllib.error, urllib.request\n\nBIND = os.environ["TDH_BIND_IP"]\nwith open(os.environ["TDH_API_TOKEN_FILE"], encoding="ascii") as token_file:\n    API_TOKEN = token_file.read().strip()\nAGENT_PORT = int(os.environ["TDH_AGENT_PORT"])\nAPI_PORT = int(os.environ["TDH_API_PORT"])\nTELEMT_PORT = int(os.environ.get("TDH_TELEMT_PORT", "24431"))\nDCS = tuple(value for value in os.environ["TDH_DC_IPV4"].split(",") if value)\nDC_PORT = int(os.environ["TDH_DC_PORT"])\nAPI_READY = False\nDC_READY = False\nAPI_CHECKED = None\nDC_CHECKED = None\nAPI_MAX_AGE = 5\nDC_MAX_AGE = 25\n# Progress deadlines cover the complete check, not each socket read. A peer\n# sending a byte before every urllib timeout can otherwise strand a live thread.\nAPI_PROGRESS_TIMEOUT = 15\nDC_PROGRESS_TIMEOUT = 45\nREADY_LOCK = threading.Lock()\nsel = selectors.DefaultSelector()\nsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\nsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\nsock.bind((BIND, AGENT_PORT)); sock.listen(64); sock.setblocking(False)\nsel.register(sock, selectors.EVENT_READ)\n\ndef healthy(http, api_port):\n    request = urllib.request.Request(\n        f"http://127.0.0.1:{api_port}/v1/health/ready",\n        headers={"Authorization": f"Bearer {API_TOKEN}"},\n    )\n    try:\n        with http.open(request, timeout=2) as response:\n            raw = response.read(16385)\n            if len(raw) > 16384:\n                return False\n            payload = json.loads(raw)\n        return (response.status == 200 and isinstance(payload, dict) and payload.get("ok") is True\n                and isinstance(payload.get("data"), dict) and payload["data"].get("ready") is True)\n    except urllib.error.HTTPError as error:\n        error.close()\n        return False\n    except (OSError, ValueError, urllib.error.URLError):\n        return False\n\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n    def redirect_request(self, req, fp, code, msg, headers, newurl):\n        # A local readiness endpoint must not forward its bearer token elsewhere.\n        return None\n\n\nclass HealthGate:\n    """Consecutive samples plus a down-state cooldown; stale results expire separately."""\n    def __init__(self, fall, rise, cooldown):\n        self.fall, self.rise, self.cooldown = fall, rise, cooldown\n        self.up = False\n        self.good = self.bad = 0\n        self.retry_after = 0\n\n    def sample(self, good, now):\n        if good:\n            self.bad = 0\n            self.good += 1\n            if self.good >= self.rise and now >= self.retry_after:\n                self.up = True\n        else:\n            self.good = 0\n            self.bad += 1\n            if self.up and self.bad >= self.fall:\n                self.up = False\n                self.retry_after = now + self.cooldown\n        return self.up\n\n\ndef dc_quorum(results):\n    # One impaired DC must not evict a backend serving the other DCs.\n    # This TCP reachability vote is NOT an MTProto or per-DC protocol guarantee.\n    results = tuple(results)\n    return bool(results) and sum(value is True for value in results) >= len(results) // 2 + 1\n\n\ndef listener_alive():\n    try:\n        with socket.create_connection((BIND, TELEMT_PORT), timeout=1):\n            return True\n    except OSError:\n        return False\n\n\ndef monitor_api():\n    global API_READY, API_CHECKED\n    # Never inherit HTTP(S)_PROXY for the loopback API or expose its bearer token.\n    http = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())\n    gate = HealthGate(fall=3, rise=2, cooldown=10)\n    while True:\n        current = healthy(http, API_PORT) and listener_alive()\n        with READY_LOCK:\n            API_CHECKED = time.monotonic()\n            API_READY = gate.sample(current, API_CHECKED)\n        time.sleep(1)\n\ndef probe_dc(address):\n    try:\n        with socket.create_connection((address, DC_PORT), timeout=2):\n            return True\n    except OSError:\n        return False\n\ndef monitor_dcs():\n    global DC_READY, DC_CHECKED\n    gate = HealthGate(fall=2, rise=3, cooldown=30)\n    while True:\n        if DCS:\n            with concurrent.futures.ThreadPoolExecutor(max_workers=len(DCS)) as executor:\n                current = dc_quorum(executor.map(probe_dc, DCS))\n        else:\n            current = False\n        with READY_LOCK:\n            DC_CHECKED = time.monotonic()\n            DC_READY = gate.sample(current, DC_CHECKED)\n        time.sleep(10)\n\ndef ready(now=None):\n    # A stalled/crashed monitor must never leave a permanently healthy flag.\n    with READY_LOCK:\n        # Read the clock after locking so a monitor cannot publish a newer timestamp.\n        if now is None:\n            now = time.monotonic()\n        return (API_READY and DC_READY and API_CHECKED is not None and DC_CHECKED is not None\n                and 0 <= now - API_CHECKED <= API_MAX_AGE and 0 <= now - DC_CHECKED <= DC_MAX_AGE)\n\n\ndef monitors_progressing(now, started):\n    with READY_LOCK:\n        # As with ready(), sample after locking: a freshly published timestamp\n        # must not look as though it came from the future.\n        if now is None:\n            now = time.monotonic()\n        return all(0 <= now - (checked if checked is not None else started) <= limit\n                   for checked, limit in ((API_CHECKED, API_PROGRESS_TIMEOUT),\n                                          (DC_CHECKED, DC_PROGRESS_TIMEOUT)))\n\n\nstarted = time.monotonic()\nmonitors = [threading.Thread(target=target, daemon=True) for target in (monitor_api, monitor_dcs)]\nfor monitor in monitors:\n    monitor.start()\n\nwhile True:\n    if any(not monitor.is_alive() for monitor in monitors):\n        # Let the existing systemd restart policy replace a failed monitor thread.\n        raise SystemExit("health monitor stopped")\n    if not monitors_progressing(None, started):\n        # Staleness already closes admission. Recover the stuck worker through\n        # the existing service restart policy; ordinary unhealthy votes do not\n        # trigger restarts, and no check is silently declared healthy.\n        raise SystemExit("health monitor progress deadline")\n    for key, _ in sel.select(timeout=1):\n        listener = key.fileobj\n        try:\n            conn, _ = listener.accept()\n        except (BlockingIOError, OSError):\n            continue\n        with conn:\n            try:\n                conn.settimeout(1)\n                current = ready()\n                conn.sendall(b"up\\n" if current else b"down\\n")\n            except OSError:\n                pass\n'
+
 """Validate a pinned core archive and stage a fresh install; never update a node.
 
 This source is embedded verbatim in the single-file Bash installer. All archive
 bytes and members are verified before any executable is run or installed.
 """
+import ctypes
 import hashlib
 import json
 import os
@@ -1235,6 +1303,16 @@ import tempfile
 
 class InstallError(RuntimeError):
     pass
+
+
+def publish_new(source,target):
+    """Atomic Linux no-replace publication without a transient second link."""
+    rename=ctypes.CDLL(None,use_errno=True).renameat2
+    rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint)
+    rename.restype=ctypes.c_int
+    if rename(-100,os.fsencode(source),-100,os.fsencode(target),1)!=0:
+        code=ctypes.get_errno()
+        raise OSError(code,os.strerror(code))
 
 
 AUDIT_FILES = {'telemt','TELEMT-LICENSE.txt','NOTICE.txt','source.patch','build-provenance.json','manifest.json'}
@@ -1342,9 +1420,1452 @@ def fresh_install(archive, target, expected_archive, version, expected_binary=''
             destination = parent/'core-source-notice'
             if destination.exists() or destination.is_symlink():
                 raise InstallError('refusing to replace existing core notice')
-            os.rename(legal, destination)
-        # Exclusive link cannot clobber a concurrent or pre-existing executable.
-        os.link(candidate, target)
+            publish_new(legal, destination)
+        # A hardlink would retain nlink=2 if killed before stage cleanup. Publish
+        # exclusively without that gap; existing/concurrent targets stay intact.
+        publish_new(candidate, target)
+        directory = os.open(parent, os.O_RDONLY|os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    return version
+
+"""Durable local core replacement engine; deliberately not a public upgrade CLI.
+
+The caller must hold an entry-side maintenance permit and drain this backend.
+This module never downloads a release, edits configuration or coordinates peers.
+Service hooks are explicit so the exact transaction can be tested without systemd.
+"""
+from contextlib import contextmanager
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import stat
+import tempfile
+
+
+class CoreError(RuntimeError):
+    pass
+
+
+def digest(path):
+    result = hashlib.sha256()
+    with Path(path).open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            result.update(chunk)
+    return result.hexdigest()
+
+
+def safe_directory(path):
+    path = Path(path)
+    info = path.lstat()
+    if (not path.is_absolute() or path.resolve() != path or not stat.S_ISDIR(info.st_mode)
+            or info.st_uid != os.geteuid() or info.st_mode & 0o022):
+        raise CoreError("unsafe transaction directory")
+
+
+def safe_file(path):
+    info = Path(path).lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid()
+            or info.st_nlink != 1 or info.st_mode & 0o022):
+        raise CoreError("unsafe transaction file")
+
+
+def sync_directory(path):
+    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def atomic_copy(source, target, mode, expected_sha256=None, owner=None):
+    target = Path(target)
+    safe_directory(target.parent)
+    temporary = None
+    try:
+        fd, temporary = tempfile.mkstemp(prefix=target.name + ".stage-", dir=target.parent)
+        with os.fdopen(fd, "wb") as output, Path(source).open("rb") as incoming:
+            shutil.copyfileobj(incoming, output, 1024 * 1024)
+            output.flush()
+            if owner is not None:
+                os.fchown(output.fileno(), *owner)
+            os.fchmod(output.fileno(), mode)
+            os.fsync(output.fileno())
+        if expected_sha256 is not None and digest(temporary) != expected_sha256:
+            raise CoreError("source changed while staging core")
+        os.replace(temporary, target)
+        temporary = None
+        sync_directory(target.parent)
+    finally:
+        if temporary is not None:
+            Path(temporary).unlink(missing_ok=True)
+
+
+class CoreTransaction:
+    """One backend only. Hooks implement stop/start, bounded ready and version."""
+
+    def __init__(self, binary, directory, service, *, file_mode=0o755, file_owner=None):
+        self.binary = Path(binary)
+        self.directory = Path(directory)
+        self.service = service
+        if file_mode not in (0o640, 0o755) or (file_mode == 0o640 and file_owner is None):
+            raise CoreError('explicit config ownership required')
+        self.file_mode, self.file_owner = file_mode, file_owner
+        self.target_metadata = ({'mode': file_mode, 'uid': file_owner[0], 'gid': file_owner[1]}
+                                if file_owner is not None else None)
+        safe_directory(self.binary.parent)
+        safe_directory(self.directory)
+        if self.directory.stat().st_mode & 0o077:
+            raise CoreError("transaction storage must be private")
+        self.journal = self.directory / "transaction.json"
+
+    @contextmanager
+    def locked(self):
+        lock = self.directory / "lock"
+        fd = os.open(lock, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
+        try:
+            safe_file(lock)
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            yield
+        finally:
+            os.close(fd)
+
+    def save(self, value):
+        temporary = None
+        try:
+            fd, temporary = tempfile.mkstemp(prefix="journal-", dir=self.directory)
+            with os.fdopen(fd, "w", encoding="ascii") as output:
+                json.dump(value, output, sort_keys=True)
+                output.write("\n")
+                output.flush()
+                os.fsync(output.fileno())
+            os.replace(temporary, self.journal)
+            temporary = None
+            sync_directory(self.directory)
+        finally:
+            if temporary is not None:
+                Path(temporary).unlink(missing_ok=True)
+
+    def load(self):
+        safe_file(self.journal)
+        if self.journal.stat().st_size > 4096:
+            raise CoreError("oversized transaction journal")
+        value = json.loads(self.journal.read_text(encoding="ascii"))
+        self.validate(value)
+        return value
+
+    def validate(self, value, allow_prior=True):
+        if not isinstance(value, dict) or value.get("schema") != 1 or value.get("binary") != str(self.binary):
+            raise CoreError("transaction journal belongs to another target")
+        if value.get('target_metadata') != self.target_metadata:
+            raise CoreError('transaction target permissions changed')
+        for key in ("old_sha256", "new_sha256"):
+            text = value.get(key, "")
+            if len(text) != 64 or any(c not in "0123456789abcdef" for c in text):
+                raise CoreError("invalid journal digest")
+        if value.get("phase") not in ("prepared", "switching", "committed", "recovered"):
+            raise CoreError("invalid journal phase")
+        if value.get("backup") != "core.previous-" + value["old_sha256"]:
+            raise CoreError("invalid backup identity")
+        snapshot = value.get("snapshot")
+        if snapshot is not None and (not isinstance(snapshot, str) or len(snapshot) != 17
+                                     or not snapshot.startswith('snapshot-')
+                                     or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for c in snapshot[9:])):
+            raise CoreError("invalid protected snapshot identity")
+        if value.get("prior") is not None:
+            if not allow_prior:
+                raise CoreError("nested transaction history")
+            self.validate(value["prior"], False)
+            if value["prior"]["phase"] != "committed" or value["prior"]["new_sha256"] != value["old_sha256"]:
+                raise CoreError("previous journal does not match this baseline")
+
+    def restore(self, value):
+        backup = self.directory / value["backup"]
+        safe_file(backup)
+        safe_file(self.binary)
+        self.validate_target_metadata()
+        if digest(backup) != value["old_sha256"]:
+            raise CoreError("previous core checksum mismatch")
+        if digest(self.binary) not in (value["old_sha256"], value["new_sha256"]):
+            raise CoreError("core changed outside this transaction; refusing overwrite")
+        self.service.stop()
+        atomic_copy(backup, self.binary, self.file_mode, value["old_sha256"], self.file_owner)
+        self.service.start()
+        if not self.service.ready():
+            raise CoreError("previous core did not regain readiness")
+        value["phase"] = "recovered"
+        self.save(value)
+
+    def activate(self, candidate, expected_sha256, expected_version, current_sha256, snapshot=None):
+        candidate = Path(candidate)
+        with self.locked():
+            safe_directory(candidate.parent)
+            safe_file(self.binary)
+            self.validate_target_metadata()
+            safe_file(candidate)
+            if candidate.stat().st_size > 64 * 1024**2:
+                raise CoreError("candidate exceeds size limit")
+            if digest(candidate) != expected_sha256:
+                raise CoreError("candidate checksum mismatch")
+            if self.service.version(candidate) != expected_version:
+                raise CoreError("candidate version mismatch")
+            if digest(self.binary) != current_sha256:
+                raise CoreError("running core differs from the approved baseline")
+            if self.journal.is_symlink():
+                raise CoreError("unsafe transaction journal")
+            prior = None
+            if self.journal.exists():
+                previous = self.load()
+                if previous["phase"] not in ("committed", "recovered"):
+                    raise CoreError("unfinished transaction; recover it before upgrading")
+                if previous["phase"] == "committed" and previous["new_sha256"] == current_sha256:
+                    prior = {k: previous[k] for k in ("schema", "binary", "old_sha256", "new_sha256", "backup", "phase")}
+                    if 'snapshot' in previous:
+                        prior['snapshot'] = previous['snapshot']
+                    if 'target_metadata' in previous:
+                        prior['target_metadata'] = previous['target_metadata']
+            if expected_sha256 == current_sha256:
+                return "unchanged"
+            backup = self.directory / ("core.previous-" + current_sha256)
+            if backup.exists() or backup.is_symlink():
+                safe_file(backup)
+            atomic_copy(self.binary, backup, 0o600, current_sha256)
+            if digest(backup) != current_sha256:
+                raise CoreError("baseline changed while saving backup")
+            value = {"schema": 1, "binary": str(self.binary), "old_sha256": current_sha256,
+                     "new_sha256": expected_sha256, "backup": backup.name, "phase": "prepared", "prior": prior}
+            if snapshot is not None:
+                value['snapshot'] = snapshot
+            if self.target_metadata is not None:
+                value['target_metadata'] = self.target_metadata
+            self.validate(value)
+            self.save(value)
+            try:
+                self.service.stop()
+                value["phase"] = "switching"
+                self.save(value)
+                atomic_copy(candidate, self.binary, self.file_mode, expected_sha256, self.file_owner)
+                if digest(self.binary) != expected_sha256:
+                    raise CoreError("activated core checksum mismatch")
+                self.service.start()
+                if not self.service.ready():
+                    raise CoreError("candidate did not become ready")
+                value["phase"] = "committed"
+                self.save(value)
+            except BaseException:
+                self.restore(value)
+                if prior is not None:
+                    self.save(prior)
+                raise
+            return "committed"
+
+    def validate_target_metadata(self):
+        if self.target_metadata is not None:
+            info = self.binary.stat()
+            if (stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid) != (self.file_mode, *self.file_owner):
+                raise CoreError('config permissions changed outside transaction')
+
+    def rollback(self):
+        with self.locked():
+            value = self.load()
+            if value["phase"] == "recovered" and digest(self.binary) == value["old_sha256"]:
+                return "unchanged"
+            pending = value["phase"] in ("prepared", "switching")
+            self.restore(value)
+            if pending and value.get("prior") is not None:
+                self.save(value["prior"])
+            return "recovered"
+
+"""Pinned backend-only upgrade adapter for CoreTransaction.
+
+Core replacement preserves the managed schema-5 configuration byte-for-byte.
+A separate explicit connect-policy transaction edits three managed defaults only.
+The caller holds the manager lock and explicitly acknowledges a maintenance restart.
+"""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import pwd
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import time
+
+
+
+class ConfigAccessMigration:
+    """One reversible 0710 -> 0750 parent-mode migration, with an immutable record.
+
+    No ownership, file bytes or child permissions change. The manager holds its
+    node lock. A crash before/after chmod is resumed from the same private record.
+    """
+    def __init__(self, base, directory, binary, group):
+        self.base, self.binary = Path(base), Path(binary)
+        self.record = Path(directory)/'config-access.json'
+        self.group = group
+
+    def validate(self):
+        safe_directory(self.base)
+        safe_directory(self.record.parent)
+        if self.record.parent.stat().st_mode & 0o077:
+            raise CoreError('config access record directory must be private')
+        info = self.base.stat()
+        if (info.st_gid != self.group or self.group == 0 or
+                stat.S_IMODE(info.st_mode) not in (0o710, 0o750)):
+            raise CoreError('custom config parent permissions; review required')
+        if self.record.exists() or self.record.is_symlink():
+            safe_file(self.record)
+            if self.record.stat().st_mode & 0o077 or self.record.stat().st_size > 4096:
+                raise CoreError('unsafe config access record')
+            value = json.loads(self.record.read_text())
+            if (value.get('schema') != 1 or value.get('path') != str(self.base) or
+                    value.get('uid') != info.st_uid or value.get('gid') != self.group or
+                    value.get('before') != 0o710 or value.get('after') != 0o750 or
+                    not re.fullmatch('[a-f0-9]{64}', value.get('legacy_binary_sha256', ''))):
+                raise CoreError('invalid config access record')
+            return value
+        return None
+
+    def set_mode(self, mode):
+        descriptor = os.open(self.base, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            info = os.fstat(descriptor)
+            if (info.st_ino, info.st_dev) != (self.base.stat().st_ino, self.base.stat().st_dev):
+                raise CoreError('config directory changed during migration')
+            os.fchmod(descriptor, mode)
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+
+    def prepare(self):
+        value = self.validate()
+        if stat.S_IMODE(self.base.stat().st_mode) == 0o750:
+            return False
+        if value is None:
+            value = {'schema': 1, 'path': str(self.base), 'uid': self.base.stat().st_uid,
+                     'gid': self.group, 'before': 0o710, 'after': 0o750,
+                     'legacy_binary_sha256': digest(self.binary)}
+            with tempfile.TemporaryDirectory(prefix='.config-access-', dir=self.record.parent) as name:
+                staged = Path(name)/'record'
+                durable_file(staged, (json.dumps(value, sort_keys=True)+'\n').encode(), 0o600)
+                publish_new(staged, self.record)
+            sync_directory(self.record.parent)
+        elif digest(self.binary) != value['legacy_binary_sha256']:
+            raise CoreError('config access baseline changed; review required')
+        self.set_mode(0o750)
+        return True
+
+    def restore(self):
+        value = self.validate()
+        # Never restrict a newer core restored from a prior committed transaction.
+        if value is not None and digest(self.binary) == value['legacy_binary_sha256']:
+            self.set_mode(0o710)
+            return True
+        return False
+
+
+class BackendService:
+    def __init__(self, binary, config, work, token_file, api_port=19091,
+                 unit='telemt-dual-hop-telemt.service', user='telemt', migrate_access=False):
+        self.binary, self.config, self.work = Path(binary), Path(config), Path(work)
+        self.token_file, self.api_port = Path(token_file), api_port
+        self.unit = unit
+        self.migrate_access = migrate_access
+        identity = pwd.getpwnam(user)
+        if identity.pw_uid == 0 or identity.pw_gid == 0:
+            raise CoreError('unprivileged telemt identity required')
+        self.identity = dict(user=identity.pw_uid, group=identity.pw_gid, extra_groups=[])
+
+    def version(self, binary):
+        result = subprocess.run([str(binary), '--version'], capture_output=True,
+                                timeout=5, check=True, cwd='/', **self.identity)
+        return result.stdout.decode('ascii').strip()
+
+    def validate_candidate(self, binary):
+        if not self.running_binary_matches():
+            raise CoreError('service process does not run the expected current core')
+        # Upstream's bounded healthcheck parses the old strict config without
+        # launching a new listener or generation, then probes the current API.
+        result = subprocess.run([str(binary), 'healthcheck', '--mode', 'ready', str(self.config)],
+                                cwd=self.work, capture_output=True, timeout=12, **self.identity)
+        if result.returncode:
+            raise CoreError('candidate rejects old config or current backend is not ready')
+
+    def running_binary_matches(self):
+        result = subprocess.run(['systemctl', 'show', self.unit,
+                                 '--property=MainPID', '--value'], capture_output=True, text=True, timeout=5, check=True)
+        pid = result.stdout.strip()
+        if not pid.isdecimal() or int(pid) <= 0:
+            return False
+        try:
+            return digest(Path('/proc')/pid/'exe') == digest(self.binary)
+        except OSError:
+            return False
+
+    def stop(self):
+        subprocess.run(['systemctl', 'stop', self.unit],
+                       check=True, capture_output=True, timeout=40)
+
+    def start(self):
+        subprocess.run(['systemctl', 'start', self.unit],
+                       check=True, capture_output=True, timeout=40)
+
+    def ready(self):
+        # Control-plane readiness + actual process image; protocol is tested separately.
+        import http.client
+        token = self.token_file.read_text(encoding='ascii').strip()
+        deadline = time.monotonic() + 45
+        while time.monotonic() < deadline:
+            connection = http.client.HTTPConnection('127.0.0.1', self.api_port, timeout=2)
+            try:
+                connection.request('GET', '/v1/health/ready', headers={'Authorization': 'Bearer '+token})
+                response = connection.getresponse()
+                raw = response.read(16385)
+                data = json.loads(raw) if len(raw) <= 16384 else None
+                if (response.status == 200 and isinstance(data, dict) and data.get('ok') is True
+                        and isinstance(data.get('data'), dict) and data['data'].get('ready') is True
+                        and self.running_binary_matches()):
+                    return True
+            except (OSError, ValueError):
+                pass
+            finally:
+                connection.close()
+            time.sleep(1)
+        return False
+
+
+class HealthService:
+    def __init__(self, bind):
+        import ipaddress
+        self.bind = str(ipaddress.IPv4Address(bind))
+    def version(self, path):
+        import ast
+        ast.parse(Path(path).read_text(encoding='utf-8'))
+        return digest(path)
+    def stop(self):
+        subprocess.run(['systemctl', 'stop', 'telemt-dual-hop-health-agent.service'],
+                       check=True, capture_output=True, timeout=20)
+    def start(self):
+        subprocess.run(['systemctl', 'start', 'telemt-dual-hop-health-agent.service'],
+                       check=True, capture_output=True, timeout=20)
+    def ready(self):
+        import socket
+        deadline = time.monotonic()+45
+        while time.monotonic() < deadline:
+            try:
+                with socket.create_connection((self.bind, 19101), timeout=2) as connection:
+                    connection.settimeout(2)
+                    if connection.recv(16).strip() == b'up':
+                        return True
+            except OSError:
+                pass
+            time.sleep(1)
+        return False
+
+
+def refresh_health(base, bind, rollback_only=False, *, target=None, service=None):
+    directory = Path(base)/'health-upgrade'
+    if not directory.exists():
+        directory.mkdir(mode=0o700)
+    target = Path(target or '/usr/local/lib/telemt-dual-hop/health_agent.py')
+    transaction = CoreTransaction(target, directory, service or HealthService(bind))
+    if rollback_only:
+        return transaction.rollback()
+    source = globals().get('HEALTH_AGENT_SOURCE')
+    if source is None:
+        source = Path(__file__).with_name('health_agent.py').read_text(encoding='utf-8')
+    with tempfile.TemporaryDirectory(prefix='.health-candidate-', dir=target.parent) as temp:
+        candidate = Path(temp)/'health_agent.py'
+        durable_file(candidate, source.encode('utf-8'), 0o755)
+        expected = digest(candidate)
+        return transaction.activate(candidate, expected, expected, digest(target))
+
+
+MAX_CONNECT_CONFIG_BYTES = 1024 * 1024
+MAX_CONNECT_POLICY_BACKUPS = 8
+
+
+def bounded_connect_config(content):
+    """Edit three managed defaults only; custom values/layouts fail closed."""
+    if len(content) > MAX_CONNECT_CONFIG_BYTES:
+        raise CoreError('connect config exceeds 1MiB bound')
+    text = content.decode('utf8')
+    if any(marker in text for marker in ('\x00', '\ufeff', '\"\"\"', "'''")):
+        raise CoreError('custom TOML layout; review required')
+    lines = text.splitlines(keepends=True)
+    headers = [i for i,line in enumerate(lines) if re.fullmatch(r'\[general\][ \t]*(?:#[^\r\n]*)?\r?\n?', line)]
+    if len(headers) != 1:
+        raise CoreError('one managed general table required')
+    start = headers[0]+1
+    end = next((i for i in range(start,len(lines)) if lines[i].lstrip().startswith('[')),len(lines))
+    defaults = {'tg_connect':10, 'upstream_connect_retry_attempts':2, 'upstream_connect_budget_ms':3000}
+    desired = {'tg_connect':4, 'upstream_connect_retry_attempts':2, 'upstream_connect_budget_ms':9000}
+    seen = set()
+    for i in range(start,end):
+        for key in desired:
+            if not re.match(r'\s*'+key+r'\s*=', lines[i]): continue
+            match = re.fullmatch(r'(\s*'+key+r'\s*=\s*)([0-9]+)([ \t]*(?:#[^\r\n]*)?)(\r?\n)?', lines[i])
+            if key in seen or match is None or int(match[2]) not in (defaults[key],desired[key]):
+                raise CoreError('custom connect settings; review required')
+            seen.add(key)
+            lines[i] = match[1]+str(desired[key])+match[3]+(match[4] or '')
+    newline = '\r\n' if lines[start-1].endswith('\r\n') else '\n'
+    if not lines[start-1].endswith('\n'): lines[start-1] += newline
+    lines[start:start] = [f'{key} = {value}{newline}' for key,value in desired.items() if key not in seen]
+    return ''.join(lines).encode('utf8')
+
+
+class ConnectPolicyService:
+    def __init__(self, backend): self.backend = backend
+    def version(self, path): return digest(path)
+    def stop(self): return self.backend.stop()
+    def start(self): return self.backend.start()
+    def ready(self): return self.backend.ready()
+
+
+def refresh_connect_policy(base, service, rollback_only=False):
+    target = service.config
+    safe_directory(Path(base))
+    safe_file(target)
+    info = target.stat()
+    if stat.S_IMODE(info.st_mode) != 0o640 or info.st_gid != service.identity['group']:
+        raise CoreError('custom config ownership or mode; review required')
+    if not rollback_only and info.st_size > MAX_CONNECT_CONFIG_BYTES:
+        raise CoreError('connect config exceeds 1MiB bound')
+    directory = Path(base)/'connect-policy'
+    if not directory.exists(): directory.mkdir(mode=0o700)
+    transaction = CoreTransaction(target, directory, ConnectPolicyService(service),
+                                  file_mode=0o640, file_owner=(info.st_uid,info.st_gid))
+    if rollback_only: return transaction.rollback()
+    with target.open('rb') as source:
+        original = source.read(MAX_CONNECT_CONFIG_BYTES + 1)
+    baseline = hashlib.sha256(original).hexdigest()
+    content = bounded_connect_config(original)
+    expected = hashlib.sha256(content).hexdigest()
+    if transaction.journal.exists() and transaction.load()['phase'] not in ('committed','recovered'):
+        raise CoreError('unfinished connect transaction; run connect-rollback first')
+    if digest(target) != baseline:
+        raise CoreError('config changed while preparing connect policy')
+    if expected == baseline:
+        if not service.ready(): raise CoreError('backend is not ready')
+        return 'unchanged'
+    if (len(list(directory.glob('core.previous-*'))) >= MAX_CONNECT_POLICY_BACKUPS
+            and not (directory/('core.previous-'+baseline)).exists()):
+        raise CoreError('connect backup limit reached; privately archive old backups before maintenance')
+    with tempfile.TemporaryDirectory(prefix='.connect-candidate-',dir=target.parent) as name:
+        stage=Path(name)
+        os.chown(stage,info.st_uid,info.st_gid); stage.chmod(0o750)
+        candidate=stage/'telemt.toml'
+        durable_file(candidate,content,0o640)
+        os.chown(candidate,info.st_uid,info.st_gid)
+        # Parse using the installed core before stopping the current service.
+        result=subprocess.run([str(service.binary),'healthcheck','--mode','ready',str(candidate)],
+            cwd=service.work,capture_output=True,timeout=12,**service.identity)
+        if result.returncode or not service.running_binary_matches():
+            raise CoreError('connect candidate validation or running core identity failed')
+        return transaction.activate(candidate,expected,expected,baseline)
+
+
+def protected_files(roots):
+    files = {}
+    for root in map(Path, roots):
+        if root.is_symlink() or root.resolve() != root:
+            raise CoreError('protected path contains a symlink')
+        candidates = [root] if root.is_file() else sorted(root.rglob('*')) if root.is_dir() else []
+        if not root.exists():
+            raise CoreError('required protected path is missing')
+        if not root.is_file() and not root.is_dir():
+            raise CoreError('protected root must be a regular file or directory')
+        if root.is_dir():
+            safe_directory(root)
+        for path in candidates:
+            if path.is_symlink():
+                raise CoreError('protected tree contains a symlink')
+            if path.is_dir():
+                safe_directory(path)
+                continue
+            safe_file(path)
+            if path.stat().st_size > 16*1024**2 or len(files) >= 128:
+                raise CoreError('protected state exceeds backup bounds')
+            files[str(path)] = {'sha256': digest(path), 'mode': stat.S_IMODE(path.stat().st_mode)}
+    if sum(Path(name).stat().st_size for name in files) > 32*1024**2:
+        raise CoreError('protected backup exceeds total byte budget')
+    return files
+
+
+def save_snapshot(directory, roots):
+    """Only hashes and fixed paths in the manifest; all copied secrets stay 0600."""
+    files = protected_files(roots)
+    folder = Path(tempfile.mkdtemp(prefix='snapshot-', dir=directory))
+    try:
+        for index, (name, metadata) in enumerate(sorted(files.items())):
+            metadata['copy'] = str(index)
+            atomic_copy(name, folder/str(index), 0o600, metadata['sha256'])
+        durable_file(folder/'manifest.json', (json.dumps(files, sort_keys=True)+'\n').encode(), 0o600)
+        sync_directory(folder)
+        sync_directory(directory)
+        return folder
+    except BaseException:
+        shutil.rmtree(folder)
+        raise
+
+
+def unchanged_snapshot(folder, roots):
+    safe_directory(folder)
+    safe_file(Path(folder)/'manifest.json')
+    files = json.loads((Path(folder)/'manifest.json').read_text())
+    current = protected_files(roots)
+    expected = {name: {k: row[k] for k in ('sha256', 'mode')} for name, row in files.items()}
+    if current != expected:
+        raise CoreError('protected configuration changed; manual review required before rollback')
+    for row in files.values():
+        if not re.fullmatch(r'[0-9]{1,3}', row['copy']):
+            raise CoreError('invalid snapshot member')
+        source = Path(folder)/row['copy']
+        safe_file(source)
+        if digest(source) != row['sha256']:
+            raise CoreError('protected backup checksum mismatch')
+
+
+def preserve_audited_archive(directory, archive, archive_sha, binary_sha):
+    """Keep exact source/license bytes without changing rollback-protected files."""
+    if not re.fullmatch(r'[a-f0-9]{64}', binary_sha):
+        raise CoreError('invalid audited core identity')
+    directory=Path(directory)
+    safe_directory(directory)
+    if directory.stat().st_mode & 0o077:
+        raise CoreError('audited archive storage must be private')
+    target=directory/('audited-core-'+binary_sha+'.tar.gz')
+    if target.exists() or target.is_symlink():
+        safe_file(target)
+        if stat.S_IMODE(target.stat().st_mode)!=0o600 or digest(target)!=archive_sha:
+            raise CoreError('audited archive cache changed; review required')
+    else:
+        if len(list(directory.glob('audited-core-*.tar.gz')))>=8:
+            raise CoreError('audited archive retention limit reached; archive old notices first')
+        atomic_copy(archive,target,0o600,archive_sha)
+    return target
+
+
+def upgrade(binary, directory, archive, archive_sha, binary_sha, version, roots, service, *, audited=False):
+    safe_directory(directory)
+    if Path(directory).stat().st_mode & 0o077:
+        raise CoreError('transaction storage must be private')
+    safe_file(binary)
+    tx = CoreTransaction(binary, directory, service)
+    if tx.journal.exists() or tx.journal.is_symlink():
+        previous = tx.load()
+        if previous['phase'] in ('prepared', 'switching'):
+            raise CoreError('unfinished transaction; run core-rollback first')
+    old = digest(binary)
+    if old == binary_sha:
+        if not service.ready():
+            raise CoreError('installed target core is not ready; diagnose or recover it first')
+        if audited:
+            # An already-installed candidate may predate source retention.
+            # Attach or revalidate its exact archive without restarting it.
+            archive_payload(archive,archive_sha,version,binary_sha,True)
+            preserve_audited_archive(directory,archive,archive_sha,binary_sha)
+        return 'unchanged'
+    if len(list(Path(directory).glob('snapshot-*'))) >= 8:
+        raise CoreError('snapshot retention limit reached; archive old backups before upgrading')
+    payload, _ = archive_payload(archive, archive_sha, version, binary_sha, audited)
+    if audited:
+        preserve_audited_archive(directory,archive,archive_sha,binary_sha)
+    # Stage on an executable root-owned filesystem, readable by telemt only
+    # through the temporary 0755 directory; no credentials are staged here.
+    with tempfile.TemporaryDirectory(prefix='.core-candidate-', dir=Path(binary).parent) as temp:
+        stage = Path(temp)
+        candidate = stage/'telemt'
+        durable_file(candidate, payload, 0o755)
+        stage.chmod(0o755)
+        snapshot = save_snapshot(directory, roots)
+        access = (ConfigAccessMigration(service.config.parent.parent, directory, binary,
+                                       service.identity['group']) if getattr(service, 'migrate_access', False) else None)
+        migrated = False
+        try:
+            if access is not None:
+                if stat.S_IMODE(access.base.stat().st_mode) == 0o710:
+                    backup = Path(directory)/('core.previous-'+old)
+                    if backup.exists() or backup.is_symlink():
+                        safe_file(backup)
+                    # Config/key/unit snapshot and original binary are durable
+                    # before the first permissions change, even before preflight.
+                    atomic_copy(binary, backup, 0o600, old)
+                migrated = access.prepare()
+            service.validate_candidate(candidate)
+            # Bind the snapshot to the exact durable journal, including recovery.
+            result = tx.activate(candidate, binary_sha, 'telemt '+version, old, snapshot=snapshot.name)
+            unchanged_snapshot(snapshot, roots)
+            return result
+        except BaseException:
+            if migrated:
+                access.restore()
+            # A preflight failure must not consume the finite snapshot budget.
+            # Keep any snapshot referenced by the durable recovery journal.
+            if not tx.journal.exists() or tx.load().get('snapshot') != snapshot.name:
+                shutil.rmtree(snapshot)
+            raise
+
+
+def rollback(binary, directory, roots, service):
+    transaction = CoreTransaction(binary, directory, service)
+    access = (ConfigAccessMigration(service.config.parent.parent, directory, binary,
+                                   service.identity['group']) if getattr(service, 'migrate_access', False) else None)
+    if not transaction.journal.exists() and access is not None and access.record.exists():
+        if not access.restore():
+            raise CoreError('config access recovery baseline changed; review required')
+        return 'access-restored'
+    value = transaction.load()
+    name = value.get('snapshot', '')
+    if not re.fullmatch(r'snapshot-[a-z0-9_]{8}', name):
+        raise CoreError('missing or invalid transaction snapshot')
+    unchanged_snapshot(Path(directory)/name, roots)
+    result = transaction.rollback()
+    if access is not None:
+        access.restore()
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('action', choices=('upgrade', 'rollback', 'refresh-health', 'rollback-health', 'refresh-connect', 'rollback-connect'))
+    parser.add_argument('--binary', required=True)
+    parser.add_argument('--directory', required=True)
+    parser.add_argument('--config', required=True)
+    parser.add_argument('--work', required=True)
+    parser.add_argument('--token-file', required=True)
+    parser.add_argument('--protect', action='append', required=True)
+    parser.add_argument('--archive')
+    parser.add_argument('--archive-sha')
+    parser.add_argument('--binary-sha')
+    parser.add_argument('--version')
+    parser.add_argument('--audited',action='store_true')
+    parser.add_argument('--bind')
+    args = parser.parse_args()
+    if args.audited and args.action!='upgrade':
+        parser.error('audited package validation is only available for upgrade')
+    if os.geteuid() != 0:
+        raise CoreError('root required')
+    if args.action in ('refresh-health', 'rollback-health'):
+        result = refresh_health(Path(args.directory).parent, args.bind, args.action == 'rollback-health')
+        print('健康代理事务结果：'+result)
+        return
+    service = BackendService(args.binary, args.config, args.work, args.token_file, migrate_access=True)
+    if args.action in ('refresh-connect','rollback-connect'):
+        print('连接策略事务结果：'+refresh_connect_policy(Path(args.directory).parent,service,args.action=='rollback-connect'))
+        return
+    if args.action == 'upgrade':
+        result = upgrade(args.binary, args.directory, args.archive, args.archive_sha,
+                         args.binary_sha, args.version, args.protect, service, audited=args.audited)
+    else:
+        result = rollback(args.binary, args.directory, args.protect, service)
+    print('核心事务结果：'+result)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as error:
+        print('核心事务失败：'+(str(error) if isinstance(error, (CoreError, InstallError)) else type(error).__name__), file=sys.stderr)
+        raise SystemExit(1)
+# END GENERATED CORE UPGRADE
+TDH_CORE_UPGRADE_PY
+  [[ -z $tmp ]] || rm -rf -- "$tmp"
+  (( result == 0 )) || die "核心事务未完成；请保留 core-upgrade 备份并检查状态，必要时执行 core-rollback。"
+}
+
+backend_maintenance() {
+  local action=$1 index=$2
+  [[ $index == 1 || $index == 2 ]] || die "后端编号只能为 1 或 2。"
+  load_state || die "未安装节点。"
+  require_current_state
+  [[ $TDH_ROLE == entry ]] || die "此命令只能在入口运行。"
+  python3 - "$action" "$index" <<'TDH_ENTRY_MAINTENANCE_PY'
+# BEGIN GENERATED ENTRY MAINTENANCE
+"""Fixed HAProxy runtime operations; no shell, untrusted commands or peer logins."""
+import csv
+import io
+import socket
+import sys
+
+
+class MaintenanceError(RuntimeError):
+    """Only fixed, non-sensitive operator messages may cross the CLI boundary."""
+
+
+def exchange(command):
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
+        connection.settimeout(3)
+        connection.connect('/run/telemt-dual-hop/haproxy.sock')
+        connection.sendall((command+'\n').encode('ascii'))
+        connection.shutdown(socket.SHUT_WR)
+        output = bytearray()
+        while True:
+            part = connection.recv(16384)
+            if not part:
+                return output.decode('ascii')
+            output += part
+            if len(output) > 262144:
+                raise MaintenanceError('HAProxy 状态响应过大；请运行 a diagnose，未继续操作')
+
+
+def maintain(action, index, request=exchange):
+    if action not in ('drain', 'resume') or index not in ('1', '2'):
+        raise ValueError('fixed action and backend index required')
+    if action == 'drain':
+        rows = list(csv.DictReader(io.StringIO(request('show stat').lstrip('# '))))
+        peer = 'vps'+('2' if index == '1' else '1')
+        for backend in ('telemt_a', 'telemt_b'):
+            matches = [row for row in rows if row.get('pxname') == backend and row.get('svname') == peer]
+            if len(matches) != 1 or matches[0].get('status') != 'UP':
+                raise MaintenanceError('备用后端未在两条线路均为 UP，已拒绝排空；请先运行 a diagnose')
+    state = 'drain' if action == 'drain' else 'ready'
+    for backend in ('telemt_a', 'telemt_b'):
+        reply = request(f'set server {backend}/vps{index} state {state}')
+        if reply.strip():
+            raise MaintenanceError('HAProxy 拒绝状态变更；两条线路可能只有一条已变更，请运行 a status 检查并重试原命令')
+    return state
+
+
+if __name__ == '__main__':
+    try:
+        if len(sys.argv) != 3:
+            raise ValueError('exact arguments required')
+        print('后端维护状态：'+maintain(sys.argv[1], sys.argv[2]))
+    except Exception as error:
+        detail = str(error) if isinstance(error, MaintenanceError) else '无法完成 HAProxy 操作；请运行 a status 和 a diagnose，检查两条线路后重试原命令'
+        print('入口维护失败：'+detail, file=sys.stderr)
+        raise SystemExit(1)
+# END GENERATED ENTRY MAINTENANCE
+TDH_ENTRY_MAINTENANCE_PY
+}
+
+recover_backend() {
+  load_state || die "未安装节点。"
+  require_current_state
+  [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "此命令仅用于后端。"
+  systemctl start "wg-quick@${WG_INTERFACE}.service"
+  systemctl restart telemt-dual-hop-telemt.service telemt-dual-hop-health-agent.service
+  diagnose
+}
+
+queue_is_configured() {
+  [[ -e ${TDH_BASE}/queue/policy.json || -L ${TDH_BASE}/queue || \
+     -e ${TDH_BASE}/queue/runtime.json || -L ${TDH_BASE}/queue/runtime.json || \
+     -e ${TDH_BASE}/queue/stopping || -L ${TDH_BASE}/queue/stopping || -L ${TDH_BASE}/queue/policy.json || \
+     -e /etc/systemd/system/wg-quick@tdh-b1.service.d/90-telemt-queue.conf || \
+     -L /etc/systemd/system/wg-quick@tdh-b1.service.d/90-telemt-queue.conf || \
+     -e /etc/systemd/system/wg-quick@tdh-b2.service.d/90-telemt-queue.conf || \
+     -L /etc/systemd/system/wg-quick@tdh-b2.service.d/90-telemt-queue.conf ]]
+}
+
+queue_manager_guard() {
+  if queue_is_configured && ! grep -Fqx '# TDH_QUEUE_PROTOCOL=1' "$1"; then
+    die "实验队列尚未撤销，目标管理器不支持它；请先 a queue disable --maintenance，再更新或回退。"
+  fi
+}
+
+manage_queue() {
+  load_state || die "未安装节点。"
+  require_current_state
+  [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "队列控制目前仅支持后端单隧道；不自动切分入口两条隧道的共享带宽。"
+  [[ ( $TDH_ROLE == backend1 && $WG_INTERFACE == tdh-b1 ) || \
+     ( $TDH_ROLE == backend2 && $WG_INTERFACE == tdh-b2 ) ]] || die "后端接口与角色不符。"
+  timeout --kill-after=2 45 python3 - "$TDH_BASE" "$WG_INTERFACE" "$TDH_MANAGER" "$@" <<'TDH_QUEUE_PY'
+# BEGIN GENERATED QUEUE CONTROL
+"""Opt-in backend WG egress shaping; no daemon, downloads or global networking.
+
+The manager holds its ordinary lock for operator actions. WG PostStart/PostStop
+uses a separate bounded lock, so restarting WG never deadlocks on the manager.
+Failure of the optional hook must not fail the tunnel or Telemt dependency.
+"""
+import argparse
+from contextlib import contextmanager
+import ctypes
+from decimal import Decimal
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import stat
+import subprocess
+import sys
+import tempfile
+
+
+class QueueError(RuntimeError):
+    pass
+
+
+def run(*args):
+    try:
+        return subprocess.run(args, check=True, capture_output=True, text=True, timeout=10).stdout.strip()
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise QueueError(f'{Path(args[0]).name}操作失败；已保留恢复记录') from exc
+
+
+def safe_directory(path):
+    path=Path(path)
+    info=path.lstat()
+    if path.resolve()!=path or not stat.S_ISDIR(info.st_mode) or info.st_uid!=0 or info.st_mode & 0o022:
+        raise QueueError('目录权限或类型异常')
+
+
+def read_file(path, private=True, limit=65536):
+    safe_directory(path.parent)
+    fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
+    with os.fdopen(fd,'rb') as stream:
+        info=os.fstat(stream.fileno())
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid!=0 or info.st_nlink!=1 or
+            info.st_mode & (0o077 if private else 0o022) or info.st_size>limit):
+            raise QueueError('文件权限或类型异常')
+        return stream.read(limit+1)
+
+
+def durable(path, data, mode=0o600):
+    safe_directory(path.parent)
+    exists=path.exists() or path.is_symlink()
+    if exists:read_file(path,mode==0o600)
+    fd,name=tempfile.mkstemp(prefix='.queue-',dir=path.parent)
+    try:
+        with os.fdopen(fd,'wb') as stream:
+            stream.write(data);os.fchmod(stream.fileno(),mode);stream.flush();os.fsync(stream.fileno())
+        if exists:os.replace(name,path)
+        else:publish_new(name,path)
+        sync(path.parent)
+    finally:Path(name).unlink(missing_ok=True)
+
+
+def publish_new(source,target):
+    # link()+unlink() leaves nlink=2 on SIGKILL between the two operations;
+    # read_file must then reject our own published recovery file. Linux's
+    # atomic no-replace rename preserves both exclusivity and nlink=1.
+    rename=ctypes.CDLL(None,use_errno=True).renameat2
+    rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint)
+    rename.restype=ctypes.c_int
+    if rename(-100,os.fsencode(source),-100,os.fsencode(target),1)!=0:
+        code=ctypes.get_errno()
+        raise OSError(code,os.strerror(code))
+
+
+def sync(path):
+    fd=os.open(path,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    try:os.fsync(fd)
+    finally:os.close(fd)
+
+
+def encoded(value):return (json.dumps(value,sort_keys=True)+'\n').encode()
+def digest(value):return hashlib.sha256(encoded(value)).hexdigest()
+
+
+def policy(interface,rate,path_mbps):
+    if interface not in ('tdh-b1','tdh-b2'):
+        raise QueueError('只支持后端单隧道；入口共享带宽尚未开放，不能给两条隧道各分配整机带宽')
+    if any(type(v) is not int for v in (rate,path_mbps)) or not 1<=rate<=900 or not rate<path_mbps<=1000 or rate*10>path_mbps*9:
+        raise QueueError('请输入1–1000Mbps内的实测路径容量，发送预算须至少预留10%，最大900Mbps')
+    return {'schema':1,'interface':interface,'rate_mbps':rate,'path_mbps':path_mbps}
+
+
+class KernelQueue:
+    ROOT='7a00:'
+    LEAF='7a01:'
+
+    def __init__(self,interface):self.interface=interface
+
+    def link(self):
+        links=json.loads(run('ip','-d','-j','link','show'))
+        rows=[v for v in links if v['ifname']==self.interface]
+        if not rows:return None
+        row=rows[0]
+        if row.get('linkinfo',{}).get('info_kind')!='wireguard':raise QueueError('目标不是WireGuard接口')
+        return {'boot':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+            'netns':os.stat('/proc/self/ns/net').st_ino,'ifindex':row['ifindex'],'txqlen':row.get('txqlen',0)}
+
+    def shape(self):
+        # Do not request -j/-s together: Ubuntu22.04 HTB prints legacy xstats.
+        qdisc=run('tc','-d','qdisc','show','dev',self.interface)
+        classes=run('tc','-d','class','show','dev',self.interface)
+        headers=[line.strip() for line in qdisc.splitlines() if line.startswith('qdisc ')]
+        if not headers:raise QueueError('缺少队列观察，拒绝修改')
+        htb=[line.strip() for line in classes.splitlines() if line.startswith('class htb ')]
+        other=[line for line in classes.splitlines() if line.startswith('class ') and not line.startswith(('class htb ','class fq_codel '))]
+        if other:raise QueueError('发现未知分类，拒绝修改')
+        # Live fq_codel flow classes and direct-packet counters are statistics,
+        # not configuration. Everything else remains part of the fingerprint.
+        headers=[re.sub(r' direct_packets_stat \d+| refcnt \d+','',line) for line in headers]
+        return {'qdisc':headers,'class':htb}
+
+    def fresh(self):
+        link=self.link()
+        if link is None:return False
+        shape=self.shape()
+        return len(shape['qdisc'])==1 and shape['qdisc'][0].startswith('qdisc noqueue 0: root') and not shape['class']
+
+    def owned(self,shape,rate,complete=True):
+        kinds=[re.match(r'qdisc (\S+) (\S+) ',s).groups() for s in shape['qdisc']]
+        expected=[('htb',self.ROOT),('fq_codel',self.LEAF)]
+        if not kinds or any(v not in expected for v in kinds) or len(kinds)!=len(set(kinds)):
+            raise QueueError('队列不属于本事务，拒绝覆盖或删除')
+        if ('htb',self.ROOT) not in kinds or (complete and set(kinds)!=set(expected)):
+            raise QueueError('队列结构不完整')
+        if any(' root' not in s for s in shape['qdisc'] if s.startswith('qdisc htb ')):
+            raise QueueError('根队列结构变化')
+        if any(f' parent {self.ROOT}10 ' not in s+' ' for s in shape['qdisc'] if s.startswith('qdisc fq_codel ')):
+            raise QueueError('叶队列结构变化')
+        if len(shape['class'])>(1 if not complete else 1) or (complete and len(shape['class'])!=1):
+            raise QueueError('HTB分类发生变化')
+        for line in shape['class']:
+            if not line.startswith(f'class htb {self.ROOT}10 root'):
+                raise QueueError('HTB分类归属异常')
+            for name in ('rate','ceil'):
+                found=re.search(r'\b'+name+r' (\d+(?:\.\d+)?)([KMG]?)bit\b',line)
+                if not found or Decimal(found[1])*{'':1,'K':1000,'M':1000000,'G':1000000000}[found[2]]!=rate*1000000:
+                    raise QueueError('队列带宽发生漂移，拒绝覆盖')
+        if run('tc','filter','show','dev',self.interface,'parent',self.ROOT):
+            raise QueueError('发现自定义过滤器，拒绝覆盖')
+
+    def create(self,rate):
+        run('ip','link','set','dev',self.interface,'txqueuelen','1000')
+        run('tc','qdisc','add','dev',self.interface,'root','handle',self.ROOT,'htb','default','10')
+        run('tc','class','add','dev',self.interface,'parent',self.ROOT,'classid',self.ROOT+'10',
+            'htb','rate',f'{rate}mbit','ceil',f'{rate}mbit','quantum','1514')
+        run('tc','qdisc','add','dev',self.interface,'parent',self.ROOT+'10','handle',self.LEAF,'fq_codel')
+
+    def restore(self,rate,baseline,expected=None):
+        link=self.link()
+        if link is None:return
+        if expected is not None and link['txqlen']!=1000:raise QueueError('接口队列长度发生漂移')
+        shape=self.shape()
+        if len(shape['qdisc'])==1 and shape['qdisc'][0].startswith('qdisc noqueue 0: root') and not shape['class']:
+            if expected is not None or link['txqlen'] not in (baseline,1000):raise QueueError('原队列已经变化，保留现场')
+            run('ip','link','set','dev',self.interface,'txqueuelen',str(baseline))
+            return
+        self.owned(shape,rate,complete=expected is not None)
+        if expected is not None and digest(shape)!=expected:raise QueueError('队列配置发生漂移，保留现场')
+        run('tc','qdisc','del','dev',self.interface,'root')
+        run('ip','link','set','dev',self.interface,'txqueuelen',str(baseline))
+        if not self.fresh() or self.link()['txqlen']!=baseline:raise QueueError('队列恢复未完成，保留记录')
+
+
+class QueueControl:
+    def __init__(self,directory,interface,manager,dropin=None):
+        self.directory=Path(directory);self.interface=interface;self.manager=Path(manager)
+        self.dropin=Path(dropin or f'/etc/systemd/system/wg-quick@{interface}.service.d/90-telemt-queue.conf')
+        self.config=self.directory/'policy.json';self.journal=self.directory/'runtime.json'
+        self.stopping=self.directory/'stopping'
+        self.kernel=KernelQueue(interface)
+
+    @contextmanager
+    def locked(self,create=False):
+        safe_directory(self.directory.parent)
+        if create:self.directory.mkdir(mode=0o700,exist_ok=True)
+        safe_directory(self.directory)
+        if self.directory.stat().st_mode & 0o077:raise QueueError('队列记录目录必须为0700')
+        fd=os.open(self.directory/'lock',os.O_RDWR|os.O_NOFOLLOW|os.O_NONBLOCK|(os.O_CREAT if create else 0),0o600)
+        try:
+            info=os.fstat(fd)
+            if not stat.S_ISREG(info.st_mode) or info.st_uid!=0 or info.st_nlink!=1 or info.st_mode & 0o077:
+                raise QueueError('队列锁不安全')
+            try:fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            except BlockingIOError:raise QueueError('队列操作正在进行，请稍后重试') from None
+            yield
+        finally:os.close(fd)
+
+    def desired(self):
+        value=json.loads(read_file(self.config))
+        if type(value) is not dict or type(value.get('schema')) is not int or set(value)!={'schema','interface','rate_mbps','path_mbps'} or value!=policy(self.interface,value.get('rate_mbps'),value.get('path_mbps')):
+            raise QueueError('队列策略内容无效')
+        return value
+
+    def record(self,value):durable(self.journal,encoded(value))
+
+    def prior(self,value):
+        if not self.journal.exists() and not self.journal.is_symlink():return None
+        record=json.loads(read_file(self.journal))
+        if (type(record) is not dict or type(record.get('schema')) is not int or record.get('schema')!=1 or record.get('policy')!=digest(value) or
+            type(record.get('baseline_txqlen')) is not int or not 0<=record['baseline_txqlen']<=10000 or record.get('phase') not in ('applying','active','removing') or
+            type(record.get('epoch')) is not dict):raise QueueError('恢复记录与策略不一致')
+        epoch=record['epoch']
+        if (set(epoch)!={'boot','netns','ifindex'} or not isinstance(epoch['boot'],str) or
+            not re.fullmatch('[a-f0-9-]{36}',epoch['boot']) or
+            any(type(epoch[k]) is not int or epoch[k]<=0 for k in ('netns','ifindex'))):raise QueueError('接口身份记录无效')
+        if record['phase'] in ('active','removing') and not re.fullmatch('[a-f0-9]{64}',record.get('fingerprint','')):
+            raise QueueError('恢复记录缺少队列指纹')
+        return record
+
+    def apply(self,value):
+        link=self.kernel.link()
+        if link is None:raise QueueError('WireGuard接口未启动；未改变服务')
+        epoch={k:link[k] for k in ('boot','netns','ifindex')}
+        record=self.prior(value)
+        if record and record['phase']=='removing':raise QueueError('撤销未完成，请先运行queue disable --maintenance')
+        if record and record['epoch']==epoch:
+            shape=self.kernel.shape()
+            if record['phase']=='active':
+                self.kernel.owned(shape,value['rate_mbps'])
+                if digest(shape)!=record['fingerprint'] or link['txqlen']!=1000:raise QueueError('队列配置发生漂移')
+                return 'unchanged'
+            self.kernel.restore(value['rate_mbps'],record['baseline_txqlen'])
+        if not self.kernel.fresh():raise QueueError('接口已有自定义队列；拒绝接管')
+        baseline=self.kernel.link()['txqlen']
+        if type(baseline) is not int or not 0<=baseline<=10000:raise QueueError('原接口队列长度超出安全恢复范围')
+        record={'schema':1,'policy':digest(value),'baseline_txqlen':baseline,'epoch':epoch,'phase':'applying'}
+        self.record(record)
+        try:
+            self.kernel.create(value['rate_mbps'])
+            shape=self.kernel.shape();self.kernel.owned(shape,value['rate_mbps'])
+            record.update(phase='active',fingerprint=digest(shape));self.record(record)
+        except BaseException:
+            self.kernel.restore(value['rate_mbps'],baseline)
+            self.journal.unlink(missing_ok=True);sync(self.directory)
+            raise
+        return 'applied'
+
+    def remove(self,value):
+        record=self.prior(value)
+        link=self.kernel.link()
+        if record and link is not None:
+            epoch={k:link[k] for k in ('boot','netns','ifindex')}
+            if record['epoch']==epoch:
+                expected=record.get('fingerprint')
+                if record['phase']=='active':
+                    shape=self.kernel.shape();self.kernel.owned(shape,value['rate_mbps'])
+                    if digest(shape)!=expected or link['txqlen']!=1000:raise QueueError('队列配置发生漂移，保留现场')
+                    record['phase']='removing';self.record(record)
+                elif record['phase']=='removing' and self.kernel.fresh():
+                    # TC deletion completed before an interruption; restoring
+                    # only the recorded txqlen is safe and does not delete a tree.
+                    expected=None
+                self.kernel.restore(value['rate_mbps'],record['baseline_txqlen'],expected)
+            elif not self.kernel.fresh():raise QueueError('接口身份变化且有自定义队列，保留现场')
+        elif link is not None and not self.kernel.fresh():
+            raise QueueError('缺少归属记录，拒绝删除队列')
+        self.journal.unlink(missing_ok=True);sync(self.directory)
+
+    def hook(self):
+        if not re.fullmatch(r'/[A-Za-z0-9_./-]+',str(self.manager)):raise QueueError('管理器路径不安全')
+        return ('# Managed by Telemt Dual-Hop queue protocol 1\n[Service]\n'
+            f'ExecStartPost=-/usr/bin/timeout --kill-after=2 12 {self.manager} --queue-service apply\n'
+            f'ExecStopPost=-/usr/bin/timeout --kill-after=2 12 {self.manager} --queue-service remove\n').encode()
+
+    def check_hook(self):
+        if self.dropin.exists() or self.dropin.is_symlink():
+            if read_file(self.dropin,False)!=self.hook():raise QueueError('队列启动配置发生漂移，拒绝覆盖')
+
+    def enable(self,rate,path_mbps):
+        value=policy(self.interface,rate,path_mbps)
+        if b'# TDH_QUEUE_PROTOCOL=1\n' not in read_file(self.manager,False,1048576):raise QueueError('已安装管理器不支持队列控制，请先更新管理器')
+        with self.locked(True):
+            if self.stopping.exists() or self.stopping.is_symlink():raise QueueError('上次撤销未完成，请先运行queue disable --maintenance')
+            self.check_hook()
+            new=not self.config.exists() and not self.config.is_symlink()
+            if self.config.exists() or self.config.is_symlink():
+                if self.desired()!=value:raise QueueError('已有不同策略，请先撤销后重新启用')
+            elif not self.kernel.fresh():raise QueueError('接口未就绪或已有自定义队列；未接管')
+            if not self.dropin.parent.exists():
+                safe_directory(self.dropin.parent.parent);self.dropin.parent.mkdir(mode=0o755)
+            safe_directory(self.dropin.parent)
+            try:
+                durable(self.config,encoded(value));durable(self.dropin,self.hook(),0o644)
+                run('systemctl','daemon-reload')
+                return self.apply(value)
+            except Exception:
+                # Ordinary failures undo a fresh enable after kernel rollback.
+                # SIGKILL leaves the durable intent/journal for safe resumption.
+                if new and not self.journal.exists() and not self.journal.is_symlink():
+                    self.check_hook()
+                    if self.dropin.exists():self.dropin.unlink();sync(self.dropin.parent)
+                    self.config.unlink(missing_ok=True);sync(self.directory)
+                    run('systemctl','daemon-reload')
+                raise
+
+    def disable(self):
+        if not self.directory.exists() and not self.directory.is_symlink():
+            if self.dropin.exists() or self.dropin.is_symlink():raise QueueError('缺少策略归属信息，保留启动配置')
+            return 'disabled'
+        with self.locked(True):
+            self.check_hook()
+            durable(self.stopping,b'1\n')
+            if self.config.exists() or self.config.is_symlink():self.remove(self.desired())
+            elif self.journal.exists() or self.journal.is_symlink():raise QueueError('缺少策略，保留恢复记录')
+            elif self.kernel.link() is not None and not self.kernel.fresh():raise QueueError('缺少策略归属，拒绝清理当前队列')
+            if self.dropin.exists():self.dropin.unlink();sync(self.dropin.parent)
+            run('systemctl','daemon-reload')
+            self.config.unlink(missing_ok=True);sync(self.directory)
+            self.stopping.unlink();sync(self.directory)
+        return 'disabled'
+
+    def service(self,action):
+        if not self.config.exists() and not self.config.is_symlink():return 'disabled'
+        with self.locked(True):
+            self.check_hook();value=self.desired()
+            if action=='apply' and (self.stopping.exists() or self.stopping.is_symlink()):
+                if read_file(self.stopping)!=b'1\n':raise QueueError('撤销记录无效')
+                return 'removal-pending'
+            return self.apply(value) if action=='apply' else self.remove(value)
+
+    def status(self):
+        if not self.directory.exists() and not self.directory.is_symlink():return {'enabled':False}
+        with self.locked():
+            if not self.config.exists() and not self.config.is_symlink():
+                if self.journal.exists() or self.dropin.exists():raise QueueError('缺少策略，需检查恢复记录')
+                return {'enabled':False}
+            value=self.desired();self.check_hook();record=self.prior(value);link=self.kernel.link()
+            active=False
+            if record and link and record['phase']=='active':
+                active=(record['epoch']=={k:link[k] for k in ('boot','netns','ifindex')} and
+                    link['txqlen']==1000 and digest(self.kernel.shape())==record['fingerprint'])
+            return dict(value,enabled=True,active=active,boot_hook=self.dropin.exists(),removal_pending=self.stopping.exists())
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('base');parser.add_argument('interface');parser.add_argument('manager')
+    parser.add_argument('action',choices=('enable','disable','status','apply','remove'))
+    parser.add_argument('rate',nargs='?',type=int);parser.add_argument('path_mbps',nargs='?',type=int)
+    parser.add_argument('--maintenance',action='store_true')
+    parser.add_argument('--experimental',action='store_true')
+    args=parser.parse_args();os.umask(0o077)
+    if os.geteuid()!=0:raise QueueError('需要root权限')
+    if args.action in ('enable','disable') and not args.maintenance:raise QueueError('请先排空本后端并添加--maintenance')
+    if args.action=='enable' and not args.experimental:raise QueueError('尚未通过完整尾延迟门槛；只允许显式--experimental实验，不能默认用于生产')
+    if args.action!='enable' and (args.rate is not None or args.path_mbps is not None):raise QueueError('参数数量无效')
+    if args.interface not in ('tdh-b1','tdh-b2'):raise QueueError('只支持后端单隧道，入口共享整形尚未开放')
+    control=QueueControl(Path(args.base)/'queue',args.interface,args.manager)
+    result=(control.enable(args.rate,args.path_mbps) if args.action=='enable' else
+            control.disable() if args.action=='disable' else control.status() if args.action=='status' else control.service(args.action))
+    print(json.dumps({'queue':result},ensure_ascii=False))
+
+
+if __name__=='__main__':
+    try:main()
+    except Exception as exc:
+        print('队列操作失败：'+(str(exc) if isinstance(exc,QueueError) else type(exc).__name__)+'；代理服务不会因此重启。',file=sys.stderr)
+        raise SystemExit(1)
+# END GENERATED QUEUE CONTROL
+TDH_QUEUE_PY
+}
+
+queue_panel() {
+  local action
+  manage_queue status
+  printf '\n实验功能默认关闭，仅控制本后端向入口的发送队列；不会重启代理。\n'
+  printf '尚未通过新连接尾延迟的绝对门槛；本面板只提供查看和撤销，不提供生产启用。\n'
+  printf '2) 撤销（请先排空本后端）  0) 返回\n'
+  read -r -p '请选择 [0]: ' action </dev/tty || return 0
+  case ${action:-0} in
+    2) manage_queue disable --maintenance ;;
+    0) ;;
+    *) warn "无效选择。" ;;
+  esac
+}
+
+select_amd64_core() {
+  local version expected binary_sha url
+  # Preserve the released high-RTT baseline until a newer core passes the
+  # joint throughput/latency gate; latest-compatible is not latest-by-default.
+  case ${TDH_NEW_INSTALL_CORE:-balanced2} in
+    official)
+      version=$TELEMT_VERSION expected=$TELEMT_SHA256_AMD64
+      binary_sha=$TELEMT_BINARY_SHA256_AMD64
+      url="https://github.com/telemt/telemt/releases/download/${version}/telemt-x86_64-linux-gnu.tar.gz" ;;
+    balanced2)
+      version=$TELEMT_CORE_VERSION_AMD64 expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64
+      binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 url=$TELEMT_CORE_URL_AMD64 ;;
+    audit2)
+      version=$TELEMT_AUDIT2_VERSION expected=$TELEMT_AUDIT2_ARCHIVE_SHA256
+      binary_sha=$TELEMT_AUDIT2_BINARY_SHA256 url=$TELEMT_AUDIT2_URL ;;
+    *) die "新安装核心选择无效；仅支持 official、balanced2 或 audit2。" ;;
+  esac
+  printf '%s\t%s\t%s\t%s\t%s\n' "${url##*/}" "$version" "$expected" "$binary_sha" "$url"
+}
+
+download_telemt() {
+  local asset expected url tmp version binary_sha="" mode selected
+  case $(uname -m) in
+    x86_64|amd64)
+      selected=$(select_amd64_core) || return 1
+      IFS=$'\t' read -r asset version expected binary_sha url <<<"$selected"
+      mode=audited
+      [[ $version != "$TELEMT_VERSION" ]] || mode=official
+      info "安装固定版本 Telemt ${version}（${mode}）。"
+      if [[ $mode == official ]]; then
+        warn "官方 ${version} 在已验证的高 RTT 单流场景存在吞吐退化；x86_64 默认稳定基线为 balanced2。"
+      fi
+      ;;
+    aarch64|arm64)
+      [[ ${TDH_NEW_INSTALL_CORE:-official} == official ]] || die "自选核心仅支持 x86_64；ARM 使用官方核心。"
+      asset="telemt-aarch64-linux-gnu.tar.gz" expected=$TELEMT_SHA256_ARM64
+      url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
+      version=$TELEMT_VERSION mode=official binary_sha=$TELEMT_BINARY_SHA256_ARM64
+      info "ARM 使用官方 Telemt ${version}；本轮提速核心仅验证了 x86_64。"
+      ;;
+    *) die "Telemt 不支持当前架构。" ;;
+  esac
+  [[ ! -e $TDH_BIN && ! -L $TDH_BIN ]] || die "已存在 Telemt 核心；新安装不会覆盖它。"
+  tmp=$(mktemp -d "${TDH_BASE}/core-download.XXXXXX")
+  if ! curl -q -fL --retry 3 --retry-all-errors --connect-timeout 10 --max-time 180 --max-filesize 67108864 \
+      --proto '=https' --proto-redir '=https' --tlsv1.2 "$url" -o "${tmp}/${asset}"; then
+    rm -rf -- "$tmp"
+    die "核心下载失败；安装已停止，不会悄悄改用其他构建。"
+  fi
+  install -d -m 0755 "$(dirname "$TDH_BIN")"
+  if ! python3 - "${tmp}/${asset}" "$TDH_BIN" "$expected" "$version" "$binary_sha" "$mode" <<'TDH_CORE_INSTALL_PY'
+# BEGIN GENERATED CORE INSTALLER
+"""Validate a pinned core archive and stage a fresh install; never update a node.
+
+This source is embedded verbatim in the single-file Bash installer. All archive
+bytes and members are verified before any executable is run or installed.
+"""
+import ctypes
+import hashlib
+import json
+import os
+from pathlib import Path, PurePosixPath
+import pwd
+import stat
+import subprocess
+import sys
+import tarfile
+import tempfile
+
+
+class InstallError(RuntimeError):
+    pass
+
+
+def publish_new(source,target):
+    """Atomic Linux no-replace publication without a transient second link."""
+    rename=ctypes.CDLL(None,use_errno=True).renameat2
+    rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint)
+    rename.restype=ctypes.c_int
+    if rename(-100,os.fsencode(source),-100,os.fsencode(target),1)!=0:
+        code=ctypes.get_errno()
+        raise OSError(code,os.strerror(code))
+
+
+AUDIT_FILES = {'telemt','TELEMT-LICENSE.txt','NOTICE.txt','source.patch','build-provenance.json','manifest.json'}
+
+
+def checksum(path):
+    value = hashlib.sha256()
+    with Path(path).open('rb') as source:
+        for block in iter(lambda: source.read(1024*1024), b''):
+            value.update(block)
+    return value.hexdigest()
+
+
+def durable_file(path, content, mode):
+    with Path(path).open('xb') as output:
+        output.write(content)
+        output.flush()
+        os.fchmod(output.fileno(), mode)
+        os.fsync(output.fileno())
+
+
+def archive_payload(path, expected_archive, version, expected_binary='', audited=False):
+    path = Path(path)
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or not 0 < info.st_size <= 64*1024**2:
+        raise InstallError('invalid archive type or size')
+    if checksum(path) != expected_archive:
+        raise InstallError('archive checksum mismatch')
+    files, names, total = {}, set(), 0
+    with tarfile.open(path, mode='r|gz') as archive:
+        for number, member in enumerate(archive, 1):
+            name = PurePosixPath(member.name)
+            if (number > 32 or name.is_absolute() or '..' in name.parts or not name.parts
+                    or str(name) in names or (not member.isfile() and not member.isdir())):
+                raise InstallError('unsafe or duplicate archive member')
+            names.add(str(name))
+            if member.isdir():
+                if audited:
+                    raise InstallError('unexpected directory in audited archive')
+                continue
+            if not 0 < member.size <= 64*1024**2:
+                raise InstallError('invalid member size')
+            total += member.size
+            if total > 64*1024**2:
+                raise InstallError('archive payload exceeds limit')
+            if audited and str(name) not in AUDIT_FILES:
+                raise InstallError('unexpected audited archive member')
+            content = archive.extractfile(member).read(member.size+1)
+            if len(content) != member.size:
+                raise InstallError('incomplete archive member')
+            files[str(name)] = content
+    binaries = [content for name, content in files.items() if PurePosixPath(name).name == 'telemt']
+    if len(binaries) != 1:
+        raise InstallError('archive must contain one telemt binary')
+    binary = binaries[0]
+    if expected_binary and hashlib.sha256(binary).hexdigest() != expected_binary:
+        raise InstallError('binary checksum mismatch')
+    if audited:
+        if set(files) != AUDIT_FILES:
+            raise InstallError('incomplete audited archive')
+        if len(binary) < 64 or binary[:6] != b'\x7fELF\x02\x01' or binary[18:20] != b'\x3e\x00':
+            raise InstallError('x86_64 ELF required')
+        manifest = json.loads(files['manifest.json'])
+        if (manifest.get('schema') != 1 or manifest.get('version') != version
+                or manifest.get('architecture') != 'x86_64' or manifest.get('os') != 'linux'
+                or manifest.get('libc') != 'gnu' or manifest.get('minimum_glibc') != '2.35'
+                or manifest.get('unofficial') is not True
+                or set(manifest.get('files', {})) != AUDIT_FILES-{'manifest.json'}):
+            raise InstallError('audited manifest identity mismatch')
+        for name, metadata in manifest['files'].items():
+            if (metadata.get('sha256') != hashlib.sha256(files[name]).hexdigest()
+                    or metadata.get('bytes') != len(files[name])
+                    or metadata.get('mode') != ('0755' if name == 'telemt' else '0644')):
+                raise InstallError('audited manifest member mismatch')
+    return binary, {name:files[name] for name in AUDIT_FILES-{'telemt'} if name in files}
+
+
+def fresh_install(archive, target, expected_archive, version, expected_binary='', audited=False):
+    target = Path(target)
+    parent = target.parent
+    if not target.is_absolute() or target.resolve() != target or target.exists() or target.is_symlink():
+        raise InstallError('fresh install refuses an existing core or symlink')
+    parent_info = parent.lstat()
+    if not stat.S_ISDIR(parent_info.st_mode) or parent_info.st_uid != os.geteuid() or parent_info.st_mode & 0o022:
+        raise InstallError('unsafe installation directory')
+    binary, documents = archive_payload(archive, expected_archive, version, expected_binary, audited)
+    identity = pwd.getpwnam('telemt')
+    if identity.pw_uid == 0 or identity.pw_gid == 0:
+        raise InstallError('unprivileged telemt identity required')
+    with tempfile.TemporaryDirectory(prefix='.telemt-install-', dir=parent) as temporary:
+        stage = Path(temporary)
+        candidate = stage/'telemt'
+        durable_file(candidate, binary, 0o755)
+        stage.chmod(0o755)
+        result = subprocess.run([str(candidate),'--version'], user=identity.pw_uid, group=identity.pw_gid,
+                                extra_groups=[], cwd='/', capture_output=True, timeout=5, check=True)
+        if result.stdout.strip() != ('telemt '+version).encode() or len(result.stdout) > 256:
+            raise InstallError('candidate runtime version mismatch')
+        if audited:
+            legal = stage/'core-source-notice'
+            legal.mkdir(mode=0o755)
+            for name, content in documents.items():
+                document = legal/name
+                durable_file(document, content, 0o644)
+            destination = parent/'core-source-notice'
+            if destination.exists() or destination.is_symlink():
+                raise InstallError('refusing to replace existing core notice')
+            publish_new(legal, destination)
+        # A hardlink would retain nlink=2 if killed before stage cleanup. Publish
+        # exclusively without that gap; existing/concurrent targets stay intact.
+        publish_new(candidate, target)
         directory = os.open(parent, os.O_RDONLY|os.O_DIRECTORY)
         try:
             os.fsync(directory)
@@ -1419,6 +2940,9 @@ write_telemt_config() {
 [general]
 config_strict = true
 fast_mode = true
+tg_connect = 4
+upstream_connect_retry_attempts = 2
+upstream_connect_budget_ms = 9000
 use_middle_proxy = false
 beobachten = false
 log_level = "normal"
@@ -1543,6 +3067,7 @@ with open(os.environ["TDH_API_TOKEN_FILE"], encoding="ascii") as token_file:
     API_TOKEN = token_file.read().strip()
 AGENT_PORT = int(os.environ["TDH_AGENT_PORT"])
 API_PORT = int(os.environ["TDH_API_PORT"])
+TELEMT_PORT = int(os.environ.get("TDH_TELEMT_PORT", "24431"))
 DCS = tuple(value for value in os.environ["TDH_DC_IPV4"].split(",") if value)
 DC_PORT = int(os.environ["TDH_DC_PORT"])
 API_READY = False
@@ -1551,6 +3076,10 @@ API_CHECKED = None
 DC_CHECKED = None
 API_MAX_AGE = 5
 DC_MAX_AGE = 25
+# Progress deadlines cover the complete check, not each socket read. A peer
+# sending a byte before every urllib timeout can otherwise strand a live thread.
+API_PROGRESS_TIMEOUT = 15
+DC_PROGRESS_TIMEOUT = 45
 READY_LOCK = threading.Lock()
 sel = selectors.DefaultSelector()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -1571,6 +3100,9 @@ def healthy(http, api_port):
             payload = json.loads(raw)
         return (response.status == 200 and isinstance(payload, dict) and payload.get("ok") is True
                 and isinstance(payload.get("data"), dict) and payload["data"].get("ready") is True)
+    except urllib.error.HTTPError as error:
+        error.close()
+        return False
     except (OSError, ValueError, urllib.error.URLError):
         return False
 
@@ -1580,15 +3112,54 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
+class HealthGate:
+    """Consecutive samples plus a down-state cooldown; stale results expire separately."""
+    def __init__(self, fall, rise, cooldown):
+        self.fall, self.rise, self.cooldown = fall, rise, cooldown
+        self.up = False
+        self.good = self.bad = 0
+        self.retry_after = 0
+
+    def sample(self, good, now):
+        if good:
+            self.bad = 0
+            self.good += 1
+            if self.good >= self.rise and now >= self.retry_after:
+                self.up = True
+        else:
+            self.good = 0
+            self.bad += 1
+            if self.up and self.bad >= self.fall:
+                self.up = False
+                self.retry_after = now + self.cooldown
+        return self.up
+
+
+def dc_quorum(results):
+    # One impaired DC must not evict a backend serving the other DCs.
+    # This TCP reachability vote is NOT an MTProto or per-DC protocol guarantee.
+    results = tuple(results)
+    return bool(results) and sum(value is True for value in results) >= len(results) // 2 + 1
+
+
+def listener_alive():
+    try:
+        with socket.create_connection((BIND, TELEMT_PORT), timeout=1):
+            return True
+    except OSError:
+        return False
+
+
 def monitor_api():
     global API_READY, API_CHECKED
     # Never inherit HTTP(S)_PROXY for the loopback API or expose its bearer token.
     http = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+    gate = HealthGate(fall=3, rise=2, cooldown=10)
     while True:
-        current = healthy(http, API_PORT)
+        current = healthy(http, API_PORT) and listener_alive()
         with READY_LOCK:
-            API_READY = current
             API_CHECKED = time.monotonic()
+            API_READY = gate.sample(current, API_CHECKED)
         time.sleep(1)
 
 def probe_dc(address):
@@ -1600,27 +3171,16 @@ def probe_dc(address):
 
 def monitor_dcs():
     global DC_READY, DC_CHECKED
-    bad_streak = 0
-    good_streak = 0
+    gate = HealthGate(fall=2, rise=3, cooldown=30)
     while True:
         if DCS:
             with concurrent.futures.ThreadPoolExecutor(max_workers=len(DCS)) as executor:
-                current = all(executor.map(probe_dc, DCS))
+                current = dc_quorum(executor.map(probe_dc, DCS))
         else:
             current = False
         with READY_LOCK:
-            if current:
-                bad_streak = 0
-                good_streak += 1
-                # Two complete successful rounds before re-admitting a backend.
-                if good_streak >= 2:
-                    DC_READY = True
-            else:
-                good_streak = 0
-                bad_streak += 1
-                if not DC_READY or bad_streak >= 2:
-                    DC_READY = False
             DC_CHECKED = time.monotonic()
+            DC_READY = gate.sample(current, DC_CHECKED)
         time.sleep(10)
 
 def ready(now=None):
@@ -1633,6 +3193,18 @@ def ready(now=None):
                 and 0 <= now - API_CHECKED <= API_MAX_AGE and 0 <= now - DC_CHECKED <= DC_MAX_AGE)
 
 
+def monitors_progressing(now, started):
+    with READY_LOCK:
+        # As with ready(), sample after locking: a freshly published timestamp
+        # must not look as though it came from the future.
+        if now is None:
+            now = time.monotonic()
+        return all(0 <= now - (checked if checked is not None else started) <= limit
+                   for checked, limit in ((API_CHECKED, API_PROGRESS_TIMEOUT),
+                                          (DC_CHECKED, DC_PROGRESS_TIMEOUT)))
+
+
+started = time.monotonic()
 monitors = [threading.Thread(target=target, daemon=True) for target in (monitor_api, monitor_dcs)]
 for monitor in monitors:
     monitor.start()
@@ -1641,7 +3213,12 @@ while True:
     if any(not monitor.is_alive() for monitor in monitors):
         # Let the existing systemd restart policy replace a failed monitor thread.
         raise SystemExit("health monitor stopped")
-    for key, _ in sel.select(timeout=30):
+    if not monitors_progressing(None, started):
+        # Staleness already closes admission. Recover the stuck worker through
+        # the existing service restart policy; ordinary unhealthy votes do not
+        # trigger restarts, and no check is silently declared healthy.
+        raise SystemExit("health monitor progress deadline")
+    for key, _ in sel.select(timeout=1):
         listener = key.fileobj
         try:
             conn, _ = listener.accept()
@@ -1817,8 +3394,10 @@ apply_tuning() {
   fi
   somax=$(sysctl -n net.core.somaxconn 2>/dev/null || echo 4096)
   syn_backlog=$(sysctl -n net.ipv4.tcp_max_syn_backlog 2>/dev/null || echo 4096)
-  if (( somax < 65535 )); then somax=65535; fi
-  if (( syn_backlog < 32768 )); then syn_backlog=32768; fi
+  # Match the 4096 listener backlog; preserve any larger operator setting.
+  # Hundreds of users on a single vCPU do not justify a 65k/32k queue floor.
+  if (( somax < 4096 )); then somax=4096; fi
+  if (( syn_backlog < 4096 )); then syn_backlog=4096; fi
   install -d -m 0755 /etc/modules-load.d
   cat >/etc/modules-load.d/90-telemt-dual-hop.conf <<'EOF'
 sch_fq
@@ -1859,16 +3438,32 @@ wireguard_handshake_is_fresh() {
 }
 
 telemt_binary_is_expected() {
-  local version expected
-  [[ -x $TDH_BIN ]] || return 1
-  version=$(timeout 5 "$TDH_BIN" --version 2>/dev/null) || return 1
-  if [[ $version == "telemt ${TELEMT_VERSION}" ]]; then return 0; fi
-  case $version in
-    "telemt ${TELEMT_CORE_VERSION_AMD64}") expected=$TELEMT_CORE_BINARY_SHA256_AMD64 ;;
-    "telemt ${TELEMT_AUDIT2_VERSION}") expected=$TELEMT_AUDIT2_BINARY_SHA256 ;;
+  local version expected checksum owner mode links directory
+  [[ -f $TDH_BIN && -x $TDH_BIN && ! -L $TDH_BIN ]] || return 1
+  read -r owner mode links < <(stat -c '%u %a %h' -- "$TDH_BIN")
+  [[ $owner == "$EUID" && $links == 1 && $mode =~ ^[0-7]{1,4}$ ]] || return 1
+  (( (8#$mode & 0022) == 0 )) || return 1
+  directory=$(dirname "$TDH_BIN")
+  while [[ $directory != / ]]; do
+    [[ -d $directory && ! -L $directory ]] || return 1
+    read -r owner mode < <(stat -c '%u %a' -- "$directory")
+    [[ ( $owner == 0 || $owner == "$EUID" ) && $mode =~ ^[0-7]{1,4}$ ]] || return 1
+    (( (8#$mode & 0022) == 0 || (8#$mode & 01000) != 0 )) || return 1
+    directory=$(dirname "$directory")
+  done
+  # Authenticate existing bytes BEFORE executing even --version as root.
+  checksum=$(sha256sum "$TDH_BIN" | awk '{print $1}')
+  case $(uname -m):$checksum in
+    x86_64:"$TELEMT_BINARY_SHA256_AMD64"|amd64:"$TELEMT_BINARY_SHA256_AMD64"|aarch64:"$TELEMT_BINARY_SHA256_ARM64"|arm64:"$TELEMT_BINARY_SHA256_ARM64") expected="telemt ${TELEMT_VERSION}" ;;
+    x86_64:"$TELEMT_PREVIOUS_BINARY_SHA256_AMD64"|amd64:"$TELEMT_PREVIOUS_BINARY_SHA256_AMD64"|aarch64:"$TELEMT_PREVIOUS_BINARY_SHA256_ARM64"|arm64:"$TELEMT_PREVIOUS_BINARY_SHA256_ARM64") expected="telemt ${TELEMT_PREVIOUS_VERSION}" ;;
+    x86_64:"$TELEMT_LEGACY_BINARY_SHA256_AMD64"|amd64:"$TELEMT_LEGACY_BINARY_SHA256_AMD64"|aarch64:"$TELEMT_LEGACY_BINARY_SHA256_ARM64"|arm64:"$TELEMT_LEGACY_BINARY_SHA256_ARM64") expected="telemt ${TELEMT_LEGACY_VERSION}" ;;
+    x86_64:"$TELEMT_CORE_BINARY_SHA256_AMD64"|amd64:"$TELEMT_CORE_BINARY_SHA256_AMD64") expected="telemt ${TELEMT_CORE_VERSION_AMD64}" ;;
+    x86_64:"$TELEMT_AUDIT2_BINARY_SHA256"|amd64:"$TELEMT_AUDIT2_BINARY_SHA256") expected="telemt ${TELEMT_AUDIT2_VERSION}" ;;
     *) return 1 ;;
   esac
-  [[ $(sha256sum "$TDH_BIN" | awk '{print $1}') == "$expected" ]]
+  version=$(timeout 5 "$TDH_BIN" --version 2>/dev/null) || return 1
+  [[ $version == "$expected" ]] || return 1
+  if [[ ${1:-} == --print-version ]]; then printf '%s\n' "$version"; fi
 }
 
 write_haproxy_config() {
@@ -2004,6 +3599,10 @@ wait_for_link() {
   return 1
 }
 
+join_core_version_is_compatible() {
+  [[ $1 == "$TELEMT_VERSION" || $1 == "$TELEMT_PREVIOUS_VERSION" ]]
+}
+
 install_backend() {
   local requested_role=$1 code decoded backend_priv backend_pub
   local -a fields
@@ -2022,7 +3621,7 @@ install_backend() {
   local wg_psk=${fields[9]}
   LOCAL_WG_IP=${fields[10]} ENTRY_WG_IP=${fields[11]} BACKEND_WG_PORT=${fields[12]}
   ENROLL_TOKEN=${fields[13]}
-  [[ ${fields[14]} == "$TELEMT_VERSION" ]] || die "Join Code 要求的 Telemt 版本与脚本不一致。"
+  join_core_version_is_compatible "${fields[14]}" || die "Join Code 要求的 Telemt 版本与脚本不兼容。"
   [[ ${fields[15]} == "$TDH_PROTOCOL_VERSION" && ${fields[16]} == "$TDH_CONFIG_SCHEMA" ]] || \
     die "Join Code 与当前配置协议不一致，请先更新三台机器的管理脚本。"
   [[ $TDH_ROLE == "$requested_role" ]] || die "Join Code 角色为 $TDH_ROLE，不是 $requested_role。"
@@ -2395,7 +3994,7 @@ diagnose() {
     if wireguard_handshake_is_fresh "$WG_INTERFACE"; then ok "WireGuard 握手新鲜"; else warn "WireGuard 超过 180 秒没有握手"; ((failures+=1)); fi
     if tuning_is_active; then ok "BBR / 默认队列 fq 已设置；a perf 可查看实际连接和接口"; else warn "BBR/fq 默认值异常"; ((failures+=1)); fi
     if telemt_binary_is_expected; then ok "Telemt 二进制身份通过（a perf 可查看构建标识）"; else warn "Telemt 二进制身份异常"; ((failures+=1)); fi
-    if health_agent_is_up "$LOCAL_WG_IP" "$TDH_AGENT_PORT"; then ok "Telemt API 与 5 个 Telegram DC 全部可达"; else warn "Telemt 或 Telegram DC 完整连通性异常"; ((failures+=1)); fi
+    if health_agent_is_up "$LOCAL_WG_IP" "$TDH_AGENT_PORT"; then ok "Telemt API 就绪且 DC 多数可达（非协议级保证）"; else warn "Telemt API 或 DC 多数连通性异常"; ((failures+=1)); fi
     RESPONSE_LINK_A=$(query_telemt_link "$TDH_API_PORT" line_a "$TDH_DOMAIN_A" 2>/dev/null || true)
     RESPONSE_LINK_B=$(query_telemt_link "$TDH_API_PORT" line_b "$TDH_DOMAIN_B" 2>/dev/null || true)
     config="${TDH_CONFIG_DIR}/telemt.toml"
@@ -2743,6 +4342,7 @@ uninstall_all() {
   load_state || die "尚未安装。"
   read -r -p "输入 UNINSTALL 确认卸载本脚本创建的服务：" confirm </dev/tty || true
   [[ $confirm == UNINSTALL ]] || { warn "已取消。"; return 0; }
+  if queue_is_configured; then manage_queue disable --maintenance; fi
   remove_ufw_rules
   if [[ $TDH_ROLE == entry ]]; then
     systemctl disable --now telemt-dual-hop-haproxy.service wg-quick@tdh1.service wg-quick@tdh2.service >/dev/null 2>&1 || true
@@ -2854,6 +4454,72 @@ menu_fresh() {
   done
 }
 
+maintenance_panel() {
+  load_state || die "未安装节点。"
+  require_current_state
+  local confirmation action index
+  printf '\n维护操作不会自动登录其他节点。\n'
+  if [[ $TDH_ROLE == entry ]]; then
+    printf '  1) 排空后端 VPS1 的新连接\n'
+    printf '  2) 恢复后端 VPS1 接收新连接\n'
+    printf '  3) 排空后端 VPS2 的新连接\n'
+    printf '  4) 恢复后端 VPS2 接收新连接\n'
+  fi
+  printf '  5) 回退上次管理脚本更新（不回退核心）\n'
+  printf '  0) 返回（默认）\n'
+  read_panel_choice '请选择' 0 || return 0
+  case $PANEL_CHOICE in
+    0) return 0 ;;
+    1|2|3|4)
+      [[ $TDH_ROLE == entry ]] || { warn "该操作只能在入口运行。"; return 0; }
+      case $PANEL_CHOICE in
+        1) action=drain index=1 ;; 2) action=resume index=1 ;;
+        3) action=drain index=2 ;; 4) action=resume index=2 ;;
+      esac
+      warn "排空只影响新连接；后端重启会断开仍未结束的旧会话。"
+      warn "排空期间不要重载或重启入口；维护完成须回来恢复该后端。"
+      ;;
+    5) action=manager; info "仅恢复上次管理脚本备份，保持服务、配置和代理链接。" ;;
+    *) warn "无效选择。"; return 0 ;;
+  esac
+  printf '确认操作请输入 MAINTENANCE，其他输入取消：' >&2
+  read -r confirmation </dev/tty || return 0
+  [[ $confirmation == MAINTENANCE ]] || { info "已取消维护。"; return 0; }
+  if [[ $action == manager ]]; then
+    rollback_manager
+  else
+    backend_maintenance "$action" "$index"
+  fi
+}
+
+core_panel() {
+  load_state || die "未安装节点。"
+  require_current_state
+  [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "核心维护只能在后端运行。"
+  local confirmation current
+  current=$(telemt_binary_is_expected --print-version) || current="未知或未通过身份校验"
+  printf '\n当前核心：%s\n' "$current"
+  printf '  1) 切换到已发布 balanced2 稳定基线（x86_64）\n'
+  printf '  2) 切换到兼容的官方核心（高 RTT 已知速度代价）\n'
+  printf '  3) 回退上一核心事务\n'
+  printf '  0) 返回（默认）\n'
+  read_panel_choice '请选择' 0 || return 0
+  case $PANEL_CHOICE in
+    1|2|3) ;;
+    0) return 0 ;;
+    *) warn "无效选择。"; return 0 ;;
+  esac
+  warn "请先在入口排空本后端并确认备用健康；核心重启会中断本后端现有会话。"
+  printf '已完成维护准备才输入 MAINTENANCE，其他输入取消：' >&2
+  read -r confirmation </dev/tty || return 0
+  [[ $confirmation == MAINTENANCE ]] || { info "已取消核心维护。"; return 0; }
+  case $PANEL_CHOICE in
+    1) manage_core upgrade --maintenance balanced2 ;;
+    2) manage_core upgrade --maintenance ;;
+    3) manage_core rollback --maintenance ;;
+  esac
+}
+
 menu_existing() {
   local PANEL_CHOICE progress
   while [[ -f $TDH_STATE ]]; do
@@ -2893,6 +4559,7 @@ menu_existing() {
       printf '  7) 安全更新管理脚本\n'
       printf '  8) 只读脱敏性能采样（5 秒）\n'
       printf '  9) 卸载\n'
+      printf ' 10) 后端排空、恢复与管理脚本回退\n'
       printf '  0) 退出\n\n'
       read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
       case $PANEL_CHOICE in
@@ -2905,6 +4572,7 @@ menu_existing() {
         7) run_panel_action update_manager ;;
         8) run_panel_action performance_report ;;
         9) run_panel_action uninstall_all ;;
+        10) run_panel_action maintenance_panel ;;
         0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
         *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
       esac
@@ -2914,6 +4582,9 @@ menu_existing() {
       printf '  3) 一键诊断\n'
       printf '  4) 安全更新管理脚本\n'
       printf '  5) 只读脱敏性能采样（5 秒）\n'
+      printf '  6) 后端实验队列（默认关闭，可撤销）\n'
+      printf '  7) 核心维护与回退\n'
+      printf '  8) 管理脚本回退\n'
       printf '  9) 卸载\n'
       printf '  0) 退出\n\n'
       read_panel_choice '请选择' 1 || { PANEL_EXIT_REQUESTED=1; return 0; }
@@ -2923,6 +4594,9 @@ menu_existing() {
         3) run_panel_action diagnose ;;
         4) run_panel_action update_manager ;;
         5) run_panel_action performance_report ;;
+        6) run_panel_action queue_panel ;;
+        7) run_panel_action core_panel ;;
+        8) run_panel_action maintenance_panel ;;
         9) run_panel_action uninstall_all ;;
         0|q|Q) PANEL_EXIT_REQUESTED=1; return 0 ;;
         *) warn "无效选择：${PANEL_CHOICE}"; pause_panel ;;
@@ -3000,6 +4674,16 @@ main() {
     performance_report "${2:-5}"
     return
   fi
+  if [[ ${1:-} == --queue-service ]]; then
+    if (( $# != 2 )) || [[ $2 != apply && $2 != remove ]]; then
+      die "内部队列钩子参数无效。"
+    fi
+    # This is called by wg-quick while an operator may hold the manager lock.
+    # The Python controller has its own flock. A hook failure is ignored by
+    # systemd's '-' prefix so optional tuning cannot fail the tunnel itself.
+    manage_queue "$2"
+    return
+  fi
   ensure_bootstrap_tools
   acquire_lock
   # Re-running a newly downloaded copy on an existing VPS updates the manager
@@ -3018,6 +4702,28 @@ main() {
     diagnose) diagnose ;;
     update|upgrade|u) update_manager ;;
     update-rollback) rollback_manager ;;
+    core-upgrade|core-rollback)
+      (( $# == 2 )) || die "用法：a $1 --maintenance"
+      manage_core "${1#core-}" "$2" ;;
+    core-baseline)
+      (( $# == 2 )) || die "用法：a core-baseline --maintenance"
+      manage_core upgrade "$2" balanced2 ;;
+    backend-drain|backend-resume)
+      (( $# == 2 )) || die "用法：a $1 1|2"
+      backend_maintenance "${1#backend-}" "$2" ;;
+    health-refresh|health-rollback)
+      (( $# == 2 )) || die "用法：a $1 --maintenance"
+      if [[ $1 == health-refresh ]]; then manage_core refresh-health "$2"; else manage_core rollback-health "$2"; fi ;;
+    connect-refresh|connect-rollback)
+      (( $# == 2 )) || die "用法：a $1 --maintenance"
+      if [[ $1 == connect-refresh ]]; then manage_core refresh-connect "$2"; else manage_core rollback-connect "$2"; fi ;;
+    recover) recover_backend ;;
+    queue)
+      shift
+      case ${1:-} in
+        enable|disable|status) manage_queue "$@" ;;
+        *) die "用法：a queue status | enable <发送Mbps> <路径Mbps> --experimental --maintenance | disable --maintenance" ;;
+      esac ;;
     uninstall) uninstall_all ;;
     menu|panel) control_panel ;;
     "") control_panel ;;

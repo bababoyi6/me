@@ -1,0 +1,19 @@
+.............................................................................../usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 302: 'Found'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+..............................................................................................................F................................
+======================================================================
+FAIL: test_runtime_templates_match_production_baseline (test_performance.PerformanceTests.test_runtime_templates_match_production_baseline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_performance.py", line 334, in test_runtime_templates_match_production_baseline
+    self.assertEqual(hashlib.sha256(text[start:end].encode()).hexdigest(), expected, name)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '7c40007942e13374b0d7773f9155ce4e6c9f37aea51d8104bcc1a48ab4d4ba43' != 'f567a24af1ed01b28915f3fc13e121ed7a27c534cf7ba351d2ca8a7b86231362'
+- 7c40007942e13374b0d7773f9155ce4e6c9f37aea51d8104bcc1a48ab4d4ba43
++ f567a24af1ed01b28915f3fc13e121ed7a27c534cf7ba351d2ca8a7b86231362
+ : write_haproxy_config
+
+----------------------------------------------------------------------
+Ran 222 tests in 20.501s
+
+FAILED (failures=1)

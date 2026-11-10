@@ -1,0 +1,218 @@
+{
+  "schema": 1,
+  "production_approval": false,
+  "full_runs": [
+    {
+      "run": 42582456747,
+      "source_commit": "9cfc3ea3f3d3dfaceec0ab9f14c30a7b2f2f6d7c",
+      "core": "balanced2",
+      "pairs": [
+        {
+          "round": 1,
+          "download_ratio": 0.9908072817086433,
+          "upload_ratio": 2.148632825551222,
+          "message_p95_ratio": 0.34259832294043024,
+          "new_connection_p95_ratio": 0.399131271251394,
+          "rss_ratio": 1.0609330898223477,
+          "group_cpu_seconds_ratio": 0.9865910083978284,
+          "eligible": true,
+          "absolute_queue_budget_ok": true,
+          "joint_gain": true
+        },
+        {
+          "round": 2,
+          "download_ratio": 0.9634879391628403,
+          "upload_ratio": 2.0890166457371437,
+          "message_p95_ratio": 0.3425246997377926,
+          "new_connection_p95_ratio": 0.40522218817248346,
+          "rss_ratio": 0.9385118306351183,
+          "group_cpu_seconds_ratio": 0.9986101072352157,
+          "eligible": true,
+          "absolute_queue_budget_ok": true,
+          "joint_gain": true
+        },
+        {
+          "round": 3,
+          "download_ratio": 0.9789994749861194,
+          "upload_ratio": 2.0661697341977505,
+          "message_p95_ratio": 0.3398967568194234,
+          "new_connection_p95_ratio": 0.3719385808446089,
+          "rss_ratio": 1.0462870462870464,
+          "group_cpu_seconds_ratio": 1.00248155215764,
+          "eligible": true,
+          "absolute_queue_budget_ok": true,
+          "joint_gain": true
+        },
+        {
+          "round": 4,
+          "download_ratio": 0.9992576679981617,
+          "upload_ratio": 2.0968281621627627,
+          "message_p95_ratio": 0.3436624318384825,
+          "new_connection_p95_ratio": 0.3699157250233032,
+          "rss_ratio": 0.9605221267112385,
+          "group_cpu_seconds_ratio": 0.9763669580005365,
+          "eligible": true,
+          "absolute_queue_budget_ok": true,
+          "joint_gain": true
+        }
+      ],
+      "all_pairs_joint_gain": true,
+      "summary": {
+        "original": {
+          "D_mbps": 137.35596967814405,
+          "U_mbps": 34.505704991181815,
+          "group_cpu_seconds": 0.845021,
+          "peak_backend_rss": 25200640.0,
+          "download_jain": 0.999604665197173,
+          "max_router_backlog_bytes": 6232125.0,
+          "message_p95_ms": 299.18173050000973,
+          "new_connection_p95_ms": 1108.6152359999915
+        },
+        "shaped180": {
+          "D_mbps": 134.87450455118463,
+          "U_mbps": 72.35393767199228,
+          "group_cpu_seconds": 0.840481,
+          "peak_backend_rss": 25227264.0,
+          "download_jain": 0.9999999284559726,
+          "max_router_backlog_bytes": 1229013.0,
+          "message_p95_ms": 102.325730000004,
+          "new_connection_p95_ms": 426.30086199999084
+        }
+      },
+      "capacity": [
+        {
+          "direction": "U",
+          "mbps": 183.12371294458862,
+          "receiver_local": true
+        },
+        {
+          "direction": "D",
+          "mbps": 183.0975355399857,
+          "receiver_local": true
+        }
+      ],
+      "group_peak_mib": 342.5390625,
+      "raw_queue_configuration_verified": false,
+      "max_recorded_shaper_drops": null,
+      "metrics_sha256": "4000a868a190a492f3cc52844424efbec6b83cf7d9f76f39c77da9915189659a"
+    },
+    {
+      "run": 42584205436,
+      "source_commit": "fc350b2869ee76e74c351b600574a4c1b02f4db2",
+      "core": "native17",
+      "pairs": [
+        {
+          "round": 1,
+          "download_ratio": 0.989975952984994,
+          "upload_ratio": 2.04736172734444,
+          "message_p95_ratio": 0.3456880578886981,
+          "new_connection_p95_ratio": 0.37395655420301055,
+          "rss_ratio": 1.047583308315821,
+          "group_cpu_seconds_ratio": 0.9579032088276406,
+          "eligible": true,
+          "absolute_queue_budget_ok": true,
+          "joint_gain": true
+        },
+        {
+          "round": 2,
+          "download_ratio": 0.9766023508003934,
+          "upload_ratio": 2.0143726424874524,
+          "message_p95_ratio": 0.34255945176291425,
+          "new_connection_p95_ratio": 0.3732902530124664,
+          "rss_ratio": 0.9442335766423358,
+          "group_cpu_seconds_ratio": 0.996400053362041,
+          "eligible": true,
+          "absolute_queue_budget_ok": true,
+          "joint_gain": true
+        },
+        {
+          "round": 3,
+          "download_ratio": 0.9728704426709883,
+          "upload_ratio": 2.087126836797838,
+          "message_p95_ratio": 0.34655433871904906,
+          "new_connection_p95_ratio": 0.40396328689697075,
+          "rss_ratio": 1.0401941453056271,
+          "group_cpu_seconds_ratio": 1.0037104894358728,
+          "eligible": true,
+          "absolute_queue_budget_ok": true,
+          "joint_gain": true
+        },
+        {
+          "round": 4,
+          "download_ratio": 0.9659789628832913,
+          "upload_ratio": 2.0117077179406557,
+          "message_p95_ratio": 0.34650357844931307,
+          "new_connection_p95_ratio": 0.37442016828432917,
+          "rss_ratio": 0.9654617298404801,
+          "group_cpu_seconds_ratio": 0.966387610626243,
+          "eligible": true,
+          "absolute_queue_budget_ok": true,
+          "joint_gain": true
+        }
+      ],
+      "all_pairs_joint_gain": true,
+      "summary": {
+        "original": {
+          "D_mbps": 138.23344390292638,
+          "U_mbps": 35.405413627791646,
+          "group_cpu_seconds": 1.5218414999999998,
+          "peak_backend_rss": 27637760.0,
+          "download_jain": 0.999772815791941,
+          "max_router_backlog_bytes": 6219607.0,
+          "message_p95_ms": 298.18624450000186,
+          "new_connection_p95_ms": 1146.160182999985
+        },
+        "shaped180": {
+          "D_mbps": 134.52536015179408,
+          "U_mbps": 71.97020176506953,
+          "group_cpu_seconds": 1.508119,
+          "peak_backend_rss": 27555840.0,
+          "download_jain": 0.9999994517845634,
+          "max_router_backlog_bytes": 1245210.0,
+          "message_p95_ms": 103.02580549999618,
+          "new_connection_p95_ms": 428.879780999992
+        }
+      },
+      "capacity": [
+        {
+          "direction": "U",
+          "mbps": 183.12331784014305,
+          "receiver_local": true
+        },
+        {
+          "direction": "D",
+          "mbps": 183.12395867616414,
+          "receiver_local": true
+        }
+      ],
+      "group_peak_mib": 344.39453125,
+      "raw_queue_configuration_verified": true,
+      "max_recorded_shaper_drops": 0,
+      "metrics_sha256": "342109a8249f8113d9722b5e71ada436ac01f8deff5faf0a49511fc5deeaf7f4"
+    }
+  ],
+  "failed_or_partial_runs": [
+    42581074585,
+    42583243638,
+    42583673480
+  ],
+  "counts": {
+    "files": 80,
+    "new_connections": 762,
+    "recorded_messages": 888,
+    "dc_sessions": 1210
+  },
+  "not_run": [
+    "1Gbps shaper",
+    "0/200ms shaper",
+    "loss/jitter shaper",
+    "50/100 logical shaper",
+    "production enable/rollback/reboot",
+    "ARM shaper",
+    "real clients",
+    "public three-VPS",
+    "24h endurance",
+    "anti-blocking"
+  ],
+  "method": "per-batch p95 median for display; qualification uses every preregistered pair, not pooled favourable samples"
+}

@@ -1,0 +1,7 @@
+{
+  "derivation": "Windows data analysis of unmodified complete CI JSON; tighter per-direction guard, not Linux test",
+  "raw_sha256": "4269848d94c4e774c66b7ee0aed2f6af5c9097b607771a397578bc044de74902",
+  "ci_analysis_preserved": true,
+  "analyzer_sha256": "878ecea725fbe84a71784924f98171d49fd9abaf31d592f37976a5dcfe973411",
+  "source_commit": "96a14dc3a9e61515a09c93d0df306531f9d154ca"
+}

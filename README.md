@@ -1,171 +1,74 @@
-<div align="center">
+# Telemt Dual-Hop 1.7.0
 
-# Telemt Dual-Hop
+**一个固定公网入口、两个独立后端、两条原生 Telegram 代理线路。**
+中文菜单引导部署；WireGuard 加密中转；HAProxy 自动主备切换。
 
-**一个入口，两台后端，两条 Telegram 代理线路。**
+[正式版本](https://github.com/bababoyi6/me/releases/tag/v1.7.0) · [安装器检查](https://github.com/bababoyi6/me/actions/workflows/validate.yml) · [更新记录](docs/RELEASE-1.7.0.md)
 
-中文菜单 · 一键部署 · 加密隧道 · 故障自动切换
+## 三台机器，四步完成
 
-[![安装器检查](https://github.com/bababoyi6/me/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/bababoyi6/me/actions/workflows/validate.yml)
+准备三台干净的 **Ubuntu 22.04 LTS** VPS，各有公网 IPv4；支持 x86_64 / ARM64，建议每台至少 1 vCPU、1GB 内存。需要 root 或 sudo，以及可用的 TCP 443 和 WireGuard UDP 通信。入口和后端不要与其他占用这些端口的服务混装。
 
-[优化版 1.6.0](https://github.com/bababoyi6/me/releases/tag/v1.6.0) · [原始稳定版 1.3.1](https://github.com/bababoyi6/me/releases/tag/v1.3.1-original) · [实测数字](#numbers)
+在三台机器上分别复制同一条命令。它固定下载 **v1.7.0**，验证 SHA256 和脚本语法，下载失败不执行，退出自动清理临时文件。
 
-</div>
-
----
-
-## 先选版本，再安装
-
-| 你要什么 | 选哪个 | 实际使用的核心 |
-|---|---|---|
-| 使用这几天完成的优化和管理器改进 | **优化版 1.6.0** | x86_64 使用本项目修改的 Telemt 3.5.5；ARM 继续使用官方核心 |
-| 保留开始优化前的原样版本，方便部署或对照 | **原始稳定版 1.3.1** | **官方 Telemt 3.5.5，没有本项目的核心补丁** |
-
-**原始版不是 audit1，也不是 audit2。** 它是优化前管理器的完整历史快照，脚本原样保留；audit1、audit2 都是后来实验过程中的修改版。
-
-### 优化版：一键部署
-
-在三台准备好的 Ubuntu 22.04 VPS 上，分别复制执行：
-
+<!-- install:stable -->
 ```bash
-bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
+bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --proto-redir "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/v1.7.0/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; printf "%s  %s\n" "33c90f9289375cbccf9a6480d7026a58b1bef03ba8e50421b2d7c9d919a6e2ef" "$tmp" | sha256sum --check --status; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
 ```
 
-下载当前 `main` 版本。x86_64 的定制核心带有明确的非官方标记，原许可和对应源码材料随安装保留。
+1. **入口机**：选 `1 安装入口 VPS`，确认公网 IP，保存两个加入码。
+2. **洛杉矶后端**：选 `2 安装后端 VPS1`，粘贴 VPS1 加入码，复制生成的回执码。
+3. **纽约后端**：选 `3 安装后端 VPS2`，粘贴 VPS2 加入码，复制生成的回执码。
+4. **回到入口**：输入 `a`，选 `2`，依次录入两个回执；自动启用后选 `4` 查看两条链接及二维码。
 
-### 原始稳定版：一键部署
-
-想装优化前的原版，就用这条：
-
-```bash
-bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/v1.3.1-original/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; printf "%s  %s\n" "07642df50587cbad056865445bfe4d38802322b2eb02d564234d1b4252a528dc" "$tmp" | sha256sum --check --status; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
-```
-
-这条命令固定下载原版标签，并自动核对脚本摘要，不会因为 `main` 更新而变成优化版。[原始脚本与来源说明](legacy/README.md) · [独立下载页](https://github.com/bababoyi6/me/releases/tag/v1.3.1-original)
-
-原始版保留当时的全部行为，**不包含后来的管理器修复**。它供需要历史版本的人选择，不代表重新做过长期稳定性认证。两个版本都用于新部署；不要拿另一版安装命令覆盖正在使用的节点。
-
-### 接下来怎么操作
-
-先准备三台 VPS，各有自己的公网 IPv4：入口一台，后端两台。系统使用 Ubuntu 22.04，架构支持 x86_64 和 ARM64；建议每台至少有 1GB 内存。
-
-1. 在入口运行所选命令，选“入口”，拿到两个加入码。
-2. 在两个后端分别运行**同一版本**的命令，选对应后端角色，粘贴各自的加入码。
-3. 把两个后端生成的回执填回入口，最后在入口查看代理链接。
-
-菜单会引导填写和配置，不用自己写隧道或转发配置。
+加入码、回执、Secret 和链接都是私密材料，不要发到公开截图或 Issue。按提示只复制完整的一行码，不带代码框符号。中途退出可再次输入 `a`；入口菜单 `3` 可查看未用加入码，过期自动刷新，后端菜单 `2` 可重新显示回执。启用失败先运行诊断，修复后入口选 `6` 重试，无需重装。
 
 ```text
-                      ┌─ 加密隧道 ─ 后端一 ─┐
-Telegram ─ 公网入口 ──┤                    ├─ Telegram 服务器
-                      └─ 加密隧道 ─ 后端二 ─┘
+                         ┌─ WireGuard ─ VPS1 洛杉矶 ─ Telegram DC
+Telegram ─ 入口 TCP 443 ──┤
+                         └─ WireGuard ─ VPS2 纽约 ─── Telegram DC
 ```
 
-两条线路平时各有主用后端，另一台作为备用。后端出问题后，**新连接**可以换到另一台；已经建立的连接仍可能中断，需要客户端重连。
+线路 A：`apple.com`，VPS1 主、VPS2 备；线路 B：`gs.apple.com`，VPS2 主、VPS1 备。两台后端独立服务，流量只经过入口和所选后端。故障自动改派**新连接**；已有 TCP 会话无法跨后端无损迁移，客户端需重连。
 
----
+## 默认速度与安全策略
 
-## 这几天到底改了什么
+- **x86_64 默认保留已发布的 `3.5.5+tdh.balanced2`**，避免官方新版已复现的高 RTT 单流吞吐退化。1.7.0 是管理、安全和恢复能力升级，不宣称比相同 balanced2 核心全面更快。
+- **ARM64 默认官方 Telemt 3.5.17**。新版兼容目标与精确版本、提交和双摘要见[版本锁](docs/telemt-stable-lock.json)。ARM 的功能验证不等于与 x86 相同的高 RTT 性能。
+- 保留 Direct-DC、原生 Fake TLS、双 SNI、已有 Secret 和链接；默认不启用 WEB、实验核心或实验整形，不增加生产 Docker 依赖。管理 API 只读且仅回环可达，后端监听限私有隧道。
+- 低配机器使用保守资源预算。满载仍可能增加消息与新连接延迟；没有证据支持“无限用户”“永久抗封锁”或“1Gbps 跑满”的承诺。
 
-### 让该发出去的数据及时发出去
+## 已安装：更新、诊断和回退
 
-实验里复现了一类上传末尾等待：数据写到缓冲里，却没有及时继续送出，双方又在等确认。我们修改了后端的发送时机，让等下一批输入之前，先把当前缓冲里的数据发出去。
+输入 `a` 打开中文菜单。状态、诊断、链接和维护均可按提示操作；普通更新**不替换核心、不重建隧道、不更改用户链接**。
 
-这解决的是具体复现的等待问题，不是给所有网络慢都贴上同一个原因。
+```bash
+a update
+a status
+a diagnose
+```
 
-### 不再把高延迟连接的“水管”固定得太细
+升级管理脚本前保留现有备份。需要回退时，入口菜单 `10` / 后端菜单 `8` 选择管理脚本回退，或运行 `a update-rollback`；退出菜单后重新输入 `a`。不要拿旧安装命令重装正在运行的节点。
 
-原来一些连接使用固定的小 TCP 缓冲，延迟一大，就容易发一点、等一点。改动后，让 Linux 根据实际情况调整，跨网传大文件时可以放开窗口。
+后端核心维护用菜单 `7`。先在入口菜单 `10` 排空对应后端，确认另一台健康，再逐台维护，完成后回入口恢复接收新连接。排空期间不要重载或重启入口，运行时排空状态不会跨入口重载保留。核心重启会断开该后端旧会话。
 
-加密、认证、双域名和 WireGuard 隔离都保留了。速度提升来自发送和缓冲处理，不是靠省掉安全步骤。
+[完整升级与回退步骤](docs/UPGRADE-1.7.md) · [故障排查](docs/TROUBLESHOOTING-1.7.md) · [架构与健康判定](docs/ARCHITECTURE-1.7.md)
 
-### 把单连接提速带来的并发问题继续往回修
+## 实测与边界
 
-中期版本单连接变快了，但同时上传很多文件时，确实出现过速度回退。后续继续限制发送端积压，并对低延迟入口连接控制接收突发，避免数据一下子堆得太多。
+复用已完成的真实核心、原生协议、HAProxy 双 SNI、WireGuard、systemd、三 Ubuntu KVM 安装/重复安装/重启、升级回退和 30/50/100 模拟并发证据。详细执行版本与失败记录均保留，不能将不同阶段的结果混称为同一次测试。
 
-当前版在最后一批并发对照里基本追平参考核心，**不能说所有场景都更快**。早期与后期实验条件有变化，没有拿不同批次直接相减，拼出一个夸大的提升率。
+[1.7.0 放行依据](docs/RELEASE-ACCEPTANCE-1.7.0.md) · [默认核心与回退实证](docs/CORE-POLICY-20261110.md) · [工程报告](docs/ENGINEERING-REPORT-1.7.md) · [混合负载与排队限制](docs/STABILITY-MIXED-20261109.md)
 
-### 让安装、管理和出错后的收拾更可靠
+尚未验证真实 Telegram 官方客户端全平台、公网三机跨运营商、24 小时长期运行及抗封锁效果。本次发行不以这些项目作为完成声明，也不自动访问或部署任何生产节点。实验调度、共享队列方案未达到综合门槛，未纳入默认。
 
-补上了下载校验、管理器备份与回退、敏感信息保护、安装中断清理、健康检查失效处理，以及不带账号和密钥的只读诊断。
+## 历史版本
 
-也真的走过了公开安装命令、三角色安装、后端停机切换、恢复和重启。期间发现的测试工具问题都修正了，失败记录也保留了，没有把失败样本删掉再宣布成功。
+[1.6.0 balanced2](https://github.com/bababoyi6/me/releases/tag/v1.6.0) 保留作对照和恢复来源。以下 **1.3.1 原始快照**不含后续修复，仅供明确需要历史版本的新环境使用，禁止覆盖当前节点：
 
----
+<!-- install:original -->
+```bash
+bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL --retry 3 --connect-timeout 10 --max-time 120 --max-filesize 1048576 --proto "=https" --proto-redir "=https" --tlsv1.2 https://raw.githubusercontent.com/bababoyi6/me/v1.3.1-original/telemt-dual-hop.sh -o "$tmp"; test -s "$tmp"; printf "%s  %s\n" "07642df50587cbad056865445bfe4d38802322b2eb02d564234d1b4252a528dc" "$tmp" | sha256sum --check --status; grep -Fqx "# Telemt Dual-Hop - three VPS / two native MTProxy links" "$tmp"; bash -n "$tmp"; if [ "$(id -u)" -eq 0 ]; then bash "$tmp"; else sudo bash "$tmp"; fi'
+```
 
-## 装好以后，常用这几个命令
-
-| 命令 | 大白话说明 |
-|---|---|
-| `a` | 打开中文菜单 |
-| `a status` | 看本机状态 |
-| `a links` | 看代理链接和二维码；链接里有访问凭据，请妥善保管 |
-| `a diagnose` | 检查服务、隧道和上游是否正常 |
-| `a perf 5` | 只读观察资源和连接，不启动测速；优化版管理器支持 |
-| `a update` | 更新管理器，不等于升级或更换后端核心 |
-| `a update-rollback` | 回退管理器备份；后来的管理器支持，原始 1.3.1 没有这个功能 |
-
-已有节点继续使用原来的核心和连接信息。**更新管理器，不会自动把原版核心换成优化核心。** 原始 1.3.1 的 `a update` 按历史行为连接 `main`，会取得新版管理器；要保留整个历史快照，就不要执行它。
-
-## 想看详细证据
-
-- [原始稳定版：具体是哪一版、脚本摘要和下载入口](legacy/README.md)
-- [最初核心问题、逐轮测速和失败记录](docs/NATIVE-BACKEND-VALIDATION.md)
-- [并发回退，以及当前版最后一批对照](docs/UPLOAD-CANDIDATES-20261024.md)
-- [当前版三角色安装、故障切换和重启验收](docs/LAB-ACCEPTANCE-1.6.0.md)
-- [1.6.0 发布内容与已有节点边界](docs/RELEASE-1.6.0.md)
-
----
-
-<a id="numbers"></a>
-
-## 最后，直接看数字
-
-**先说测的是哪里：** 以下速度来自同一台荷兰测试机搭建的模拟网络，不是真实 Telegram 文件下载，也不是三台美国生产机测速。没有访问生产机。不同实验行不能拼在一起计算提升。
-
-### 真正直接对比“官方未改核心”的结果
-
-这组经过入口、加密隧道和后端，模拟往返延迟 100ms、带宽上限 100Mbps，每次下载 16MiB，取三轮中位数：
-
-| 项目 | 官方原版 | 中期优化版 | 实测变化 |
-|---|---:|---:|---:|
-| 单连接下载 | 22.745 Mbps | 55.915 Mbps | **约 2.46 倍，提升约 146%** |
-| 换成常见下载单位 | 约 2.84 MB/s | 约 6.99 MB/s | 同一组数据，换算单位 |
-| 同组上传完整性 | 3 次均在等确认时超时 | 3 次均完整、摘要一致 | 原版失败上传无法计算提速倍数 |
-
-**这里的提速是在中期优化版（audit2）测出来的。** 当前 1.6.0 保留相应修复并继续调整并发策略，但没有再做一遍“原版对当前版”的同条件单连接对照，不能把这张表冒充当前版的独立测量。详见[完整隧道对照原始记录](docs/NATIVE-BACKEND-VALIDATION.md#完整wg路径的吞吐对照)。
-
-### 更高带宽预算下，单连接能快多少
-
-这组只测模拟服务器的 TCP 段，**文件数据不经过 WireGuard**；延迟 100ms、带宽预算 1000Mbps，每项 64MiB，三轮中位数。参考核心已经修过上传尾部等待，因此它也不是纯官方原版。
-
-| 项目 | 已修尾部等待的参考核心 | 中期优化版 | 实测变化 |
-|---|---:|---:|---:|
-| 单连接下载 | 16.146 Mbps | 156.682 Mbps | **约 9.70 倍，提升约 870%** |
-| 单连接上传 | 23.044 Mbps | 169.434 Mbps | **约 7.35 倍，提升约 635%** |
-
-数据来源：[历史单连接大文件对照](docs/RELEASE-1.5.0.md#可量化的突破)。这两行不能当成完整隧道提速，也不能当成当前版重新测出的原版对照。
-
-### 当前版，多文件同时上传表现如何
-
-最后一批做了 32 路同时上传，每路 8MiB，两轮交换执行顺序。双方采用相同的 80% 内存软节流设置、共享核心文件和客户端缓冲设置；延迟 100ms、带宽预算 1000Mbps。此组同样只测模拟 TCP 段，下面是**合计速度**。
-
-| 项目 | 旧固定缓冲参考核心 | 当前版 1.6.0 使用的核心 | 结果 |
-|---|---:|---:|---|
-| 第一轮 | 358.619 Mbps | 374.122 Mbps | 当前版快约 4.32% |
-| 第二轮 | 375.206 Mbps | 356.505 Mbps | 当前版慢约 4.98% |
-| 两轮中位数 | 366.912 Mbps | 365.314 Mbps | **约低 0.44%，基本持平** |
-| 全批完整性 | 64/64 条上传通过 | 64/64 条上传通过 | 合计 128/128；小消息 13/13；OOM 为 0 |
-
-早期自动缓冲版本曾在另一批 32 路上传里回退约 **27%**，这个失败没有隐去。最新一批基本持平，但两批资源条件不同，**不能直接说同条件下把 27% 全部追回了，更不能说并发稳定提速。** 详见[当前版最后一批记录](docs/UPLOAD-CANDIDATES-20261024.md#balanced2-的80软节流批次达到本批约定门槛)。
-
-### 交付验证做到哪一步
-
-| 检查 | 已有结果 |
-|---|---|
-| 当前版公开命令安装、主备恢复、三角色正常重启 | **通过**；配置、密钥和核心文件保持一致 |
-| 60 秒持久上传/下载与双域名小文件预检 | 每批 7 条传输、648,192 字节全部校验通过 |
-| 荷兰低流量持续观察 | 约 **56 分钟**；提前停止前 **60 条短流**校验通过，宿主 OOM 为 **0**，清理通过 |
-| 24 小时持续验证 | **没有完成**；按用户要求提前结束，未标成通过 |
-
-**能确认的提升：高延迟单连接传输明显改善，最后一批并发基本持平，安装和管理更完整。真实线路能快多少、能稳定带多少人，仍要看部署环境；这里没有“保证跑满千兆”或“所有场景都更快”的结论。**
+[原始脚本及来源](legacy/README.md) · [上游 Telemt](https://github.com/telemt/telemt)

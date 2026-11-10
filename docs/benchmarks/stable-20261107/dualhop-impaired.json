@@ -1,0 +1,123 @@
+{
+  "scope": "single Linux host, private entry/two backends and router namespaces; actual HAProxy/WireGuard/Telemt, synthetic DC and process-state health agent only",
+  "kernel": "6.18.40.1-microsoft-standard-WSL2",
+  "wireguard_psk": true,
+  "wireguard_mtu": 1420,
+  "rtt_ms_configured": 100,
+  "haproxy": "HAProxy version 3.2.9-1ubuntu2.2 2026/06/19 - https://haproxy.org/",
+  "telemt": "telemt 3.5.16",
+  "agent_failover_and_recovery": true,
+  "master_worker_reload_with_existing_transfer": true,
+  "reload_flow_active": [
+    true
+  ],
+  "splice_auto_pipes_allocated_observed": 1,
+  "forced_splice_test_pipes_allocated_observed": null,
+  "master_worker_reload_count": 1,
+  "rows": [
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7136691649999989,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.716795187999999,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 2,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6964011199999973,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 2,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6991822990000003,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 131072,
+      "elapsed_seconds": 0.671393307999999,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 3.6214410369999968,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.7160475969999993,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "D",
+      "bytes": 8388608,
+      "elapsed_seconds": 8.353770261000001,
+      "sha256_verified": true,
+      "backend_index_at_connection_start": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6915716339999989,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.687086260000001,
+      "sha256_verified": true,
+      "backend_index": 1
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6479652619999996,
+      "sha256_verified": true,
+      "backend_index": 2
+    },
+    {
+      "domain_index": 1,
+      "direction": "U",
+      "bytes": 131072,
+      "elapsed_seconds": 0.6972125989999967,
+      "sha256_verified": true,
+      "backend_index": 1
+    }
+  ],
+  "classification": "SINGLE_LINUX_VIRTUAL_3NODE",
+  "health_agent_kind": "synthetic process-state agent; production health agent is tested separately",
+  "offline_bootstrap": true,
+  "loss_percent_configured": 0.1,
+  "jitter_ms_configured": 5,
+  "separate_mock_dc_namespace": true,
+  "actual_backend_process_restart_verified": true,
+  "wireguard_link_outage_recovery_verified": true
+}

@@ -1,0 +1,88 @@
+{
+  "complete": true,
+  "roles": {
+    "entry": {
+      "role": "entry",
+      "installed_version": "1.7.0",
+      "pid1": "systemd",
+      "manager_sha256": "dbfccbc4eb82178689e6c45b396c084745aea7725f5d514ff43a4dca8bb75881",
+      "core_sha256": null,
+      "core_version": null,
+      "license_retained": false,
+      "new_boot_id": true,
+      "reboot_files_unchanged": true
+    },
+    "backend1": {
+      "role": "backend1",
+      "installed_version": "1.7.0",
+      "pid1": "systemd",
+      "manager_sha256": "dbfccbc4eb82178689e6c45b396c084745aea7725f5d514ff43a4dca8bb75881",
+      "core_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+      "core_version": "telemt 3.5.17",
+      "license_retained": false,
+      "new_boot_id": true,
+      "reboot_files_unchanged": true
+    },
+    "backend2": {
+      "role": "backend2",
+      "installed_version": "1.7.0",
+      "pid1": "systemd",
+      "manager_sha256": "dbfccbc4eb82178689e6c45b396c084745aea7725f5d514ff43a4dca8bb75881",
+      "core_sha256": "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4",
+      "core_version": "telemt 3.5.17",
+      "license_retained": false,
+      "new_boot_id": true,
+      "reboot_files_unchanged": true
+    }
+  },
+  "download_boundary_substituted": false,
+  "production_accessed": false,
+  "shared_ci_host": true,
+  "capacity_benchmark": false,
+  "profile": "candidate",
+  "source_ref": "1a429a71e64503c0b9c2e275ea32f22689c9fb49",
+  "pinned_manager_download": true,
+  "phase": "complete",
+  "repeat_installs": {
+    "entry": {
+      "files_unchanged": true,
+      "protected_files": 12,
+      "core_unchanged": true,
+      "manager_unchanged": true
+    },
+    "backend1": {
+      "files_unchanged": true,
+      "protected_files": 9,
+      "core_unchanged": true,
+      "manager_unchanged": true
+    },
+    "backend2": {
+      "files_unchanged": true,
+      "protected_files": 9,
+      "core_unchanged": true,
+      "manager_unchanged": true
+    }
+  },
+  "native_maintenance": {
+    "drain_routing_verified": true,
+    "old_core_seeded": true,
+    "upgrade_verified": true,
+    "config_access_migration_verified": true,
+    "repeat_upgrade_verified": true,
+    "connect_refresh_verified": true,
+    "repeat_connect_refresh_verified": true,
+    "connect_drift_guard_verified": true,
+    "connect_rollback_verified": true,
+    "repeat_connect_rollback_verified": true,
+    "rollback_verified": true,
+    "config_access_rollback_verified": true,
+    "repeat_rollback_verified": true,
+    "final_core_verified": true,
+    "connect_final_policy_verified": true,
+    "health_refresh_verified": true,
+    "configuration_unchanged": true,
+    "resume_routing_verified": true
+  },
+  "e2e_failover_verified": true,
+  "post_reboot_sni_cases": 2
+}

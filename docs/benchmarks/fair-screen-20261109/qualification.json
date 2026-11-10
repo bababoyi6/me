@@ -1,0 +1,72 @@
+{
+  "decision": "WITHDRAWN; do not deploy or repeat without new evidence",
+  "production_change": false,
+  "source_commit": "6ad188fc38669d30eaaea602b86b6bafaafecdfd",
+  "primary_run": 42576639372,
+  "protocol_complete": true,
+  "advance_to_qualification": false,
+  "control_limited": true,
+  "oom_delta": {
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "memory_peak_mib": 403.8203125,
+  "completed_dc_sessions": 592,
+  "counts": {
+    "files": 40,
+    "new_connection_probes": 352,
+    "recorded_message_echoes": 418
+  },
+  "pairs": [
+    {
+      "round": 1,
+      "download_ratio": 0.9996315771722897,
+      "upload_ratio": 0.9165351408613855,
+      "message_p95_ratio": 1.0040865245904804,
+      "new_connection_p95_ratio": 0.9186386981252544,
+      "cpu_ratio": 1.0553412813023513,
+      "rss_ratio": 0.9687788372808367,
+      "eligible": false,
+      "joint_gain": false
+    },
+    {
+      "round": 2,
+      "download_ratio": 0.9849139877612865,
+      "upload_ratio": 1.0191408867572191,
+      "message_p95_ratio": 0.9974985921203549,
+      "new_connection_p95_ratio": 0.9944096580532266,
+      "cpu_ratio": 1.0202458604692233,
+      "rss_ratio": 0.9746835443037974,
+      "eligible": false,
+      "joint_gain": false
+    },
+    {
+      "round": 3,
+      "download_ratio": 0.9896838090855953,
+      "upload_ratio": 0.9344181533175936,
+      "message_p95_ratio": 0.9864012530094576,
+      "new_connection_p95_ratio": 0.9962640254812566,
+      "cpu_ratio": 1.0088719864959976,
+      "rss_ratio": 0.9670278637770898,
+      "eligible": false,
+      "joint_gain": false
+    },
+    {
+      "round": 4,
+      "download_ratio": 0.9779360267685874,
+      "upload_ratio": 0.9384548208656747,
+      "message_p95_ratio": 1.0008033849872127,
+      "new_connection_p95_ratio": 0.9896021140891721,
+      "cpu_ratio": 1.0114911333831065,
+      "rss_ratio": 0.966820987654321,
+      "eligible": false,
+      "joint_gain": false
+    }
+  ],
+  "candidate_binary_sha256": "7799e488ef7f32f5f1fa9a7b25988f6fd21b91b67a1e313ab673c4d0268feec0",
+  "same_binary_as_prior_9_test_run": true,
+  "prior_upstream_test_run": 42574699893,
+  "runtime_copy_sha256": "323bfbd535944d49bea7505f03be73c25df2ab77de7fc6d929741e15f6dfc721",
+  "native_reference_sha256": "cd4c5ff500d956a8a7059e3e536ff139983a0c5897b4c410ea0e53c68a6cfa14",
+  "scope": "100ms/200Mbps/30 logical connections, 4D+1U files; four AB/BA pairs; synthetic DC"
+}

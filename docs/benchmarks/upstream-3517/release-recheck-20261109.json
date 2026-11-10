@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-11-08T17:05:40.274741+00:00",
+  "selection": "max published_at among draft=false/prerelease=false in first 100 releases",
+  "releases_examined": 100,
+  "stable_count": 69,
+  "latest_tag": "3.5.17",
+  "release_id": 438221255,
+  "published_at": "2026-11-08T12:08:51Z",
+  "url": "https://github.com/telemt/telemt/releases/tag/3.5.17",
+  "locked_asset_digests_and_sizes_match": true,
+  "note": "Independent CI previously downloaded/hashed/ELF-checked exact locked assets; this recheck is metadata-only"
+}

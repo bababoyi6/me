@@ -50,7 +50,7 @@ def sync_directory(path):
         os.close(fd)
 
 
-def atomic_copy(source, target, mode, expected_sha256=None):
+def atomic_copy(source, target, mode, expected_sha256=None, owner=None):
     target = Path(target)
     safe_directory(target.parent)
     temporary = None
@@ -59,6 +59,8 @@ def atomic_copy(source, target, mode, expected_sha256=None):
         with os.fdopen(fd, "wb") as output, Path(source).open("rb") as incoming:
             shutil.copyfileobj(incoming, output, 1024 * 1024)
             output.flush()
+            if owner is not None:
+                os.fchown(output.fileno(), *owner)
             os.fchmod(output.fileno(), mode)
             os.fsync(output.fileno())
         if expected_sha256 is not None and digest(temporary) != expected_sha256:
@@ -74,10 +76,15 @@ def atomic_copy(source, target, mode, expected_sha256=None):
 class CoreTransaction:
     """One backend only. Hooks implement stop/start, bounded ready and version."""
 
-    def __init__(self, binary, directory, service):
+    def __init__(self, binary, directory, service, *, file_mode=0o755, file_owner=None):
         self.binary = Path(binary)
         self.directory = Path(directory)
         self.service = service
+        if file_mode not in (0o640, 0o755) or (file_mode == 0o640 and file_owner is None):
+            raise CoreError('explicit config ownership required')
+        self.file_mode, self.file_owner = file_mode, file_owner
+        self.target_metadata = ({'mode': file_mode, 'uid': file_owner[0], 'gid': file_owner[1]}
+                                if file_owner is not None else None)
         safe_directory(self.binary.parent)
         safe_directory(self.directory)
         if self.directory.stat().st_mode & 0o077:
@@ -122,6 +129,8 @@ class CoreTransaction:
     def validate(self, value, allow_prior=True):
         if not isinstance(value, dict) or value.get("schema") != 1 or value.get("binary") != str(self.binary):
             raise CoreError("transaction journal belongs to another target")
+        if value.get('target_metadata') != self.target_metadata:
+            raise CoreError('transaction target permissions changed')
         for key in ("old_sha256", "new_sha256"):
             text = value.get(key, "")
             if len(text) != 64 or any(c not in "0123456789abcdef" for c in text):
@@ -130,6 +139,11 @@ class CoreTransaction:
             raise CoreError("invalid journal phase")
         if value.get("backup") != "core.previous-" + value["old_sha256"]:
             raise CoreError("invalid backup identity")
+        snapshot = value.get("snapshot")
+        if snapshot is not None and (not isinstance(snapshot, str) or len(snapshot) != 17
+                                     or not snapshot.startswith('snapshot-')
+                                     or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for c in snapshot[9:])):
+            raise CoreError("invalid protected snapshot identity")
         if value.get("prior") is not None:
             if not allow_prior:
                 raise CoreError("nested transaction history")
@@ -141,23 +155,25 @@ class CoreTransaction:
         backup = self.directory / value["backup"]
         safe_file(backup)
         safe_file(self.binary)
+        self.validate_target_metadata()
         if digest(backup) != value["old_sha256"]:
             raise CoreError("previous core checksum mismatch")
         if digest(self.binary) not in (value["old_sha256"], value["new_sha256"]):
             raise CoreError("core changed outside this transaction; refusing overwrite")
         self.service.stop()
-        atomic_copy(backup, self.binary, 0o755, value["old_sha256"])
+        atomic_copy(backup, self.binary, self.file_mode, value["old_sha256"], self.file_owner)
         self.service.start()
         if not self.service.ready():
             raise CoreError("previous core did not regain readiness")
         value["phase"] = "recovered"
         self.save(value)
 
-    def activate(self, candidate, expected_sha256, expected_version, current_sha256):
+    def activate(self, candidate, expected_sha256, expected_version, current_sha256, snapshot=None):
         candidate = Path(candidate)
         with self.locked():
             safe_directory(candidate.parent)
             safe_file(self.binary)
+            self.validate_target_metadata()
             safe_file(candidate)
             if candidate.stat().st_size > 64 * 1024**2:
                 raise CoreError("candidate exceeds size limit")
@@ -176,6 +192,10 @@ class CoreTransaction:
                     raise CoreError("unfinished transaction; recover it before upgrading")
                 if previous["phase"] == "committed" and previous["new_sha256"] == current_sha256:
                     prior = {k: previous[k] for k in ("schema", "binary", "old_sha256", "new_sha256", "backup", "phase")}
+                    if 'snapshot' in previous:
+                        prior['snapshot'] = previous['snapshot']
+                    if 'target_metadata' in previous:
+                        prior['target_metadata'] = previous['target_metadata']
             if expected_sha256 == current_sha256:
                 return "unchanged"
             backup = self.directory / ("core.previous-" + current_sha256)
@@ -186,12 +206,17 @@ class CoreTransaction:
                 raise CoreError("baseline changed while saving backup")
             value = {"schema": 1, "binary": str(self.binary), "old_sha256": current_sha256,
                      "new_sha256": expected_sha256, "backup": backup.name, "phase": "prepared", "prior": prior}
+            if snapshot is not None:
+                value['snapshot'] = snapshot
+            if self.target_metadata is not None:
+                value['target_metadata'] = self.target_metadata
+            self.validate(value)
             self.save(value)
             try:
                 self.service.stop()
                 value["phase"] = "switching"
                 self.save(value)
-                atomic_copy(candidate, self.binary, 0o755, expected_sha256)
+                atomic_copy(candidate, self.binary, self.file_mode, expected_sha256, self.file_owner)
                 if digest(self.binary) != expected_sha256:
                     raise CoreError("activated core checksum mismatch")
                 self.service.start()
@@ -205,6 +230,12 @@ class CoreTransaction:
                     self.save(prior)
                 raise
             return "committed"
+
+    def validate_target_metadata(self):
+        if self.target_metadata is not None:
+            info = self.binary.stat()
+            if (stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid) != (self.file_mode, *self.file_owner):
+                raise CoreError('config permissions changed outside transaction')
 
     def rollback(self):
         with self.locked():

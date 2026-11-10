@@ -1,0 +1,49 @@
+name: Native ARM64 stable compatibility
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths:
+      - .github/workflows/arm-compat.yml
+      - tests/arm_compat_lab.py
+      - tests/e2e_lab.py
+      - tools/core_install.py
+      - telemt-dual-hop.sh
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-arm-stable-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  native:
+    runs-on: ubuntu-22.04-arm
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require native ARM64 and prepare bounded dependencies
+        run: |
+          test "$(uname -m)" = aarch64
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy python3-cryptography iproute2
+      - name: Fetch and verify exact official ARM64 archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -m 700 "$RUNNER_TEMP/arm-evidence"
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/telemt/telemt/releases/assets/723821990 > "$RUNNER_TEMP/arm.tar.gz"
+          printf '%s  %s\n' f0d3d06d029f2b21dc66a44069bcc7bd20d32fcb34b5867c5250cee647785de6 "$RUNNER_TEMP/arm.tar.gz" | sha256sum --check
+      - name: Verify native install, strict config and both native proxy links
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-arm-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=1G -p MemorySwapMax=0 -p RuntimeMaxSec=180 -p "WorkingDirectory=$GITHUB_WORKSPACE" /usr/bin/unshare --net sh -c 'set -e; ip link set lo up; exec python3 tests/arm_compat_lab.py --archive "$1/arm.tar.gz" --output "$1/arm-evidence/native-arm.json"' lab "$RUNNER_TEMP"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-arm-compat-evidence
+          path: ${{ runner.temp }}/arm-evidence/*.json
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,1122 @@
+{
+  "scope": "diagnostic only; genuine HAProxy/Telemt/transport, synthetic DC; no production changes",
+  "source_commit": "745d1f1648953c1d7b4aea6ba6df3a8b64ffadb1",
+  "complete": true,
+  "runs": [
+    {
+      "round": 1,
+      "kind": "balanced2",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:02:55.238379Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:02:55.238392Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:02:55.238396Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:02:55.238404Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:02:55.238685Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:02:55.238936Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:02:55.238946Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:02:55.238971Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:02:55.240002Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:02:55.240017Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:02:55.240020Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:02:55.240023Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:02:55.240026Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:02:55.240029Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:02:55.240032Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:02:55.240174Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:02:55.240966Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:55411 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:02:55.241131Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-fwmltwzj/config/telemt.toml\"\n2026-11-07T13:02:55.241172Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:02:55.272882Z  INFO telemt::api: API endpoint: http://127.0.0.1:38101/v1/* and /web-status\n2026-11-07T13:02:55.293117Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "rows": [
+          {
+            "concurrency": 30,
+            "direction": "U",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 21.456333083968623,
+            "wall_seconds": 2.932213988000001,
+            "handshake_ms": {
+              "p50": 247.3382959999988,
+              "p95": 262.7743370000033
+            },
+            "completion_ms": {
+              "p50": 2801.122057499999,
+              "p95": 2858.270756000003
+            },
+            "backend_cpu_one_core_percent": 1.3641569190959055,
+            "controller_and_mock_cpu_one_core_percent": 3.901078450213028,
+            "haproxy_cpu_one_core_percent": 0.6820784595479528,
+            "backend_peak_rss_bytes": 22159360,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 30,
+            "direction": "D",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 20.745020992637468,
+            "wall_seconds": 3.0327547039999985,
+            "handshake_ms": {
+              "p50": 242.4984785000035,
+              "p95": 250.27110100000272
+            },
+            "completion_ms": {
+              "p50": 2790.753861499997,
+              "p95": 2914.645252999996
+            },
+            "backend_cpu_one_core_percent": 1.3189329142657895,
+            "controller_and_mock_cpu_one_core_percent": 3.5255077128057777,
+            "haproxy_cpu_one_core_percent": 0.6594664571328948,
+            "backend_peak_rss_bytes": 22159360,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 50,
+            "direction": "U",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 22.061535303810835,
+            "wall_seconds": 4.752960234,
+            "handshake_ms": {
+              "p50": 252.09763200000168,
+              "p95": 264.3931699999982
+            },
+            "completion_ms": {
+              "p50": 4403.531471999997,
+              "p95": 4423.246032999998
+            },
+            "backend_cpu_one_core_percent": 1.262371175984049,
+            "controller_and_mock_cpu_one_core_percent": 3.8388566496893595,
+            "haproxy_cpu_one_core_percent": 0.841580783989366,
+            "backend_peak_rss_bytes": 24682496,
+            "backend_fds_before": 16,
+            "backend_fds_after": 14
+          },
+          {
+            "concurrency": 50,
+            "direction": "D",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 18.85951078707512,
+            "wall_seconds": 5.5599321309999965,
+            "handshake_ms": {
+              "p50": 250.32009249999732,
+              "p95": 254.89697899999442
+            },
+            "completion_ms": {
+              "p50": 4392.870749,
+              "p95": 4417.258283000003
+            },
+            "backend_cpu_one_core_percent": 0.899291552881008,
+            "controller_and_mock_cpu_one_core_percent": 3.298590210794793,
+            "haproxy_cpu_one_core_percent": 0.7194332423048064,
+            "backend_peak_rss_bytes": 24444928,
+            "backend_fds_before": 14,
+            "backend_fds_after": 18
+          },
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 22.42813131119984,
+            "wall_seconds": 9.350542722,
+            "handshake_ms": {
+              "p50": 261.7693014999993,
+              "p95": 276.3586410000016
+            },
+            "completion_ms": {
+              "p50": 7993.970893000003,
+              "p95": 8003.714477000002
+            },
+            "backend_cpu_one_core_percent": 1.390293631771078,
+            "controller_and_mock_cpu_one_core_percent": 3.9015421761740168,
+            "haproxy_cpu_one_core_percent": 0.4277826559295625,
+            "backend_peak_rss_bytes": 30556160,
+            "backend_fds_before": 18,
+            "backend_fds_after": 18
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.360695407259165,
+            "wall_seconds": 8.977267001000001,
+            "handshake_ms": {
+              "p50": 250.99269250000233,
+              "p95": 261.2381690000021
+            },
+            "completion_ms": {
+              "p50": 8753.651709499998,
+              "p95": 8762.440985999994
+            },
+            "backend_cpu_one_core_percent": 1.1139247611646252,
+            "controller_and_mock_cpu_one_core_percent": 4.122900621745693,
+            "haproxy_cpu_one_core_percent": 0.8911398089317003,
+            "backend_peak_rss_bytes": 30416896,
+            "backend_fds_before": 18,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 19021824,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.42,
+          "rss_bytes": 30400512,
+          "fds": 14
+        },
+        "config_policy_sha256": "26ddff26d8568f27f7584971b50149a7b8a2bc6c26f4f583733cfc87ec74921c",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 364,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 1,
+      "kind": "stable",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:03:35.096034Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:03:35.096042Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:03:35.096046Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:03:35.096049Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:03:35.096193Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:03:35.096396Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:03:35.096402Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:03:35.096431Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:03:35.097507Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:03:35.097526Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:03:35.097529Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:03:35.097531Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:03:35.097535Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:03:35.097538Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:03:35.097541Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:03:35.097650Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:55687 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:03:35.097754Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:47895)\n2026-11-07T13:03:35.097788Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:03:35.098547Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-2ygs6805/config/telemt.toml\"\n2026-11-07T13:03:35.098583Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 30,
+            "direction": "U",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 21.454359683009724,
+            "wall_seconds": 2.932483696999995,
+            "handshake_ms": {
+              "p50": 245.24387750000187,
+              "p95": 252.5136969999977
+            },
+            "completion_ms": {
+              "p50": 2792.5197510000075,
+              "p95": 2855.495879000003
+            },
+            "backend_cpu_one_core_percent": 1.7050393170523426,
+            "controller_and_mock_cpu_one_core_percent": 3.6543755080252054,
+            "haproxy_cpu_one_core_percent": 1.0230235902314055,
+            "backend_peak_rss_bytes": 18681856,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 30,
+            "direction": "D",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 20.7607003267981,
+            "wall_seconds": 3.0304642429999973,
+            "handshake_ms": {
+              "p50": 244.68456349999457,
+              "p95": 256.4113880000036
+            },
+            "completion_ms": {
+              "p50": 2950.4206129999984,
+              "p95": 3004.463364000003
+            },
+            "backend_cpu_one_core_percent": 0.6599648897424731,
+            "controller_and_mock_cpu_one_core_percent": 3.339515067163914,
+            "haproxy_cpu_one_core_percent": 0.32998244487123657,
+            "backend_peak_rss_bytes": 18681856,
+            "backend_fds_before": 16,
+            "backend_fds_after": 34
+          },
+          {
+            "concurrency": 50,
+            "direction": "U",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.816032653119567,
+            "wall_seconds": 4.402815595999996,
+            "handshake_ms": {
+              "p50": 246.9020515000082,
+              "p95": 256.4008999999885
+            },
+            "completion_ms": {
+              "p50": 4296.043322000002,
+              "p95": 4307.945368000006
+            },
+            "backend_cpu_one_core_percent": 1.5898917061980913,
+            "controller_and_mock_cpu_one_core_percent": 3.6902283426907436,
+            "haproxy_cpu_one_core_percent": 0.45425477319945456,
+            "backend_peak_rss_bytes": 21192704,
+            "backend_fds_before": 34,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 50,
+            "direction": "D",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 22.78447735922061,
+            "wall_seconds": 4.602150768999991,
+            "handshake_ms": {
+              "p50": 250.85899649999277,
+              "p95": 256.66043100000024
+            },
+            "completion_ms": {
+              "p50": 4347.055671,
+              "p95": 4436.33770000001
+            },
+            "backend_cpu_one_core_percent": 0.8691588348091354,
+            "controller_and_mock_cpu_one_core_percent": 3.7252678933257397,
+            "haproxy_cpu_one_core_percent": 0.6518691261068518,
+            "backend_peak_rss_bytes": 21016576,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 26.669748457241038,
+            "wall_seconds": 7.863411248000006,
+            "handshake_ms": {
+              "p50": 258.1315200000063,
+              "p95": 282.9467960000045
+            },
+            "completion_ms": {
+              "p50": 7755.143724999996,
+              "p95": 7764.075125000005
+            },
+            "backend_cpu_one_core_percent": 1.6532265183645893,
+            "controller_and_mock_cpu_one_core_percent": 4.333302090573805,
+            "haproxy_cpu_one_core_percent": 0.63585635321715,
+            "backend_peak_rss_bytes": 27111424,
+            "backend_fds_before": 16,
+            "backend_fds_after": 24
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 24.049658915422754,
+            "wall_seconds": 8.720090407,
+            "handshake_ms": {
+              "p50": 253.84917899999948,
+              "p95": 261.5136889999974
+            },
+            "completion_ms": {
+              "p50": 8286.591893500003,
+              "p95": 8328.532038000007
+            },
+            "backend_cpu_one_core_percent": 1.0320993911686174,
+            "controller_and_mock_cpu_one_core_percent": 4.088287797037284,
+            "haproxy_cpu_one_core_percent": 0.6880662607790782,
+            "backend_peak_rss_bytes": 27111424,
+            "backend_fds_before": 24,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 15765504,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.4,
+          "rss_bytes": 25550848,
+          "fds": 14
+        },
+        "config_policy_sha256": "26ddff26d8568f27f7584971b50149a7b8a2bc6c26f4f583733cfc87ec74921c",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 364,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 1,
+      "kind": "stable",
+      "fast_mode": false,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:04:11.994213Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:04:11.994226Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:04:11.994230Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:04:11.994233Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:04:11.994383Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:04:11.994624Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:04:11.994631Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:04:11.994663Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:04:11.995735Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:04:11.995775Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:04:11.995780Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:04:11.995783Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:04:11.995787Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:04:11.995789Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:04:11.995792Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:04:11.995894Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:33531 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:04:11.995985Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:52909)\n2026-11-07T13:04:11.996008Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:04:11.996779Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-feaa5m5f/config/telemt.toml\"\n2026-11-07T13:04:11.996820Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 30,
+            "direction": "U",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 16.378334213842106,
+            "wall_seconds": 3.841328378,
+            "handshake_ms": {
+              "p50": 246.81162350000108,
+              "p95": 254.4943700000033
+            },
+            "completion_ms": {
+              "p50": 2790.4634320000027,
+              "p95": 2808.5512930000077
+            },
+            "backend_cpu_one_core_percent": 0.7809798342629483,
+            "controller_and_mock_cpu_one_core_percent": 2.917678729105508,
+            "haproxy_cpu_one_core_percent": 0.5206532228419656,
+            "backend_peak_rss_bytes": 18714624,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 30,
+            "direction": "D",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 20.423095730687375,
+            "wall_seconds": 3.080559422999997,
+            "handshake_ms": {
+              "p50": 241.69267199999211,
+              "p95": 249.6622319999915
+            },
+            "completion_ms": {
+              "p50": 3004.5982460000005,
+              "p95": 3033.0384930000064
+            },
+            "backend_cpu_one_core_percent": 0.9738490929931344,
+            "controller_and_mock_cpu_one_core_percent": 3.3017865924153016,
+            "haproxy_cpu_one_core_percent": 0.6492327286620895,
+            "backend_peak_rss_bytes": 19058688,
+            "backend_fds_before": 16,
+            "backend_fds_after": 20
+          },
+          {
+            "concurrency": 50,
+            "direction": "U",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.826569589871145,
+            "wall_seconds": 4.400868517999996,
+            "handshake_ms": {
+              "p50": 250.8780564999995,
+              "p95": 267.57483100000456
+            },
+            "completion_ms": {
+              "p50": 4304.704129999998,
+              "p95": 4323.323948999999
+            },
+            "backend_cpu_one_core_percent": 1.3633672479555785,
+            "controller_and_mock_cpu_one_core_percent": 3.6984398496406152,
+            "haproxy_cpu_one_core_percent": 0.45445574931852617,
+            "backend_peak_rss_bytes": 21438464,
+            "backend_fds_before": 20,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 50,
+            "direction": "D",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.034762339317965,
+            "wall_seconds": 4.55214594600001,
+            "handshake_ms": {
+              "p50": 247.71522249999833,
+              "p95": 257.9619750000006
+            },
+            "completion_ms": {
+              "p50": 4390.679318000004,
+              "p95": 4440.425982999983
+            },
+            "backend_cpu_one_core_percent": 1.0983830613764747,
+            "controller_and_mock_cpu_one_core_percent": 3.7269337585513234,
+            "haproxy_cpu_one_core_percent": 0.87870644910118,
+            "backend_peak_rss_bytes": 21143552,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 26.62406789735315,
+            "wall_seconds": 7.876902989000001,
+            "handshake_ms": {
+              "p50": 263.16302600000085,
+              "p95": 285.467213000004
+            },
+            "completion_ms": {
+              "p50": 7646.800676499978,
+              "p95": 7657.088149999992
+            },
+            "backend_cpu_one_core_percent": 1.6503948338775203,
+            "controller_and_mock_cpu_one_core_percent": 4.401635940980614,
+            "haproxy_cpu_one_core_percent": 0.5078137950392371,
+            "backend_peak_rss_bytes": 27086848,
+            "backend_fds_before": 16,
+            "backend_fds_after": 18
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 24.329759699561123,
+            "wall_seconds": 8.619698779999993,
+            "handshake_ms": {
+              "p50": 254.09069600000578,
+              "p95": 262.2795910000093
+            },
+            "completion_ms": {
+              "p50": 8473.834209999979,
+              "p95": 8481.380045000009
+            },
+            "backend_cpu_one_core_percent": 1.044120012741328,
+            "controller_and_mock_cpu_one_core_percent": 4.0751863373119015,
+            "haproxy_cpu_one_core_percent": 0.6960800084942185,
+            "backend_peak_rss_bytes": 27549696,
+            "backend_fds_before": 18,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.01,
+          "rss_bytes": 15826944,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.4,
+          "rss_bytes": 27549696,
+          "fds": 14
+        },
+        "config_policy_sha256": "df0c736727cbc9cc9227fe7e606193c0e6875ce6cf591150722464e117807b89",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 364,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 2,
+      "kind": "balanced2",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "MAESTRO: Telemt MTProxy v3.5.5+tdh.balanced2\n2026-11-07T13:04:49.642229Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:04:49.642238Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:04:49.642243Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:04:49.642251Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:04:49.642487Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:04:49.642661Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:04:49.642667Z  INFO telemt::network::probe: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:04:49.642702Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:04:49.643783Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:04:49.643799Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:04:49.643802Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:04:49.643805Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:04:49.643809Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:04:49.643812Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:04:49.643815Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:04:49.643965Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:57731 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:04:49.644098Z  INFO telemt::api: API endpoint: http://127.0.0.1:35409/v1/* and /web-status\n2026-11-07T13:04:49.644181Z  WARN telemt::transport::upstream: No DC groups available for upstream health-checks\n2026-11-07T13:04:49.644911Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-x9e4h575/config/telemt.toml\"\n2026-11-07T13:04:49.644952Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)\n2026-11-07T13:04:49.697358Z  WARN telemt::config::hot_reload::diff: config reload: censorship settings changed; restart required",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "rows": [
+          {
+            "concurrency": 30,
+            "direction": "U",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 20.741393875434586,
+            "wall_seconds": 3.0332850519999965,
+            "handshake_ms": {
+              "p50": 249.3831964999913,
+              "p95": 256.61248399998726
+            },
+            "completion_ms": {
+              "p50": 2895.8890605000106,
+              "p95": 2912.662904000001
+            },
+            "backend_cpu_one_core_percent": 1.6483778854556548,
+            "controller_and_mock_cpu_one_core_percent": 3.7165659365139136,
+            "haproxy_cpu_one_core_percent": 0.32967557709113093,
+            "backend_peak_rss_bytes": 21741568,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 30,
+            "direction": "D",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 19.7727619049091,
+            "wall_seconds": 3.1818802200000107,
+            "handshake_ms": {
+              "p50": 249.49556499998948,
+              "p95": 254.9105659999782
+            },
+            "completion_ms": {
+              "p50": 2867.169968000013,
+              "p95": 2885.244479999983
+            },
+            "backend_cpu_one_core_percent": 0.9428387596563864,
+            "controller_and_mock_cpu_one_core_percent": 3.4220491492919733,
+            "haproxy_cpu_one_core_percent": 0.9428387596563865,
+            "backend_peak_rss_bytes": 21737472,
+            "backend_fds_before": 16,
+            "backend_fds_after": 18
+          },
+          {
+            "concurrency": 50,
+            "direction": "U",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.28989531547034,
+            "wall_seconds": 4.502278716999996,
+            "handshake_ms": {
+              "p50": 251.00836800000081,
+              "p95": 265.2721489999976
+            },
+            "completion_ms": {
+              "p50": 4464.687801499991,
+              "p95": 4477.17418900001
+            },
+            "backend_cpu_one_core_percent": 1.332658499649258,
+            "controller_and_mock_cpu_one_core_percent": 3.872950165026401,
+            "haproxy_cpu_one_core_percent": 0.44421949988308607,
+            "backend_peak_rss_bytes": 24297472,
+            "backend_fds_before": 18,
+            "backend_fds_after": 110
+          },
+          {
+            "concurrency": 50,
+            "direction": "D",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 18.355345058648744,
+            "wall_seconds": 5.712646624999991,
+            "handshake_ms": {
+              "p50": 249.8955294999945,
+              "p95": 792.1615710000083
+            },
+            "completion_ms": {
+              "p50": 4181.205544000008,
+              "p95": 5234.362645999994
+            },
+            "backend_cpu_one_core_percent": 0.8752510575603838,
+            "controller_and_mock_cpu_one_core_percent": 3.2754267554576963,
+            "haproxy_cpu_one_core_percent": 0.7002008460483071,
+            "backend_peak_rss_bytes": 24297472,
+            "backend_fds_before": 110,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 26.171837189371598,
+            "wall_seconds": 8.013010263000012,
+            "handshake_ms": {
+              "p50": 262.84319700000935,
+              "p95": 279.95841800000676
+            },
+            "completion_ms": {
+              "p50": 7982.044178999999,
+              "p95": 7989.9095140000045
+            },
+            "backend_cpu_one_core_percent": 1.4975645364401777,
+            "controller_and_mock_cpu_one_core_percent": 4.3547653696546815,
+            "haproxy_cpu_one_core_percent": 0.6239852235167407,
+            "backend_peak_rss_bytes": 30117888,
+            "backend_fds_before": 16,
+            "backend_fds_after": 206
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 22.971072470533418,
+            "wall_seconds": 9.129534560000025,
+            "handshake_ms": {
+              "p50": 257.0278175000169,
+              "p95": 265.5566319999991
+            },
+            "completion_ms": {
+              "p50": 8884.339761500003,
+              "p95": 8897.232081999988
+            },
+            "backend_cpu_one_core_percent": 1.2048807009499911,
+            "controller_and_mock_cpu_one_core_percent": 4.059213364761053,
+            "haproxy_cpu_one_core_percent": 0.7667422642409036,
+            "backend_peak_rss_bytes": 30117888,
+            "backend_fds_before": 206,
+            "backend_fds_after": 18
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 18661376,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.42,
+          "rss_bytes": 23252992,
+          "fds": 14
+        },
+        "config_policy_sha256": "26ddff26d8568f27f7584971b50149a7b8a2bc6c26f4f583733cfc87ec74921c",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 364,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 2,
+      "kind": "stable",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:05:28.253648Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:05:28.253661Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:05:28.253665Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:05:28.253668Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:05:28.253860Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:05:28.254065Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:05:28.254071Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:05:28.254104Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:05:28.255146Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:05:28.255164Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:05:28.255167Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:05:28.255169Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:05:28.255173Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:05:28.255176Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:05:28.255179Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:05:28.255281Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:35381 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:05:28.255382Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:57439)\n2026-11-07T13:05:28.255404Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:05:28.256177Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-h5hf0jc5/config/telemt.toml\"\n2026-11-07T13:05:28.256223Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 30,
+            "direction": "U",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 22.206592642123976,
+            "wall_seconds": 2.833147840999999,
+            "handshake_ms": {
+              "p50": 247.18308050000815,
+              "p95": 255.23633200000972
+            },
+            "completion_ms": {
+              "p50": 2783.338057000009,
+              "p95": 2795.976355999983
+            },
+            "backend_cpu_one_core_percent": 1.058892852884482,
+            "controller_and_mock_cpu_one_core_percent": 3.7154327591618386,
+            "haproxy_cpu_one_core_percent": 0.7059285685896548,
+            "backend_peak_rss_bytes": 18690048,
+            "backend_fds_before": 16,
+            "backend_fds_after": 72
+          },
+          {
+            "concurrency": 30,
+            "direction": "D",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 15.774059906966444,
+            "wall_seconds": 3.9884823799999936,
+            "handshake_ms": {
+              "p50": 248.26878350000925,
+              "p95": 255.9376899999961
+            },
+            "completion_ms": {
+              "p50": 2883.164800000003,
+              "p95": 3036.227175999983
+            },
+            "backend_cpu_one_core_percent": 0.7521657899363731,
+            "controller_and_mock_cpu_one_core_percent": 2.766468407966259,
+            "haproxy_cpu_one_core_percent": 0.501443859957582,
+            "backend_peak_rss_bytes": 18984960,
+            "backend_fds_before": 72,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 50,
+            "direction": "U",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.816065417132712,
+            "wall_seconds": 4.402809539000003,
+            "handshake_ms": {
+              "p50": 248.2744774999901,
+              "p95": 257.80328400000485
+            },
+            "completion_ms": {
+              "p50": 4291.701397499992,
+              "p95": 4308.066249999996
+            },
+            "backend_cpu_one_core_percent": 1.3627661943702343,
+            "controller_and_mock_cpu_one_core_percent": 3.738908452473928,
+            "haproxy_cpu_one_core_percent": 0.6813830971851172,
+            "backend_peak_rss_bytes": 21356544,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 50,
+            "direction": "D",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.292535005449672,
+            "wall_seconds": 4.501768483999996,
+            "handshake_ms": {
+              "p50": 248.73920299999952,
+              "p95": 256.1562820000063
+            },
+            "completion_ms": {
+              "p50": 4436.743594000021,
+              "p95": 4453.922425999991
+            },
+            "backend_cpu_one_core_percent": 1.110674619934543,
+            "controller_and_mock_cpu_one_core_percent": 3.9320190416082714,
+            "haproxy_cpu_one_core_percent": 0.4442698479738171,
+            "backend_peak_rss_bytes": 21356544,
+            "backend_fds_before": 16,
+            "backend_fds_after": 36
+          },
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 21.838446347244236,
+            "wall_seconds": 9.603027462,
+            "handshake_ms": {
+              "p50": 259.4387890000007,
+              "p95": 274.9212609999745
+            },
+            "completion_ms": {
+              "p50": 7756.4023555,
+              "p95": 7764.383455000001
+            },
+            "backend_cpu_one_core_percent": 1.249605923494963,
+            "controller_and_mock_cpu_one_core_percent": 3.62950808356232,
+            "haproxy_cpu_one_core_percent": 0.5206691347895681,
+            "backend_peak_rss_bytes": 27140096,
+            "backend_fds_before": 36,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 19.62440600919702,
+            "wall_seconds": 10.68644828799998,
+            "handshake_ms": {
+              "p50": 251.9187924999926,
+              "p95": 261.35401100000877
+            },
+            "completion_ms": {
+              "p50": 8254.635380500005,
+              "p95": 8338.224490000015
+            },
+            "backend_cpu_one_core_percent": 1.0293410592134817,
+            "controller_and_mock_cpu_one_core_percent": 3.4467236735109372,
+            "haproxy_cpu_one_core_percent": 0.5614587595709901,
+            "backend_peak_rss_bytes": 26349568,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.01,
+          "rss_bytes": 15745024,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.41,
+          "rss_bytes": 20668416,
+          "fds": 14
+        },
+        "config_policy_sha256": "26ddff26d8568f27f7584971b50149a7b8a2bc6c26f4f583733cfc87ec74921c",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 364,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 2,
+      "kind": "stable",
+      "fast_mode": false,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "MAESTRO: Telemt MTProxy v3.5.16\n2026-11-07T13:06:09.639659Z  INFO telemt::maestro::bootstrap: Log level: normal\n2026-11-07T13:06:09.639673Z  INFO telemt::maestro::bootstrap: Modes: classic=false secure=false tls=true\n2026-11-07T13:06:09.639677Z  INFO telemt::maestro::bootstrap: TLS domain: apple.com\n2026-11-07T13:06:09.639680Z  INFO telemt::maestro::bootstrap: Mask: true -> apple.com:443\n2026-11-07T13:06:09.639880Z  INFO telemt::maestro::orchestrator: Direct relay buffer budget initialized hard_limit_bytes=268435456 configured_override_bytes=268435456\n2026-11-07T13:06:09.640080Z  INFO telemt::network::probe: STUN probe is disabled by network.stun_use=false\n2026-11-07T13:06:09.640087Z  INFO telemt::network::probe::local: Network capabilities resolved ipv4=\"-\" ipv6=\"-\" reflected_v4=\"-\" reflected_v6=\"-\" ipv4_bogon=false ipv6_bogon=false ipv4_me=false ipv6_me=false ipv4_dc=false ipv6_dc=false prefer=4 multipath=false\n2026-11-07T13:06:09.640119Z  INFO telemt::maestro::runtime_startup: Transport: Direct DC - TCP - standard DC-over-TCP\n2026-11-07T13:06:09.641169Z  INFO telemt::maestro::connectivity: ================= Telegram DC Connectivity =================\n2026-11-07T13:06:09.641187Z  INFO telemt::maestro::connectivity:   No DC connectivity\n2026-11-07T13:06:09.641189Z  INFO telemt::maestro::connectivity:   via direct\n2026-11-07T13:06:09.641192Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:06:09.641196Z  INFO telemt::maestro::connectivity: ===================== Telegram Startup =====================\n2026-11-07T13:06:09.641199Z  INFO telemt::maestro::connectivity:   DC/ME Initialized in 0 seconds\n2026-11-07T13:06:09.641202Z  INFO telemt::maestro::connectivity: ============================================================\n2026-11-07T13:06:09.641303Z  INFO telemt::maestro::listeners::bind: Listening on TCP endpoint addr=127.0.0.1:35253 transport=Mtproxy\nMAESTRO: Proxy links (203.0.113.10)\nMAESTRO: User: line_a\nMAESTRO: User: line_b\n2026-11-07T13:06:09.641403Z  INFO telemt::api: API endpoint ready at /v1/* and /web-status listen=Some(127.0.0.1:41175)\n2026-11-07T13:06:09.641428Z  WARN telemt::transport::upstream::health_checks: No DC groups available for upstream health-checks\n2026-11-07T13:06:09.642212Z  INFO telemt::config::hot_reload::watcher: config watcher: inotify active on \"/tmp/tdh-e2e-f1vsdxmd/config/telemt.toml\"\n2026-11-07T13:06:09.642257Z  INFO telemt::config::hot_reload::watcher: config watcher: poll watcher active (Docker/NFS safe)",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 30,
+            "direction": "U",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 15.571268122302204,
+            "wall_seconds": 4.0404262200000005,
+            "handshake_ms": {
+              "p50": 248.53463650001117,
+              "p95": 256.82783500002415
+            },
+            "completion_ms": {
+              "p50": 2808.1846400000077,
+              "p95": 3081.3324610000163
+            },
+            "backend_cpu_one_core_percent": 0.9899945654743324,
+            "controller_and_mock_cpu_one_core_percent": 2.8251876852734705,
+            "haproxy_cpu_one_core_percent": 0.4949972827371662,
+            "backend_peak_rss_bytes": 18714624,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 30,
+            "direction": "D",
+            "successes": 30,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 20.757861894574727,
+            "wall_seconds": 3.030878629,
+            "handshake_ms": {
+              "p50": 248.38331700000538,
+              "p95": 253.92948500001467
+            },
+            "completion_ms": {
+              "p50": 2919.298858500014,
+              "p95": 2997.2302210000234
+            },
+            "backend_cpu_one_core_percent": 0.6598746584121302,
+            "controller_and_mock_cpu_one_core_percent": 3.351218918109939,
+            "haproxy_cpu_one_core_percent": 0.329937329206065,
+            "backend_peak_rss_bytes": 19017728,
+            "backend_fds_before": 16,
+            "backend_fds_after": 26
+          },
+          {
+            "concurrency": 50,
+            "direction": "U",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.03855651406695,
+            "wall_seconds": 4.551396261999997,
+            "handshake_ms": {
+              "p50": 254.38306999998872,
+              "p95": 262.6394870000013
+            },
+            "completion_ms": {
+              "p50": 4276.704975999991,
+              "p95": 4284.107924000011
+            },
+            "backend_cpu_one_core_percent": 1.3182767780723734,
+            "controller_and_mock_cpu_one_core_percent": 3.603574673762395,
+            "haproxy_cpu_one_core_percent": 0.6591383890361867,
+            "backend_peak_rss_bytes": 21360640,
+            "backend_fds_before": 26,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 50,
+            "direction": "D",
+            "successes": 50,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.037911422659317,
+            "wall_seconds": 4.551523707000001,
+            "handshake_ms": {
+              "p50": 249.70119649999845,
+              "p95": 255.50035499998103
+            },
+            "completion_ms": {
+              "p50": 4303.483144499993,
+              "p95": 4356.617558000011
+            },
+            "backend_cpu_one_core_percent": 1.098533221371618,
+            "controller_and_mock_cpu_one_core_percent": 3.727853130569239,
+            "haproxy_cpu_one_core_percent": 0.6591199328229709,
+            "backend_peak_rss_bytes": 21692416,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 26.829948707432816,
+            "wall_seconds": 7.816459221999992,
+            "handshake_ms": {
+              "p50": 258.15267199998004,
+              "p95": 284.9749979999956
+            },
+            "completion_ms": {
+              "p50": 7700.260615999994,
+              "p95": 7709.885271000019
+            },
+            "backend_cpu_one_core_percent": 1.6631571445304232,
+            "controller_and_mock_cpu_one_core_percent": 4.3557226274748615,
+            "haproxy_cpu_one_core_percent": 0.6396758248193938,
+            "backend_peak_rss_bytes": 27213824,
+            "backend_fds_before": 16,
+            "backend_fds_after": 20
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.505015346918334,
+            "wall_seconds": 8.922146908000002,
+            "handshake_ms": {
+              "p50": 254.81976649999183,
+              "p95": 264.4052429999988
+            },
+            "completion_ms": {
+              "p50": 8356.551914500016,
+              "p95": 8376.495144999979
+            },
+            "backend_cpu_one_core_percent": 1.0087258249390842,
+            "controller_and_mock_cpu_one_core_percent": 4.006892776888134,
+            "haproxy_cpu_one_core_percent": 0.6724838832927227,
+            "backend_peak_rss_bytes": 27213824,
+            "backend_fds_before": 20,
+            "backend_fds_after": 18
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.01,
+          "rss_bytes": 15794176,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.4,
+          "rss_bytes": 26234880,
+          "fds": 16
+        },
+        "config_policy_sha256": "df0c736727cbc9cc9227fe7e606193c0e6875ce6cf591150722464e117807b89",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 364,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    }
+  ],
+  "resources_before": {
+    "memory_current": 15552512,
+    "memory_peak": 16195584,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 99417,
+      "user_usec": 73569,
+      "system_usec": 25848,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 4,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "1610612736",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "tcp_congestion_control": "cubic",
+  "resources_after": {
+    "memory_current": 129781760,
+    "memory_peak": 281231360,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 12735958,
+      "user_usec": 7550642,
+      "system_usec": 5185316,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 2215,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "1610612736",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "curation": {
+    "source_sha256": "befc8bb6a31e95fdeed49b8ea1664c32f55d32ec363be6ba326b1e5eb29737db",
+    "change": "remove synthetic proxy URL lines from already-sanitized core logs; metrics and failures unchanged"
+  }
+}

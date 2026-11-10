@@ -1,0 +1,96 @@
+{
+  "source_commit": "399c39993b1ce3a05fdbea850fc84775fdb0907c",
+  "accepted": true,
+  "checks": {
+    "default_off": true,
+    "repeat_no_reset": true,
+    "active": true,
+    "drift_preserved": true,
+    "partial_failure_rolled_back": true,
+    "crash_injected": true,
+    "crash_resumed": true,
+    "wg_recreated_and_policy_restored": true,
+    "hook_failure_keeps_wg_up": true,
+    "hung_hook_keeps_wg_up": true,
+    "hook_drift_preserved": true,
+    "failed_disable_cannot_reenable": true,
+    "disable_idempotent": true,
+    "foreign_queue_preserved": true,
+    "wg_key_bytes_unchanged": true,
+    "state_private": true
+  },
+  "resources_before": {
+    "memory_current": 17027072,
+    "memory_peak": 17027072,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 121792,
+      "user_usec": 97237,
+      "system_usec": 24554,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 2,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "536870912",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "controller_sha256": "768c569a439013af97cf3409214dbec11956dce7c123a34bc6057ac5b2439720",
+  "initial_link": {
+    "boot": "35c366e0-e8ce-4c91-9923-885964e10a30",
+    "netns": 4026532252,
+    "ifindex": 2,
+    "txqlen": 1000
+  },
+  "initial_shape": {
+    "qdisc": [
+      "qdisc noqueue 0: root"
+    ],
+    "class": []
+  },
+  "hook_timeout_seconds": 12.187396765000003,
+  "private_keys_removed": true,
+  "cleanup_errors": [],
+  "resources_after": {
+    "memory_current": 18059264,
+    "memory_peak": 27426816,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 742295,
+      "user_usec": 343940,
+      "system_usec": 398355,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 43,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "536870912",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "oom_delta": {
+    "oom": 0,
+    "oom_kill": 0
+  }
+}

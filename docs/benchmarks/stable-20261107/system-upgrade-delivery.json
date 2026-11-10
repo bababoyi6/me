@@ -1,0 +1,61 @@
+{
+  "scope": "WSL isolated namespace; real systemd, real release binaries; synthetic identities/DC only",
+  "accepted": true,
+  "fresh_official_install": "3.5.16",
+  "fresh_official_binary_sha256_match": true,
+  "upgrade": "committed",
+  "repeat_upgrade": "unchanged",
+  "unauthenticated_api_status": 401,
+  "read_only_api_write_status": 403,
+  "transfers": [
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.06139993200000049,
+      "handshake_ms": 16.292470999999864,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.06388912800000135,
+      "handshake_ms": 17.67192400000006,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.056201073000000434,
+      "handshake_ms": 13.825566999999594,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.06779597799999948,
+      "handshake_ms": 19.833197000000524,
+      "sha256_verified": true,
+      "persistent_dc": true
+    }
+  ],
+  "systemd_crash_recovery_seconds": 1.272168452999999,
+  "systemd_restart_count": 1,
+  "production_agent_cold_ready_seconds": 20.242374441,
+  "production_agent_core_down_seconds": 2.806217420000003,
+  "production_agent_recovery_seconds": 10.021856464000003,
+  "rollback": "recovered",
+  "old_binary_restored": true,
+  "config_and_token_unchanged": true,
+  "temporary_unit_removed": true
+}

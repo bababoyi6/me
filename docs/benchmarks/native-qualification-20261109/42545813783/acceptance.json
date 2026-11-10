@@ -1,0 +1,19 @@
+{
+  "source_commit": "ae953aa792f76cd57a95d95b8b94541e93b8016e",
+  "accepted": true,
+  "production_channel_enabled": false,
+  "package": {
+    "bundle_sha256": "c36de407f3c4602b629c3331644c6b6aa2d116fd106e9475698ebe671564febb",
+    "files": 6,
+    "binary_sha256": "cd4c5ff500d956a8a7059e3e536ff139983a0c5897b4c410ea0e53c68a6cfa14",
+    "version": "3.5.17+tdh.balanced1",
+    "complete_patch_sha256": "87a734aa1cdc409c902544f73403c252beaa6c2f46adcaca7614c485fb00a8d8",
+    "published": false,
+    "updater_enabled": false
+  },
+  "two_archive_bytes_identical": true,
+  "complete_patch_applies_to_pinned_upstream": true,
+  "repeat_refused_existing_core_preserved": true,
+  "all_source_license_bytes_preserved": true,
+  "unprivileged_exact_runtime_version_checked": true
+}

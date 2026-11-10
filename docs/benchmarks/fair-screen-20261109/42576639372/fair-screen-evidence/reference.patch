@@ -1,0 +1,178 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 3a43060..13fe21a 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2780,7 +2780,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "telemt"
+-version = "3.5.17"
++version = "3.5.17+tdh.balanced1"
+ dependencies = [
+  "aes",
+  "anyhow",
+diff --git a/Cargo.toml b/Cargo.toml
+index c9a2883..ea88df5 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,6 +1,6 @@
+ [package]
+ name = "telemt"
+-version = "3.5.17"
++version = "3.5.17+tdh.balanced1"
+ edition = "2024"
+ rust-version = "1.88"
+ 
+diff --git a/src/transport/socket.rs b/src/transport/socket.rs
+index 8d9a0c7..2c50eab 100644
+--- a/src/transport/socket.rs
++++ b/src/transport/socket.rs
+@@ -14,6 +14,10 @@ use tracing::{debug, warn};
+ #[cfg(target_os = "linux")]
+ mod fragmented_send;
+ #[cfg(target_os = "linux")]
++mod low_rtt_receive;
++#[cfg(target_os = "linux")]
++mod unsent_queue_bulk;
++#[cfg(target_os = "linux")]
+ pub(crate) use fragmented_send::send_tcp_fragmented_fd;
+ 
+ const DEFAULT_SOCKET_BUFFER_BYTES: usize = 256 * 1024;
+@@ -68,8 +72,17 @@ pub fn configure_client_socket(
+     socket.set_tcp_keepalive(&keepalive)?;
+ 
+     // Keep explicit baseline buffers for predictable throughput across busy hosts.
++    // Linux: reuse balanced2 low-RTT receive guard; retain automatic send sizing.
++    #[cfg(target_os = "linux")]
++    {
++        use std::os::fd::AsRawFd;
++        low_rtt_receive::configure_low_rtt_receive(socket.as_raw_fd())?;
++    }
++    #[cfg(not(target_os = "linux"))]
++    {
+     socket.set_recv_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;
+     socket.set_send_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;
++    }
+ 
+     // Set TCP user timeout (Linux only)
+     // NOTE: iOS does not support TCP_USER_TIMEOUT - application-level timeout
+@@ -151,8 +164,17 @@ pub fn create_outgoing_socket_bound(addr: SocketAddr, bind_addr: Option<IpAddr>)
+ 
+     // Disable Nagle
+     socket.set_tcp_nodelay(true)?;
++    // Linux: preserve autotuning and bound unsent data, not in-flight bytes.
++    #[cfg(target_os = "linux")]
++    {
++        use std::os::fd::AsRawFd;
++        unsent_queue_bulk::configure_unsent_queue(socket.as_raw_fd())?;
++    }
++    #[cfg(not(target_os = "linux"))]
++    {
+     socket.set_recv_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;
+     socket.set_send_buffer_size(DEFAULT_SOCKET_BUFFER_BYTES)?;
++    }
+ 
+     if let Some(bind_ip) = bind_addr {
+         let bind_sock_addr = SocketAddr::new(bind_ip, 0);
+diff --git a/src/transport/socket/tests.rs b/src/transport/socket/tests.rs
+index 5ecfeb2..3d812c2 100644
+--- a/src/transport/socket/tests.rs
++++ b/src/transport/socket/tests.rs
+@@ -371,3 +371,39 @@ async fn test_chunked_send_has_no_fd_growth_after_success_and_cancellation_stres
+     let final_fds = std::fs::read_dir("/proc/self/fd").unwrap().count();
+     assert_eq!(final_fds, baseline_fds);
+ }
++
++// CI regression for the optional native port; no public peer or account.
++#[cfg(target_os = "linux")]
++#[test]
++fn tdh_outgoing_autotune_and_unsent_limit() {
++    use std::os::fd::AsRawFd;
++    let address = "127.0.0.1:1".parse().unwrap();
++    let baseline = socket2::Socket::new(socket2::Domain::IPV4, socket2::Type::STREAM,
++                                      Some(socket2::Protocol::TCP)).unwrap();
++    let configured = super::create_outgoing_socket_bound(address, None).unwrap();
++    assert_eq!(configured.send_buffer_size().unwrap(), baseline.send_buffer_size().unwrap());
++    assert_eq!(configured.recv_buffer_size().unwrap(), baseline.recv_buffer_size().unwrap());
++    let mut actual: libc::c_uint = 0;
++    let mut length = std::mem::size_of_val(&actual) as libc::socklen_t;
++    let rc = unsafe { libc::getsockopt(configured.as_raw_fd(), libc::IPPROTO_TCP,
++        libc::TCP_NOTSENT_LOWAT, (&mut actual as *mut libc::c_uint).cast(), &mut length) };
++    assert_eq!(rc, 0);
++    assert_eq!(actual, 256 * 1024);
++    assert_eq!(super::low_rtt_receive::receive_request(0), None);
++    assert_eq!(super::low_rtt_receive::receive_request(5_001), None);
++    assert_eq!(super::low_rtt_receive::receive_request(5_000), Some(256 * 1024));
++}
++
++#[cfg(target_os = "linux")]
++#[tokio::test]
++async fn tdh_client_send_stays_automatic() {
++    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
++    let (client, accepted) = tokio::join!(tokio::net::TcpStream::connect(listener.local_addr().unwrap()), listener.accept());
++    let _client = client.unwrap();
++    let (server, _) = accepted.unwrap();
++    let socket = socket2::SockRef::from(&server);
++    let previous = socket.send_buffer_size().unwrap();
++    super::configure_client_socket(&server, 30, 30).unwrap();
++    assert_eq!(socket.send_buffer_size().unwrap(), previous);
++    assert!(socket.tcp_nodelay().unwrap());
++}
+diff --git a/src/transport/socket/low_rtt_receive.rs b/src/transport/socket/low_rtt_receive.rs
+new file mode 100644
+--- /dev/null
++++ b/src/transport/socket/low_rtt_receive.rs
+@@ -0,0 +1,29 @@
++use std::io;
++use std::os::fd::RawFd;
++
++// Keep automatic receive sizing on unknown/long-RTT entry links. On a short
++// entry-to-backend hop, a 256KiB request avoids multi-MiB receive bursts without
++// changing the client send buffer or the high-RTT DC receive path.
++pub(super) fn receive_request(rtt_us: u32) -> Option<libc::c_int> {
++    (rtt_us > 0 && rtt_us <= 5_000).then_some(256 * 1024)
++}
++
++pub(super) fn configure_low_rtt_receive(fd: RawFd) -> io::Result<Option<u32>> {
++    let mut info: libc::tcp_info = unsafe { std::mem::zeroed() };
++    let mut size = std::mem::size_of_val(&info) as libc::socklen_t;
++    let result = unsafe {
++        libc::getsockopt(fd, libc::IPPROTO_TCP, libc::TCP_INFO,
++                        (&mut info as *mut libc::tcp_info).cast(), &mut size)
++    };
++    let required = std::mem::offset_of!(libc::tcp_info, tcpi_rtt) + std::mem::size_of::<u32>();
++    if result != 0 || (size as usize) < required {
++        return Ok(None);
++    }
++    let Some(request) = receive_request(info.tcpi_rtt) else { return Ok(None) };
++    let result = unsafe {
++        libc::setsockopt(fd, libc::SOL_SOCKET, libc::SO_RCVBUF,
++                        (&request as *const libc::c_int).cast(),
++                        std::mem::size_of_val(&request) as libc::socklen_t)
++    };
++    if result == 0 { Ok(Some(info.tcpi_rtt)) } else { Err(io::Error::last_os_error()) }
++}
+diff --git a/src/transport/socket/unsent_queue_bulk.rs b/src/transport/socket/unsent_queue_bulk.rs
+new file mode 100644
+--- /dev/null
++++ b/src/transport/socket/unsent_queue_bulk.rs
+@@ -0,0 +1,19 @@
++use std::io;
++use std::os::fd::RawFd;
++
++// Keep automatic buffers and bound unsent data at the former 256KiB write
++// request scale. A larger batch may reduce readiness wakeups; throughput and
++// latency still require paired measurement, and in-flight bytes are not capped.
++pub(super) fn configure_unsent_queue(fd: RawFd) -> io::Result<()> {
++    let limit: libc::c_uint = 256 * 1024;
++    let result = unsafe {
++        libc::setsockopt(
++            fd,
++            libc::IPPROTO_TCP,
++            libc::TCP_NOTSENT_LOWAT,
++            (&limit as *const libc::c_uint).cast(),
++            std::mem::size_of_val(&limit) as libc::socklen_t,
++        )
++    };
++    if result == 0 { Ok(()) } else { Err(io::Error::last_os_error()) }
++}

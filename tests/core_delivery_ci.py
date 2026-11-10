@@ -42,14 +42,16 @@ def install_case(folder,channel,archive,*,existing=False,accepted=True):
     if existing:
         target.write_bytes(b'EXISTING_CORE_MUST_REMAIN')
     version,archive_sha,core_sha=PINS[channel]
-    asset=f'telemt-{version.replace("+","-")}-x86_64-linux-gnu.tar.gz'
-    url=f'https://github.com/bababoyi6/me/releases/download/telemt-core-{version.replace("+","-")}/{asset}'
+    asset=('telemt-x86_64-linux-gnu.tar.gz' if channel=='official' else
+        f'telemt-{version.replace("+","-")}-x86_64-linux-gnu.tar.gz')
+    url=(f'https://github.com/telemt/telemt/releases/download/{version}/{asset}' if channel=='official' else
+        f'https://github.com/bababoyi6/me/releases/download/telemt-core-{version.replace("+","-")}/{asset}')
     env=dict(os.environ,TDH_BASE=str(config),TDH_BIN=str(target),TDH_DELIVERY_SCRIPT=str(REPO/'telemt-dual-hop.sh'),
              TDH_DELIVERY_FIXTURE=str(Path(__file__).resolve()),TDH_DELIVERY_ARCHIVE=str(archive),
              TDH_DELIVERY_URL=url,TDH_DELIVERY_FETCH=str(folder/'fetch.json'))
     env.pop('TDH_NEW_INSTALL_CORE',None)
-    if channel=='audit2':
-        env['TDH_NEW_INSTALL_CORE']='audit2'
+    if channel!='balanced2':
+        env['TDH_NEW_INSTALL_CORE']=channel
     body='''set -Eeuo pipefail
 TDH_SOURCE_ONLY=1 source "$TDH_DELIVERY_SCRIPT"
 curl() { python3 "$TDH_DELIVERY_FIXTURE" --download-fixture "$@"; }
@@ -65,11 +67,12 @@ telemt_binary_is_expected
     elif accepted:
         if digest(target)!=core_sha:
             raise RuntimeError('production installer installed unexpected core')
-        documents=target.parent/'core-source-notice'
-        manifest=json.loads((documents/'manifest.json').read_text())
-        for name,record in manifest['files'].items():
-            if name!='telemt' and digest(documents/name)!=record['sha256']:
-                raise RuntimeError('production installer lost source/license bytes')
+        if channel!='official':
+            documents=target.parent/'core-source-notice'
+            manifest=json.loads((documents/'manifest.json').read_text())
+            for name,record in manifest['files'].items():
+                if name!='telemt' and digest(documents/name)!=record['sha256']:
+                    raise RuntimeError('production installer lost source/license bytes')
     elif target.exists() or (target.parent/'core-source-notice').exists():
         raise RuntimeError('rejected install left a core or source notice')
     if list(config.iterdir()) or list(target.parent.glob('.telemt-install-*')):

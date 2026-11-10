@@ -1,0 +1,78 @@
+[
+  {
+    "replica": 1,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+    "os": "Ubuntu 22.04.5 LTS",
+    "source_commit": "42ecd9a5867261c33a57a979207c30046c1be0cd",
+    "complete": true,
+    "accepted": true,
+    "oom_delta": {
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "pids_after": 1,
+    "group_peak_bytes": 317808640,
+    "cores": {
+      "balanced2": {
+        "payload_successes": 5040,
+        "payload_errors": 0,
+        "peak_backend_rss_bytes": 30654464,
+        "peak_backend_cpu_one_core_percent": 49.930343287630585,
+        "peak_controller_cpu_one_core_percent": 86.2360299916454,
+        "idle_fd_values": [
+          14
+        ],
+        "all_private_processes_closed": true
+      },
+      "stable": {
+        "payload_successes": 5040,
+        "payload_errors": 0,
+        "peak_backend_rss_bytes": 41615360,
+        "peak_backend_cpu_one_core_percent": 53.56409347896133,
+        "peak_controller_cpu_one_core_percent": 86.89006699461113,
+        "idle_fd_values": [
+          14
+        ],
+        "all_private_processes_closed": true
+      }
+    }
+  },
+  {
+    "replica": 2,
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "os": "Ubuntu 22.04.5 LTS",
+    "source_commit": "42ecd9a5867261c33a57a979207c30046c1be0cd",
+    "complete": true,
+    "accepted": true,
+    "oom_delta": {
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "pids_after": 1,
+    "group_peak_bytes": 342638592,
+    "cores": {
+      "balanced2": {
+        "payload_successes": 5040,
+        "payload_errors": 0,
+        "peak_backend_rss_bytes": 30552064,
+        "peak_backend_cpu_one_core_percent": 57.7477006544885,
+        "peak_controller_cpu_one_core_percent": 84.29863229562214,
+        "idle_fd_values": [
+          14
+        ],
+        "all_private_processes_closed": true
+      },
+      "stable": {
+        "payload_successes": 5040,
+        "payload_errors": 0,
+        "peak_backend_rss_bytes": 43769856,
+        "peak_backend_cpu_one_core_percent": 59.60254648736475,
+        "peak_controller_cpu_one_core_percent": 83.28877455562441,
+        "idle_fd_values": [
+          14
+        ],
+        "all_private_processes_closed": true
+      }
+    }
+  }
+]

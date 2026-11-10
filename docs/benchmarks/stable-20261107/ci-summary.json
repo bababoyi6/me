@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "code_commit": "dcdea2b20ce4ce2d3525c843aa1f3bb740abbfe5",
+  "os": "Ubuntu 22.04.5 LTS",
+  "kernel": "6.8.0-1070-azure",
+  "stable_run": "https://github.com/bababoyi6/me/actions/runs/42351018133",
+  "validate_run": "https://github.com/bababoyi6/me/actions/runs/42351022710",
+  "first_failed_stable_run": "https://github.com/bababoyi6/me/actions/runs/42350787027",
+  "first_failure_resolution": "service UID cannot read repository agent under runner home; stage the exact source in the owned test directory; no host directory permission changes",
+  "protocol_completed": 364,
+  "official_clients": "NOT RUN",
+  "three_full_os_reboots": "NOT RUN",
+  "production_deployed": false
+}

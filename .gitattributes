@@ -27,3 +27,20 @@ docs/benchmarks/system-staged-20261025/** -text -whitespace
 docs/benchmarks/system-ci-20261025/** -text -whitespace
 docs/benchmarks/endurance-ci-20261025/** -text -whitespace
 docs/benchmarks/endurance-vps-20261025/** -text -whitespace
+
+# New CI scripts and this delivery evidence keep explicit line-ending rules.
+.github/workflows/*.yml text eol=lf
+docs/benchmarks/stable-20261107/** -text -whitespace
+docs/benchmarks/continuation-20261107/** -text -whitespace
+docs/benchmarks/paired-20261107/** -text -whitespace
+docs/benchmarks/paired-20261108/** -text -whitespace
+docs/benchmarks/long-path-20261108/** -text -whitespace
+docs/benchmarks/upstream-3517/** -text -whitespace
+docs/benchmarks/queue-20261108/** -text -whitespace
+docs/benchmarks/native-qualification-20261109/** -text -whitespace
+docs/benchmarks/mixed-experience-20261109/** -text -whitespace
+docs/benchmarks/fair-screen-20261109/** -text -whitespace
+docs/benchmarks/path-capacity-20261109/** -text -whitespace
+docs/benchmarks/managed-queue-20261109/** -text -whitespace
+docs/benchmarks/shared-entry-20261109/** -text -whitespace
+docs/benchmarks/core-policy-20261110/** -text -whitespace

@@ -6,6 +6,7 @@ with open(os.environ["TDH_API_TOKEN_FILE"], encoding="ascii") as token_file:
     API_TOKEN = token_file.read().strip()
 AGENT_PORT = int(os.environ["TDH_AGENT_PORT"])
 API_PORT = int(os.environ["TDH_API_PORT"])
+TELEMT_PORT = int(os.environ.get("TDH_TELEMT_PORT", "24431"))
 DCS = tuple(value for value in os.environ["TDH_DC_IPV4"].split(",") if value)
 DC_PORT = int(os.environ["TDH_DC_PORT"])
 API_READY = False
@@ -14,6 +15,10 @@ API_CHECKED = None
 DC_CHECKED = None
 API_MAX_AGE = 5
 DC_MAX_AGE = 25
+# Progress deadlines cover the complete check, not each socket read. A peer
+# sending a byte before every urllib timeout can otherwise strand a live thread.
+API_PROGRESS_TIMEOUT = 15
+DC_PROGRESS_TIMEOUT = 45
 READY_LOCK = threading.Lock()
 sel = selectors.DefaultSelector()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -34,6 +39,9 @@ def healthy(http, api_port):
             payload = json.loads(raw)
         return (response.status == 200 and isinstance(payload, dict) and payload.get("ok") is True
                 and isinstance(payload.get("data"), dict) and payload["data"].get("ready") is True)
+    except urllib.error.HTTPError as error:
+        error.close()
+        return False
     except (OSError, ValueError, urllib.error.URLError):
         return False
 
@@ -43,15 +51,54 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
+class HealthGate:
+    """Consecutive samples plus a down-state cooldown; stale results expire separately."""
+    def __init__(self, fall, rise, cooldown):
+        self.fall, self.rise, self.cooldown = fall, rise, cooldown
+        self.up = False
+        self.good = self.bad = 0
+        self.retry_after = 0
+
+    def sample(self, good, now):
+        if good:
+            self.bad = 0
+            self.good += 1
+            if self.good >= self.rise and now >= self.retry_after:
+                self.up = True
+        else:
+            self.good = 0
+            self.bad += 1
+            if self.up and self.bad >= self.fall:
+                self.up = False
+                self.retry_after = now + self.cooldown
+        return self.up
+
+
+def dc_quorum(results):
+    # One impaired DC must not evict a backend serving the other DCs.
+    # This TCP reachability vote is NOT an MTProto or per-DC protocol guarantee.
+    results = tuple(results)
+    return bool(results) and sum(value is True for value in results) >= len(results) // 2 + 1
+
+
+def listener_alive():
+    try:
+        with socket.create_connection((BIND, TELEMT_PORT), timeout=1):
+            return True
+    except OSError:
+        return False
+
+
 def monitor_api():
     global API_READY, API_CHECKED
     # Never inherit HTTP(S)_PROXY for the loopback API or expose its bearer token.
     http = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+    gate = HealthGate(fall=3, rise=2, cooldown=10)
     while True:
-        current = healthy(http, API_PORT)
+        current = healthy(http, API_PORT) and listener_alive()
         with READY_LOCK:
-            API_READY = current
             API_CHECKED = time.monotonic()
+            API_READY = gate.sample(current, API_CHECKED)
         time.sleep(1)
 
 def probe_dc(address):
@@ -63,27 +110,16 @@ def probe_dc(address):
 
 def monitor_dcs():
     global DC_READY, DC_CHECKED
-    bad_streak = 0
-    good_streak = 0
+    gate = HealthGate(fall=2, rise=3, cooldown=30)
     while True:
         if DCS:
             with concurrent.futures.ThreadPoolExecutor(max_workers=len(DCS)) as executor:
-                current = all(executor.map(probe_dc, DCS))
+                current = dc_quorum(executor.map(probe_dc, DCS))
         else:
             current = False
         with READY_LOCK:
-            if current:
-                bad_streak = 0
-                good_streak += 1
-                # Two complete successful rounds before re-admitting a backend.
-                if good_streak >= 2:
-                    DC_READY = True
-            else:
-                good_streak = 0
-                bad_streak += 1
-                if not DC_READY or bad_streak >= 2:
-                    DC_READY = False
             DC_CHECKED = time.monotonic()
+            DC_READY = gate.sample(current, DC_CHECKED)
         time.sleep(10)
 
 def ready(now=None):
@@ -96,6 +132,18 @@ def ready(now=None):
                 and 0 <= now - API_CHECKED <= API_MAX_AGE and 0 <= now - DC_CHECKED <= DC_MAX_AGE)
 
 
+def monitors_progressing(now, started):
+    with READY_LOCK:
+        # As with ready(), sample after locking: a freshly published timestamp
+        # must not look as though it came from the future.
+        if now is None:
+            now = time.monotonic()
+        return all(0 <= now - (checked if checked is not None else started) <= limit
+                   for checked, limit in ((API_CHECKED, API_PROGRESS_TIMEOUT),
+                                          (DC_CHECKED, DC_PROGRESS_TIMEOUT)))
+
+
+started = time.monotonic()
 monitors = [threading.Thread(target=target, daemon=True) for target in (monitor_api, monitor_dcs)]
 for monitor in monitors:
     monitor.start()
@@ -104,7 +152,12 @@ while True:
     if any(not monitor.is_alive() for monitor in monitors):
         # Let the existing systemd restart policy replace a failed monitor thread.
         raise SystemExit("health monitor stopped")
-    for key, _ in sel.select(timeout=30):
+    if not monitors_progressing(None, started):
+        # Staleness already closes admission. Recover the stuck worker through
+        # the existing service restart policy; ordinary unhealthy votes do not
+        # trigger restarts, and no check is silently declared healthy.
+        raise SystemExit("health monitor progress deadline")
+    for key, _ in sel.select(timeout=1):
         listener = key.fileobj
         try:
             conn, _ = listener.accept()

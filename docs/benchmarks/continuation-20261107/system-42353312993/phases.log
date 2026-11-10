@@ -1,0 +1,9 @@
+{"initialized": true, "image_verified": true, "image_sha256": "5a83bf87599fe26fb86296434305378fe2c136df95c71c721b522fbe63f65900", "limits_from_transient_unit": true}
+Full-system phase: prepare-base-os
+{"started": "base", "logical_memory_mib": 1024}
+{"started": "entry", "logical_memory_mib": 1024}
+{"started": "backend1", "logical_memory_mib": 1024}
+{"started": "backend2", "logical_memory_mib": 1024}
+Full-system phase: attest-private-lan-before-installs
+Full-system phase: public-install-entry
+Full-system phase: public-install-backend1

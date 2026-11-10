@@ -1,0 +1,19 @@
+{
+  "scope": "targeted connect-budget repair; not a replacement for failed historical qualification or a speed claim",
+  "deterministic_counterexample_accepted": true,
+  "weak_completed": true,
+  "weak_runs": 12,
+  "weak_payload_successes": 2400,
+  "weak_payload_errors": 0,
+  "all_weak_runs_accepted": true,
+  "weak_oom_delta": {
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "real_systemd_config_transaction_accepted": true,
+  "config_metadata_private": true,
+  "config_original_bytes_restored": true,
+  "original_paired_results_remain_failed": true,
+  "official_clients_public_cross_region_and_long_term": "NOT RUN",
+  "full_two_runner_three_profile_matrix_after_parameter_change": "NOT RUN"
+}

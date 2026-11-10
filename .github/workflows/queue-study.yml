@@ -1,0 +1,73 @@
+name: Bounded joint throughput and queue latency study
+on:
+  workflow_dispatch:
+    inputs:
+      layout:
+        description: Counterfactuals or equal offered-load mechanism check
+        type: choice
+        default: candidates
+        options: [candidates, equal-load, sustained, legacy-parity]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: private-queue-study
+  cancel-in-progress: false
+jobs:
+  measure:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require the immutable reviewed native build and wait within a bound
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh run view 42495175073 --repo bababoyi6/me --json headSha --jq .headSha)" = dec285fbdf5b42dd8be3e9e879bc0c2ad8994bc8
+          ready=false
+          for attempt in $(seq 1 60); do
+            state=$(gh run view 42495175073 --repo bababoyi6/me --json jobs --jq '.jobs[] | select(.name=="build") | .conclusion')
+            if [ "$state" = success ]; then ready=true; break; fi
+            if [ -n "$state" ]; then echo 'Pinned build did not pass'; exit 1; fi
+            sleep 15
+          done
+          test "$ready" = true
+          gh run download 42495175073 --repo bababoyi6/me --name native-pair --dir "$RUNNER_TEMP/native-pair"
+      - name: Fetch exact legacy fixture only for the old/new parity layout
+        if: inputs.layout == 'legacy-parity'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
+          echo 'b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5  '"$RUNNER_TEMP/balanced2.tar.gz" | sha256sum --check
+      - name: Prepare bounded disposable dependencies and verify socket oracle
+        run: |
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 wireguard-tools ethtool iperf3 python3-cryptography
+          cc -shared -fPIC -Wall -Wextra -Werror tests/socket_policy_lab.c -ldl -o "$RUNNER_TEMP/socket-policy.so"
+          timeout 20 python3 tests/policy_oracle.py --library "$RUNNER_TEMP/socket-policy.so"
+          mkdir -m 700 "$RUNNER_TEMP/queue-evidence"
+      - name: Measure balanced counterfactuals only inside owned namespaces
+        env:
+          STUDY_LAYOUT: ${{ inputs.layout }}
+        run: |
+          flags=(--queue-study)
+          analyzer=tests/queue_analysis.py
+          memory=1536; high=1200
+          case "$STUDY_LAYOUT" in
+            candidates) ;;
+            equal-load) flags=(--equal-load-study); analyzer=tests/long_path_analysis.py ;;
+            sustained) flags=(--sustained-stress); analyzer=tests/stress_analysis.py; memory=768; high=640 ;;
+            legacy-parity) flags=(--legacy-queue-study --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz"); analyzer=tests/legacy_queue_analysis.py ;;
+            *) exit 2 ;;
+          esac
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-queue-${GITHUB_RUN_ID}" -p CPUQuota=300% -p "MemoryMax=${memory}M" -p "MemoryHigh=${high}M" -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=900 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/long_path_lab.py "${flags[@]}" --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/queue-evidence/metrics.json"
+          python3 "$analyzer" "$RUNNER_TEMP/queue-evidence/metrics.json" "$RUNNER_TEMP/queue-evidence/analysis.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: queue-study-evidence
+          path: ${{ runner.temp }}/queue-evidence/*.json
+          retention-days: 14

@@ -1,0 +1,37 @@
+{
+  "benchmark": {
+    "source_commit": "42ecd9a5867261c33a57a979207c30046c1be0cd",
+    "manager_sha256": "cdbca06310a09950fc6b68950d16621427ecbbfd9a61c354dd012514334cb93a",
+    "functions": {
+      "write_haproxy_config": "f567a24af1ed01b28915f3fc13e121ed7a27c534cf7ba351d2ca8a7b86231362",
+      "write_haproxy_unit": "ee3dc800bdc12194c92a938f3131da4bcc2daddef2bc4d7d40ebcc45d618e284",
+      "write_backend_wg": "be3d7737326509d906b066ed97b8327688675a499d3527c02f9fa2721ea41346",
+      "write_entry_wg": "6b6fccf4b61637808b606fec0c169afe459ebd89ee34d6754ba5ee6c4ec8985c",
+      "write_telemt_config": "eaac89adfebe2712acfe220b480db33966d32d5f01584029408f8bf2acde0ca2",
+      "write_telemt_unit": "30ddd92222cb955614c651748b2eae0b08bb2d702f91c8ad5ede0ee84afb332b",
+      "write_health_agent": "65a16a8891c0de6028b24c1884ce6870b361f0a34c77694da83a83335db51643",
+      "open_firewall_entry": "a465280996c2a654ea22f54fdab144ca4cd3404f99d8979ee2c51c8d5f40309f",
+      "open_firewall_backend": "cd275842d21545cb42acc0450d98b7280db1a07f50e783c3fde471a23c73d084",
+      "calculate_connection_limit": "8d0d505452d08b5543450a0dd75c2f080b9844d9a69915af694deb2bffcd7f68",
+      "calculate_direct_buffer_budget": "cbb808e6a92b04e79c23c90a75c98d362f48290bef00895b6115964b93587561"
+    }
+  },
+  "maintenance": {
+    "source_commit": "b7b5ae122bd019d6a369aed8e496fd94df327adf",
+    "manager_sha256": "b675562399f6bc21806a485297732f371019106437edea631dd5a5cf4e8a2eeb",
+    "functions": {
+      "write_haproxy_config": "f567a24af1ed01b28915f3fc13e121ed7a27c534cf7ba351d2ca8a7b86231362",
+      "write_haproxy_unit": "ee3dc800bdc12194c92a938f3131da4bcc2daddef2bc4d7d40ebcc45d618e284",
+      "write_backend_wg": "be3d7737326509d906b066ed97b8327688675a499d3527c02f9fa2721ea41346",
+      "write_entry_wg": "6b6fccf4b61637808b606fec0c169afe459ebd89ee34d6754ba5ee6c4ec8985c",
+      "write_telemt_config": "eaac89adfebe2712acfe220b480db33966d32d5f01584029408f8bf2acde0ca2",
+      "write_telemt_unit": "30ddd92222cb955614c651748b2eae0b08bb2d702f91c8ad5ede0ee84afb332b",
+      "write_health_agent": "65a16a8891c0de6028b24c1884ce6870b361f0a34c77694da83a83335db51643",
+      "open_firewall_entry": "a465280996c2a654ea22f54fdab144ca4cd3404f99d8979ee2c51c8d5f40309f",
+      "open_firewall_backend": "cd275842d21545cb42acc0450d98b7280db1a07f50e783c3fde471a23c73d084",
+      "calculate_connection_limit": "8d0d505452d08b5543450a0dd75c2f080b9844d9a69915af694deb2bffcd7f68",
+      "calculate_direct_buffer_budget": "cbb808e6a92b04e79c23c90a75c98d362f48290bef00895b6115964b93587561"
+    }
+  },
+  "meaning": "Different source commits; listed runtime templates identical. This does not relabel any historical run as a test of another commit."
+}

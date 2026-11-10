@@ -1,0 +1,18 @@
+{
+  "scope": "original constructor/stdout/fixture unchanged; capture after exceptions only",
+  "errors": [],
+  "expected_timeout_diagnostic": [
+    {
+      "version": "telemt 3.5.5+tdh.balanced2",
+      "type": "RuntimeError",
+      "phase": "digest",
+      "received_bytes": 262144,
+      "reason": "unexpected EOF",
+      "count": 100
+    }
+  ],
+  "curation": {
+    "source_sha256": "ba745a230deec5418f2e4e1a764bcbd77ece8e7e85cf366de5aaf4048cb75e5e",
+    "change": "aggregate intentional 8-second diagnostic only; retain all actual 25-second failures unchanged; full diagnostic counts and DC errors remain in companion replica JSON"
+  }
+}

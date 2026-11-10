@@ -1,0 +1,814 @@
+[
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": false,
+      "warn": false
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "error_type": "TimeoutError"
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": false,
+      "warn": false
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": false,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "error_type": "URLError"
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "error_type": "TimeoutError"
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "status": 200,
+      "users": 2,
+      "tls_link_counts": [
+        2,
+        2
+      ]
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  },
+  {
+    "telemt-dual-hop-telemt.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "wg-quick@tdh-b1.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "active",
+      "SubState": "exited"
+    },
+    "wg-quick@tdh-b2.service": {
+      "Result": "success",
+      "NRestarts": "0",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "api": {
+      "error_type": "TimeoutError"
+    },
+    "startup_markers": {
+      "permission denied": false,
+      "os error 13": false,
+      "panicked": false,
+      "address already in use": false,
+      "failed to parse": false,
+      "unknown field": false,
+      "tls": true,
+      "error": true,
+      "warn": true
+    }
+  }
+]

@@ -1,0 +1,94 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-11-09T16:53:06Z",
+  "databaseId": 42659213985,
+  "headSha": "8fb78c361a4581141c761433a87d985545b00dc3",
+  "jobs": [
+    {
+      "completedAt": "2026-11-09T16:54:17Z",
+      "conclusion": "success",
+      "databaseId": 129305902340,
+      "name": "selection",
+      "startedAt": "2026-11-09T16:53:10Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T16:53:11Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T16:53:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:53:12Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T16:53:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:53:25Z",
+          "conclusion": "success",
+          "name": "Prepare bounded dependencies and service identity",
+          "number": 3,
+          "startedAt": "2026-11-09T16:53:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:53:27Z",
+          "conclusion": "success",
+          "name": "Fetch released bytes from actual pinned public installation URLs",
+          "number": 4,
+          "startedAt": "2026-11-09T16:53:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:53:27Z",
+          "conclusion": "skipped",
+          "name": "Verify default and explicit real install, both links, auth and refusal boundaries",
+          "number": 5,
+          "startedAt": "2026-11-09T16:53:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:54:09Z",
+          "conclusion": "success",
+          "name": "Verify official without upgrade history switches to baseline and back with real systemd",
+          "number": 6,
+          "startedAt": "2026-11-09T16:53:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:54:15Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 7,
+          "startedAt": "2026-11-09T16:54:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:54:15Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "startedAt": "2026-11-09T16:54:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T16:54:16Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-11-09T16:54:15Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42659213985/job/129305902340"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-09T16:54:18Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42659213985"
+}

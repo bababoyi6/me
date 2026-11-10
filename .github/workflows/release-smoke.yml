@@ -1,0 +1,18 @@
+name: Public release installation smoke
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute the exact public pinned README command without installing on the runner
+        run: timeout --kill-after=5 160 python3 tests/test_install_command.py --public

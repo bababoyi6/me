@@ -1,0 +1,11 @@
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	﻿2026-11-08T09:38:09.1001857Z ##[group]Run sudo timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/native-maintenance/system.json"' native "$RUNNER_TEMP"
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.1002770Z ^[[36;1msudo timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/native-maintenance/system.json"' native "$RUNNER_TEMP"^[[0m
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.1029405Z shell: /usr/bin/bash -e {0}
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.1029542Z ##[endgroup]
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.8028300Z Traceback (most recent call last):
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.8028693Z   File "/home/runner/work/me/me/tests/stable_system_lab.py", line 243, in <module>
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.8029026Z     raise SystemExit(main())
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.8029310Z   File "/home/runner/work/me/me/tests/stable_system_lab.py", line 83, in main
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.8029821Z     raise RuntimeError('native candidate requires owned CI namespace')
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.8030146Z RuntimeError: native candidate requires owned CI namespace
+verify	Verify actual systemd candidate upgrade crash recovery and reverse rollback	2026-11-08T09:38:09.8148724Z ##[error]Process completed with exit code 1.

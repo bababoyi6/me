@@ -1,0 +1,174 @@
+{
+  "scope": "real HAProxy/FakeTLS/MTProto and synthetic DC/payload only; shared Linux host",
+  "conditions": "Ubuntu22.04_private_loopback_netem25ms_rate100Mbps_CPU100pct_Memory1GiB",
+  "kernel": "6.8.0-1070-azure",
+  "results": [
+    {
+      "version": "telemt 3.5.17",
+      "rows": [
+        {
+          "concurrency": 30,
+          "direction": "U",
+          "successes": 30,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 22.316400016170817,
+          "wall_seconds": 2.8192073970000138,
+          "handshake_ms": {
+            "p50": 220.7920814999511,
+            "p95": 229.754220000018
+          },
+          "completion_ms": {
+            "p50": 2747.3223380000036,
+            "p95": 2764.185246000011
+          },
+          "backend_cpu_one_core_percent": 0.7094192510023377,
+          "controller_and_mock_cpu_one_core_percent": 3.9967085472285837,
+          "haproxy_cpu_one_core_percent": 0.35470962550116886,
+          "backend_peak_rss_bytes": 20688896,
+          "backend_fds_before": 16,
+          "backend_fds_after": 16
+        },
+        {
+          "concurrency": 30,
+          "direction": "D",
+          "successes": 30,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 21.169527951865568,
+          "wall_seconds": 2.971939673999941,
+          "handshake_ms": {
+            "p50": 214.21408599996994,
+            "p95": 221.77164200002153
+          },
+          "completion_ms": {
+            "p50": 2898.2053975000213,
+            "p95": 2945.338150999987
+          },
+          "backend_cpu_one_core_percent": 0.6729611699379466,
+          "controller_and_mock_cpu_one_core_percent": 3.342540895734276,
+          "haproxy_cpu_one_core_percent": 0.3364805849689733,
+          "backend_peak_rss_bytes": 20619264,
+          "backend_fds_before": 16,
+          "backend_fds_after": 42
+        },
+        {
+          "concurrency": 50,
+          "direction": "U",
+          "successes": 50,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 24.90030480881512,
+          "wall_seconds": 4.211097044999974,
+          "handshake_ms": {
+            "p50": 231.18850250006062,
+            "p95": 249.9806629999739
+          },
+          "completion_ms": {
+            "p50": 4178.267485000049,
+            "p95": 4196.125185000028
+          },
+          "backend_cpu_one_core_percent": 0.7124034350056208,
+          "controller_and_mock_cpu_one_core_percent": 5.419199808538286,
+          "haproxy_cpu_one_core_percent": 0.4749356233370804,
+          "backend_peak_rss_bytes": 23261184,
+          "backend_fds_before": 42,
+          "backend_fds_after": 114
+        },
+        {
+          "concurrency": 50,
+          "direction": "D",
+          "successes": 50,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 23.889159015407376,
+          "wall_seconds": 4.389338274000011,
+          "handshake_ms": {
+            "p50": 216.28591899997218,
+            "p95": 222.3163649999833
+          },
+          "completion_ms": {
+            "p50": 4285.208059499951,
+            "p95": 4327.332769999998
+          },
+          "backend_cpu_one_core_percent": 0.683474321806165,
+          "controller_and_mock_cpu_one_core_percent": 3.8352181921625004,
+          "haproxy_cpu_one_core_percent": 0.22782477393538839,
+          "backend_peak_rss_bytes": 23261184,
+          "backend_fds_before": 114,
+          "backend_fds_after": 14
+        },
+        {
+          "concurrency": 100,
+          "direction": "U",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 26.48537505038551,
+          "wall_seconds": 7.918151039999998,
+          "handshake_ms": {
+            "p50": 238.83467350003684,
+            "p95": 265.43962900007045
+          },
+          "completion_ms": {
+            "p50": 7875.152950000029,
+            "p95": 7886.41197000004
+          },
+          "backend_cpu_one_core_percent": 0.8840447681078842,
+          "controller_and_mock_cpu_one_core_percent": 5.258510085202921,
+          "haproxy_cpu_one_core_percent": 0.3788763291890932,
+          "backend_peak_rss_bytes": 28934144,
+          "backend_fds_before": 14,
+          "backend_fds_after": 204
+        },
+        {
+          "concurrency": 100,
+          "direction": "D",
+          "successes": 100,
+          "errors": [],
+          "success_rate": 1.0,
+          "aggregate_mbps": 24.992088783678383,
+          "wall_seconds": 8.391263404000028,
+          "handshake_ms": {
+            "p50": 217.4374430000512,
+            "p95": 223.42137500004355
+          },
+          "completion_ms": {
+            "p50": 8323.880907999977,
+            "p95": 8361.726268999973
+          },
+          "backend_cpu_one_core_percent": 0.7150293955901637,
+          "controller_and_mock_cpu_one_core_percent": 4.227719544960179,
+          "haproxy_cpu_one_core_percent": 0.3575146977950818,
+          "backend_peak_rss_bytes": 28934144,
+          "backend_fds_before": 204,
+          "backend_fds_after": 100
+        }
+      ],
+      "before_load": {
+        "cpu_seconds": 0.0,
+        "rss_bytes": 17780736,
+        "fds": 16
+      },
+      "after_idle": {
+        "cpu_seconds": 0.23,
+        "rss_bytes": 22175744,
+        "fds": 14
+      },
+      "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+      "config_policy_sha256": "29750af6c3d894f3e7a958b765c2637e8e8847997fda31c126bd7c618541051b",
+      "mock_dc_socket_timeout_seconds": 25,
+      "client_io_timeout_seconds": 25,
+      "offline_bootstrap": false,
+      "payload_bytes": 262144,
+      "transfer_rate": 12500000,
+      "mock_dc_completed": 364,
+      "mock_dc_errors": [],
+      "validation_error": null,
+      "config_unchanged": true,
+      "accepted": true,
+      "private_processes_closed": true
+    }
+  ],
+  "accepted": true
+}

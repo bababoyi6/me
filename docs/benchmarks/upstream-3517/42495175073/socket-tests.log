@@ -1,0 +1,30 @@
+2026-11-08T15:40:48.3051286Z test transport::socket::tests::test_chunked_send_has_no_fd_growth_after_success_and_cancellation_stress ... ignored, manual descriptor-pressure gate
+2026-11-08T15:40:48.3056994Z test transport::socket::tests::test_chunked_send_rejects_zero_fragment_size ... ok
+2026-11-08T15:40:48.3057846Z test transport::socket::tests::test_chunked_send_rejects_invalid_fd ... ok
+2026-11-08T15:40:48.3058609Z test transport::socket::tests::test_configure_client_socket ... ok
+2026-11-08T15:40:48.3060781Z test transport::socket::tests::test_chunked_send_restores_mss_after_send_error ... ok
+2026-11-08T15:40:48.3062473Z test transport::socket::tests::test_configure_client_socket_ack_timeout_overflow_rejected ... ok
+2026-11-08T15:40:48.3064386Z test transport::socket::tests::test_configure_client_socket_zero_ack_timeout ... ok
+2026-11-08T15:40:48.3065360Z test transport::socket::tests::test_chunked_send_preserves_stream_and_configured_mss ... ok
+2026-11-08T15:40:48.3066475Z test transport::socket::tests::test_create_listener_applies_client_mss ... ok
+2026-11-08T15:40:48.3069367Z test transport::socket::tests::test_listen_options_default ... ok
+2026-11-08T15:40:48.3069936Z test transport::socket::tests::test_configure_socket ... ok
+2026-11-08T15:40:48.3070715Z test transport::socket::tests::test_normalize_ip ... ok
+2026-11-08T15:40:48.3071508Z test transport::socket::tests::test_configure_client_socket_roundtrip_io ... ok
+2026-11-08T15:40:48.3072696Z test result: ok. 12 passed; 0 failed; 1 ignored; 0 measured; 2836 filtered out; finished in 0.00s
+2026-11-08T15:48:09.9821653Z test transport::socket::tests::test_chunked_send_has_no_fd_growth_after_success_and_cancellation_stress ... ignored, manual descriptor-pressure gate
+2026-11-08T15:48:09.9823151Z test transport::socket::tests::tdh_outgoing_autotune_and_unsent_limit ... ok
+2026-11-08T15:48:09.9823974Z test transport::socket::tests::test_chunked_send_rejects_invalid_fd ... ok
+2026-11-08T15:48:09.9824793Z test transport::socket::tests::test_chunked_send_rejects_zero_fragment_size ... ok
+2026-11-08T15:48:09.9825670Z test transport::socket::tests::tdh_client_send_stays_automatic ... ok
+2026-11-08T15:48:09.9826400Z test transport::socket::tests::test_configure_client_socket ... ok
+2026-11-08T15:48:09.9827269Z test transport::socket::tests::test_configure_client_socket_ack_timeout_overflow_rejected ... ok
+2026-11-08T15:48:09.9828267Z test transport::socket::tests::test_configure_client_socket_zero_ack_timeout ... ok
+2026-11-08T15:48:09.9829134Z test transport::socket::tests::test_configure_client_socket_roundtrip_io ... ok
+2026-11-08T15:48:09.9830000Z test transport::socket::tests::test_chunked_send_restores_mss_after_send_error ... ok
+2026-11-08T15:48:09.9830874Z test transport::socket::tests::test_create_listener_applies_client_mss ... ok
+2026-11-08T15:48:09.9832597Z test transport::socket::tests::test_chunked_send_preserves_stream_and_configured_mss ... ok
+2026-11-08T15:48:09.9833436Z test transport::socket::tests::test_listen_options_default ... ok
+2026-11-08T15:48:09.9834140Z test transport::socket::tests::test_normalize_ip ... ok
+2026-11-08T15:48:09.9834795Z test transport::socket::tests::test_configure_socket ... ok
+2026-11-08T15:48:09.9835506Z test result: ok. 14 passed; 0 failed; 1 ignored; 0 measured; 2836 filtered out; finished in 0.00s

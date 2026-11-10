@@ -1,0 +1,52 @@
+{
+  "scope": "original constructor/stdout/fixture unchanged; capture after exceptions only",
+  "errors": [
+    {
+      "version": "telemt 3.5.16",
+      "type": "RuntimeError",
+      "phase": "payload",
+      "received_bytes": 0,
+      "reason": "unexpected EOF",
+      "dc_timeout_setting": 25,
+      "core_exit": null,
+      "mock_dc_errors_so_far": []
+    },
+    {
+      "version": "telemt 3.5.16",
+      "type": "RuntimeError",
+      "phase": "payload",
+      "received_bytes": 0,
+      "reason": "unexpected EOF",
+      "dc_timeout_setting": 25,
+      "core_exit": null,
+      "mock_dc_errors_so_far": []
+    }
+  ],
+  "environment": {
+    "openssl": "OpenSSL 3.0.2 15 Mar 2022",
+    "python_cryptography": "3.4.8",
+    "tcp_sysctl": {
+      "tcp_congestion_control": "cubic",
+      "tcp_rmem": "4096\t131072\t6291456",
+      "tcp_wmem": "4096\t16384\t4194304",
+      "tcp_tw_reuse": "2",
+      "tcp_timestamps": "1",
+      "ip_local_port_range": "32768\t60999"
+    },
+    "cpu_flags": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru amd_ibpb_ret arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect"
+  },
+  "expected_timeout_diagnostic": [
+    {
+      "version": "telemt 3.5.5+tdh.balanced2",
+      "type": "RuntimeError",
+      "phase": "digest",
+      "received_bytes": 262144,
+      "reason": "unexpected EOF",
+      "count": 100
+    }
+  ],
+  "curation": {
+    "source_sha256": "61c18c8eb5eef853f1dd8f47ecc47689282ecaee06e2f6ca089eb3b5822ab3ec",
+    "change": "aggregate intentional 8-second diagnostic only; retain all actual 25-second failures unchanged; full diagnostic counts and DC errors remain in companion replica JSON"
+  }
+}

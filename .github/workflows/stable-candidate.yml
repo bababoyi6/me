@@ -1,0 +1,70 @@
+name: Build and qualify optional native stable socket port
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths:
+      - .github/workflows/stable-candidate.yml
+permissions:
+  contents: read
+concurrency:
+  group: stable-native-candidate
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: telemt/telemt
+          ref: 66708d2866f3f3a4541c4fa67984d408e71a8af4
+          path: upstream
+          persist-credentials: false
+      - name: Prepare pinned Rust
+        run: rustup toolchain install 1.99.1 --profile minimal --no-self-update && rustup default 1.99.1
+      - name: Build and test same-toolchain native controls
+        run: timeout --kill-after=10 1700 python3 tools/build_stable_candidate.py --source upstream --output "$RUNNER_TEMP/native-pair"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-pair
+          path: ${{ runner.temp }}/native-pair/
+          retention-days: 7
+          if-no-files-found: error
+  measure:
+    needs: build
+    runs-on: ubuntu-22.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-pair
+          path: ${{ runner.temp }}/native-pair
+      - name: Prepare disposable dependencies
+        run: |
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 wireguard-tools ethtool iperf3 python3-cryptography
+          mkdir -m 700 "$RUNNER_TEMP/native-evidence"
+      - name: Compare native single-core high-RTT WG relays in four AB BA rounds
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativepath-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=900 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" python3 tests/long_path_lab.py --native-directory "$RUNNER_TEMP/native-pair" --output "$RUNNER_TEMP/native-evidence/metrics.json"
+          python3 tests/long_path_analysis.py "$RUNNER_TEMP/native-evidence/metrics.json" "$RUNNER_TEMP/native-evidence/analysis.json"
+      - name: Fetch exact legacy rollback fixture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          timeout 90 gh api -H 'Accept: application/octet-stream' repos/bababoyi6/me/releases/assets/672609415 > "$RUNNER_TEMP/balanced2.tar.gz"
+      - name: Verify native systemd maintenance and exact legacy rollback
+        run: |
+          sudo env GITHUB_ACTIONS=true timeout --kill-after=10 240 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/native-pair" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/native-evidence/system.json"' native "$RUNNER_TEMP"
+      - name: Validate native 30 50 100 concurrency and idle recovery inside one CPU and 768MiB
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-nativeprotocol-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=768M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv="GITHUB_ACTIONS=true" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" unshare --net -- bash -c 'ip link set lo up; tc qdisc add dev lo root netem delay 25ms rate 100mbit limit 10000; exec python3 tests/native_socket_acceptance.py --directory "$1" --output "$2"' native "$RUNNER_TEMP/native-pair" "$RUNNER_TEMP/native-evidence/protocol.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-socket-evidence
+          path: ${{ runner.temp }}/native-evidence/*.json
+          retention-days: 14

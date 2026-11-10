@@ -1,0 +1,86 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-11-08T09:48:59Z",
+  "databaseId": 42468767384,
+  "headSha": "02ba6cd236dcabab1404af214513dbc9a8fa82ae",
+  "jobs": [
+    {
+      "completedAt": "2026-11-08T09:51:30Z",
+      "conclusion": "success",
+      "databaseId": 128694351979,
+      "name": "verify",
+      "startedAt": "2026-11-08T09:49:01Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-08T09:49:03Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-08T09:49:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T09:49:04Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-08T09:49:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T09:49:39Z",
+          "conclusion": "success",
+          "name": "Prepare disposable dependencies and exact tested core",
+          "number": 3,
+          "startedAt": "2026-11-08T09:49:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T09:50:24Z",
+          "conclusion": "success",
+          "name": "Verify actual systemd candidate upgrade crash recovery and reverse rollback",
+          "number": 4,
+          "startedAt": "2026-11-08T09:49:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T09:51:27Z",
+          "conclusion": "success",
+          "name": "Verify 30 50 100 concurrent flows inside one CPU and 768MiB budget",
+          "number": 5,
+          "startedAt": "2026-11-08T09:50:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T09:51:28Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 6,
+          "startedAt": "2026-11-08T09:51:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T09:51:28Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 12,
+          "startedAt": "2026-11-08T09:51:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-08T09:51:28Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-11-08T09:51:28Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42468767384/job/128694351979"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-08T09:51:30Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42468767384"
+}

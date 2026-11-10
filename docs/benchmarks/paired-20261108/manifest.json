@@ -1,0 +1,237 @@
+{
+  "kind": "post-connect-repair_full_matrix_and_native_maintenance_evidence",
+  "files": {
+    "artifact-index.json": {
+      "bytes": 603,
+      "sha256": "5dccab81d2cfbf743db0577b5adf4480d6be1da50abd85c24d9598ad0eabc776"
+    },
+    "ci-42450540276.json": {
+      "bytes": 5255,
+      "sha256": "28bad5de4a574def7ef32d6a89f360df30ec7f62d39b081903f8c03c54cdd4bc"
+    },
+    "ci-42450779814.json": {
+      "bytes": 3119,
+      "sha256": "8ca9f605a06a98dca12e1498e3b4de7ed9846f180a403d3752076d42afc96b5c"
+    },
+    "ci-42450779836.json": {
+      "bytes": 2790,
+      "sha256": "422e67dc96a4c9a08e3b5fd6b41dd8c687f6061188c4086d2608953ce5c8a221"
+    },
+    "ci-42450779843.json": {
+      "bytes": 3416,
+      "sha256": "2a0081fa196e6185fb4966e445ce59330a4e724157ad1a4425c313e5c67cb037"
+    },
+    "ci-42450784265.json": {
+      "bytes": 7790,
+      "sha256": "9fb41c417889cb7437e876e72e4ccb057d89169b43a679186a0ffa4526f07740"
+    },
+    "ci-42451301643.json": {
+      "bytes": 3119,
+      "sha256": "faa570cbd9816136e98e2d9cf6500aae4f5ee1f969b1eb1e2ff3970e32bd2ea6"
+    },
+    "ci-42451808600.json": {
+      "bytes": 7790,
+      "sha256": "9152c825ed93f37b013d9461f8c0b5995ec7bb55ad15ca24b49c635c39cdd9a4"
+    },
+    "latest-stable.json": {
+      "bytes": 2033,
+      "sha256": "e1178fc02ece634d20bfe3e710e48a3da61392e8d54e2df8dd459baf17e99ddd"
+    },
+    "qualification.json": {
+      "bytes": 828,
+      "sha256": "08c53ab1fd0107a68220957af2f8604b36464fa7ef59d45804f0c4c15d5a7b50"
+    },
+    "README.md": {
+      "bytes": 4386,
+      "sha256": "c85782de8aca10607b45b2e3d3b6630cb743572b8cc46896dd4e296e9df407af"
+    },
+    "resource-summary.json": {
+      "bytes": 2268,
+      "sha256": "0c0662085215e76b66aa1c3efeff4e3c261a71c9f93cf5db17f547fd545d4e1a"
+    },
+    "root-tests-42451808600.log": {
+      "bytes": 53890,
+      "sha256": "a7d808a6c3c33fc1924cd7e9216d201e3f6d9fac6a4bdffce9712691c88b8f0b"
+    },
+    "root-tests.log": {
+      "bytes": 53677,
+      "sha256": "1f539a3527fc0a482793c4eea2eeb2f9e1183e6bcfa2898198a142e75371d96c"
+    },
+    "runtime-template-bridge.json": {
+      "bytes": 2744,
+      "sha256": "096e2b0087644ed863ffc2f0c37da5c671ce3cfabc83fb75cfe480a95ccb7d31"
+    },
+    "summary.json": {
+      "bytes": 43068,
+      "sha256": "34175ed5d8f16059744c5ba890b59de6aab17c1ea4ca95e37583b78f6c98c70e"
+    },
+    "42450779814/assessment.json": {
+      "bytes": 149,
+      "sha256": "3bd7fda128cd7c4b564ed4b66cdb7c8d45259b00447c13ce6711c9150851a3ed"
+    },
+    "42450779814/e2e.json": {
+      "bytes": 4819,
+      "sha256": "a749d123dd1808496a5aff1abc6b3c10269cac522fa3dcf476e2c4326c8be581"
+    },
+    "42450779814/interaction-backend1-install.json": {
+      "bytes": 393,
+      "sha256": "6692a2fba1fb9e2029bd5b69e85e8aadb94236e495e8f712aafa2df8a92aff76"
+    },
+    "42450779814/interaction-backend1-registration.json": {
+      "bytes": 186,
+      "sha256": "e245db05eb808458d5d1e865e291305d0c4a8d3829416a2eaa0e3e992787a789"
+    },
+    "42450779814/interaction-backend1-repeat-install.json": {
+      "bytes": 219,
+      "sha256": "0e08860bbdf684df597081cdad94d07857db771c794a0c0c5662e5fa9a558646"
+    },
+    "42450779814/interaction-backend2-install.json": {
+      "bytes": 393,
+      "sha256": "fcf4acbfe6bba2bd5f9e6bbdb0909dfb1e95ad06bed1f6060f983c1c9803cced"
+    },
+    "42450779814/interaction-backend2-registration.json": {
+      "bytes": 186,
+      "sha256": "7c49e2f7701052d8c67714283fd0dc45d841d6c953072b88e9897e6aeb1f17ea"
+    },
+    "42450779814/interaction-backend2-repeat-install.json": {
+      "bytes": 219,
+      "sha256": "67e3c61e7aa4fedf3fd0e1227566409c3856a7145ef66d93c516bf8a3cd299dc"
+    },
+    "42450779814/interaction-entry-install.json": {
+      "bytes": 387,
+      "sha256": "7d616ecf9aef9b85ef812626ea5402dae6501f917f5d9159241029781c4a7d8c"
+    },
+    "42450779814/interaction-entry-repeat-install.json": {
+      "bytes": 213,
+      "sha256": "72b9300628729c0e3fa787c3e94aed7df2cefa8ac33c9db04b26abbb423b0b75"
+    },
+    "42450779814/lan.json": {
+      "bytes": 9081,
+      "sha256": "4153f5d3761274896c5dfd78fdbd61cae6473b6f5ff397c1438913ea4ff4682c"
+    },
+    "42450779814/phases.log": {
+      "bytes": 1112,
+      "sha256": "238b185159c68c4fbd9d064927fd90d2d413bf19dfe1d245a6266796ee81c4db"
+    },
+    "42450779814/preparation-failure.json": {
+      "bytes": 237,
+      "sha256": "213411923ec0dbc1cdcaceb1650dc8db613aa1b37c892fa04cefc65e127c60dc"
+    },
+    "42450779814/preparation.json": {
+      "bytes": 308,
+      "sha256": "0171664d69e868e8e83b6562561c8971f87b1b33e32800364351b2dd2614672b"
+    },
+    "42450779814/startup-backend1.json": {
+      "bytes": 18469,
+      "sha256": "14f060ff67aba82cfa871ce1ad1ed032f1bfd5a4265858c530254dfd90a05945"
+    },
+    "42450779814/startup-backend2.json": {
+      "bytes": 18727,
+      "sha256": "71327455eab20f05e0fe8ac0cad9b7e543adf0f116408eace9b88bc4f27c52c7"
+    },
+    "42450779814/supervisor.json": {
+      "bytes": 23646,
+      "sha256": "d6789111b1dda3497c1e31341f82580885a400051843efb48b773a6881356c8f"
+    },
+    "42450779814/worker.json": {
+      "bytes": 2515,
+      "sha256": "12942545ae9d2fa73dd6aae131cc8ad3ce26f505e395f8529e67542b5ead5324"
+    },
+    "42450779836/native-arm.json": {
+      "bytes": 5804,
+      "sha256": "686438bbc378bf413fdc0cf86ce3a3b5f29c9d11b1d74614bd71efdf02958cc9"
+    },
+    "42450779843/dualhop.json": {
+      "bytes": 3511,
+      "sha256": "fc75ea68101d3bb1ef72e93c044558296493d77c8c0c97f25fe6679b81b52b1d"
+    },
+    "42450779843/protocol-load.json": {
+      "bytes": 5962,
+      "sha256": "2aab41e47204aa90c5f8beb9882e009fd9f6f8cbe17f032817b0aeb642810f98"
+    },
+    "42450779843/system-upgrade.json": {
+      "bytes": 2172,
+      "sha256": "9e589fe1f6af2a203a316ab979cf0facfcaa87cb0bd5c53bce422631b1184da0"
+    },
+    "42451301643/assessment.json": {
+      "bytes": 149,
+      "sha256": "3bd7fda128cd7c4b564ed4b66cdb7c8d45259b00447c13ce6711c9150851a3ed"
+    },
+    "42451301643/e2e.json": {
+      "bytes": 4819,
+      "sha256": "a749d123dd1808496a5aff1abc6b3c10269cac522fa3dcf476e2c4326c8be581"
+    },
+    "42451301643/interaction-backend1-install.json": {
+      "bytes": 393,
+      "sha256": "6692a2fba1fb9e2029bd5b69e85e8aadb94236e495e8f712aafa2df8a92aff76"
+    },
+    "42451301643/interaction-backend1-registration.json": {
+      "bytes": 186,
+      "sha256": "e245db05eb808458d5d1e865e291305d0c4a8d3829416a2eaa0e3e992787a789"
+    },
+    "42451301643/interaction-backend1-repeat-install.json": {
+      "bytes": 219,
+      "sha256": "0e08860bbdf684df597081cdad94d07857db771c794a0c0c5662e5fa9a558646"
+    },
+    "42451301643/interaction-backend2-install.json": {
+      "bytes": 393,
+      "sha256": "fcf4acbfe6bba2bd5f9e6bbdb0909dfb1e95ad06bed1f6060f983c1c9803cced"
+    },
+    "42451301643/interaction-backend2-registration.json": {
+      "bytes": 186,
+      "sha256": "7c49e2f7701052d8c67714283fd0dc45d841d6c953072b88e9897e6aeb1f17ea"
+    },
+    "42451301643/interaction-backend2-repeat-install.json": {
+      "bytes": 219,
+      "sha256": "67e3c61e7aa4fedf3fd0e1227566409c3856a7145ef66d93c516bf8a3cd299dc"
+    },
+    "42451301643/interaction-entry-install.json": {
+      "bytes": 387,
+      "sha256": "7d616ecf9aef9b85ef812626ea5402dae6501f917f5d9159241029781c4a7d8c"
+    },
+    "42451301643/interaction-entry-repeat-install.json": {
+      "bytes": 213,
+      "sha256": "72b9300628729c0e3fa787c3e94aed7df2cefa8ac33c9db04b26abbb423b0b75"
+    },
+    "42451301643/lan.json": {
+      "bytes": 9081,
+      "sha256": "004fff8014e1a9b2ed79d12b7a73ab847f1b2a666e2d6907d0518d9a488f7bd2"
+    },
+    "42451301643/phases.log": {
+      "bytes": 1112,
+      "sha256": "238b185159c68c4fbd9d064927fd90d2d413bf19dfe1d245a6266796ee81c4db"
+    },
+    "42451301643/preparation-failure.json": {
+      "bytes": 237,
+      "sha256": "6577713a75c3ed3a2a0ed8df9ef2f9a0c631ad85507a3d91779685c4b7a43776"
+    },
+    "42451301643/preparation.json": {
+      "bytes": 308,
+      "sha256": "0171664d69e868e8e83b6562561c8971f87b1b33e32800364351b2dd2614672b"
+    },
+    "42451301643/startup-backend1.json": {
+      "bytes": 18531,
+      "sha256": "00910cda46865d1e0f18a6c194f3d33c06127f21c1bf65281bad477f59c187b5"
+    },
+    "42451301643/startup-backend2.json": {
+      "bytes": 18727,
+      "sha256": "71327455eab20f05e0fe8ac0cad9b7e543adf0f116408eace9b88bc4f27c52c7"
+    },
+    "42451301643/supervisor.json": {
+      "bytes": 29173,
+      "sha256": "bbbc1d0713a1a41c0cf46574f0d5266c2d2c7fad8a7d91257f9bc7ada2802edb"
+    },
+    "42451301643/worker.json": {
+      "bytes": 2768,
+      "sha256": "a97d36f35ba6bf9aabe6b91a5e4576a5838b39084a43500dc712ad1af5e765ed"
+    },
+    "paired-performance-1/replica-1.json": {
+      "bytes": 265093,
+      "sha256": "ef3469c320edaa2ad0835f7209ce855e0ba54ffa5e9d18199e05da20a612db84"
+    },
+    "paired-performance-2/replica-2.json": {
+      "bytes": 225589,
+      "sha256": "e088026a68dc74f8533502ceb096d53caf8693c48607f9b9052b10746a76ebbd"
+    }
+  }
+}

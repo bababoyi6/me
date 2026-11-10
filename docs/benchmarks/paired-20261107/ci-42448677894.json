@@ -1,0 +1,9 @@
+{
+  "conclusion": "cancelled",
+  "databaseId": 42448677894,
+  "headSha": "31e2ac5e9635ae2adef3b61a07b5e43807066967",
+  "jobs": [],
+  "name": "Candidate three-system install and reboot",
+  "status": "completed",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42448677894"
+}

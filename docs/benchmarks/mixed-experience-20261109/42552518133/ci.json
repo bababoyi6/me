@@ -1,0 +1,311 @@
+{
+  "conclusion": "failure",
+  "createdAt": "2026-11-09T02:43:51Z",
+  "databaseId": 42552518133,
+  "headSha": "d0f761a18839f8c740a242fbcfa30c905cf31f62",
+  "jobs": [
+    {
+      "completedAt": "2026-11-09T02:50:01Z",
+      "conclusion": "success",
+      "databaseId": 128951018593,
+      "name": "measure (low)",
+      "startedAt": "2026-11-09T02:43:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T02:43:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T02:43:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:43:57Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T02:43:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:00Z",
+          "conclusion": "success",
+          "name": "Fetch exact three immutable binaries; no new build or release",
+          "number": 3,
+          "startedAt": "2026-11-09T02:43:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:16Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable dependencies",
+          "number": 4,
+          "startedAt": "2026-11-09T02:44:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:49:56Z",
+          "conclusion": "success",
+          "name": "Measure preregistered mixed traffic only in owned namespaces",
+          "number": 5,
+          "startedAt": "2026-11-09T02:44:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:49:58Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 6,
+          "startedAt": "2026-11-09T02:49:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:49:58Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 12,
+          "startedAt": "2026-11-09T02:49:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:49:58Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-11-09T02:49:58Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42552518133/job/128951018593"
+    },
+    {
+      "completedAt": "2026-11-09T02:58:52Z",
+      "conclusion": "success",
+      "databaseId": 128951018736,
+      "name": "measure (weak)",
+      "startedAt": "2026-11-09T02:43:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T02:43:54Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T02:43:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:43:55Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T02:43:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:43:58Z",
+          "conclusion": "success",
+          "name": "Fetch exact three immutable binaries; no new build or release",
+          "number": 3,
+          "startedAt": "2026-11-09T02:43:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:16Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable dependencies",
+          "number": 4,
+          "startedAt": "2026-11-09T02:43:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:58:49Z",
+          "conclusion": "success",
+          "name": "Measure preregistered mixed traffic only in owned namespaces",
+          "number": 5,
+          "startedAt": "2026-11-09T02:44:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:58:50Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 6,
+          "startedAt": "2026-11-09T02:58:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:58:50Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 12,
+          "startedAt": "2026-11-09T02:58:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:58:50Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-11-09T02:58:50Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42552518133/job/128951018736"
+    },
+    {
+      "completedAt": "2026-11-09T02:57:57Z",
+      "conclusion": "success",
+      "databaseId": 128951018796,
+      "name": "measure (rtt100)",
+      "startedAt": "2026-11-09T02:43:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T02:43:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T02:43:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:43:56Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T02:43:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:01Z",
+          "conclusion": "success",
+          "name": "Fetch exact three immutable binaries; no new build or release",
+          "number": 3,
+          "startedAt": "2026-11-09T02:43:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:16Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable dependencies",
+          "number": 4,
+          "startedAt": "2026-11-09T02:44:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:57:53Z",
+          "conclusion": "success",
+          "name": "Measure preregistered mixed traffic only in owned namespaces",
+          "number": 5,
+          "startedAt": "2026-11-09T02:44:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:57:54Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 6,
+          "startedAt": "2026-11-09T02:57:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:57:54Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 12,
+          "startedAt": "2026-11-09T02:57:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:57:55Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-11-09T02:57:54Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42552518133/job/128951018796"
+    },
+    {
+      "completedAt": "2026-11-09T02:46:57Z",
+      "conclusion": "failure",
+      "databaseId": 128951018930,
+      "name": "measure (rtt200)",
+      "startedAt": "2026-11-09T02:43:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-09T02:43:54Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-09T02:43:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:43:55Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-09T02:43:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:43:59Z",
+          "conclusion": "success",
+          "name": "Fetch exact three immutable binaries; no new build or release",
+          "number": 3,
+          "startedAt": "2026-11-09T02:43:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:44:16Z",
+          "conclusion": "success",
+          "name": "Prepare bounded disposable dependencies",
+          "number": 4,
+          "startedAt": "2026-11-09T02:43:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:46:54Z",
+          "conclusion": "failure",
+          "name": "Measure preregistered mixed traffic only in owned namespaces",
+          "number": 5,
+          "startedAt": "2026-11-09T02:44:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:46:55Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 6,
+          "startedAt": "2026-11-09T02:46:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:46:56Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 12,
+          "startedAt": "2026-11-09T02:46:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-09T02:46:56Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-11-09T02:46:56Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bababoyi6/me/actions/runs/42552518133/job/128951018930"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-09T02:58:52Z",
+  "url": "https://github.com/bababoyi6/me/actions/runs/42552518133"
+}

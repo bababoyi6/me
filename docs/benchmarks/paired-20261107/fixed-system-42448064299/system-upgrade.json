@@ -1,0 +1,70 @@
+{
+  "scope": "isolated Linux namespace; real systemd and release binaries; synthetic identities/DC only",
+  "os": "Ubuntu 22.04.5 LTS",
+  "kernel": "6.8.0-1070-azure",
+  "accepted": true,
+  "fresh_official_install": "3.5.16",
+  "fresh_official_binary_sha256_match": true,
+  "upgrade": "committed",
+  "repeat_upgrade": "unchanged",
+  "connect_refresh": "committed",
+  "repeat_connect_refresh": "unchanged",
+  "connect_config_private": true,
+  "unauthenticated_api_status": 401,
+  "read_only_api_write_status": 403,
+  "transfers": [
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.1746620920000055,
+      "handshake_ms": 170.18781199999466,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.07143661099999576,
+      "handshake_ms": 24.999637000007624,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.05595331300000339,
+      "handshake_ms": 13.940097999977752,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.0620399969999994,
+      "handshake_ms": 15.989804000014374,
+      "sha256_verified": true,
+      "persistent_dc": true
+    }
+  ],
+  "systemd_crash_recovery_seconds": 1.0750713689999998,
+  "systemd_restart_count": 1,
+  "repository_agent_readable_by_service_uid": false,
+  "health_agent_source_sha256": "8321cf9a524b0aa0436a67dab65cad54f6ae245989119554e9321bc973d9eba3",
+  "production_agent_cold_ready_seconds": 20.264448318999968,
+  "production_agent_core_down_seconds": 3.0115347320000296,
+  "production_agent_recovery_seconds": 8.832496287000026,
+  "connect_rollback": "recovered",
+  "connect_original_bytes_restored": true,
+  "rollback": "recovered",
+  "old_binary_restored": true,
+  "config_and_token_unchanged": true,
+  "temporary_unit_removed": true
+}

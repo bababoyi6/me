@@ -30,8 +30,12 @@ from telemt_probe import SECRETS, TOKEN, port, request
 from lab_artifacts import register_artifact
 from lab_files import file_sha256, link_private_binary
 
-# Extracted x86_64 binaries from the checksum-verified official GNU archives.
+# Extracted binaries from the checksum-verified official GNU archives.
 BINARIES = {
+    "e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4": "telemt 3.5.17",
+    "e5ca8befdc1428fcd66537ef04f3a95e5f278ebf3c3dd0d0909ce25a390f502b": "telemt 3.5.17",
+    "ebaec212fd5556ceca7fb0fcc4d3d23c01a8883d20a4cbc567219022d57c2a0b": "telemt 3.5.16",
+    "1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8": "telemt 3.5.16",
     "cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd": "telemt 3.5.5",
     "feb1d8779de0b86c6c43d1b871020ec94b11fad9fec5612b07b278edfd2181ff": "telemt 3.5.14",
 }
@@ -84,6 +88,20 @@ class DcHandler(socketserver.BaseRequestHandler):
             stream = PacketStream(CryptoStream(self.request, encoder, decoder))
             phase = "control"
             operation, size, rate = struct.unpack("!cQQ", exact(stream, 17))
+            if operation == b'e' and self.server.enable_echo:
+                # Explicit synthetic-only persistent message protocol. END is
+                # a full bounded frame; no EOF can flush or rescue its response.
+                phase = 'echo'
+                if size != 64 or rate != 128:
+                    raise ValueError('bounded echo dimensions required')
+                for _ in range(128):
+                    message = exact(stream,64)
+                    stream.sendall(message)
+                    if message == b'\xff'*64:
+                        with self.server.error_lock:
+                            self.server.completed += 1
+                        return
+                raise ValueError('echo request budget exceeded')
             persistent = operation in (b"d", b"u")
             operation = operation.upper()
             if not 0 < size <= 128 * 1024**2 or not 0 < rate <= 125000000:
@@ -121,15 +139,17 @@ class DcHandler(socketserver.BaseRequestHandler):
 class MockDc(socketserver.ThreadingTCPServer):
     daemon_threads = True
     allow_reuse_address = True
-    # Accommodate 16-stream bursts plus probes without a five-slot lab bottleneck.
-    request_queue_size = 64
+    # The bounded 100-stream acceptance burst also needs room for health probes.
+    # This is the synthetic DC's accept queue, never a production tuning value.
+    request_queue_size = 256
 
-    def __init__(self, bind="127.0.0.1", listen=0, *, socket_timeout=8, receive_buffer=0):
+    def __init__(self, bind="127.0.0.1", listen=0, *, socket_timeout=8, receive_buffer=0, enable_echo=False):
         if socket_timeout not in (8, 25):
             raise ValueError("mock DC socket timeout must be bounded")
         if receive_buffer not in (0,262144):
             raise ValueError('bounded mock DC receive buffer required')
         self.socket_timeout = socket_timeout
+        self.enable_echo = enable_echo
         self.errors, self.error_lock = [], threading.Lock()
         self.connect_only_checks, self.completed = 0, 0
         super().__init__((bind, listen), DcHandler, bind_and_activate=False)
@@ -149,9 +169,15 @@ class FullLab:
     def __init__(self, binary, haproxy="haproxy", fast=True, real_dc=False, splice=False,
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
                  listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None,
-                 shared_binary_root=None,startup_report=None):
-        if startup_report is not None and (real_dc or experimental_binary is None or artifact_registry is None):
+                 shared_binary_root=None,startup_report=None,offline_lab=False,connection_logs=False,connect_policy='unchanged'):
+        if offline_lab and real_dc:
+            raise ValueError('offline bootstrap is confined to synthetic DC tests')
+        if startup_report is not None and (real_dc or artifact_registry is None):
             raise ValueError('startup diagnostics require a private synthetic experimental lab')
+        if connection_logs and (startup_report is None or real_dc):
+            raise ValueError('connection diagnostics require private synthetic startup logging')
+        if connect_policy not in ('unchanged', 'upstream-default', 'bounded-retry') or (real_dc and connect_policy != 'unchanged'):
+            raise ValueError('connect policy experiments require the private synthetic DC')
         if listen_endpoint is not None and (listen_endpoint not in (("10.77.1.2", 24431), ("10.77.2.2", 24431))
                                             or real_dc or start_haproxy):
             raise ValueError("private namespace backend requires a fixed WG bind and no local frontend")
@@ -160,7 +186,7 @@ class FullLab:
             raise ValueError("external mock DC must be the fixed private namespace endpoint")
         if real_dc and (dc_endpoint or socket_library or experimental_binary or shared_binary_root is not None):
             raise ValueError("experimental socket policies are forbidden for public DC probes")
-        if socket_mode not in ("pass", "auto", "1m", "4m", "client-auto", "dc-auto", "auto-lowat") or (socket_mode != "pass" and socket_library is None):
+        if socket_mode not in ("pass", "auto", "1m", "4m", "client-auto", "dc-auto", "auto-lowat", "client-lowat64", "client-lowat256") or (socket_mode != "pass" and socket_library is None):
             raise ValueError("explicit lab socket library required for experimental policy")
         binary = Path(binary)
         info = binary.stat()
@@ -170,11 +196,11 @@ class FullLab:
         expected = BINARIES.get(binary_hash)
         if experimental_binary is not None:
             checksum, version = experimental_binary
-            if checksum != binary_hash or version not in ("telemt 3.5.5", "telemt 3.5.5+tdh.audit1", "telemt 3.5.5+tdh.audit2", "telemt 3.5.5+tdh.fair1", "telemt 3.5.5+tdh.queue1", "telemt 3.5.5+tdh.balanced1", "telemt 3.5.5+tdh.balanced2"):
+            if checksum != binary_hash or version not in ("telemt 3.5.5", "telemt 3.5.5+tdh.audit1", "telemt 3.5.5+tdh.audit2", "telemt 3.5.5+tdh.fair1", "telemt 3.5.5+tdh.queue1", "telemt 3.5.5+tdh.balanced1", "telemt 3.5.5+tdh.balanced2", "telemt 3.5.16+tdh.control1", "telemt 3.5.16+tdh.balanced1", "telemt 3.5.17", "telemt 3.5.17+tdh.control1", "telemt 3.5.17+tdh.balanced1"):
                 raise ValueError("explicit experimental build checksum/version mismatch")
             expected = version
         if expected is None:
-            raise ValueError("lab requires a pinned official x86_64 GNU binary")
+            raise ValueError("lab requires a pinned official GNU binary")
         self.temp = tempfile.TemporaryDirectory(prefix="tdh-e2e-",dir='/tmp' if artifact_registry is not None else None)
         self.root = Path(self.temp.name)
         self.processes, self.dc = [], None
@@ -205,8 +231,19 @@ class FullLab:
             entry_ip = bind_ip.rsplit(".", 1)[0] + ".1" if listen_endpoint else "127.0.0.1"
             config = generate_telemt(config_dir, work, self.listen, self.api, bind_ip, entry_ip)
             text = config.read_text()
+            if offline_lab:
+                # An isolated router drops DNS/STUN/HTTP discovery, delaying
+                # readiness before any listener exists. No public bootstrap is
+                # needed for synthetic transport; leave production templates intact.
+                text = text.replace('tls_emulation = true', 'tls_emulation = false')
+                text = text.replace('[network]\n', '[network]\nstun_use = false\nhttp_ip_detect_urls = []\n')
             if not fast:
                 text = text.replace("fast_mode = true", "fast_mode = false")
+            if connect_policy != 'unchanged':
+                for key in ('tg_connect', 'upstream_connect_retry_attempts', 'upstream_connect_budget_ms'):
+                    text = re.sub(r'^'+key+r'\s*=.*\n', '', text, flags=re.MULTILINE)
+                attempt, budget = (4, 9000) if connect_policy == 'bounded-retry' else (10, 3000)
+                text = text.replace('[general]\n', f'[general]\ntg_connect = {attempt}\nupstream_connect_retry_attempts = 2\nupstream_connect_budget_ms = {budget}\n')
             if small_copy:
                 if real_dc:
                     raise ValueError("experimental copy policy is confined to synthetic DC tests")
@@ -260,11 +297,13 @@ class FullLab:
             config = self.root / "haproxy.cfg"
             pipes = "    maxpipes 128\n" if splice else ""
             forwarding = "    option splice-auto\n" if splice else ""
+            global_logging = "    log stdout format raw local0\n" if connection_logs else ""
+            session_logging = "    log global\n    option tcplog\n" if connection_logs else ""
             config.write_text(f'''global
     nbthread 1
-{pipes}defaults
+{global_logging}{pipes}defaults
     mode tcp
-    timeout connect 3s
+{session_logging}    timeout connect 3s
     timeout client 20s
     timeout server 20s
 frontend mtp_tls
@@ -295,7 +334,7 @@ backend telemt
             error_file = self.root / "haproxy-errors.txt"
             with error_file.open("wb") as errors:
                 self.haproxy = subprocess.Popen([str(haproxy_target), "-db", "-f", str(config)], cwd=self.root, env=haproxy_environment, **self.identity(),
-                                                stdout=subprocess.DEVNULL, stderr=errors)
+                                                stdout=errors if connection_logs else subprocess.DEVNULL, stderr=errors)
             self.processes.append(self.haproxy)
             deadline = time.monotonic() + 3
             while time.monotonic() < deadline and self.haproxy.poll() is None:
@@ -314,7 +353,7 @@ backend telemt
     def identity(self):
         return {"user": self.uid, "group": self.gid, "extra_groups": []} if os.geteuid() == 0 else {}
 
-    def transfer(self, domain, direction, size, rate, direct=False, fragment=False, io_timeout=8, persistent=False, read_pause=0, receive_buffer=0, send_buffer=0):
+    def transfer(self, domain, direction, size, rate, direct=False, fragment=False, io_timeout=8, persistent=False, read_pause=0, receive_buffer=0, send_buffer=0, client_nodelay=False):
         if self.real_dc:
             raise ValueError("synthetic file operations are confined to the mock DC")
         if not 2 <= io_timeout <= 30:
@@ -325,10 +364,17 @@ backend telemt
             raise ValueError("bounded lab receive buffer required")
         if send_buffer not in (0,262144):
             raise ValueError('bounded lab send buffer required')
+        if type(client_nodelay) is not bool:
+            raise ValueError('explicit lab client socket policy required')
         started = time.monotonic()
         phase, observed = "connect", None
+        client_port = None
         try:
             with socket.create_connection(("127.0.0.1", self.listen if direct else self.front), timeout=8) as sock:
+                client_port = sock.getsockname()[1]
+                if client_nodelay:
+                    sock.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
+                actual_nodelay=sock.getsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY)
                 if receive_buffer:
                     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, receive_buffer)
                 if send_buffer:
@@ -361,11 +407,13 @@ backend telemt
         except Exception as exc:
             exc.lab_phase = phase
             exc.lab_received_bytes = observed.bytes if observed else None
+            exc.lab_elapsed_seconds = time.monotonic() - started
+            exc.lab_client_port = client_port
             raise
         return {"direction": direction, "domain_index": list(SECRETS).index(domain) + 1,
                 "path": "telemt" if direct else "haproxy-telemt", "bytes": size,
                 "elapsed_seconds": time.monotonic() - started, "handshake_ms": (ready - started) * 1000,
-                "sha256_verified": True, "persistent_dc": persistent}
+                "sha256_verified": True, "persistent_dc": persistent,"client_nodelay":actual_nodelay}
 
     def real_probe(self, dc=2):
         if not self.real_dc:

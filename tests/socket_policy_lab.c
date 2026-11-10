@@ -1,6 +1,7 @@
 /* Linux-only causal experiment; NEVER preload into a production service.
  * Headerless so a private TinyCC compiler suffices on a disposable host.
- * Only exact 256 KiB TCP socket requests change; all other calls pass through.
+ * Buffer modes change only exact 256 KiB requests; client-lowat modes attach
+ * only to NODELAY on the explicit private listener port.
  * The official binary, cryptography and authentication remain unchanged.
  */
 extern void *dlsym(void *, const char *);
@@ -29,6 +30,24 @@ int setsockopt(int fd, int level, int option, const void *value, unsigned int le
         }
     }
     if (!original) return -1;
+    /* Native autotuned sockets no longer request fixed buffers. Attach the
+     * causal client-only low-water experiment to their existing NODELAY call. */
+    if (mode && (!strcmp(mode,"client-lowat64") || !strcmp(mode,"client-lowat256")) &&
+        level == 6 && option == 1 && value && length == sizeof(int) && *(const int *)value == 1) {
+        int result = original(fd,level,option,value,length);
+        const char *port_text = getenv("TDH_LAB_CLIENT_PORT");
+        char *end = 0;
+        unsigned char address[128] = {0};
+        unsigned int address_size = sizeof(address);
+        long port = port_text ? strtol(port_text,&end,10) : 0;
+        if (!result && port > 0 && port <= 65535 && end && !*end &&
+            !getsockname(fd,address,&address_size) && address_size >= 4 &&
+            ((unsigned int)address[2]*256+address[3]) == (unsigned int)port) {
+            int lowat = !strcmp(mode,"client-lowat64") ? 65536 : 262144;
+            return original(fd,6,25,&lowat,sizeof(lowat));
+        }
+        return result;
+    }
     if (level != 1 || (option != 7 && option != 8) || length != sizeof(int) || !value || !mode)
         return original(fd, level, option, value, length);
     requested = *(const int *)value;

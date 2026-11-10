@@ -1,0 +1,696 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded powerfmt v0.2.0
+  Downloaded rand_pcg v0.10.2
+  Downloaded aead v0.5.2
+  Downloaded polyval v0.6.2
+  Downloaded potential_utf v0.1.6
+  Downloaded rand_chacha v0.9.0
+  Downloaded rand_core v0.10.1
+  Downloaded ppv-lite86 v0.2.21
+  Downloaded rand_core v0.9.5
+  Downloaded rand_core v0.6.4
+  Downloaded poly1305 v0.8.0
+  Downloaded subtle v2.6.1
+  Downloaded quinn v0.11.11
+  Downloaded rand v0.9.5
+  Downloaded rand v0.10.2
+  Downloaded ghash v0.5.1
+  Downloaded httpdate v1.0.3
+  Downloaded sendfd v0.4.4
+  Downloaded serde_spanned v1.1.1
+  Downloaded slab v0.4.12
+  Downloaded tinyvec_macros v0.1.1
+  Downloaded static_assertions v1.1.0
+  Downloaded try-lock v0.2.5
+  Downloaded hex v0.4.3
+  Downloaded regex v1.13.1
+  Downloaded scopeguard v1.2.0
+  Downloaded semver v1.0.28
+  Downloaded shlex v2.0.1
+  Downloaded sync_wrapper v1.0.2
+  Downloaded toml_datetime v1.1.3+spec-1.1.0
+  Downloaded universal-hash v0.5.1
+  Downloaded kem v0.3.0
+  Downloaded rustc_version v0.4.1
+  Downloaded serde v1.0.229
+  Downloaded serde_derive v1.0.229
+  Downloaded serde_urlencoded v0.7.1
+  Downloaded thiserror v2.0.20
+  Downloaded time-core v0.1.9
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded tokio-util v0.7.19
+  Downloaded tungstenite v0.30.0
+  Downloaded tokio-tungstenite v0.30.0
+  Downloaded shadowsocks-crypto v0.6.2
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded spin v0.10.1
+  Downloaded rustc-hash v2.1.3
+  Downloaded same-file v1.0.6
+  Downloaded inotify-sys v0.1.8
+  Downloaded tower-layer v0.3.3
+  Downloaded idna_adapter v1.2.2
+  Downloaded inout v0.1.4
+  Downloaded lru-slab v0.1.2
+  Downloaded http-body v1.1.0
+  Downloaded hyper-rustls v0.27.9
+  Downloaded sealed v0.6.0
+  Downloaded signature v2.2.0
+  Downloaded toml v1.1.5+spec-1.1.0
+  Downloaded sha1 v0.10.7
+  Downloaded iana-time-zone v0.1.65
+  Downloaded ipnetwork v0.21.1
+  Downloaded equivalent v1.0.2
+  Downloaded crc32c v0.6.8
+  Downloaded itoa v1.0.18
+  Downloaded lru_time_cache v0.11.11
+  Downloaded memoffset v0.9.1
+  Downloaded num-conv v0.2.2
+  Downloaded quinn-proto v0.11.17
+  Downloaded quinn-udp v0.5.15
+  Downloaded rusticata-macros v4.1.0
+  Downloaded rustls-native-certs v0.8.4
+  Downloaded smallvec v1.16.0
+  Downloaded spki v0.7.3
+  Downloaded spki v0.8.0
+  Downloaded symlink v0.1.0
+  Downloaded synstructure v0.13.2
+  Downloaded thread_local v1.1.10
+  Downloaded trait-variant v0.1.3
+  Downloaded block-buffer v0.10.4
+  Downloaded block-padding v0.3.3
+  Downloaded cfg-if v1.0.4
+  Downloaded dunce v1.0.5
+  Downloaded dynosaur v0.3.1
+  Downloaded fnv v1.0.7
+  Downloaded form_urlencoded v1.2.2
+  Downloaded inotify v0.11.5
+  Downloaded lazy_static v1.5.0
+  Downloaded matchers v0.2.0
+  Downloaded openssl-probe v0.2.1
+  Downloaded percent-encoding v2.3.2
+  Downloaded rustversion v1.0.23
+  Downloaded sha2 v0.10.9
+  Downloaded shadowsocks v1.24.0
+  Downloaded time-macros v0.2.32
+  Downloaded tinystr v0.8.4
+  Downloaded tokio-rustls v0.26.5
+  Downloaded tokio-tfo v0.4.3
+  Downloaded toml_parser v1.1.5+spec-1.1.0
+  Downloaded toml_writer v1.2.0+spec-1.1.0
+  Downloaded tower-service v0.3.3
+  Downloaded tracing-appender v0.2.5
+  Downloaded tracing-log v0.2.0
+  Downloaded unicode-ident v1.0.24
+  Downloaded untrusted v0.9.0
+  Downloaded utf8_iter v1.0.4
+  Downloaded want v0.3.1
+  Downloaded yoke-derive v0.8.2
+  Downloaded zerofrom v0.1.8
+  Downloaded zerofrom-derive v0.1.7
+  Downloaded zeroize_derive v1.5.0
+  Downloaded zmij v1.0.23
+  Downloaded autocfg v1.5.1
+  Downloaded block-buffer v0.12.1
+  Downloaded byte_string v1.0.0
+  Downloaded cfg_aliases v0.2.2
+  Downloaded chacha20 v0.9.1
+  Downloaded constant_time_eq v0.4.2
+  Downloaded cpufeatures v0.2.17
+  Downloaded cpufeatures v0.3.1
+  Downloaded crc32fast v1.5.1
+  Downloaded ctr v0.9.2
+  Downloaded ctutils v0.4.2
+  Downloaded dashmap v6.2.1
+  Downloaded deranged v0.5.8
+  Downloaded digest v0.10.7
+  Downloaded digest v0.11.3
+  Downloaded displaydoc v0.2.7
+  Downloaded ed25519 v2.2.3
+  Downloaded errno v0.3.14
+  Downloaded foldhash v0.2.0
+  Downloaded futures-core v0.3.34
+  Downloaded futures-io v0.3.34
+  Downloaded futures-sink v0.3.34
+  Downloaded getrandom v0.2.17
+  Downloaded getrandom v0.3.4
+  Downloaded getrandom v0.4.3
+  Downloaded http-body-util v0.1.5
+  Downloaded httparse v1.10.1
+  Downloaded hybrid-array v0.4.14
+  Downloaded icu_provider v2.3.1
+  Downloaded jobserver v0.1.35
+  Downloaded keccak v0.2.2
+  Downloaded lock_api v0.4.14
+  Downloaded lru v0.18.4
+  Downloaded md-5 v0.10.6
+  Downloaded ml-kem v0.3.2
+  Downloaded module-lattice v0.2.3
+  Downloaded notify v8.2.0
+  Downloaded notify-types v2.1.0
+  Downloaded nu-ansi-term v0.50.3
+  Downloaded num-integer v0.1.47
+  Downloaded oid-registry v0.8.1
+  Downloaded opaque-debug v0.3.1
+  Downloaded parking_lot_core v0.9.12
+  Downloaded pin-project-internal v1.1.13
+  Downloaded pkcs8 v0.10.2
+  Downloaded pkg-config v0.3.34
+  Downloaded rustls-pki-types v1.15.1
+  Downloaded rustls-platform-verifier v0.7.0
+  Downloaded ryu v1.0.23
+  Downloaded serde_core v1.0.229
+  Downloaded socket2 v0.6.5
+  Downloaded thiserror-impl v2.0.20
+  Downloaded tinyvec v1.13.2
+  Downloaded tracing-attributes v0.1.31
+  Downloaded version_check v0.9.5
+  Downloaded walkdir v2.5.0
+  Downloaded writeable v0.6.4
+  Downloaded yoke v0.8.3
+  Downloaded zeroize v1.9.0
+  Downloaded zerovec-derive v0.11.6
+  Downloaded anyhow v1.0.104
+  Downloaded arrayvec v0.7.8
+  Downloaded bitflags v2.13.1
+  Downloaded const-oid v0.9.6
+  Downloaded crossbeam-queue v0.3.14
+  Downloaded crypto-common v0.1.7
+  Downloaded data-encoding v2.11.1
+  Downloaded dynosaur_derive v0.3.1
+  Downloaded find-msvc-tools v0.1.12
+  Downloaded futures-executor v0.3.34
+  Downloaded futures-macro v0.3.34
+  Downloaded hmac v0.12.1
+  Downloaded icu_normalizer_data v2.3.0
+  Downloaded ipnet v2.12.2
+  Downloaded litemap v0.8.3
+  Downloaded log v0.4.34
+  Downloaded minimal-lexical v0.2.1
+  Downloaded once_cell v1.21.4
+  Downloaded parking_lot v0.12.5
+  Downloaded sharded-slab v0.1.7
+  Downloaded toml_edit v0.25.19+spec-1.1.0
+  Downloaded tower v0.5.3
+  Downloaded tracing-core v0.1.36
+  Downloaded allocator-api2 v0.2.21
+  Downloaded asn1-rs-derive v0.6.0
+  Downloaded asn1-rs-impl v0.2.0
+  Downloaded atomic-waker v1.1.2
+  Downloaded base64 v0.22.1
+  Downloaded cbc v0.1.2
+  Downloaded crypto-common v0.2.2
+  Downloaded curve25519-dalek-derive v0.1.1
+  Downloaded der v0.7.10
+  Downloaded der-parser v10.0.0
+  Downloaded http v1.5.0
+  Downloaded icu_collections v2.3.0
+  Downloaded icu_locale_core v2.3.0
+  Downloaded num-traits v0.2.19
+  Downloaded pin-project v1.1.13
+  Downloaded pkcs8 v0.11.0
+  Downloaded rustls-webpki v0.103.15
+  Downloaded time v0.3.55
+  Downloaded arc-swap v1.9.2
+  Downloaded base64ct v1.8.3
+  Downloaded cc v1.4.5
+  Downloaded chacha20 v0.10.2
+  Downloaded cmake v0.1.58
+  Downloaded cmov v0.5.4
+  Downloaded futures-task v0.3.34
+  Downloaded generic-array v0.14.7
+  Downloaded icu_properties v2.3.0
+  Downloaded typenum v1.20.1
+  Downloaded x25519-dalek v2.0.1
+  Downloaded zerotrie v0.2.5
+  Downloaded cipher v0.4.4
+  Downloaded const-oid v0.10.2
+  Downloaded crossbeam-channel v0.5.17
+  Downloaded crossbeam-utils v0.8.23
+  Downloaded fs_extra v1.3.0
+  Downloaded futures-channel v0.3.34
+  Downloaded hyper-util v0.1.20
+  Downloaded indexmap v2.14.2
+  Downloaded memchr v2.8.3
+  Downloaded nom v7.1.3
+  Downloaded num-bigint v0.4.8
+  Downloaded url v2.5.8
+  Downloaded x509-parser v0.18.1
+  Downloaded zerocopy-derive v0.8.56
+  Downloaded chacha20poly1305 v0.10.1
+  Downloaded der v0.8.2
+  Downloaded futures v0.3.34
+  Downloaded hashbrown v0.14.5
+  Downloaded hashbrown v0.15.5
+  Downloaded mio v1.2.3
+  Downloaded regex-syntax v0.8.11
+  Downloaded reqwest v0.13.4
+  Downloaded zerovec v0.11.8
+  Downloaded aes v0.8.4
+  Downloaded asn1-rs v0.7.2
+  Downloaded hashbrown v0.17.1
+  Downloaded hyper v1.11.1
+  Downloaded icu_properties_data v2.3.0
+  Downloaded idna v1.1.0
+  Downloaded ring-compat v0.8.0
+  Downloaded serde_json v1.0.151
+  Downloaded tower-http v0.6.11
+  Downloaded aes-gcm v0.10.3
+  Downloaded aho-corasick v1.1.5
+  Downloaded h2 v0.4.19
+  Downloaded winnow v1.0.4
+  Downloaded blake3 v1.8.7
+  Downloaded hkdf v0.12.4
+  Downloaded tracing-subscriber v0.3.23
+  Downloaded webpki-roots v1.0.9
+  Downloaded aws-lc-rs v1.18.1
+  Downloaded futures-util v0.3.34
+  Downloaded curve25519-dalek v4.1.3
+  Downloaded syn v2.0.119
+  Downloaded rustls v0.23.43
+  Downloaded syn v3.0.5
+  Downloaded chrono v0.4.45
+  Downloaded nix v0.31.3
+  Downloaded regex-automata v0.4.18
+  Downloaded zerocopy v0.8.56
+  Downloaded tracing v0.1.44
+  Downloaded icu_normalizer v2.3.0
+  Downloaded sha3 v0.11.0
+  Downloaded libc v0.2.189
+  Downloaded tokio v1.53.1
+  Downloaded ring v0.17.14
+  Downloaded aws-lc-sys v0.45.0
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling cfg-if v1.0.4
+   Compiling libc v0.2.189
+   Compiling typenum v1.20.1
+   Compiling version_check v0.9.5
+   Compiling syn v2.0.119
+   Compiling syn v3.0.5
+   Compiling getrandom v0.2.17
+   Compiling generic-array v0.14.7
+   Compiling memchr v2.8.3
+   Compiling synstructure v0.13.2
+   Compiling zeroize_derive v1.5.0
+   Compiling zeroize v1.9.0
+   Compiling jobserver v0.1.35
+   Compiling rand_core v0.6.4
+   Compiling find-msvc-tools v0.1.12
+   Compiling shlex v2.0.1
+   Compiling smallvec v1.16.0
+   Compiling cc v1.4.5
+   Compiling crypto-common v0.1.7
+   Compiling log v0.4.34
+   Compiling pin-project-lite v0.2.17
+   Compiling subtle v2.6.1
+   Compiling bytes v1.12.1
+   Compiling parking_lot_core v0.9.12
+   Compiling scopeguard v1.2.0
+   Compiling lock_api v0.4.14
+   Compiling displaydoc v0.2.7
+   Compiling zerofrom-derive v0.1.7
+   Compiling futures-core v0.3.34
+   Compiling yoke-derive v0.8.2
+   Compiling autocfg v1.5.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling mio v1.2.3
+   Compiling zerofrom v0.1.8
+   Compiling errno v0.3.14
+   Compiling futures-sink v0.3.34
+   Compiling futures-channel v0.3.34
+   Compiling yoke v0.8.3
+   Compiling signal-hook-registry v1.4.8
+   Compiling parking_lot v0.12.5
+   Compiling futures-macro v0.3.34
+   Compiling tokio-macros v2.7.2
+   Compiling zerovec-derive v0.11.6
+   Compiling socket2 v0.6.5
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
+   Compiling futures-io v0.3.34
+   Compiling once_cell v1.21.4
+   Compiling tokio v1.53.1
+   Compiling futures-util v0.3.34
+   Compiling zerovec v0.11.8
+   Compiling cpufeatures v0.2.17
+   Compiling ring v0.17.14
+   Compiling cmake v0.1.58
+   Compiling pkg-config v0.3.34
+   Compiling serde_core v1.0.229
+   Compiling itoa v1.0.18
+   Compiling dunce v1.0.5
+   Compiling fs_extra v1.3.0
+   Compiling aws-lc-sys v0.45.0
+   Compiling num-traits v0.2.19
+   Compiling tinystr v0.8.4
+   Compiling block-padding v0.3.3
+   Compiling writeable v0.6.4
+   Compiling untrusted v0.9.0
+   Compiling thiserror v2.0.20
+   Compiling rand_core v0.10.1
+   Compiling litemap v0.8.3
+   Compiling icu_locale_core v2.3.0
+   Compiling inout v0.1.4
+   Compiling potential_utf v0.1.6
+   Compiling tracing-core v0.1.36
+   Compiling zerotrie v0.2.5
+   Compiling thiserror-impl v2.0.20
+   Compiling equivalent v1.0.2
+   Compiling icu_normalizer_data v2.3.0
+   Compiling utf8_iter v1.0.4
+   Compiling allocator-api2 v0.2.21
+   Compiling cmov v0.5.4
+   Compiling aws-lc-rs v1.18.1
+   Compiling foldhash v0.2.0
+   Compiling icu_properties_data v2.3.0
+   Compiling hashbrown v0.17.1
+   Compiling ctutils v0.4.2
+   Compiling icu_collections v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling cipher v0.4.4
+   Compiling http v1.5.0
+   Compiling rustls-pki-types v1.15.1
+   Compiling tracing-attributes v0.1.31
+   Compiling block-buffer v0.10.4
+   Compiling percent-encoding v2.3.2
+   Compiling semver v1.0.28
+   Compiling tracing v0.1.44
+   Compiling rustc_version v0.4.1
+   Compiling digest v0.10.7
+   Compiling hybrid-array v0.4.14
+   Compiling universal-hash v0.5.1
+   Compiling num-conv v0.2.2
+   Compiling cpufeatures v0.3.1
+   Compiling time-core v0.1.9
+   Compiling zerocopy v0.8.56
+   Compiling getrandom v0.3.4
+   Compiling opaque-debug v0.3.1
+   Compiling time-macros v0.2.32
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling http-body v1.1.0
+   Compiling indexmap v2.14.2
+   Compiling serde v1.0.229
+   Compiling hashbrown v0.15.5
+   Compiling minimal-lexical v0.2.1
+   Compiling crossbeam-utils v0.8.23
+   Compiling bitflags v2.13.1
+   Compiling rustls v0.23.43
+   Compiling deranged v0.5.8
+   Compiling powerfmt v0.2.0
+   Compiling httparse v1.10.1
+   Compiling tokio-util v0.7.19
+   Compiling time v0.3.55
+   Compiling nom v7.1.3
+   Compiling idna_adapter v1.2.2
+   Compiling form_urlencoded v1.2.2
+   Compiling aead v0.5.2
+   Compiling serde_derive v1.0.229
+   Compiling aho-corasick v1.1.5
+   Compiling getrandom v0.4.3
+   Compiling regex-syntax v0.8.11
+   Compiling atomic-waker v1.1.2
+   Compiling try-lock v0.2.5
+   Compiling fnv v1.0.7
+   Compiling tower-service v0.3.3
+   Compiling h2 v0.4.19
+   Compiling regex-automata v0.4.18
+   Compiling want v0.3.1
+   Compiling ppv-lite86 v0.2.21
+   Compiling rusticata-macros v4.1.0
+   Compiling rand_core v0.9.5
+   Compiling idna v1.1.0
+   Compiling polyval v0.6.2
+   Compiling crypto-common v0.2.2
+   Compiling blake3 v1.8.7
+   Compiling asn1-rs-impl v0.2.0
+   Compiling asn1-rs-derive v0.6.0
+   Compiling inotify-sys v0.1.8
+   Compiling lazy_static v1.5.0
+   Compiling httpdate v1.0.3
+   Compiling base64 v0.22.1
+   Compiling zmij v1.0.23
+   Compiling hyper v1.11.1
+   Compiling asn1-rs v0.7.2
+   Compiling ghash v0.5.1
+   Compiling url v2.5.8
+   Compiling rand_chacha v0.9.0
+   Compiling poly1305 v0.8.0
+   Compiling block-buffer v0.12.1
+   Compiling chacha20 v0.10.2
+   Compiling hmac v0.12.1
+   Compiling curve25519-dalek v4.1.3
+   Compiling aes v0.8.4
+   Compiling ctr v0.9.2
+   Compiling chacha20 v0.9.1
+   Compiling num-integer v0.1.47
+   Compiling futures-executor v0.3.34
+   Compiling memoffset v0.9.1
+   Compiling sync_wrapper v1.0.2
+   Compiling pin-project-internal v1.1.13
+   Compiling openssl-probe v0.2.1
+   Compiling rustversion v1.0.23
+   Compiling tower-layer v0.3.3
+   Compiling serde_json v1.0.151
+   Compiling arrayvec v0.7.8
+   Compiling ipnet v2.12.2
+   Compiling cfg_aliases v0.2.2
+   Compiling oid-registry v0.8.1
+   Compiling constant_time_eq v0.4.2
+   Compiling winnow v1.0.4
+   Compiling hyper-util v0.1.20
+   Compiling toml_parser v1.1.5+spec-1.1.0
+   Compiling nix v0.31.3
+   Compiling pin-project v1.1.13
+   Compiling tower v0.5.3
+   Compiling rustls-native-certs v0.8.4
+   Compiling futures v0.3.34
+   Compiling num-bigint v0.4.8
+   Compiling aes-gcm v0.10.3
+   Compiling chacha20poly1305 v0.10.1
+   Compiling rand v0.10.2
+   Compiling hkdf v0.12.4
+   Compiling digest v0.11.3
+   Compiling rand v0.9.5
+   Compiling sharded-slab v0.1.7
+   Compiling matchers v0.2.0
+   Compiling ring-compat v0.8.0
+   Compiling md-5 v0.10.6
+   Compiling sha1 v0.10.7
+   Compiling crc32c v0.6.8
+   Compiling tracing-log v0.2.0
+   Compiling toml_datetime v1.1.3+spec-1.1.0
+   Compiling dynosaur_derive v0.3.1
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling keccak v0.2.2
+   Compiling thread_local v1.1.10
+   Compiling same-file v1.0.6
+   Compiling nu-ansi-term v0.50.3
+   Compiling crc32fast v1.5.1
+   Compiling anyhow v1.0.104
+   Compiling toml_writer v1.2.0+spec-1.1.0
+   Compiling ryu v1.0.23
+   Compiling serde_urlencoded v0.7.1
+   Compiling tracing-subscriber v0.3.23
+   Compiling walkdir v2.5.0
+   Compiling dynosaur v0.3.1
+   Compiling sha3 v0.11.0
+   Compiling shadowsocks-crypto v0.6.2
+   Compiling inotify v0.11.5
+   Compiling der-parser v10.0.0
+   Compiling tungstenite v0.30.0
+   Compiling tokio-tfo v0.4.3
+   Compiling tower-http v0.6.11
+   Compiling kem v0.3.0
+   Compiling crossbeam-channel v0.5.17
+   Compiling notify-types v2.1.0
+   Compiling http-body-util v0.1.5
+   Compiling module-lattice v0.2.3
+   Compiling serde_spanned v1.1.1
+   Compiling sendfd v0.4.4
+   Compiling spin v0.10.1
+   Compiling trait-variant v0.1.3
+   Compiling sealed v0.6.0
+   Compiling data-encoding v2.11.1
+   Compiling byte_string v1.0.0
+   Compiling symlink v0.1.0
+   Compiling iana-time-zone v0.1.65
+   Compiling lru_time_cache v0.11.11
+   Compiling hashbrown v0.14.5
+   Compiling shadowsocks v1.24.0
+   Compiling dashmap v6.2.1
+   Compiling chrono v0.4.45
+   Compiling x509-parser v0.18.1
+   Compiling tracing-appender v0.2.5
+   Compiling ml-kem v0.3.2
+   Compiling toml v1.1.5+spec-1.1.0
+   Compiling notify v8.2.0
+   Compiling arc-swap v1.9.2
+   Compiling tokio-tungstenite v0.30.0
+   Compiling x25519-dalek v2.0.1
+   Compiling toml_edit v0.25.19+spec-1.1.0
+   Compiling crossbeam-queue v0.3.14
+   Compiling regex v1.13.1
+   Compiling ipnetwork v0.21.1
+   Compiling sha2 v0.10.9
+   Compiling webpki-roots v1.0.9
+   Compiling cbc v0.1.2
+   Compiling lru v0.18.4
+   Compiling static_assertions v1.1.0
+   Compiling hex v0.4.3
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling hyper-rustls v0.27.9
+   Compiling reqwest v0.13.4
+   Compiling telemt v3.5.17+tdh.fair1 (/home/runner/work/me/me/upstream)
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/transport/middle_proxy/pool_writer/runtime.rs:365:26
+    |
+365 |                         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |count| {
+    |                          ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+365 -                         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |count| {
+365 +                         .try_update(Ordering::Relaxed, Ordering::Relaxed, |count| {
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/tls_front/cache.rs:120:14
+    |
+120 |             .fetch_update(Ordering::AcqRel, Ordering::Relaxed, |last_sweep| {
+    |              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+120 -             .fetch_update(Ordering::AcqRel, Ordering::Relaxed, |last_sweep| {
+120 +             .try_update(Ordering::AcqRel, Ordering::Relaxed, |last_sweep| {
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/ip_tracker.rs:164:25
+    |
+164 |         let _ = counter.fetch_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+    |                         ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+164 -         let _ = counter.fetch_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+164 +         let _ = counter.try_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/ip_tracker.rs:199:14
+    |
+199 |             .fetch_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+    |              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+199 -             .fetch_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+199 +             .try_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u32>::fetch_update`: renamed to `try_update` for consistency
+  --> src/proxy/relay/adaptive_copy/write_pressure.rs:55:70
+   |
+55 |                 let _ = this.counters.s2c_consecutive_pending_writes.fetch_update(
+   |                                                                      ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+55 -                 let _ = this.counters.s2c_consecutive_pending_writes.fetch_update(
+55 +                 let _ = this.counters.s2c_consecutive_pending_writes.try_update(
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+  --> src/slot_budget.rs:54:14
+   |
+54 |             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |current| {
+   |              ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+54 -             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |current| {
+54 +             .try_update(Ordering::AcqRel, Ordering::Acquire, |current| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/stats/writer_counters.rs:101:63
+    |
+101 |         let _ = self.me_writer_byte_budget_queued_bytes_gauge.fetch_update(
+    |                                                               ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+101 -         let _ = self.me_writer_byte_budget_queued_bytes_gauge.fetch_update(
+101 +         let _ = self.me_writer_byte_budget_queued_bytes_gauge.try_update(
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/stats/writer_counters.rs:110:63
+    |
+110 |         let _ = self.me_writer_byte_budget_queued_bytes_gauge.fetch_update(
+    |                                                               ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+110 -         let _ = self.me_writer_byte_budget_queued_bytes_gauge.fetch_update(
+110 +         let _ = self.me_writer_byte_budget_queued_bytes_gauge.try_update(
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/stats/writer_counters.rs:119:14
+    |
+119 |             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+    |              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+119 -             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+119 +             .try_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/stream/buffer_pool.rs:127:14
+    |
+127 |             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+    |              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+127 -             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+127 +             .try_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+  --> src/tls_front/cache.rs:82:14
+   |
+82 |             .fetch_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+   |              ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+82 -             .fetch_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+82 +             .try_update(Ordering::AcqRel, Ordering::Relaxed, |current| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/web/manager/websocket.rs:331:10
+    |
+331 |         .fetch_update(Ordering::AcqRel, Ordering::Acquire, |value| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+331 -         .fetch_update(Ordering::AcqRel, Ordering::Acquire, |value| {
+331 +         .try_update(Ordering::AcqRel, Ordering::Acquire, |value| {
+    |
+
+warning: `telemt` (bin "telemt") generated 12 warnings (run `cargo fix --bin "telemt" -p telemt` to apply 12 suggestions)
+    Finished `release` profile [optimized] target(s) in 3m 56s
+Upstream 9 tests: NOT RUN here; reused exact Rust source/toolchain from verified run42574699893

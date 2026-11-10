@@ -1,0 +1,96 @@
+{
+  "scope": "isolated Linux namespace; real systemd and release binaries; synthetic identities/DC only",
+  "os": "Ubuntu 22.04.5 LTS",
+  "kernel": "6.8.0-1070-azure",
+  "accepted": true,
+  "native_manifest": {
+    "upstream_commit": "84e5b827a6619fb2e09ad3d09f253cdffe04bc2f",
+    "manager_commit": "6dd5c4af9b0495f21d5b5b230630ed31077d7477",
+    "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "lto": "thin",
+    "codegen_units": 8,
+    "production_default_changed": false,
+    "binaries": {
+      "control": {
+        "sha256": "643c001b133410cefe7a769d0807c0eedf5a3f3635c7ef3d089058c8e9d2a259",
+        "version": "telemt 3.5.16+tdh.control1",
+        "bytes": 31390528
+      },
+      "balanced": {
+        "sha256": "d0265d1c919966173339f2d9314c76048608b6b099d0a2e9e9ee33053651bc61",
+        "version": "telemt 3.5.16+tdh.balanced1",
+        "bytes": 31355744
+      }
+    },
+    "builder_sha256": "1b7aa4f959233889e79ab9163a917f8064be8828777e8b1545da06f714c2c06c",
+    "helpers": {
+      "low_rtt_receive": "7b6c638525d3f2f9a106ae0b6c13b8d87fa21a1224ffc32ad5960b002cbb3990",
+      "unsent_queue_bulk": "b711a4bf9f3bd8296cb1182e7d956250371f54088264c514a483525f13fef3ca"
+    },
+    "scope": "unofficial synthetic lab candidates only; no publication or deployment"
+  },
+  "fresh_candidate_install": "3.5.16+tdh.balanced1",
+  "fresh_candidate_binary_sha256_match": true,
+  "upgrade": "committed",
+  "repeat_upgrade": "unchanged",
+  "connect_refresh": "committed",
+  "repeat_connect_refresh": "unchanged",
+  "connect_config_private": true,
+  "unauthenticated_api_status": 401,
+  "read_only_api_write_status": 403,
+  "transfers": [
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.22109238000000175,
+      "handshake_ms": 216.69045699999856,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.05682436300000404,
+      "handshake_ms": 10.611554000007573,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.06001511200000209,
+      "handshake_ms": 17.707669000003534,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.06297911400000089,
+      "handshake_ms": 16.754096999989088,
+      "sha256_verified": true,
+      "persistent_dc": true
+    }
+  ],
+  "systemd_crash_recovery_seconds": 1.08053124300001,
+  "systemd_restart_count": 1,
+  "repository_agent_readable_by_service_uid": false,
+  "health_agent_source_sha256": "8321cf9a524b0aa0436a67dab65cad54f6ae245989119554e9321bc973d9eba3",
+  "production_agent_cold_ready_seconds": 20.064316512000005,
+  "production_agent_core_down_seconds": 2.2074167610000046,
+  "production_agent_recovery_seconds": 8.828331565999989,
+  "connect_rollback": "recovered",
+  "connect_original_bytes_restored": true,
+  "rollback": "recovered",
+  "old_binary_restored": true,
+  "config_and_token_unchanged": true,
+  "temporary_unit_removed": true
+}

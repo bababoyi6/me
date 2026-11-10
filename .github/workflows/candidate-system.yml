@@ -1,0 +1,53 @@
+name: Candidate three-system install and reboot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev/telemt-stable-compat-20261107]
+    paths:
+      - tests/full_system_ci.py
+      - tests/full_system_candidate.py
+      - tests/full_system_contract.py
+      - 'tests/system_vm*.py'
+      - .github/workflows/candidate-system.yml
+      - telemt-dual-hop.sh
+
+permissions:
+  contents: read
+
+concurrency:
+  group: candidate-three-system
+  cancel-in-progress: false
+
+jobs:
+  system:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require actual KVM before package or image downloads
+        run: sudo python3 tests/full_system_ci.py --gate
+      - name: Prepare bounded disposable host dependencies
+        run: |
+          sudo timeout --kill-after=10 180 apt-get update -qq
+          sudo timeout --kill-after=10 240 apt-get install -y --no-install-recommends qemu-system-x86 qemu-utils seabios gpgv ubuntu-cloudimage-keyring openssh-client python3-pexpect python3-cryptography
+      - name: Fetch official Ubuntu 22.04 minimal image and signed checksums
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0700 "$RUNNER_TEMP/tdh-audit-system-vms"
+          base=https://cloud-images.ubuntu.com/minimal/releases/jammy/release
+          for name in SHA256SUMS SHA256SUMS.gpg ubuntu-22.04-minimal-cloudimg-amd64.img; do
+            limit=262144
+            [ "$name" != ubuntu-22.04-minimal-cloudimg-amd64.img ] || limit=450000000
+            sudo curl -q -fL --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 10 --max-time 240 --max-filesize "$limit" --limit-rate 8M "$base/$name" -o "$RUNNER_TEMP/tdh-audit-system-vms/$name"
+          done
+      - name: Verify pinned candidate installs, native maintenance and three normal reboots
+        run: sudo env RUNNER_TEMP="$RUNNER_TEMP" TDH_FULL_SYSTEM_PROFILE=candidate TDH_CANDIDATE_REF="$GITHUB_SHA" python3 tests/full_system_ci.py
+      - name: Export fixed-name sanitized evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate-three-system-evidence
+          path: ${{ runner.temp }}/tdh-full-system-evidence/
+          if-no-files-found: warn
+          retention-days: 14

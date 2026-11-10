@@ -1,0 +1,219 @@
+{
+  "scope": "native ARM64 Linux; actual release/HAProxy/MTProto; synthetic DC and identities",
+  "os": "Ubuntu 22.04.5 LTS",
+  "kernel": "6.8.0-1070-azure",
+  "machine": "aarch64",
+  "accepted": true,
+  "fresh_install_version": "3.5.16",
+  "binary_sha256_matches": true,
+  "production_arch_selection_verified": true,
+  "version": "telemt 3.5.16",
+  "unauthenticated_api_status": 401,
+  "read_only_write_status": 403,
+  "rows": [
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.2094994500000098,
+      "handshake_ms": 205.00154699999484,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.09247515200001999,
+      "handshake_ms": 46.218866999993224,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.09308281099998794,
+      "handshake_ms": 51.17356800002426,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 4096,
+      "elapsed_seconds": 0.09084522700004527,
+      "handshake_ms": 45.05714100002933,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07286822500003609,
+      "handshake_ms": 12.489940000023125,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07980685299997958,
+      "handshake_ms": 17.11019099997202,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07869766599998229,
+      "handshake_ms": 20.935744999974304,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07464876099999174,
+      "handshake_ms": 11.788446000025488,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.08077238800001396,
+      "handshake_ms": 21.3865029999738,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07972719499997538,
+      "handshake_ms": 16.00394799999094,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07673939599999358,
+      "handshake_ms": 19.15494399997897,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07863413600000513,
+      "handshake_ms": 14.576789999978246,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07313560200003622,
+      "handshake_ms": 14.808006000009755,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07799194800003306,
+      "handshake_ms": 14.43509900002482,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07611172000002853,
+      "handshake_ms": 18.49419500001659,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07873575500002516,
+      "handshake_ms": 15.664817000015319,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.03960570499998539,
+      "handshake_ms": 18.133223999996062,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07679413300002125,
+      "handshake_ms": 13.932377999992696,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "U",
+      "domain_index": 1,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.07403738200002863,
+      "handshake_ms": 16.25938000000815,
+      "sha256_verified": true,
+      "persistent_dc": true
+    },
+    {
+      "direction": "D",
+      "domain_index": 2,
+      "path": "haproxy-telemt",
+      "bytes": 262144,
+      "elapsed_seconds": 0.08452919500001599,
+      "handshake_ms": 21.56778800002712,
+      "sha256_verified": true,
+      "persistent_dc": true
+    }
+  ],
+  "completed": 20,
+  "mock_dc_errors": [],
+  "config_unchanged": true,
+  "private_processes_closed": true
+}

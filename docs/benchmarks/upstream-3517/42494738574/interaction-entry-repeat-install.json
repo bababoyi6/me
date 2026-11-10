@@ -1,0 +1,10 @@
+{
+  "node": "entry",
+  "operation": "entry-repeat-install",
+  "complete": true,
+  "expected": "<class 'pexpect.exceptions.EOF'>",
+  "known_markers": [
+    "\u8bf7\u9009\u62e9"
+  ],
+  "sanitized_error_lines": ""
+}

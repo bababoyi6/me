@@ -1,0 +1,140 @@
+......................................................................../usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 302: 'Found'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+..F..F..........................................FE..FEEE.............................................E..........F................................
+======================================================================
+ERROR: test_legacy_fixed_backup_temporary_path_is_never_used (test_manager_lifecycle.ManagerLifecycleTests.test_legacy_fixed_backup_temporary_path_is_never_used)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_manager_lifecycle.py", line 169, in test_legacy_fixed_backup_temporary_path_is_never_used
+    self.assertEqual((self.base / "manager.previous").read_bytes(), old)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tdh-manager-test-_z3u0coo/manager.previous'
+
+======================================================================
+ERROR: test_repeat_install_and_rollback_preserve_three_role_identities (test_manager_lifecycle.ManagerLifecycleTests.test_repeat_install_and_rollback_preserve_three_role_identities) (role='entry')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_manager_lifecycle.py", line 93, in test_repeat_install_and_rollback_preserve_three_role_identities
+    self.assertEqual((self.base / "manager.previous").read_bytes(), old)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tdh-manager-test-rvwuud_t/manager.previous'
+
+======================================================================
+ERROR: test_repeat_install_and_rollback_preserve_three_role_identities (test_manager_lifecycle.ManagerLifecycleTests.test_repeat_install_and_rollback_preserve_three_role_identities) (role='backend1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_manager_lifecycle.py", line 93, in test_repeat_install_and_rollback_preserve_three_role_identities
+    self.assertEqual((self.base / "manager.previous").read_bytes(), old)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tdh-manager-test-rvwuud_t/manager.previous'
+
+======================================================================
+ERROR: test_repeat_install_and_rollback_preserve_three_role_identities (test_manager_lifecycle.ManagerLifecycleTests.test_repeat_install_and_rollback_preserve_three_role_identities) (role='backend2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_manager_lifecycle.py", line 93, in test_repeat_install_and_rollback_preserve_three_role_identities
+    self.assertEqual((self.base / "manager.previous").read_bytes(), old)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tdh-manager-test-rvwuud_t/manager.previous'
+
+======================================================================
+ERROR: test_manager_update_and_failure_preserve_running_configuration (test_performance.PerformanceTests.test_manager_update_and_failure_preserve_running_configuration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_performance.py", line 231, in test_manager_update_and_failure_preserve_running_configuration
+    self.assertEqual((self.base / "manager.previous").read_bytes(), old_manager)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tdh-test-ipfvi3jf/manager.previous'
+
+======================================================================
+FAIL: test_download_and_launch_then_clean_private_temporary_file (test_install_command.InstallCommandTests.test_download_and_launch_then_clean_private_temporary_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_install_command.py", line 74, in test_download_and_launch_then_clean_private_temporary_file
+    self.invoke(True)
+    ~~~~~~~~~~~^^^^^^
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_install_command.py", line 71, in invoke
+    self.assertIn("Telemt Dual-Hop " + ("1.3.1" if original else "1.6.0"), result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Telemt Dual-Hop 1.6.0' not found in 'Telemt Dual-Hop 1.7.0\n\n用法：\n  sudo bash telemt-dual-hop.sh              打开中文菜单\n  a                                         安装后打开控制面板（自动使用 sudo）\n  a status                                  快速查看状态\n  a update                                  安全更新管理脚本（可简写为 a u）\n  a update-rollback                         恢复上次 a update 前的管理脚本\n  a core-upgrade --maintenance               后端固定版本核心升级（需先排空）\n  a core-rollback --maintenance              后端核心回滚（配置变更时拒绝）\n  a recover                                 后端隧道与服务恢复\n  a perf [2-30]                             只读脱敏性能采样（默认 5 秒）\n  sudo bash telemt-dual-hop.sh entry        初始化入口 VPS\n  sudo bash telemt-dual-hop.sh backend1     安装后端 VPS1\n  sudo bash telemt-dual-hop.sh backend2     安装后端 VPS2\n  sudo bash telemt-dual-hop.sh register     在入口录入后端回执\n  sudo bash telemt-dual-hop.sh complete     重试启用已配对入口\n  sudo bash telemt-dual-hop.sh status       查看状态\n  sudo bash telemt-dual-hop.sh links        显示两条 MTP 链接\n  sudo bash telemt-dual-hop.sh diagnose     运行诊断\n  sudo bash telemt-dual-hop.sh uninstall    卸载本脚本创建的服务\n  bash telemt-dual-hop.sh --self-test       本地无特权自检\n'
+
+======================================================================
+FAIL: test_nonroot_install_uses_sudo_boundary (test_install_command.InstallCommandTests.test_nonroot_install_uses_sudo_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_install_command.py", line 77, in test_nonroot_install_uses_sudo_boundary
+    self.invoke(True, root=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_install_command.py", line 71, in invoke
+    self.assertIn("Telemt Dual-Hop " + ("1.3.1" if original else "1.6.0"), result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Telemt Dual-Hop 1.6.0' not found in 'Telemt Dual-Hop 1.7.0\n\n用法：\n  sudo bash telemt-dual-hop.sh              打开中文菜单\n  a                                         安装后打开控制面板（自动使用 sudo）\n  a status                                  快速查看状态\n  a update                                  安全更新管理脚本（可简写为 a u）\n  a update-rollback                         恢复上次 a update 前的管理脚本\n  a core-upgrade --maintenance               后端固定版本核心升级（需先排空）\n  a core-rollback --maintenance              后端核心回滚（配置变更时拒绝）\n  a recover                                 后端隧道与服务恢复\n  a perf [2-30]                             只读脱敏性能采样（默认 5 秒）\n  sudo bash telemt-dual-hop.sh entry        初始化入口 VPS\n  sudo bash telemt-dual-hop.sh backend1     安装后端 VPS1\n  sudo bash telemt-dual-hop.sh backend2     安装后端 VPS2\n  sudo bash telemt-dual-hop.sh register     在入口录入后端回执\n  sudo bash telemt-dual-hop.sh complete     重试启用已配对入口\n  sudo bash telemt-dual-hop.sh status       查看状态\n  sudo bash telemt-dual-hop.sh links        显示两条 MTP 链接\n  sudo bash telemt-dual-hop.sh diagnose     运行诊断\n  sudo bash telemt-dual-hop.sh uninstall    卸载本脚本创建的服务\n  bash telemt-dual-hop.sh --self-test       本地无特权自检\n'
+
+======================================================================
+FAIL: test_first_install_creates_working_shortcut (test_manager_lifecycle.ManagerLifecycleTests.test_first_install_creates_working_shortcut)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_manager_lifecycle.py", line 83, in test_first_install_creates_working_shortcut
+    self.assertIn("Telemt Dual-Hop 1.6.0", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Telemt Dual-Hop 1.6.0' not found in 'Telemt Dual-Hop 1.7.0\n\n用法：\n  sudo bash telemt-dual-hop.sh              打开中文菜单\n  a                                         安装后打开控制面板（自动使用 sudo）\n  a status                                  快速查看状态\n  a update                                  安全更新管理脚本（可简写为 a u）\n  a update-rollback                         恢复上次 a update 前的管理脚本\n  a core-upgrade --maintenance               后端固定版本核心升级（需先排空）\n  a core-rollback --maintenance              后端核心回滚（配置变更时拒绝）\n  a recover                                 后端隧道与服务恢复\n  a perf [2-30]                             只读脱敏性能采样（默认 5 秒）\n  sudo bash telemt-dual-hop.sh entry        初始化入口 VPS\n  sudo bash telemt-dual-hop.sh backend1     安装后端 VPS1\n  sudo bash telemt-dual-hop.sh backend2     安装后端 VPS2\n  sudo bash telemt-dual-hop.sh register     在入口录入后端回执\n  sudo bash telemt-dual-hop.sh complete     重试启用已配对入口\n  sudo bash telemt-dual-hop.sh status       查看状态\n  sudo bash telemt-dual-hop.sh links        显示两条 MTP 链接\n  sudo bash telemt-dual-hop.sh diagnose     运行诊断\n  sudo bash telemt-dual-hop.sh uninstall    卸载本脚本创建的服务\n  bash telemt-dual-hop.sh --self-test       本地无特权自检\n'
+
+======================================================================
+FAIL: test_rejects_downloaded_downgrade_and_protocol_change (test_manager_lifecycle.ManagerLifecycleTests.test_rejects_downloaded_downgrade_and_protocol_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_manager_lifecycle.py", line 104, in test_rejects_downloaded_downgrade_and_protocol_change
+    self.invoke(ok=False)
+    ~~~~~~~~~~~^^^^^^^^^^
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_manager_lifecycle.py", line 63, in invoke
+    self.assertEqual(result.returncode == 0, ok, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True != False : [成功] 管理入口已就绪；以后直接输入 a 即可打开控制面板。
+
+
+======================================================================
+FAIL: test_runtime_templates_match_production_baseline (test_performance.PerformanceTests.test_runtime_templates_match_production_baseline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/d/project/MTP脚本/telemt-dual-hop/tests/test_performance.py", line 334, in test_runtime_templates_match_production_baseline
+    self.assertEqual(hashlib.sha256(text[start:end].encode()).hexdigest(), expected, name)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '7c40007942e13374b0d7773f9155ce4e6c9f37aea51d8104bcc1a48ab4d4ba43' != 'f567a24af1ed01b28915f3fc13e121ed7a27c534cf7ba351d2ca8a7b86231362'
+- 7c40007942e13374b0d7773f9155ce4e6c9f37aea51d8104bcc1a48ab4d4ba43
++ f567a24af1ed01b28915f3fc13e121ed7a27c534cf7ba351d2ca8a7b86231362
+ : write_haproxy_config
+
+----------------------------------------------------------------------
+Ran 215 tests in 19.621s
+
+FAILED (failures=5, errors=5)

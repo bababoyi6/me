@@ -1,0 +1,108 @@
+{
+  "scope": "split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only",
+  "plan": "sustained",
+  "transfer_rate_per_stream": 125000000,
+  "official_release": "3.5.16",
+  "source_commit": "d5276b6b3db4afb431e312b3ea8829964839331e",
+  "complete": false,
+  "accepted": false,
+  "payload_bytes_per_stream": 4194304,
+  "rate_mbps": 200,
+  "cpu_assignment": {
+    "core": 0,
+    "client_and_haproxy": 1,
+    "dc": 2
+  },
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "resources_before": {
+    "memory_current": 16670720,
+    "memory_peak": 16670720,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 87996,
+      "user_usec": 75717,
+      "system_usec": 12278,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 4,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "300000 100000",
+    "memory_max": "805306368",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "controls": [],
+  "rows": [],
+  "idle_checks": [],
+  "native_manifest": {
+    "upstream_commit": "66708d2866f3f3a4541c4fa67984d408e71a8af4",
+    "manager_commit": "dec285fbdf5b42dd8be3e9e879bc0c2ad8994bc8",
+    "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "lto": "thin",
+    "codegen_units": 8,
+    "production_default_changed": false,
+    "binaries": {
+      "control": {
+        "sha256": "f1a0f2a91e4e4d9972da5bdc32ea63484d00dc30f0c0fb42cc3d396b07344067",
+        "version": "telemt 3.5.17+tdh.control1",
+        "bytes": 33582016
+      },
+      "balanced": {
+        "sha256": "cd4c5ff500d956a8a7059e3e536ff139983a0c5897b4c410ea0e53c68a6cfa14",
+        "version": "telemt 3.5.17+tdh.balanced1",
+        "bytes": 33559584
+      }
+    },
+    "builder_sha256": "29ce5233f9b1737f674e709b135d9e03a18f467324636c2e09aff5dcd4ce77be",
+    "helpers": {
+      "low_rtt_receive": "7b6c638525d3f2f9a106ae0b6c13b8d87fa21a1224ffc32ad5960b002cbb3990",
+      "unsent_queue_bulk": "b711a4bf9f3bd8296cb1182e7d956250371f54088264c514a483525f13fef3ca"
+    },
+    "scope": "unofficial synthetic lab candidates only; no publication or deployment"
+  },
+  "lab_socket_library_sha256": "3199c28b58d9b6a0ebeb148a48f8d78e3c0ff3b507e29761f1d2c1a5368e5ec1",
+  "cleanup_errors": [],
+  "private_processes_closed": true,
+  "resources_after": {
+    "memory_current": 52224000,
+    "memory_peak": 163803136,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 10366516,
+      "user_usec": 3250474,
+      "system_usec": 7116042,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 216,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "300000 100000",
+    "memory_max": "805306368",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "oom_delta": {
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "namespaces_removed": true
+}

@@ -1,0 +1,11 @@
+system	Verify pinned candidate installs, native maintenance and three normal reboots	﻿2026-11-09T02:36:58.5067868Z ##[group]Run sudo env RUNNER_TEMP="$RUNNER_TEMP" TDH_FULL_SYSTEM_PROFILE=candidate TDH_CANDIDATE_REF="$GITHUB_SHA" python3 tests/full_system_ci.py
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:36:58.5068908Z ^[[36;1msudo env RUNNER_TEMP="$RUNNER_TEMP" TDH_FULL_SYSTEM_PROFILE=candidate TDH_CANDIDATE_REF="$GITHUB_SHA" python3 tests/full_system_ci.py^[[0m
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:36:58.5104779Z shell: /usr/bin/bash -e {0}
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:36:58.5105164Z ##[endgroup]
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:39:40.8986997Z Traceback (most recent call last):
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:39:40.8988315Z   File "/home/runner/work/me/me/tests/full_system_ci.py", line 595, in <module>
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:39:40.8989642Z     elif not sys.argv[1:]: supervise()
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:39:40.8990982Z   File "/home/runner/work/me/me/tests/full_system_ci.py", line 588, in supervise
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:39:40.8992752Z     assert accepted, 'full-system acceptance incomplete; see sanitized JSON'
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:39:40.8993971Z AssertionError: full-system acceptance incomplete; see sanitized JSON
+system	Verify pinned candidate installs, native maintenance and three normal reboots	2026-11-09T02:39:40.9129513Z ##[error]Process completed with exit code 1.

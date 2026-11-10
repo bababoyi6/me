@@ -1,0 +1,6 @@
+validate	Check Python tools	﻿2026-11-09T02:36:25.3495669Z ##[group]Run python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check && python3 tools/embed_core_upgrade.py --check
+validate	Check Python tools	2026-11-09T02:36:25.3497014Z ^[[36;1mpython3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check && python3 tools/embed_core_upgrade.py --check^[[0m
+validate	Check Python tools	2026-11-09T02:36:25.3559881Z shell: /usr/bin/bash -e {0}
+validate	Check Python tools	2026-11-09T02:36:25.3560150Z ##[endgroup]
+validate	Check Python tools	2026-11-09T02:36:25.6251663Z embedded upgrade differs from tested source
+validate	Check Python tools	2026-11-09T02:36:25.6301162Z ##[error]Process completed with exit code 1.

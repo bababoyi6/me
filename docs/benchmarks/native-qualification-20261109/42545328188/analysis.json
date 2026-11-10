@@ -1,0 +1,419 @@
+{
+  "source_commit": "3d649a83e83a9e6490a38465151cad5ecf5e68ba",
+  "transport_accepted": true,
+  "payload_flows": 80,
+  "comparisons": [
+    {
+      "kind": "legacy-parity",
+      "baseline": "legacy-deep",
+      "candidate": "native-deep",
+      "streams": 1,
+      "classification": "PATH_CONTROL_LIMITED",
+      "throughput_ratios": [
+        1.0011730494977078,
+        1.0026989804640922,
+        1.0148418367533731,
+        1.0043171632926862
+      ],
+      "tcp_rtt_ratios": [
+        0.8762635638145179,
+        0.8815015592431611,
+        1.1197978022826904,
+        1.169362707841974
+      ],
+      "ping_p95_ratios": [
+        1.0,
+        0.8013698630136986,
+        1.3839285714285714,
+        1.2695652173913043
+      ],
+      "baseline_median_mbps": 104.82801488838544,
+      "candidate_median_mbps": 105.8227217466216,
+      "baseline_tcp_rtt_ms": [
+        130.6325,
+        123.778,
+        103.56200000000001,
+        101.97049999999999
+      ],
+      "candidate_tcp_rtt_ms": [
+        114.4685,
+        109.1105,
+        115.9685,
+        119.2405
+      ],
+      "baseline_ping_p95_ms": [
+        156.0,
+        146.0,
+        112.0,
+        115.0
+      ],
+      "candidate_ping_p95_ms": [
+        156.0,
+        117.0,
+        155.0,
+        146.0
+      ]
+    },
+    {
+      "kind": "legacy-parity",
+      "baseline": "legacy-bounded",
+      "candidate": "native-bounded",
+      "streams": 1,
+      "classification": "PROBE_FAILURE",
+      "throughput_ratios": [
+        1.025564647475775,
+        1.001165364800828,
+        0.8704164392903898,
+        0.9524338548848738
+      ],
+      "tcp_rtt_ratios": [
+        0.9801486329975782,
+        0.9892131677330757,
+        0.9849421489044475,
+        0.9165126800670668
+      ],
+      "ping_p95_ratios": [
+        1.0,
+        0.9926470588235294,
+        1.0465116279069768,
+        1.0692307692307692
+      ],
+      "baseline_median_mbps": 92.39108537169608,
+      "candidate_median_mbps": 91.47066647609448,
+      "baseline_tcp_rtt_ms": [
+        113.97200000000001,
+        115.4185,
+        114.691,
+        128.5285
+      ],
+      "candidate_tcp_rtt_ms": [
+        111.70949999999999,
+        114.17349999999999,
+        112.964,
+        117.798
+      ],
+      "baseline_ping_p95_ms": [
+        138.0,
+        136.0,
+        129.0,
+        130.0
+      ],
+      "candidate_ping_p95_ms": [
+        138.0,
+        135.0,
+        135.0,
+        139.0
+      ]
+    },
+    {
+      "kind": "router-model",
+      "baseline": "legacy-deep",
+      "candidate": "legacy-bounded",
+      "streams": 1,
+      "classification": "PATH_CONTROL_LIMITED",
+      "throughput_ratios": [
+        0.8441267079881282,
+        0.8987512155115903,
+        1.005063883812534,
+        0.8641054112030545
+      ],
+      "tcp_rtt_ratios": [
+        0.8724628251009513,
+        0.9324637657742085,
+        1.1074621965585831,
+        1.260447874630408
+      ],
+      "ping_p95_ratios": [
+        0.8846153846153846,
+        0.9315068493150684,
+        1.1517857142857142,
+        1.1304347826086956
+      ],
+      "baseline_median_mbps": 104.82801488838544,
+      "candidate_median_mbps": 92.39108537169608,
+      "baseline_tcp_rtt_ms": [
+        130.6325,
+        123.778,
+        103.56200000000001,
+        101.97049999999999
+      ],
+      "candidate_tcp_rtt_ms": [
+        113.97200000000001,
+        115.4185,
+        114.691,
+        128.5285
+      ],
+      "baseline_ping_p95_ms": [
+        156.0,
+        146.0,
+        112.0,
+        115.0
+      ],
+      "candidate_ping_p95_ms": [
+        138.0,
+        136.0,
+        129.0,
+        130.0
+      ]
+    },
+    {
+      "kind": "router-model",
+      "baseline": "native-deep",
+      "candidate": "native-bounded",
+      "streams": 1,
+      "classification": "PATH_CONTROL_LIMITED",
+      "throughput_ratios": [
+        0.8646921829718242,
+        0.8973765866665024,
+        0.8620300182008319,
+        0.8194654815225516
+      ],
+      "tcp_rtt_ratios": [
+        0.9758972992570007,
+        1.0464025002176691,
+        0.9740921025968258,
+        0.9879026002071444
+      ],
+      "ping_p95_ratios": [
+        0.8846153846153846,
+        1.1538461538461537,
+        0.8709677419354839,
+        0.952054794520548
+      ],
+      "baseline_median_mbps": 105.8227217466216,
+      "candidate_median_mbps": 91.47066647609448,
+      "baseline_tcp_rtt_ms": [
+        114.4685,
+        109.1105,
+        115.9685,
+        119.2405
+      ],
+      "candidate_tcp_rtt_ms": [
+        111.70949999999999,
+        114.17349999999999,
+        112.964,
+        117.798
+      ],
+      "baseline_ping_p95_ms": [
+        156.0,
+        117.0,
+        155.0,
+        146.0
+      ],
+      "candidate_ping_p95_ms": [
+        138.0,
+        135.0,
+        135.0,
+        139.0
+      ]
+    },
+    {
+      "kind": "legacy-parity",
+      "baseline": "legacy-deep",
+      "candidate": "native-deep",
+      "streams": 4,
+      "classification": "PATH_CONTROL_LIMITED",
+      "throughput_ratios": [
+        1.0237953156545374,
+        0.9928635444822365,
+        0.9791348475596626,
+        0.9741767165837517
+      ],
+      "tcp_rtt_ratios": [
+        0.8498690068752461,
+        0.9937264851807762,
+        0.9851475841323558,
+        0.9718593117783011
+      ],
+      "ping_p95_ratios": [
+        0.909967845659164,
+        0.9565217391304348,
+        0.9565217391304348,
+        0.9894366197183099
+      ],
+      "baseline_median_mbps": 156.31444630232264,
+      "candidate_median_mbps": 154.60937848589148,
+      "baseline_tcp_rtt_ms": [
+        264.13599999999997,
+        230.174,
+        223.398,
+        229.96949999999998
+      ],
+      "candidate_tcp_rtt_ms": [
+        224.481,
+        228.73,
+        220.08,
+        223.498
+      ],
+      "baseline_ping_p95_ms": [
+        311.0,
+        299.0,
+        299.0,
+        284.0
+      ],
+      "candidate_ping_p95_ms": [
+        283.0,
+        286.0,
+        286.0,
+        281.0
+      ]
+    },
+    {
+      "kind": "legacy-parity",
+      "baseline": "legacy-bounded",
+      "candidate": "native-bounded",
+      "streams": 4,
+      "classification": "PROBE_FAILURE",
+      "throughput_ratios": [
+        0.9176613277553466,
+        1.045217180528579,
+        1.010620362514926,
+        0.9678566859716292
+      ],
+      "tcp_rtt_ratios": [
+        0.9999463310088698,
+        1.0371669732391857,
+        1.0134898761621285,
+        0.999789859098745
+      ],
+      "ping_p95_ratios": [
+        0.9928571428571429,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "baseline_median_mbps": 154.21150383648535,
+      "candidate_median_mbps": 152.91511714807996,
+      "baseline_tcp_rtt_ms": [
+        139.7455,
+        134.824,
+        136.065,
+        140.382
+      ],
+      "candidate_tcp_rtt_ms": [
+        139.738,
+        139.83499999999998,
+        137.90050000000002,
+        140.35250000000002
+      ],
+      "baseline_ping_p95_ms": [
+        140.0,
+        140.0,
+        140.0,
+        140.0
+      ],
+      "candidate_ping_p95_ms": [
+        139.0,
+        140.0,
+        140.0,
+        140.0
+      ]
+    },
+    {
+      "kind": "router-model",
+      "baseline": "legacy-deep",
+      "candidate": "legacy-bounded",
+      "streams": 4,
+      "classification": "PATH_CONTROL_LIMITED",
+      "throughput_ratios": [
+        0.9902878211847744,
+        0.948858012181729,
+        0.9887619833882281,
+        0.9854690237125094
+      ],
+      "tcp_rtt_ratios": [
+        0.529066465760063,
+        0.585748173121204,
+        0.6090699111003679,
+        0.6104374710559445
+      ],
+      "ping_p95_ratios": [
+        0.45016077170418006,
+        0.4682274247491639,
+        0.4682274247491639,
+        0.49295774647887325
+      ],
+      "baseline_median_mbps": 156.31444630232264,
+      "candidate_median_mbps": 154.21150383648535,
+      "baseline_tcp_rtt_ms": [
+        264.13599999999997,
+        230.174,
+        223.398,
+        229.96949999999998
+      ],
+      "candidate_tcp_rtt_ms": [
+        139.7455,
+        134.824,
+        136.065,
+        140.382
+      ],
+      "baseline_ping_p95_ms": [
+        311.0,
+        299.0,
+        299.0,
+        284.0
+      ],
+      "candidate_ping_p95_ms": [
+        140.0,
+        140.0,
+        140.0,
+        140.0
+      ]
+    },
+    {
+      "kind": "router-model",
+      "baseline": "native-deep",
+      "candidate": "native-bounded",
+      "streams": 4,
+      "classification": "PATH_CONTROL_LIMITED",
+      "throughput_ratios": [
+        0.8876274612248874,
+        0.9988912391095277,
+        1.0205570729948912,
+        0.9790757335720895
+      ],
+      "tcp_rtt_ratios": [
+        0.622493663160802,
+        0.6113539981637738,
+        0.626592602689931,
+        0.6279810110157587
+      ],
+      "ping_p95_ratios": [
+        0.4911660777385159,
+        0.48951048951048953,
+        0.48951048951048953,
+        0.498220640569395
+      ],
+      "baseline_median_mbps": 154.60937848589148,
+      "candidate_median_mbps": 152.91511714807996,
+      "baseline_tcp_rtt_ms": [
+        224.481,
+        228.73,
+        220.08,
+        223.498
+      ],
+      "candidate_tcp_rtt_ms": [
+        139.738,
+        139.83499999999998,
+        137.90050000000002,
+        140.35250000000002
+      ],
+      "baseline_ping_p95_ms": [
+        283.0,
+        286.0,
+        286.0,
+        281.0
+      ],
+      "candidate_ping_p95_ms": [
+        139.0,
+        140.0,
+        140.0,
+        140.0
+      ]
+    }
+  ],
+  "legacy_parity_all_cases": false,
+  "scope": "one CI host; old and native exact binaries; router counterfactual is lab-only, not a production qdisc recommendation",
+  "rules": "every paired cohort: native throughput>=95% old, TCP median and path ping p95<=110% old; CPU/path/loss gates first; four-flow model experiment additionally requires both latency measures<=80% deep",
+  "analysis_sha256": "5479490a855d8ee510dfde8fc7396544bd2f0047e422bcde83d69a8e4026cc77"
+}

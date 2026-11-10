@@ -1,0 +1,38 @@
+{
+  "42581074585/path-capacity/metrics.json": {
+    "bytes": 79213,
+    "sha256": "79bb0dd411bb11284487719ed28f8f699d76ce71e2a383aa5d2cbf240d70d971",
+    "gzip_path": "42581074585/path-capacity/metrics.json.gz",
+    "gzip_sha256": "02dd6dd40a5450a806d3813ba98ae8591132bd75759c0a05fde7ec45f6731c4b"
+  },
+  "42581528010/path-capacity/metrics.json": {
+    "bytes": 687915,
+    "sha256": "838d4db78a3a7adab7eec324e9f8653438896951c493aef373c37a5140a86c8f",
+    "gzip_path": "42581528010/path-capacity/metrics.json.gz",
+    "gzip_sha256": "c9d886edd352fdcb92d16ffa6fe19372c7d91aa3982e9f1dff3d624efdecd51b"
+  },
+  "42582456747/private-shaper/metrics.json": {
+    "bytes": 1771868,
+    "sha256": "4000a868a190a492f3cc52844424efbec6b83cf7d9f76f39c77da9915189659a",
+    "gzip_path": "42582456747/private-shaper/metrics.json.gz",
+    "gzip_sha256": "a8f9f425c1136e48f2f686c45b272266c5b0a107c4348aa7e4301ea26b80cd39"
+  },
+  "42583243638/private-shaper/metrics.json": {
+    "bytes": 19494,
+    "sha256": "5be73d4955d943b54811c389f4cfbb6e881ada59ccbf2ebbc5080718f03c9060",
+    "gzip_path": "42583243638/private-shaper/metrics.json.gz",
+    "gzip_sha256": "282517d6b2116742aa2f638b066a8ef1af171e84f4f4639dd4c0355804b8f464"
+  },
+  "42583673480/private-shaper/metrics.json": {
+    "bytes": 237456,
+    "sha256": "f559bab8b9f56ab05275bf1951752d8c8aef88cb1727939ce3988d9c411685a5",
+    "gzip_path": "42583673480/private-shaper/metrics.json.gz",
+    "gzip_sha256": "9da6b769636a9c8136fcbc0f68b99cdbc93afc5ee5827953fe7acb2703d686a0"
+  },
+  "42584205436/private-shaper/metrics.json": {
+    "bytes": 1810091,
+    "sha256": "342109a8249f8113d9722b5e71ada436ac01f8deff5faf0a49511fc5deeaf7f4",
+    "gzip_path": "42584205436/private-shaper/metrics.json.gz",
+    "gzip_sha256": "0a59a242bdc5ec2739c3991184e2b5c3da1e3d76d38830c1b059d47a82c1ea5b"
+  }
+}

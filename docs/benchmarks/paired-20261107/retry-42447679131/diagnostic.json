@@ -1,0 +1,1090 @@
+{
+  "scope": "diagnostic only; genuine HAProxy/Telemt/transport, synthetic DC; no production changes",
+  "source_commit": "b9213873889a14edca26c5ababdcd06ea740a4ee",
+  "complete": true,
+  "runs": [
+    {
+      "round": 1,
+      "kind": "balanced2",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.259669Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.259831Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.259836Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.270095Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.270104Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.271414Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271424Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.271437Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271442Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.271742Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271765Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.271833Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271846Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.271852Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271862Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.271870Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271875Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.271882Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271887Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.271892Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271897Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.271903Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271907Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.271913Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271917Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.271949Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.271966Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.271992Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.272008Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.272033Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.272055Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.272082Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.272086Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.329594Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.329608Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:11.329617Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:11.329622Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:11.562398Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=0\n2026-11-08T04:40:11.562411Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:40:12.770083Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_a c2s_kbps=0 s2c_kbps=25 c2s_total=21 s2c_total=262144\n2026-11-08T04:40:12.778167Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_b c2s_kbps=0 s2c_kbps=25 c2s_total=29 s2c_total=262196\n2026-11-08T04:40:13.398456Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:40:13.398479Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:40:13.583112Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:40:13.583191Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 25.12205638552141,
+            "wall_seconds": 8.347851655999989,
+            "handshake_ms": {
+              "p50": 262.37037499996063,
+              "p95": 278.30135900001096
+            },
+            "completion_ms": {
+              "p50": 7922.077706999971,
+              "p95": 7930.0891340000135
+            },
+            "backend_cpu_one_core_percent": 0.7187477985054419,
+            "controller_and_mock_cpu_one_core_percent": 1.8759074244862242,
+            "haproxy_cpu_one_core_percent": 0.119791299750907,
+            "backend_peak_rss_bytes": 29278208,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 18.97936957526759,
+            "wall_seconds": 11.04963993499996,
+            "handshake_ms": {
+              "p50": 258.79132550002737,
+              "p95": 270.8455120000508
+            },
+            "completion_ms": {
+              "p50": 8834.621228999993,
+              "p95": 8858.032141000023
+            },
+            "backend_cpu_one_core_percent": 0.2715020595827235,
+            "controller_and_mock_cpu_one_core_percent": 1.3736893228457998,
+            "haproxy_cpu_one_core_percent": 0.2715020595827235,
+            "backend_peak_rss_bytes": 29278208,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 18694144,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.09,
+          "rss_bytes": 22585344,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 1,
+      "kind": "stable",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "ted user=line_a\n2026-11-08T04:40:34.655326Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.655332Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.655338Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.655344Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.656362Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656386Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.656393Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656398Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656402Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656407Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656414Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656419Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656425Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656430Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.656435Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656439Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656449Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656455Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656460Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656465Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.656752Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656766Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656782Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656787Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656791Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656796Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656801Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656806Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.656811Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656816Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.656821Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656826Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.656831Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.656836Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.657331Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.657337Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:34.669320Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.669329Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.708515Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.708525Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.771184Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=4\n2026-11-08T04:40:34.771197Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:34.905216Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:34.905226Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 26.71817848936365,
+            "wall_seconds": 7.849157834000039,
+            "handshake_ms": {
+              "p50": 258.10048549999465,
+              "p95": 273.059609000029
+            },
+            "completion_ms": {
+              "p50": 7720.846412500009,
+              "p95": 7741.906900999993
+            },
+            "backend_cpu_one_core_percent": 0.6370110151616013,
+            "controller_and_mock_cpu_one_core_percent": 1.9580415791139407,
+            "haproxy_cpu_one_core_percent": 0.12740220303232025,
+            "backend_peak_rss_bytes": 25546752,
+            "backend_fds_before": 16,
+            "backend_fds_after": 18
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 24.404587618031275,
+            "wall_seconds": 8.593269564000025,
+            "handshake_ms": {
+              "p50": 253.29093599998487,
+              "p95": 260.4116449999765
+            },
+            "completion_ms": {
+              "p50": 8389.512387499992,
+              "p95": 8423.455079999996
+            },
+            "backend_cpu_one_core_percent": 0.3491104262070361,
+            "controller_and_mock_cpu_one_core_percent": 1.6568791301098715,
+            "haproxy_cpu_one_core_percent": 0.3491104262070361,
+            "backend_peak_rss_bytes": 26492928,
+            "backend_fds_before": 16,
+            "backend_fds_after": 18
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 15663104,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.08,
+          "rss_bytes": 26492928,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 2,
+      "kind": "stable",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "gs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.955786Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:55.955792Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.955797Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:55.966605Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966621Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:55.966628Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966633Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:55.966638Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966643Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:55.966650Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966655Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:55.966842Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966847Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:55.966852Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966857Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:55.966862Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966867Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:55.966875Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966880Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:55.966886Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.966891Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:55.969218Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.969224Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:55.969230Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.969234Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:55.979184Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.979191Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:55.980081Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.980088Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:55.985180Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:40:55.985185Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:56.062890Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:40:56.062901Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:56.074797Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=2\n2026-11-08T04:40:56.074803Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:56.090084Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=2\n2026-11-08T04:40:56.090094Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:56.136726Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=5\n2026-11-08T04:40:56.136735Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:40:56.152128Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=1\n2026-11-08T04:40:56.152137Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:40:58.028525Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_b c2s_kbps=0 s2c_kbps=25 c2s_total=29 s2c_total=262196\n2026-11-08T04:40:58.692515Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:40:58.692545Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 26.558739051484938,
+            "wall_seconds": 7.896278494000057,
+            "handshake_ms": {
+              "p50": 269.21647249997704,
+              "p95": 283.3900719999747
+            },
+            "completion_ms": {
+              "p50": 7589.612500999976,
+              "p95": 7592.646116999958
+            },
+            "backend_cpu_one_core_percent": 0.5065677461907375,
+            "controller_and_mock_cpu_one_core_percent": 1.8835063265943492,
+            "haproxy_cpu_one_core_percent": 0.12664193654768438,
+            "backend_peak_rss_bytes": 25395200,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 18.977711494402488,
+            "wall_seconds": 11.050605340999937,
+            "handshake_ms": {
+              "p50": 256.5495210000108,
+              "p95": 268.02236699995774
+            },
+            "completion_ms": {
+              "p50": 8259.176824000007,
+              "p95": 8398.527121000028
+            },
+            "backend_cpu_one_core_percent": 0.4524639009094831,
+            "controller_and_mock_cpu_one_core_percent": 1.330092438055523,
+            "haproxy_cpu_one_core_percent": 0.27147834054568987,
+            "backend_peak_rss_bytes": 26374144,
+            "backend_fds_before": 14,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 15671296,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.09,
+          "rss_bytes": 26374144,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 2,
+      "kind": "balanced2",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743042Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743049Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743054Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743060Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743065Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:22.743072Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743076Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:22.743082Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743087Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743093Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743098Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:22.743104Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743109Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:22.743116Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743122Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743129Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743133Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:22.743140Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743144Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:22.743150Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743155Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743162Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743166Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743172Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743177Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743183Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743189Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743195Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743199Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.743204Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743209Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:22.743215Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.743220Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:22.772509Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:22.772522Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:22.883610Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=6\n2026-11-08T04:41:22.883622Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:23.024205Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=0\n2026-11-08T04:41:23.024219Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:24.360110Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_a c2s_kbps=0 s2c_kbps=25 c2s_total=29 s2c_total=262196\n2026-11-08T04:41:24.399287Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_b c2s_kbps=0 s2c_kbps=22 c2s_total=21 s2c_total=229376\n2026-11-08T04:41:24.945079Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:41:24.945143Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:25.070706Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:41:25.070803Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 19.998316952252235,
+            "wall_seconds": 10.486642476000043,
+            "handshake_ms": {
+              "p50": 262.04071300003307,
+              "p95": 303.91506500006926
+            },
+            "completion_ms": {
+              "p50": 7924.05321450002,
+              "p95": 7932.304267000063
+            },
+            "backend_cpu_one_core_percent": 0.47679703121786676,
+            "controller_and_mock_cpu_one_core_percent": 2.1313625835106516,
+            "haproxy_cpu_one_core_percent": 0.1907188124871467,
+            "backend_peak_rss_bytes": 29540352,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 19.13797891663446,
+            "wall_seconds": 10.95806411500007,
+            "handshake_ms": {
+              "p50": 253.29457999998795,
+              "p95": 261.22275900002023
+            },
+            "completion_ms": {
+              "p50": 8693.994122999982,
+              "p95": 8716.90796300004
+            },
+            "backend_cpu_one_core_percent": 0.45628497401796486,
+            "controller_and_mock_cpu_one_core_percent": 1.500263771727339,
+            "haproxy_cpu_one_core_percent": 0.27377098441077896,
+            "backend_peak_rss_bytes": 29024256,
+            "backend_fds_before": 16,
+            "backend_fds_after": 18
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 19062784,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.1,
+          "rss_bytes": 22822912,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 3,
+      "kind": "balanced2",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "mpleted user=line_b\n2026-11-08T04:41:49.272244Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.272249Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.272256Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.272262Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.272270Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.272275Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273481Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273488Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273495Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273501Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:49.273508Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273514Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273522Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273527Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273535Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273542Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273548Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273554Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273562Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273567Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:49.273574Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273580Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273592Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273596Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:49.273605Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273610Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:49.273617Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273622Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:49.273629Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273634Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:49.273641Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273648Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:49.273656Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273660Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273668Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273672Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.273679Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.273684Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:49.311741Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:41:49.311763Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:41:49.415346Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=4\n2026-11-08T04:41:49.415379Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:41:50.866415Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_b c2s_kbps=0 s2c_kbps=22 c2s_total=21 s2c_total=229376\n2026-11-08T04:41:51.436330Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:41:51.436362Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 19.68466606191194,
+            "wall_seconds": 10.653734197999938,
+            "handshake_ms": {
+              "p50": 265.06089800000154,
+              "p95": 275.88087499998437
+            },
+            "completion_ms": {
+              "p50": 8004.946912000037,
+              "p95": 8020.627288000014
+            },
+            "backend_cpu_one_core_percent": 0.46931901125697945,
+            "controller_and_mock_cpu_one_core_percent": 1.5714803738151313,
+            "haproxy_cpu_one_core_percent": 0.18772760450279177,
+            "backend_peak_rss_bytes": 29097984,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 19.097593940877825,
+            "wall_seconds": 10.981236728000113,
+            "handshake_ms": {
+              "p50": 255.67742949999683,
+              "p95": 265.1757470000575
+            },
+            "completion_ms": {
+              "p50": 8784.669997499976,
+              "p95": 8787.55864599998
+            },
+            "backend_cpu_one_core_percent": 0.364257696931416,
+            "controller_and_mock_cpu_one_core_percent": 1.7379718944894968,
+            "haproxy_cpu_one_core_percent": 0.18212884846570804,
+            "backend_peak_rss_bytes": 28512256,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 18620416,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.09,
+          "rss_bytes": 28512256,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 3,
+      "kind": "stable",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "ted user=line_a\n2026-11-08T04:42:13.813159Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813186Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.813227Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813249Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.813259Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813263Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813268Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813272Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.813277Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813281Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813289Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813293Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813308Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813312Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813317Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813322Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.813326Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813331Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.813336Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813341Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.813345Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813350Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813394Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813421Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813429Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813433Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813440Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813444Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813453Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813459Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.813464Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.813469Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.815626Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.815631Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.819104Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.819109Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:13.822277Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.822282Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.822287Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.822291Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.865919Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:13.865928Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:13.889640Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:42:13.889654Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.053208553653114,
+            "wall_seconds": 9.097007018,
+            "handshake_ms": {
+              "p50": 264.6427949999861,
+              "p95": 278.7808399999676
+            },
+            "completion_ms": {
+              "p50": 7660.526757499952,
+              "p95": 7664.152555999976
+            },
+            "backend_cpu_one_core_percent": 0.5496313227093962,
+            "controller_and_mock_cpu_one_core_percent": 1.6615077871318416,
+            "haproxy_cpu_one_core_percent": 0.10992626454187925,
+            "backend_peak_rss_bytes": 25731072,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 24.548563882523013,
+            "wall_seconds": 8.542870409999978,
+            "handshake_ms": {
+              "p50": 249.77015050001228,
+              "p95": 256.57776499997453
+            },
+            "completion_ms": {
+              "p50": 8398.126319000028,
+              "p95": 8420.725111000025
+            },
+            "backend_cpu_one_core_percent": 0.4682266975884058,
+            "controller_and_mock_cpu_one_core_percent": 1.6731730687695212,
+            "haproxy_cpu_one_core_percent": 0.35117002319130436,
+            "backend_peak_rss_bytes": 26648576,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 15884288,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.09,
+          "rss_bytes": 26648576,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 4,
+      "kind": "stable",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "gs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.346893Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.346900Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.346906Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.346912Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.346917Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.346923Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.346929Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.346935Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.346940Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.346945Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.346950Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.346955Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.346960Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.346965Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.346970Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.348072Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.348080Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.348090Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.348097Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.348103Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.348108Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.348114Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.348119Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.348125Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.348131Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.352163Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.352169Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.352581Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.352587Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.365745Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.365778Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.408098Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.408117Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.408132Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.408138Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.437352Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:42:35.437360Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:42:35.514643Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=5\n2026-11-08T04:42:35.514653Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:35.515452Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=1\n2026-11-08T04:42:35.515458Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:42:37.232602Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_b c2s_kbps=0 s2c_kbps=25 c2s_total=29 s2c_total=262196\n2026-11-08T04:42:38.278864Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=11\n2026-11-08T04:42:38.278888Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 26.71504013259262,
+            "wall_seconds": 7.850079916000027,
+            "handshake_ms": {
+              "p50": 261.31577399996786,
+              "p95": 273.8453480000089
+            },
+            "completion_ms": {
+              "p50": 7649.0522239999445,
+              "p95": 7655.252050999934
+            },
+            "backend_cpu_one_core_percent": 0.636936190905395,
+            "controller_and_mock_cpu_one_core_percent": 2.0988237414524598,
+            "haproxy_cpu_one_core_percent": 0.254774476362158,
+            "backend_peak_rss_bytes": 25583616,
+            "backend_fds_before": 16,
+            "backend_fds_after": 18
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 18.307077080980978,
+            "wall_seconds": 11.455416889999924,
+            "handshake_ms": {
+              "p50": 257.6040959999659,
+              "p95": 271.405317000017
+            },
+            "completion_ms": {
+              "p50": 8454.151664499988,
+              "p95": 8536.303528999952
+            },
+            "backend_cpu_one_core_percent": 0.3491797844120212,
+            "controller_and_mock_cpu_one_core_percent": 1.328776712900591,
+            "haproxy_cpu_one_core_percent": 0.1745898922060106,
+            "backend_peak_rss_bytes": 26562560,
+            "backend_fds_before": 18,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 15679488,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.09,
+          "rss_bytes": 26562560,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 4,
+      "kind": "balanced2",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384685Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384690Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384695Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.384701Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384706Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384712Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384716Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384722Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384726Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384733Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384738Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384759Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384780Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.384795Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384799Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384805Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384811Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.384817Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384821Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384827Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384832Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.384839Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384844Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384849Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384854Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384862Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384867Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384872Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384877Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.384883Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384888Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.384893Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384898Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384904Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384908Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.384915Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384920Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:00.384927Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.384931Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.394229Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:00.394240Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.628313Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=1\n2026-11-08T04:43:00.628326Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:00.837237Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=0\n2026-11-08T04:43:00.837253Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 25.584480651417213,
+            "wall_seconds": 8.19696920399997,
+            "handshake_ms": {
+              "p50": 259.45367700001043,
+              "p95": 282.5107419999995
+            },
+            "completion_ms": {
+              "p50": 7895.68603050003,
+              "p95": 7907.753056000047
+            },
+            "backend_cpu_one_core_percent": 0.6099815523962311,
+            "controller_and_mock_cpu_one_core_percent": 1.866459141085246,
+            "haproxy_cpu_one_core_percent": 0.24399262095849242,
+            "backend_peak_rss_bytes": 29540352,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 22.811686363295294,
+            "wall_seconds": 9.193322959999932,
+            "handshake_ms": {
+              "p50": 255.270004500062,
+              "p95": 266.67016800001875
+            },
+            "completion_ms": {
+              "p50": 8692.561084499972,
+              "p95": 8695.412304000001
+            },
+            "backend_cpu_one_core_percent": 0.4350983879717883,
+            "controller_and_mock_cpu_one_core_percent": 1.6171789204716556,
+            "haproxy_cpu_one_core_percent": 0.21754919398589417,
+            "backend_peak_rss_bytes": 30154752,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 19136512,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.09,
+          "rss_bytes": 30158848,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 5,
+      "kind": "balanced2",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070431Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:23.070438Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070443Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.070449Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070454Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.070466Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070472Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:23.070478Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070483Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.070489Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070494Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:23.070500Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070505Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.070510Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070517Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.070523Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070528Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:23.070535Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.070539Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.071328Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.071334Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:23.071340Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.071345Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.071352Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.071356Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:23.075818Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.075824Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.081238Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.081244Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:23.081269Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.081274Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.119642Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.119716Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:23.241918Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=6\n2026-11-08T04:43:23.241930Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.324597Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:23.324612Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:23.526340Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=0\n2026-11-08T04:43:23.526353Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:43:24.705876Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_b c2s_kbps=0 s2c_kbps=22 c2s_total=21 s2c_total=229376\n2026-11-08T04:43:24.710962Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_b c2s_kbps=0 s2c_kbps=25 c2s_total=29 s2c_total=262196\n2026-11-08T04:43:24.871747Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:43:24.871778Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:43:25.079522Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:43:25.079602Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 25.75519288846967,
+            "wall_seconds": 8.142637521999973,
+            "handshake_ms": {
+              "p50": 254.23650400000497,
+              "p95": 268.5212800000727
+            },
+            "completion_ms": {
+              "p50": 7883.065080000051,
+              "p95": 7886.8900950000125
+            },
+            "backend_cpu_one_core_percent": 0.6140516492955607,
+            "controller_and_mock_cpu_one_core_percent": 1.8068725962869931,
+            "haproxy_cpu_one_core_percent": 0.12281032985911212,
+            "backend_peak_rss_bytes": 29372416,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 19.42034183054602,
+            "wall_seconds": 10.798738859999958,
+            "handshake_ms": {
+              "p50": 251.26161399998637,
+              "p95": 257.52399600003173
+            },
+            "completion_ms": {
+              "p50": 8722.667789500065,
+              "p95": 8745.589303999965
+            },
+            "backend_cpu_one_core_percent": 0.37041362439243347,
+            "controller_and_mock_cpu_one_core_percent": 1.3938424287445035,
+            "haproxy_cpu_one_core_percent": 0.2778102182943251,
+            "backend_peak_rss_bytes": 29372416,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 18894848,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.09,
+          "rss_bytes": 22507520,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 5,
+      "kind": "stable",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "ted user=line_b\n2026-11-08T04:43:48.715351Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.715361Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.715393Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.715402Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.715411Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.715415Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.715421Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.715426Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.719859Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.719868Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.722440Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.722446Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.722580Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.722585Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.722767Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.722773Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.722779Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.722783Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.723614Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.723622Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.723629Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.723636Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.723801Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.723806Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.723812Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.723839Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.723866Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.723872Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.723878Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.723886Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.741714Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.741720Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.743536Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.743542Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:48.743548Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.743553Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.782790Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:43:48.782802Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.853718Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=4\n2026-11-08T04:43:48.853729Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:43:48.901659Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=0\n2026-11-08T04:43:48.901668Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:43:49.221161Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:43:49.221177Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 20.869031730228173,
+            "wall_seconds": 10.049110217999896,
+            "handshake_ms": {
+              "p50": 257.1657410000512,
+              "p95": 270.9987920000003
+            },
+            "completion_ms": {
+              "p50": 7536.661600500054,
+              "p95": 7655.221373000018
+            },
+            "backend_cpu_one_core_percent": 0.3980451913877139,
+            "controller_and_mock_cpu_one_core_percent": 1.4989249270069238,
+            "haproxy_cpu_one_core_percent": 0.19902259569385694,
+            "backend_peak_rss_bytes": 25759744,
+            "backend_fds_before": 16,
+            "backend_fds_after": 14
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 23.715834134022685,
+            "wall_seconds": 8.842834657000026,
+            "handshake_ms": {
+              "p50": 252.49274449998893,
+              "p95": 258.2805170000029
+            },
+            "completion_ms": {
+              "p50": 8247.951048499941,
+              "p95": 8318.709001999992
+            },
+            "backend_cpu_one_core_percent": 0.5654295476442024,
+            "controller_and_mock_cpu_one_core_percent": 1.6654957116428177,
+            "haproxy_cpu_one_core_percent": 0.22617181905768094,
+            "backend_peak_rss_bytes": 26644480,
+            "backend_fds_before": 14,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 15974400,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.09,
+          "rss_bytes": 26644480,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 6,
+      "kind": "stable",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "ted user=line_b\n2026-11-08T04:44:12.230185Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230191Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.230199Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230205Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.230219Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230225Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.230234Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230239Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.230247Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230253Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.230262Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230268Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.230276Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230283Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.230291Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230310Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.230318Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230324Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.230332Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230337Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.230346Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230351Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.230358Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230363Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.230371Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230377Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.230385Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.230390Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.256951Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.256970Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.288399Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.288413Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_b\n2026-11-08T04:44:12.290462Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=7\n2026-11-08T04:44:12.290474Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.319510Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=3\n2026-11-08T04:44:12.319521Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.384509Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=1\n2026-11-08T04:44:12.384521Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.399567Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=5\n2026-11-08T04:44:12.399576Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:12.405697Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:12.405706Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a\n2026-11-08T04:44:13.959429Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=9\n2026-11-08T04:44:13.959462Z DEBUG telemt::proxy::direct_relay::relay: Direct relay completed user=line_a",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.16",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 21.684582377644652,
+            "wall_seconds": 9.671166192999976,
+            "handshake_ms": {
+              "p50": 263.59577100004117,
+              "p95": 279.14618700003757
+            },
+            "completion_ms": {
+              "p50": 7605.8758285000185,
+              "p95": 7659.536933000027
+            },
+            "backend_cpu_one_core_percent": 0.517000731888882,
+            "controller_and_mock_cpu_one_core_percent": 1.877758239036812,
+            "haproxy_cpu_one_core_percent": 0.10340014637777639,
+            "backend_peak_rss_bytes": 25755648,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 20.85370829917419,
+            "wall_seconds": 10.056494365000049,
+            "handshake_ms": {
+              "p50": 255.6547839999439,
+              "p95": 264.1209890000482
+            },
+            "completion_ms": {
+              "p50": 8262.602347499978,
+              "p95": 8371.402227999966
+            },
+            "backend_cpu_one_core_percent": 0.39775292013500574,
+            "controller_and_mock_cpu_one_core_percent": 1.6279109604015507,
+            "haproxy_cpu_one_core_percent": 0.29831469010125433,
+            "backend_peak_rss_bytes": 26673152,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 15958016,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.1,
+          "rss_bytes": 26673152,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    },
+    {
+      "round": 6,
+      "kind": "balanced2",
+      "fast_mode": true,
+      "observation": {
+        "errors": [],
+        "sanitized_core_log_tail": "mpleted user=line_b\n2026-11-08T04:44:35.876731Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.876736Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.877034Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.877040Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.877048Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.877053Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.877062Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.877067Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.877076Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.877081Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:44:35.877089Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.877095Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.877784Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.877790Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:44:35.877797Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.877804Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:44:35.877812Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.877819Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.878493Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.878502Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.878513Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.878521Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.878532Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.878538Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:44:35.878546Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.878552Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.883364Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.883372Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:44:35.883381Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.883386Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:44:35.884506Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.884514Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.907456Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.907490Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:35.944253Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:35.944290Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a\n2026-11-08T04:44:36.033533Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=6\n2026-11-08T04:44:36.033571Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:36.238771Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=8\n2026-11-08T04:44:36.238813Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:37.528131Z DEBUG telemt::proxy::relay::adaptive_copy: Relay active user=line_b c2s_kbps=0 s2c_kbps=25 c2s_total=29 s2c_total=262196\n2026-11-08T04:44:38.160277Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_b c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=10\n2026-11-08T04:44:38.160363Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_b\n2026-11-08T04:44:39.052120Z DEBUG telemt::proxy::relay::adaptive_copy: Relay finished user=line_a c2s_bytes=29 s2c_bytes=262196 c2s_msgs=2 s2c_msgs=34 duration_secs=6\n2026-11-08T04:44:39.052161Z DEBUG telemt::proxy::direct_relay: Direct relay completed user=line_a",
+        "mock_dc_errors_after_close": []
+      },
+      "result": {
+        "version": "telemt 3.5.5+tdh.balanced2",
+        "rows": [
+          {
+            "concurrency": 100,
+            "direction": "U",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 26.05984136112315,
+            "wall_seconds": 8.047447300000044,
+            "handshake_ms": {
+              "p50": 261.4709455000366,
+              "p95": 274.26373400010107
+            },
+            "completion_ms": {
+              "p50": 7939.551731499989,
+              "p95": 7953.696362000073
+            },
+            "backend_cpu_one_core_percent": 0.7455780418717333,
+            "controller_and_mock_cpu_one_core_percent": 1.948909972979871,
+            "haproxy_cpu_one_core_percent": 0.1242630069786222,
+            "backend_peak_rss_bytes": 29491200,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          },
+          {
+            "concurrency": 100,
+            "direction": "D",
+            "successes": 100,
+            "errors": [],
+            "success_rate": 1.0,
+            "aggregate_mbps": 17.592131867348634,
+            "wall_seconds": 11.920965667000019,
+            "handshake_ms": {
+              "p50": 256.0068329999581,
+              "p95": 266.30794300001526
+            },
+            "completion_ms": {
+              "p50": 8696.964515000047,
+              "p95": 8724.826292999978
+            },
+            "backend_cpu_one_core_percent": 0.3355432866544464,
+            "controller_and_mock_cpu_one_core_percent": 1.9805008553423196,
+            "haproxy_cpu_one_core_percent": 0.3355432866544463,
+            "backend_peak_rss_bytes": 28966912,
+            "backend_fds_before": 16,
+            "backend_fds_after": 16
+          }
+        ],
+        "before_load": {
+          "cpu_seconds": 0.0,
+          "rss_bytes": 19013632,
+          "fds": 16
+        },
+        "after_idle": {
+          "cpu_seconds": 0.1,
+          "rss_bytes": 22786048,
+          "fds": 14
+        },
+        "handshake_measurement": "client verifies FakeTLS ServerHello and writes native nonce; excludes confirmation of native auth/DC readiness",
+        "config_policy_sha256": "6d329b13c017db5c300a979243d637ae30a46d7cfa56ec540cc5affd3dba1cdd",
+        "mock_dc_socket_timeout_seconds": 25,
+        "client_io_timeout_seconds": 25,
+        "offline_bootstrap": true,
+        "payload_bytes": 262144,
+        "transfer_rate": 12500000,
+        "mock_dc_completed": 204,
+        "mock_dc_errors": [],
+        "validation_error": null,
+        "config_unchanged": true,
+        "accepted": true,
+        "backend_cpu_affinity_verified": true,
+        "private_processes_closed": true
+      }
+    }
+  ],
+  "connect_policy": "bounded-retry",
+  "os": "Ubuntu 22.04.5 LTS",
+  "kernel": "6.8.0-1070-azure",
+  "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+  "resources_before": {
+    "memory_current": 18735104,
+    "memory_peak": 171814912,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 623093,
+      "user_usec": 444493,
+      "system_usec": 178600,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 36,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "1610612736",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "tcp_congestion_control": "cubic",
+  "resources_after": {
+    "memory_current": 131010560,
+    "memory_peak": 284246016,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "cpu": {
+      "usage_usec": 7311941,
+      "user_usec": 4839220,
+      "system_usec": 2472721,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 2437,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "cpu_max": "200000 100000",
+    "memory_max": "1610612736",
+    "swap_max": "0",
+    "pids_current": 1
+  },
+  "curation": {
+    "source_sha256": "c9df0869563c650e921681fa884306ebbc0435789fb0bc7a081d8129e99d09b3",
+    "change": "remove synthetic proxy URL lines only; keep failed connection events and metrics"
+  }
+}

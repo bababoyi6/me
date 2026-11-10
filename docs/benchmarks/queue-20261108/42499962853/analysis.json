@@ -1,0 +1,36 @@
+{
+  "accepted": true,
+  "source_commit": "f8f42158b78e9c7dab7c125b0d124c630dafffea",
+  "payload_flows": 720,
+  "memory_peak": 671842304,
+  "idle_checks": [
+    {
+      "variant": "control",
+      "before": {
+        "cpu_seconds": 0.01,
+        "rss_bytes": 22691840,
+        "fds": 16
+      },
+      "after": {
+        "cpu_seconds": 10.53,
+        "rss_bytes": 33587200,
+        "fds": 14
+      }
+    },
+    {
+      "variant": "balanced",
+      "before": {
+        "cpu_seconds": 0.01,
+        "rss_bytes": 22589440,
+        "fds": 16
+      },
+      "after": {
+        "cpu_seconds": 10.69,
+        "rss_bytes": 52322304,
+        "fds": 14
+      }
+    }
+  ],
+  "generator_limited_batches": 0,
+  "scope": "100ms real WG, 4MiB/flow, 30/50/100 concurrency; whole lab <=768MiB, backend one logical CPU; no core throughput ceiling or 24h claim"
+}

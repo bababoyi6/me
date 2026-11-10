@@ -33,15 +33,22 @@ jobs:
           shellcheck -x -S style legacy/telemt-dual-hop-1.3.1.sh
           sudo timeout 30 bash legacy/telemt-dual-hop-1.3.1.sh --self-test
       - name: Check Python tools
-        run: python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check
+        run: python3 -m compileall -q tests tools && python3 tools/embed_core_install.py --check && python3 tools/embed_health_agent.py --check && python3 tools/embed_core_upgrade.py --check && python3 tools/embed_queue.py --check
       - name: Test diagnostics, configuration and rollback
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Run complete bounded root regression in disposable CI
+        run: sudo timeout --kill-after=10 180 python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Verify private shared core inode permissions and cleanup
         run: sudo timeout 20 python3 -m unittest discover -s tests -p 'test_lab_binary.py' -v
       - name: Verify orphan cleanup ownership and refusal of changed namespaces
         run: sudo timeout 20 python3 -m unittest discover -s tests -p 'test_endurance_cleanup.py' -v
       - name: Verify real backend socket observations in private namespaces
         run: sudo timeout --kill-after=5 20 python3 -m unittest discover -s tests -p 'test_backend_observer.py' -v
+      - name: Verify state trust boundaries and conservative tuning in private mounts
+        run: |
+          sudo timeout 20 python3 -m unittest discover -s tests -p 'test_state_safety.py' -v
+          sudo timeout 20 python3 -m unittest discover -s tests -p 'test_config_access.py' -v
+          sudo timeout 20 python3 -m unittest discover -s tests -p 'test_tuning_preflight.py' -v
       - name: Verify experimental socket policies on private loopback
         run: |
           cc -shared -fPIC -Wall -Wextra -Werror tests/socket_policy_lab.c -ldl -o "$RUNNER_TEMP/tdh-socket-policy.so"

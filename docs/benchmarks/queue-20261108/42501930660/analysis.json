@@ -1,0 +1,38 @@
+{
+  "accepted": true,
+  "source_commit": "8fe39203dc1a8c0df4f04b1f436dad32de26f3d9",
+  "payload_flows": 720,
+  "flow_timing_available": true,
+  "memory_peak": 672464896,
+  "idle_checks": [
+    {
+      "variant": "control",
+      "before": {
+        "cpu_seconds": 0.01,
+        "rss_bytes": 22798336,
+        "fds": 16
+      },
+      "after": {
+        "cpu_seconds": 8.38,
+        "rss_bytes": 32509952,
+        "fds": 14
+      }
+    },
+    {
+      "variant": "balanced",
+      "before": {
+        "cpu_seconds": 0.01,
+        "rss_bytes": 22941696,
+        "fds": 16
+      },
+      "after": {
+        "cpu_seconds": 8.4,
+        "rss_bytes": 55816192,
+        "fds": 14
+      }
+    }
+  ],
+  "generator_limited_batches": 0,
+  "scope": "100ms real WG, 4MiB/flow, 30/50/100 concurrency; whole lab <=768MiB, backend one logical CPU; no core throughput ceiling or 24h claim",
+  "analysis_sha256": "c6a51f3b6f1873f13e34cccfc41923901c65faa0b2432ece190d5bd807650fcd"
+}
