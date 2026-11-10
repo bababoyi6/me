@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class InstallCommandTests(unittest.TestCase):
     def invoke(self, download_ok, root=True, payload=None, original=False, public=False):
-        channel = 'original' if original else 'stable'
-        command = (ROOT / "README.md").read_text().split(f'<!-- install:{channel} -->')[1].split("```bash\n",1)[1].split("\n```", 1)[0]
+        guide = ROOT / ("legacy/README.md" if original else "README.md")
+        command = guide.read_text().split("```bash\n",1)[1].split("\n```", 1)[0]
         with tempfile.TemporaryDirectory(prefix="tdh-bootstrap-test-") as name:
             base = Path(name)
             commands = base / "commands"
