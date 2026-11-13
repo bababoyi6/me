@@ -27,9 +27,13 @@ def main():
                         help='Build only the socket candidate on the pinned post-3.5.17 upstream commit')
     parser.add_argument('--build-only', action='store_true',
                         help='Build the same fixed candidate for a follow-up performance run')
+    parser.add_argument('--client-unsent-limit', action='store_true',
+                        help='Build a separate candidate that also bounds unsent bytes toward the entry')
     args=parser.parse_args();source=Path(args.source).resolve();output=Path(args.output).resolve()
     if args.build_only and not args.security_main:
         parser.error('--build-only requires --security-main')
+    if args.client_unsent_limit and not args.security_main:
+        parser.error('--client-unsent-limit requires --security-main')
     if sys.platform!='linux' or os.environ.get('GITHUB_ACTIONS')!='true':raise RuntimeError('disposable CI only')
     upstream = SECURITY_COMMIT if args.security_main else COMMIT
     if subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip()!=upstream:
@@ -50,6 +54,9 @@ def main():
         variants = [('balanced', '3.5.17+tdh.main.b594ee5.balanced1')]
         manifest['cargo'] = subprocess.check_output(['cargo', '--version'], text=True).strip()
         manifest['architecture'] = os.uname().machine
+    if args.client_unsent_limit:
+        variants = [('balanced', '3.5.17+tdh.main.b594ee5.clientlowat1')]
+        manifest['client_tcp_notsent_lowat_bytes'] = 256 * 1024
     for name,version in variants:
         if name=='balanced':
             text=original
@@ -63,9 +70,14 @@ def main():
             client,outgoing=body.split('pub fn create_outgoing_socket_bound(',1)
             if client.count(fixed)!=1 or outgoing.count(fixed)!=1:raise RuntimeError('socket context drift')
             fallback='    #[cfg(not(target_os = "linux"))]\n    {\n'+fixed+'\n    }'
-            client=client.replace(fixed,'    // Linux: reuse balanced2 low-RTT receive guard; retain automatic send sizing.\n'
+            client_policy = (
+                '    // Linux: reuse balanced2 low-RTT receive guard; retain automatic send sizing.\n'
                 '    #[cfg(target_os = "linux")]\n    {\n        use std::os::fd::AsRawFd;\n'
-                '        low_rtt_receive::configure_low_rtt_receive(socket.as_raw_fd())?;\n    }\n'+fallback,1)
+                '        low_rtt_receive::configure_low_rtt_receive(socket.as_raw_fd())?;\n'
+            )
+            if args.client_unsent_limit:
+                client_policy += '        unsent_queue_bulk::configure_unsent_queue(socket.as_raw_fd())?;\n'
+            client=client.replace(fixed,client_policy+'    }\n'+fallback,1)
             outgoing=outgoing.replace(fixed,'    // Linux: preserve autotuning and bound unsent data, not in-flight bytes.\n'
                 '    #[cfg(target_os = "linux")]\n    {\n        use std::os::fd::AsRawFd;\n'
                 '        unsent_queue_bulk::configure_unsent_queue(socket.as_raw_fd())?;\n    }\n'+fallback,1)
