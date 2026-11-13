@@ -11,6 +11,10 @@ on:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
         type: boolean
         default: false
+      dual_recovery_only:
+        description: For new-dual, verify only route withdrawal and recovery
+        type: boolean
+        default: false
   push:
     branches: [dev/telemt-stable-compat-20261107]
     paths:
@@ -172,10 +176,14 @@ jobs:
           python3 tests/private_shaper_analysis.py --require-gain "$RUNNER_TEMP/tls-evidence/queue.json" "$RUNNER_TEMP/tls-evidence/queue-analysis.json"
       - name: Compare two active tunnels and reclaim capacity after maintenance failover
         if: inputs.tls_candidate == 'new-dual'
+        env:
+          RECOVERY_ONLY: ${{ inputs.dual_recovery_only }}
         run: |
           sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool
           sudo modprobe tcp_bbr
-          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-dual-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=540 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/dual_queue_lab.py --candidate "$RUNNER_TEMP/tls-core" --output "$RUNNER_TEMP/tls-evidence/dual.json"
+          args=()
+          if [[ $RECOVERY_ONLY == true ]]; then args+=(--recovery-only); fi
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-dual-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=540 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/dual_queue_lab.py --candidate "$RUNNER_TEMP/tls-core" --output "$RUNNER_TEMP/tls-evidence/dual.json" "${args[@]}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
