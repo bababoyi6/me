@@ -1,6 +1,7 @@
 """Run the exact README command against a local download boundary, without sudo."""
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
@@ -11,7 +12,13 @@ ROOT = Path(__file__).resolve().parents[1]
 class InstallCommandTests(unittest.TestCase):
     def invoke(self, download_ok, root=True, payload=None, original=False, public=False):
         guide = ROOT / ("legacy/README.md" if original else "README.md")
-        command = guide.read_text().split("```bash\n",1)[1].split("\n```", 1)[0]
+        command = guide.read_text(encoding="utf-8").split("```bash\n",1)[1].split("\n```", 1)[0]
+        if original:
+            channel = "v1.3.1-original"
+            version = "1.3.1"
+        else:
+            channel = re.search(r'/me/(v[0-9]+\.[0-9]+\.[0-9]+)/telemt-dual-hop\.sh', command)[1]
+            version = channel.removeprefix("v")
         with tempfile.TemporaryDirectory(prefix="tdh-bootstrap-test-") as name:
             base = Path(name)
             commands = base / "commands"
@@ -68,10 +75,9 @@ exec /bin/bash "$@"
             self.assertIn("--max-filesize", arguments)
             self.assertIn("--proto", arguments)
             self.assertIn("=https", arguments)
-            channel = 'v1.3.1-original' if original else 'v1.7.0'
             self.assertIn(f'https://raw.githubusercontent.com/bababoyi6/me/{channel}/telemt-dual-hop.sh', arguments)
             if expected_success:
-                self.assertIn("Telemt Dual-Hop " + ("1.3.1" if original else "1.7.0"), result.stdout)
+                self.assertIn("Telemt Dual-Hop " + version, result.stdout)
 
     def test_download_and_launch_then_clean_private_temporary_file(self):
         self.invoke(True)
@@ -106,6 +112,6 @@ if __name__ == "__main__":
         if os.environ.get('GITHUB_ACTIONS')!='true':
             raise SystemExit('public bootstrap smoke is confined to disposable CI')
         InstallCommandTests().invoke(True,root=False,public=True)
-        print('Public v1.7.0 README command: HTTPS download, pinned SHA256, real --help and temporary cleanup PASS; no host installation')
+        print('Public README command: HTTPS download, pinned SHA256, real --help and temporary cleanup PASS')
     else:
         unittest.main()
