@@ -69,12 +69,16 @@ def worker(role,cpu):
                 if request['command']=='mixed':
                     from mixed_workload import run_mixed
                     result=run_mixed(endpoint,request['logical_clients'],candidate_screen=request.get('candidate_screen',False),
-                                     domain=request.get('domain'))
+                                     domain=request.get('domain'),payload_bytes=request.get('payload_bytes'))
                 elif request['command']=='single':
                     if request['domain'] not in ('apple.com','gs.apple.com'):
                         raise ValueError('unregistered synthetic domain')
-                    result=FullLab.transfer(endpoint,request['domain'],'D',4096,125000000,
-                                            persistent=True,io_timeout=8)
+                    size=request.get('size',4096)
+                    direction=request.get('direction','D')
+                    if size not in (4096,128*1024**2) or direction not in ('D','U'):
+                        raise ValueError('unregistered single-flow workload')
+                    result=FullLab.transfer(endpoint,request['domain'],direction,size,125000000,
+                                            persistent=True,io_timeout=25 if size>4096 else 8)
                 elif request['command']=='probe-client-policy':
                     if type(request.get('nodelay')) is not bool:raise RuntimeError('explicit client flag required')
                     result={'rows':[FullLab.transfer(endpoint,('apple.com','gs.apple.com')[i%2],

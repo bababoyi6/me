@@ -37,7 +37,8 @@ def second_tunnel(net):
     command('ip','-n',ns,'route','add','default','via','198.51.100.5')
     command('ip','netns','exec',ns,'sysctl','-qw','net.ipv4.tcp_congestion_control=bbr')
     command('ip','netns','exec',NAMES[1],'tc','qdisc','add','dev','tdh-lc0','root','netem',
-        'limit','10000','delay',f'{net.args.rtt_ms/2:g}ms','rate',f'{net.args.rate_mbps}mbit')
+        'limit',str(getattr(net.args,'queue_limit_packets',10000)),
+        'delay',f'{net.args.rtt_ms/2:g}ms','rate',f'{net.args.rate_mbps}mbit')
     keys=[]
     for index in range(2):
         path=net.root/f'shared-wg-{index}.key';key=command('wg','genkey')+'\n'
@@ -115,7 +116,7 @@ backend line_b
         if process.poll() is not None:
             raise RuntimeError('private HAProxy exited')
         if (net.root/'haproxy.sock').is_socket():
-            return
+            return process
         time.sleep(.1)
     raise RuntimeError('private HAProxy readiness timeout')
 
@@ -132,14 +133,18 @@ def set_second_route(root, enabled):
                 raise RuntimeError('HAProxy admin command rejected')
 
 
-def run_cohort(clients, dc, *, failed_over):
+def run_cohort(clients, dc, *, failed_over, payload_bytes=32*1024**2, observe=None):
     before = [w.call({'command':'stats'}) for w in dc]
     with ThreadPoolExecutor(max_workers=2) as executor:
         def workload(pair):
             client, domain = pair
-            client.send({'command':'mixed','logical_clients':30,'candidate_screen':True,'domain':domain})
+            client.send({'command':'mixed','logical_clients':30,'candidate_screen':True,
+                         'domain':domain,'payload_bytes':payload_bytes})
             return client.receive(110)
-        rows = list(executor.map(workload, zip(clients, DOMAINS, strict=True)))
+        futures = [executor.submit(workload,pair) for pair in zip(clients,DOMAINS,strict=True)]
+        if observe:
+            observe(futures)
+        rows = [future.result() for future in futures]
     if any(row.get('errors') or not row.get('complete') for row in rows):
         raise RuntimeError('mixed workload failed: '+json.dumps([row['errors'] for row in rows]))
     expected = [row['dc_connections'] for row in rows]
@@ -161,7 +166,7 @@ def run_cohort(clients, dc, *, failed_over):
         origin = row['monotonic_origin_seconds']
         flows = row['bulk']
         if sorted(f['direction'] for f in flows) != ['D']*4+['U'] or any(
-                f['bytes'] != 32*1024**2 or not f['sha256_verified'] or not f['persistent_dc'] for f in flows):
+                f['bytes'] != payload_bytes or not f['sha256_verified'] or not f['persistent_dc'] for f in flows):
             raise RuntimeError('file payload or integrity mismatch')
         all_bulk.extend((f['direction'],f['bytes'],origin+f['start_offset_seconds'],
                          origin+f['end_offset_seconds']) for f in flows)

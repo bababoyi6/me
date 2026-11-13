@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual']
+        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -116,7 +116,7 @@ jobs:
     env:
       CANDIDATE_KIND: ${{ startsWith(inputs.tls_candidate, 'new') && 'new' || 'old' }}
       UPSTREAM_COMMIT: ${{ startsWith(inputs.tls_candidate, 'new') && 'b594ee55270798fe21f23b721b50eab46c2e0bec' || 'ac71d92ec41dea00a7eafd6b8d350c3486633500' }}
-      FOLLOWUP_SCREEN: ${{ inputs.tls_candidate == 'new-mixed' || inputs.tls_candidate == 'new-queue' || inputs.tls_candidate == 'new-dual' }}
+      FOLLOWUP_SCREEN: ${{ inputs.tls_candidate == 'new-mixed' || inputs.tls_candidate == 'new-queue' || inputs.tls_candidate == 'new-dual' || inputs.tls_candidate == 'new-gigabit' }}
       PYTHONPATH: ${{ github.workspace }}/tools
     steps:
       - uses: actions/checkout@v4
@@ -184,6 +184,12 @@ jobs:
           args=()
           if [[ $RECOVERY_ONLY == true ]]; then args+=(--recovery-only); fi
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-dual-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=540 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/dual_queue_lab.py --candidate "$RUNNER_TEMP/tls-core" --output "$RUNNER_TEMP/tls-evidence/dual.json" "${args[@]}"
+      - name: Measure TCP, WireGuard, and proxy on the same gigabit path
+        if: inputs.tls_candidate == 'new-gigabit'
+        run: |
+          sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
+          sudo modprobe tcp_bbr
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-gigabit-${GITHUB_RUN_ID}" -p CPUQuota=400% -p MemoryMax=2048M -p MemoryHigh=1700M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=840 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/gigabit_lab.py --candidate "$RUNNER_TEMP/tls-core" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/tls-evidence/gigabit.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

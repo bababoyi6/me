@@ -136,7 +136,7 @@ class Network:
             command("ip", "netns", "exec", ns, "tc", "qdisc", "replace", "dev", dev, "root", "fq")
         for ns, dev in ((NAMES[1], "tdh-la1"), (NAMES[1], "tdh-lb0")):
             args = ["ip", "netns", "exec", ns, "tc", "qdisc", "replace", "dev", dev, "root", "netem",
-                    "limit", "10000", "delay", f"{self.args.rtt_ms / 2:g}ms"]
+                    "limit", str(getattr(self.args, "queue_limit_packets", 10000)), "delay", f"{self.args.rtt_ms / 2:g}ms"]
             if getattr(self.args, 'jitter_ms', 0):
                 args += [f'{self.args.jitter_ms:g}ms', 'distribution', 'normal']
             if self.args.loss_percent:

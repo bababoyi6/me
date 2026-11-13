@@ -33,12 +33,15 @@ def finish_idle(streams):
         return list(pool.map(finish,streams))
 
 
-def run_mixed(endpoint, logical_clients, *, candidate_screen=False, domain=None):
+def run_mixed(endpoint, logical_clients, *, candidate_screen=False, domain=None, payload_bytes=None):
     if logical_clients not in (30,50,100):raise ValueError('unregistered cohort')
     if domain is not None and domain not in SECRETS:
         raise ValueError('unregistered synthetic domain')
     domains=(domain,) if domain else tuple(SECRETS)
-    payload_bytes = 2 * PAYLOAD if candidate_screen else PAYLOAD
+    if payload_bytes is None:
+        payload_bytes = 2 * PAYLOAD if candidate_screen else PAYLOAD
+    if payload_bytes not in (PAYLOAD,2*PAYLOAD,8*PAYLOAD):
+        raise ValueError('unregistered file size')
     held=[];lock=threading.Lock();stop=threading.Event()
     result={'logical_clients':logical_clients,'idle_connections':logical_clients-11,
             'baseline':{'message':[],'new_connection':[]},'loaded':{'message':[],'new_connection':[]},
