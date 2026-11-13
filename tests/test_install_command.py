@@ -1,6 +1,8 @@
 """Run the exact README command against a local download boundary, without sudo."""
+import hashlib
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
@@ -21,6 +23,12 @@ class InstallCommandTests(unittest.TestCase):
             existing = temporary / "telemt-dual-hop.sh"
             existing.write_bytes(b"SYNTHETIC_UNRELATED_EXISTING_FILE\n")
             candidate = ROOT / ("legacy/telemt-dual-hop-1.3.1.sh" if original else "telemt-dual-hop.sh")
+            if not original and not public:
+                # The working manager and the README's frozen release can differ.
+                # Pin the working fixture for local tests; --public uses the exact README.
+                command, replacements = re.subn(r'"[a-f0-9]{64}"',
+                    f'"{hashlib.sha256(candidate.read_bytes()).hexdigest()}"', command)
+                self.assertEqual(replacements, 1)
             if payload is not None:
                 candidate = base / "payload.sh"
                 candidate.write_bytes(payload)

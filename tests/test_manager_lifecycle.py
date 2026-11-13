@@ -192,6 +192,19 @@ apt_get_with_lock_wait() { return 99; }
         self.assertTrue(self.manager.is_symlink())
         self.assertEqual(target.read_bytes(), b"SYNTHETIC_KEEP_LINK_TARGET\n")
 
+    def test_rollback_rejects_writable_or_hardlinked_backup_before_execution(self):
+        old = self.old_manager()
+        previous = self.base / "manager.previous"
+        previous.write_bytes(SCRIPT.read_bytes())
+        prelude = 'timeout() { touch "$TDH_BASE/selftest-called"; return 99; }'
+        previous.chmod(0o664)
+        self.invoke("rollback_manager", prelude=prelude, ok=False)
+        previous.chmod(0o644)
+        os.link(previous, self.base / "extra-link")
+        self.invoke("rollback_manager", prelude=prelude, ok=False)
+        self.assertFalse((self.base / "selftest-called").exists())
+        self.assertEqual(self.manager.read_bytes(), old)
+
     def test_rollback_stage_and_rename_failures_preserve_both_versions(self):
         old = self.old_manager("1.4.1")
         previous = self.base / "manager.previous"
