@@ -40,6 +40,10 @@ def capacity(net, evidence, entry_cpu, backend_cpu):
     time.sleep(.4)
     if any(proc.poll() is not None for proc in net.processes):
         raise RuntimeError('capacity server exited')
+    measure_capacity(paths,evidence,entry_cpu,backend_cpu)
+
+
+def measure_capacity(paths, evidence, entry_cpu, backend_cpu):
     for path, (entry, backend) in paths.items():
         for direction, receiver, sender, cpu in (
                 ('D', NAMES[0], backend, entry_cpu), ('U', BACKENDS[0], entry, backend_cpu)):
@@ -256,10 +260,75 @@ def main(args):
     return 0 if report['accepted'] else 1
 
 
+def control_only(output):
+    if os.geteuid()!=0 or os.environ.get('GITHUB_ACTIONS')!='true':
+        raise RuntimeError('disposable CI only')
+    before = resources()
+    if (before['cpu_max'],before['memory_max'],before['swap_max']) != ('400000 100000',str(2048*1024**2),'0'):
+        raise RuntimeError('unexpected control resource limits')
+    cpus = sorted(os.sched_getaffinity(0))
+    if len(cpus)<4:
+        raise RuntimeError('four logical CPUs required')
+    report = {'source_commit':os.environ['TDH_SOURCE_COMMIT'],'rtt_ms':100,'rate_mbps':1000,
+              'iperf_version':command('iperf3','--version').splitlines()[0],
+              'rows':{'default':[],'larger_max':[]},'limits':{},'complete':False}
+    paths = {'tcp':('192.0.2.1','198.51.100.2'),'wireguard':('10.77.1.1','10.77.1.2')}
+    keys = ('net.ipv4.tcp_rmem','net.ipv4.tcp_wmem')
+    net = None
+    with tempfile.TemporaryDirectory(prefix='tdh-audit-gigabit-control-') as folder:
+        try:
+            net = Network(SimpleNamespace(root=folder,wg='wg',iperf='iperf3',start_iperf=False,
+                                          rtt_ms=100,rate_mbps=1000,loss_percent=0,mtu=1420,
+                                          queue_limit_packets=50000))
+            net.setup()
+            command('ip','netns','exec',NAMES[0],'tc','qdisc','replace','dev','tdh-la0','root',
+                    'tbf','rate','1000mbit','burst','256kb','limit','31250000')
+            for mode, rows in report['rows'].items():
+                report['limits'][mode] = {}
+                for ns in (NAMES[0],BACKENDS[0]):
+                    prefix = ('ip','netns','exec',ns,'sysctl')
+                    limits = []
+                    for key in keys:
+                        values = command(*prefix,'-n',key).split()
+                        if mode=='larger_max':
+                            command(*prefix,'-wq',f'{key}={" ".join(values[:2])} {32*1024**2}')
+                            values = command(*prefix,'-n',key).split()
+                            if int(values[-1])!=32*1024**2:
+                                raise RuntimeError('private TCP autotuning limit mismatch')
+                        limits.append([int(v) for v in values])
+                    report['limits'][mode][ns] = limits
+                    command('ip','netns','exec',ns,'ip','tcp_metrics','flush','all')
+                if mode=='default':
+                    capacity(net,rows,cpus[0],cpus[1])
+                else:
+                    measure_capacity(paths,rows,cpus[0],cpus[1])
+                write(output,report)
+            report['complete'] = True
+        finally:
+            errors = []
+            if net:
+                try:
+                    net.close()
+                except Exception as exc:
+                    errors.append(type(exc).__name__)
+            after = resources()
+            report.update(resources_after=after,cleanup_errors=errors,
+                          oom_delta={k:after['memory_events'][k]-before['memory_events'][k]
+                                     for k in ('oom','oom_kill')})
+            report['accepted'] = (report['complete'] and not errors and not any(report['oom_delta'].values())
+                                  and after['pids_current']==1)
+            write(output,report)
+    return 0 if report['accepted'] else 1
+
+
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--candidate', type=Path, required=True)
-    parser.add_argument('--balanced2-archive', type=Path, required=True)
+    parser.add_argument('--candidate', type=Path)
+    parser.add_argument('--balanced2-archive', type=Path)
+    parser.add_argument('--control-only', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     signal.signal(signal.SIGTERM,lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
-    raise SystemExit(main(parser.parse_args()))
+    args = parser.parse_args()
+    if not args.control_only and (not args.candidate or not args.balanced2_archive):
+        parser.error('proxy measurements require both pinned binaries')
+    raise SystemExit(control_only(args.output) if args.control_only else main(args))

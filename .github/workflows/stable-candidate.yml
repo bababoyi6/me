@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit']
+        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -25,6 +25,28 @@ concurrency:
   group: stable-native-candidate
   cancel-in-progress: false
 jobs:
+  gigabit-control:
+    if: inputs.tls_candidate == 'gigabit-control'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Measure the effect of private TCP autotuning ceilings
+        env:
+          PYTHONPATH: ${{ github.workspace }}/tools
+        run: |
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3 python3-cryptography
+          sudo modprobe tcp_bbr
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-gigabit-control-${GITHUB_RUN_ID}" -p CPUQuota=400% -p MemoryMax=2048M -p MemoryHigh=1700M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=600 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/gigabit_lab.py --control-only --output "$RUNNER_TEMP/gigabit-control.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gigabit-control
+          path: ${{ runner.temp }}/gigabit-control.json
+          retention-days: 7
   build:
     if: inputs.tls_candidate == 'none' || github.event_name == 'push'
     runs-on: ubuntu-22.04
