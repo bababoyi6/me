@@ -7,7 +7,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.7.0"
+readonly TDH_VERSION="1.7.1"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.17"
@@ -38,7 +38,10 @@ readonly TDH_WORK_ROOT="${TDH_WORK_ROOT:-/var/lib/telemt-dual-hop}"
 readonly TDH_BIN="${TDH_BIN:-/usr/local/lib/telemt-dual-hop/telemt}"
 readonly TDH_MANAGER="${TDH_MANAGER:-/usr/local/sbin/telemt-dual-hop}"
 readonly TDH_SHORTCUT="${TDH_SHORTCUT:-/usr/local/bin/a}"
-readonly TDH_UPDATE_URL="https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh"
+# Keep this pin independent of the downloaded bytes. Advance it only after
+# verifying a published manager release. See docs/MANAGER-UPDATE.md.
+readonly TDH_STABLE_MANAGER_TAG="v1.7.0"
+readonly TDH_STABLE_MANAGER_SHA256="33c90f9289375cbccf9a6480d7026a58b1bef03ba8e50421b2d7c9d919a6e2ef"
 readonly TDH_HAPROXY_CFG="${TDH_HAPROXY_CFG:-${TDH_BASE}/haproxy.cfg}"
 readonly TDH_LOCK="${TDH_LOCK:-/run/lock/telemt-dual-hop.lock}"
 readonly TDH_DOMAIN_A="apple.com"
@@ -153,7 +156,8 @@ usage() {
   sudo bash telemt-dual-hop.sh              打开中文菜单
   a                                         安装后打开控制面板（自动使用 sudo）
   a status                                  快速查看状态
-  a update                                  安全更新管理脚本（可简写为 a u）
+  a update                                  检查内置的稳定版锁（可简写为 a u）
+  a update --release vX.Y.Z --sha256 SHA256   安装已独立核验摘要的稳定版
   a update-rollback                         恢复上次 a update 前的管理脚本
   a core-upgrade --maintenance               后端固定版本核心升级（需先排空）
   a core-baseline --maintenance              x86_64 切回已发布稳定基线（需先排空）
@@ -234,8 +238,6 @@ validate_runtime_paths() {
   [[ $TDH_BIN == /usr/local/lib/telemt-dual-hop/telemt ]] || die "生产模式二进制路径异常。"
   [[ $TDH_MANAGER == /usr/local/sbin/telemt-dual-hop ]] || die "生产模式管理器路径异常。"
   [[ $TDH_SHORTCUT == /usr/local/bin/a ]] || die "生产模式快捷命令路径异常。"
-  [[ $TDH_UPDATE_URL == https://raw.githubusercontent.com/bababoyi6/me/main/telemt-dual-hop.sh ]] || \
-    die "生产模式更新地址异常。"
 }
 
 ensure_bootstrap_tools() {
@@ -309,12 +311,13 @@ install_packages() {
 }
 
 shortcut_is_managed() {
-  [[ ! -L $TDH_SHORTCUT && -f $TDH_SHORTCUT ]] && \
+  trusted_local_file "$TDH_SHORTCUT" && \
     grep -Fqx '# Managed by Telemt Dual-Hop' "$TDH_SHORTCUT" 2>/dev/null
 }
 
 install_shortcut() {
   local tmp
+  trusted_local_directory "$(dirname "$TDH_SHORTCUT")" || die "快捷入口目录权限异常。"
   if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
     die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；为避免覆盖，请先自行改名或移除。"
   fi
@@ -358,7 +361,7 @@ remove_shortcut() {
 install_self() {
   local self=${BASH_SOURCE[0]} self_real manager_real installed_version entrypoints_changed=0
   if [[ -f $self && -r $self ]]; then
-    [[ ! -L $TDH_MANAGER && ( ! -e $TDH_MANAGER || -f $TDH_MANAGER ) ]] || die "管理器文件类型异常；已保留原文件。"
+    assert_manager_paths
     if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
       die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；为避免覆盖，请先自行改名或移除。"
     fi
@@ -390,16 +393,19 @@ install_self() {
 }
 
 activate_manager() {
-  local candidate=$1 staged backup="" prior_backup="" previous="${TDH_MANAGER}.previous"
+  local candidate=$1 expected=${2:-} staged checksum backup="" prior_backup="" previous="${TDH_MANAGER}.previous"
+  assert_manager_paths
   queue_manager_guard "$candidate"
-  if [[ -L $TDH_MANAGER || ( -e $TDH_MANAGER && ! -f $TDH_MANAGER ) || \
-        -L $previous || ( -e $previous && ! -f $previous ) ]]; then
-    die "管理器或备份文件类型异常；已停止替换。"
-  fi
   staged=$(mktemp "${TDH_MANAGER}.update.XXXXXX")
   if ! install -m 0755 "$candidate" "$staged"; then
     rm -f "$staged"
     die "无法准备新管理器；当前版本未作任何修改。"
+  fi
+  if [[ -n $expected ]]; then
+    if ! checksum=$(sha256sum < "$staged") || [[ ${checksum%% *} != "$expected" ]]; then
+      rm -f -- "$staged"
+      die "待安装管理脚本的 SHA256 与版本锁不符。"
+    fi
   fi
   # Unique adjacent files and rename keep replacement atomic on this filesystem.
   if [[ -f $TDH_MANAGER ]] && ! cmp -s "$staged" "$TDH_MANAGER"; then
@@ -445,74 +451,102 @@ extract_release_value() {
   awk -F'"' -v prefix="readonly ${name}=\"" 'index($0, prefix) == 1 { print $2; exit }' "$file"
 }
 
-update_manager() {
-  local download_tmp new_version new_schema new_protocol checksum
+trusted_local_directory() {
+  local directory=$1 owner mode
+  while [[ $directory != / ]]; do
+    [[ -d $directory && ! -L $directory ]] || return 1
+    read -r owner mode < <(stat -c '%u %a' -- "$directory") || return 1
+    [[ ( $owner == 0 || $owner == "$EUID" ) && $mode =~ ^[0-7]{1,4}$ ]] || return 1
+    (( (8#$mode & 0022) == 0 || (8#$mode & 01000) != 0 )) || return 1
+    directory=$(dirname "$directory")
+  done
+}
+
+trusted_local_file() {
+  local file=$1 owner mode links
+  [[ -f $file && ! -L $file ]] || return 1
+  read -r owner mode links < <(stat -c '%u %a %h' -- "$file") || return 1
+  [[ $owner == "$EUID" && $links == 1 && $mode =~ ^[0-7]{1,4}$ ]] || return 1
+  (( (8#$mode & 0022) == 0 ))
+}
+
+assert_manager_paths() {
+  local file
+  trusted_local_directory "$(dirname "$TDH_MANAGER")" || die "管理器目录权限异常。"
+  for file in "$TDH_MANAGER" "${TDH_MANAGER}.previous"; do
+    if [[ -e $file || -L $file ]]; then
+      trusted_local_file "$file" || die "管理器或备份的权限、类型或链接数异常。"
+    fi
+  done
+}
+
+update_manager() (
+  set -Eeuo pipefail
+  local tag=$TDH_STABLE_MANAGER_TAG expected=$TDH_STABLE_MANAGER_SHA256
+  local download_dir download_tmp version installed_version size checksum
+  if (( $# != 0 )); then
+    [[ $# == 4 && $1 == --release && $3 == --sha256 ]] || \
+      die "用法：a update [--release vX.Y.Z --sha256 SHA256]"
+    tag=$2 expected=$4
+  fi
+  [[ $tag =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ && $expected =~ ^[a-f0-9]{64}$ ]] || \
+    die "需要正式版本标签和已独立核验的 SHA256。"
+  version=${tag#v}
   load_state || die "尚未安装，不能使用快捷更新。"
+  assert_manager_paths
+  installed_version=$(extract_release_value "$TDH_MANAGER" TDH_VERSION)
+  [[ $installed_version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "已安装的管理器版本信息无效。"
+  if ! dpkg --compare-versions "$version" gt "$installed_version"; then
+    if (( $# == 0 )); then
+      info "内置稳定版锁为 ${tag}，没有更高的已锁定版本。请从正式发布说明获取新版和独立核验的 SHA256。"
+      return 0
+    fi
+    die "更新目标必须高于当前管理器 ${installed_version}。"
+  fi
+  trusted_local_directory "$(dirname "$TDH_SHORTCUT")" || die "快捷入口目录权限异常。"
   if [[ ( -e $TDH_SHORTCUT || -L $TDH_SHORTCUT ) ]] && ! shortcut_is_managed; then
     die "系统中已存在非本脚本创建的 a 命令（${TDH_SHORTCUT}）；更新已取消。"
   fi
 
-  download_tmp=$(mktemp)
-  info "正在从 GitHub 获取最新管理脚本……"
-  # Match bootstrap protections, including responses without Content-Length.
+  download_dir=$(mktemp -d "${TDH_MANAGER}.download.XXXXXX")
+  trap 'rm -f -- "$download_dir/manager"; rmdir -- "$download_dir"' EXIT
+  trap 'exit 129' HUP
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+  download_tmp=$download_dir/manager
+  info "正在获取固定版本 ${tag} 的管理脚本……"
   if ! (ulimit -f 1024 || exit 1
-    curl -q -fL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 --max-filesize 1048576 \
-      --proto '=https' --proto-redir '=https' --tlsv1.2 "$TDH_UPDATE_URL" -o "$download_tmp"); then
-    rm -f "$download_tmp"
+    curl -q -fL --max-redirs 5 --connect-timeout 10 --max-time 120 --max-filesize 1048576 \
+      --proto '=https' --proto-redir '=https' --tlsv1.2 \
+      "https://raw.githubusercontent.com/bababoyi6/me/${tag}/telemt-dual-hop.sh" -o "$download_tmp"); then
     die "下载失败；当前版本未作任何修改。"
   fi
-
-  if ! grep -Fqx '# Telemt Dual-Hop - three VPS / two native MTProxy links' "$download_tmp"; then
-    rm -f "$download_tmp"
-    die "下载内容不是有效的 Telemt Dual-Hop 脚本；当前版本未作任何修改。"
-  fi
-  new_version=$(extract_release_value "$download_tmp" TDH_VERSION)
-  new_schema=$(extract_release_value "$download_tmp" TDH_CONFIG_SCHEMA)
-  new_protocol=$(extract_release_value "$download_tmp" TDH_PROTOCOL_VERSION)
-  if [[ ! $new_version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ || ! $new_schema =~ ^[0-9]+$ || \
-        ! $new_protocol =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    rm -f "$download_tmp"
-    die "下载脚本的版本信息无效；当前版本未作任何修改。"
-  fi
-  if [[ $new_schema != "$TDH_CONFIG_SCHEMA" || $new_protocol != "$TDH_PROTOCOL_VERSION" ]]; then
-    rm -f "$download_tmp"
+  size=$(stat -c '%s' -- "$download_tmp")
+  [[ $size -gt 0 && $size -le 1048576 ]] || die "下载大小超限或文件为空。"
+  checksum=$(sha256sum < "$download_tmp")
+  [[ ${checksum%% *} == "$expected" ]] || die "管理脚本 SHA256 与可信版本锁不符；更新已取消。"
+  [[ $(extract_release_value "$download_tmp" TDH_VERSION) == "$version" ]] || \
+    die "管理脚本版本与发行标签不符。"
+  if [[ $(extract_release_value "$download_tmp" TDH_CONFIG_SCHEMA) != "$TDH_CONFIG_SCHEMA" || \
+        $(extract_release_value "$download_tmp" TDH_PROTOCOL_VERSION) != "$TDH_PROTOCOL_VERSION" ]]; then
     die "新版本涉及配置协议升级，不能快捷更新；请查看发布说明后手动升级。"
   fi
-  if ! dpkg --compare-versions "$new_version" ge "$TDH_VERSION"; then
-    rm -f "$download_tmp"
-    die "远端版本 ${new_version} 低于当前版本 ${TDH_VERSION}，已拒绝降级。"
-  fi
-  if ! bash -n "$download_tmp"; then
-    rm -f "$download_tmp"
-    die "新脚本未通过 Bash 语法检查；当前版本未作任何修改。"
-  fi
-  if ! timeout 60 bash "$download_tmp" --self-test >/dev/null; then
-    rm -f "$download_tmp"
+  queue_manager_guard "$download_tmp"
+  if ! BASH_ENV='' bash -n "$download_tmp" || ! BASH_ENV='' timeout 60 bash "$download_tmp" --self-test >/dev/null; then
     die "新脚本未通过内置自检；当前版本未作任何修改。"
   fi
-
-  checksum=$(sha256sum "$download_tmp" | awk '{print $1}')
-  activate_manager "$download_tmp"
-  rm -f "$download_tmp"
-  if [[ $new_version == "$TDH_VERSION" ]]; then
-    ok "已重新安装最新版 ${new_version}（SHA256: ${checksum}）。"
-  else
-    ok "管理脚本已从 ${TDH_VERSION} 更新到 ${new_version}（SHA256: ${checksum}）。"
-  fi
-  info "升级完成，无需重新部署。现有服务、IP、端口、Secret、链接和主备配置均保留。"
-  info "本次为兼容性与只读诊断升级，没有经生产验证的大幅提速，未自动修改传输参数。"
-  info "退出当前面板后再次输入 a 即可使用新版本；诊断为按需功能，不是升级步骤。"
-}
+  activate_manager "$download_tmp" "$expected"
+  ok "管理脚本已更新到 ${version}（SHA256: ${expected}）。退出面板后重新输入 a。"
+)
 
 rollback_manager() {
   local previous="${TDH_MANAGER}.previous" tmp
-  [[ ! -L $TDH_MANAGER && ( ! -e $TDH_MANAGER || -f $TDH_MANAGER ) ]] || \
-    die "管理器文件类型异常；已保留当前文件和回退备份。"
-  [[ -f $previous && ! -L $previous ]] || die "没有上次 a update 的管理器备份。"
+  assert_manager_paths
+  [[ -f $previous ]] || die "没有上次 a update 的管理器备份。"
   queue_manager_guard "$previous"
   [[ $(extract_release_value "$previous" TDH_CONFIG_SCHEMA) == "$TDH_CONFIG_SCHEMA" && \
      $(extract_release_value "$previous" TDH_PROTOCOL_VERSION) == "$TDH_PROTOCOL_VERSION" ]] || die "备份协议不兼容，拒绝回退。"
-  if ! bash -n "$previous" || ! timeout 60 bash "$previous" --self-test >/dev/null; then
+  if ! BASH_ENV='' bash -n "$previous" || ! BASH_ENV='' timeout 60 bash "$previous" --self-test >/dev/null; then
     die "备份自检失败。"
   fi
   tmp=$(mktemp "${TDH_MANAGER}.rollback.XXXXXX")
@@ -3438,19 +3472,10 @@ wireguard_handshake_is_fresh() {
 }
 
 telemt_binary_is_expected() {
-  local version expected checksum owner mode links directory
-  [[ -f $TDH_BIN && -x $TDH_BIN && ! -L $TDH_BIN ]] || return 1
-  read -r owner mode links < <(stat -c '%u %a %h' -- "$TDH_BIN")
-  [[ $owner == "$EUID" && $links == 1 && $mode =~ ^[0-7]{1,4}$ ]] || return 1
-  (( (8#$mode & 0022) == 0 )) || return 1
-  directory=$(dirname "$TDH_BIN")
-  while [[ $directory != / ]]; do
-    [[ -d $directory && ! -L $directory ]] || return 1
-    read -r owner mode < <(stat -c '%u %a' -- "$directory")
-    [[ ( $owner == 0 || $owner == "$EUID" ) && $mode =~ ^[0-7]{1,4}$ ]] || return 1
-    (( (8#$mode & 0022) == 0 || (8#$mode & 01000) != 0 )) || return 1
-    directory=$(dirname "$directory")
-  done
+  local version expected checksum
+  [[ -x $TDH_BIN ]] || return 1
+  trusted_local_file "$TDH_BIN" || return 1
+  trusted_local_directory "$(dirname "$TDH_BIN")" || return 1
   # Authenticate existing bytes BEFORE executing even --version as root.
   checksum=$(sha256sum "$TDH_BIN" | awk '{print $1}')
   case $(uname -m):$checksum in
@@ -4700,7 +4725,7 @@ main() {
     status) show_status ;;
     links) show_links ;;
     diagnose) diagnose ;;
-    update|upgrade|u) update_manager ;;
+    update|upgrade|u) update_manager "${@:2}" ;;
     update-rollback) rollback_manager ;;
     core-upgrade|core-rollback)
       (( $# == 2 )) || die "用法：a $1 --maintenance"

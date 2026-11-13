@@ -66,7 +66,7 @@ apt_get_with_lock_wait() { return 99; }
         return result
 
     def old_manager(self, version="1.3.1"):
-        data = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.0"', f'TDH_VERSION="{version}"'.encode())
+        data = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.1"', f'TDH_VERSION="{version}"'.encode())
         self.manager.write_bytes(data)
         self.manager.chmod(0o755)
         return data
@@ -80,14 +80,14 @@ apt_get_with_lock_wait() { return 99; }
         result = subprocess.run(["bash", str(self.shortcut), "--help"], env=self.env,
                                 capture_output=True, text=True, timeout=5)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Telemt Dual-Hop 1.7.0", result.stdout)
+        self.assertIn("Telemt Dual-Hop 1.7.1", result.stdout)
 
     def test_repeat_install_and_rollback_preserve_three_role_identities(self):
         for role in ("entry", "backend1", "backend2"):
             with self.subTest(role=role):
                 self.protected["state.env"] = f"TDH_ROLE={role}\nCONFIG_SCHEMA=5\nPORT_A=443\nPORT_B=443\n".encode()
                 (self.base / "state.env").write_bytes(self.protected["state.env"])
-                old = self.old_manager()
+                old = self.old_manager("1.7.0")
                 self.invoke()
                 self.invoke()
                 self.assertEqual((self.base / "manager.previous").read_bytes(), old)
@@ -192,10 +192,23 @@ apt_get_with_lock_wait() { return 99; }
         self.assertTrue(self.manager.is_symlink())
         self.assertEqual(target.read_bytes(), b"SYNTHETIC_KEEP_LINK_TARGET\n")
 
+    def test_rollback_rejects_writable_or_hardlinked_backup_before_execution(self):
+        old = self.old_manager()
+        previous = self.base / "manager.previous"
+        previous.write_bytes(SCRIPT.read_bytes())
+        prelude = 'timeout() { touch "$TDH_BASE/selftest-called"; return 99; }'
+        previous.chmod(0o664)
+        self.invoke("rollback_manager", prelude=prelude, ok=False)
+        previous.chmod(0o644)
+        os.link(previous, self.base / "extra-link")
+        self.invoke("rollback_manager", prelude=prelude, ok=False)
+        self.assertFalse((self.base / "selftest-called").exists())
+        self.assertEqual(self.manager.read_bytes(), old)
+
     def test_rollback_stage_and_rename_failures_preserve_both_versions(self):
         old = self.old_manager("1.4.1")
         previous = self.base / "manager.previous"
-        expected = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.0"', b'TDH_VERSION="1.3.1"')
+        expected = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.1"', b'TDH_VERSION="1.3.1"')
         previous.write_bytes(expected)
         for prelude in ("install() { return 74; }", "mv() { return 73; }"):
             with self.subTest(failure=prelude):
