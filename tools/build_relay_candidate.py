@@ -37,12 +37,15 @@ def verify_tls_backport(source, build):
     run('git', 'apply', str(fixture), cwd=source)
     command = ['cargo', 'test', '--release', '--locked', '--bin', 'telemt']
     # Require the baseline regression to fail at the intended assertion.
-    baseline = subprocess.run(
-        [*command, 'inner_content_type_position_is_not_constant'],
-        cwd=source, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=1200,
-    )
-    (build / 'tls-before.log').write_text(baseline.stdout, encoding='utf-8')
-    if baseline.returncode != 101 or '2 failed' not in baseline.stdout or 'a fixed plaintext' not in baseline.stdout:
+    with (build / 'tls-before.log').open('w+', encoding='utf-8') as log:
+        baseline = subprocess.run(
+            [*command, 'inner_content_type_position_is_not_constant'],
+            cwd=source, stdout=log, stderr=subprocess.STDOUT, timeout=1200,
+        )
+        log.seek(0)
+        result = log.read()
+    if (baseline.returncode != 101 or '2 failed' not in result or
+            result.count('must not be a fixed plaintext') != 2):
         raise RuntimeError('baseline did not fail both marker assertions; see tls-before.log')
     run('git', 'apply', str(emulator), str(cache), cwd=source)
     run(*command, 'tls_front::emulator::', cwd=source, timeout=1200)
@@ -105,16 +108,16 @@ def main():
             architecture=os.uname().machine,
             balanced2_reference_sha256='5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100',
         )
-        historical = json.loads((ROOT / 'docs/benchmarks/bulk-admission-20261024/results/core-manifest.json').read_text())
-        for field in ('base_patch_sha256', 'normalized_patch_sha256'):
-            if manifest[field] != historical[field]:
-                raise RuntimeError(f'balanced2 provenance mismatch: {field}')
     if candidate_kind in ('balanced','bulk'):
         manifest.update(receive_helper_sha256=digest(ROOT/'patches/low_rtt_receive.rs'),
                         outgoing_queue_helper_sha256=digest(ROOT/('patches/unsent_queue_bulk.rs' if candidate_kind=='bulk' else 'patches/unsent_queue.rs')),
                         outgoing_unsent_low_water_bytes=262144 if candidate_kind=='bulk' else 65536)
     if security:
-        for field in ('receive_helper_sha256', 'outgoing_queue_helper_sha256', 'outgoing_unsent_low_water_bytes'):
+        historical_path = ROOT / 'docs/benchmarks/bulk-admission-20261024/results/core-manifest.json'
+        historical = json.loads(historical_path.read_text())
+        for field in ('source_commit', 'rust', 'jobs', 'lto', 'codegen_units',
+                      'base_patch_sha256', 'normalized_patch_sha256', 'receive_helper_sha256',
+                      'outgoing_queue_helper_sha256', 'outgoing_unsent_low_water_bytes'):
             if manifest[field] != historical[field]:
                 raise RuntimeError(f'balanced2 provenance mismatch: {field}')
         if manifest['balanced2_reference_sha256'] != historical['binaries']['bulk']['sha256']:
@@ -215,6 +218,7 @@ def main():
     if security:
         for tls_patch in TLS_PATCHES:
             shutil.copyfile(tls_patch, output / tls_patch.name)
+        shutil.copyfile(historical_path, output / 'balanced2-reference-manifest.json')
         (output / 'NOTICE.txt').write_text(
             'Unofficial modified Telemt 3.5.5. Upstream license and copyright retained.\n'
             'Includes balanced2 Linux socket and relay changes and backports of Telemt PRs #966 and #968.\n'

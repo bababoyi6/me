@@ -1,4 +1,4 @@
-"""CI-only same-toolchain 3.5.17 control/balanced1 build; never an installer."""
+"""CI-only native socket candidates from fixed upstream Telemt commits."""
 import argparse
 import hashlib
 import json
@@ -88,7 +88,10 @@ def main():
             (output/'candidate.patch').write_bytes(subprocess.check_output(['git','diff','--','Cargo.toml','Cargo.lock','src/transport/socket.rs','src/transport/socket/tests.rs'],cwd=source))
     for name in ('LICENSE',):shutil.copyfile(source/name,output/name)
     for name in ('low_rtt_receive','unsent_queue_bulk'):shutil.copyfile(ROOT/'patches'/(name+'.rs'),output/(name+'.rs'))
-    (output/'NOTICE.txt').write_text('Unofficial Telemt 3.5.17 lab builds. Not a release or production deployment. Original license retained.\n')
+    (output/'NOTICE.txt').write_text(
+        f'Unofficial Telemt lab build from {upstream}. Original license and copyright retained.\n'
+        'Includes local Linux socket buffering changes. Experimental build; no upstream endorsement.\n'
+    )
     (output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 
 

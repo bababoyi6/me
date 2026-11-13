@@ -7,6 +7,16 @@ from release_pins import RELEASES
 
 
 class ReleaseLockTests(unittest.TestCase):
+    def test_stable_manager_pin_matches_the_readme_release(self):
+        root = Path(__file__).resolve().parents[1]
+        script = (root / 'telemt-dual-hop.sh').read_text(encoding='utf-8')
+        readme = (root / 'README.md').read_text(encoding='utf-8')
+        tag = re.search(r'^readonly TDH_STABLE_MANAGER_TAG="(v[0-9.]+)"$', script, re.M)[1]
+        digest = re.search(r'^readonly TDH_STABLE_MANAGER_SHA256="([a-f0-9]{64})"$', script, re.M)[1]
+        self.assertIn(f'https://raw.githubusercontent.com/bababoyi6/me/{tag}/telemt-dual-hop.sh', readme)
+        self.assertIn(f'"{digest}"', readme)
+        self.assertNotIn('raw.githubusercontent.com/bababoyi6/me/main/', script)
+
     def test_acceptance_and_native_builder_pin_the_same_active_source(self):
         root=Path(__file__).resolve().parents[1]
         lock=json.loads((root/'docs/telemt-stable-lock.json').read_text())

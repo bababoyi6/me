@@ -268,10 +268,36 @@ timeout() { touch "$TDH_BASE/selftest-called"; return 99; }
         self.assertEqual(previous.read_bytes(), b"existing rollback\n")
         self.assertEqual(list(self.base.glob("manager.download.*")), [])
 
+    def test_manager_update_rejects_invalid_tags_before_network(self):
+        prelude = 'curl() { touch "$TDH_BASE/network-called"; return 99; }'
+        for tag in ('main', 'v1.7.1-rc.1', 'v1.7.1/../main'):
+            result = self.bash(f'update_manager --release "{tag}" --sha256 "$(printf %064d 0)"',
+                               success=False, prelude=prelude)
+            self.assertIn("正式版本标签", result.stderr)
+        self.assertFalse((self.base / "network-called").exists())
+
     def test_update_default_at_locked_version_does_not_download(self):
         (self.base / "manager").write_bytes(SCRIPT.read_bytes())
         self.bash("update_manager", prelude='curl() { touch "$TDH_BASE/network-called"; return 99; }')
         self.assertFalse((self.base / "network-called").exists())
+
+    def test_manager_update_rejects_changed_staged_bytes(self):
+        manager = self.base / "manager"
+        manager.write_bytes(SCRIPT.read_bytes())
+        (self.base / "download").write_bytes(
+            SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.0"', b'TDH_VERSION="1.7.1"'))
+        prelude = '''
+curl() { cp "$TDH_BASE/download" "${@: -1}"; }
+install() { command install "$@"; printf '\\n# changed during staging\\n' >>"${@: -1}"; }
+install_shortcut() { touch "$TDH_BASE/shortcut-called"; }
+'''
+        result = self.bash('update_manager --release v1.7.1 --sha256 "$(sha256sum < "$TDH_BASE/download" | cut -d" " -f1)"',
+                           success=False, prelude=prelude)
+        self.assertIn("待安装管理脚本的 SHA256", result.stderr)
+        self.assertEqual(manager.read_bytes(), SCRIPT.read_bytes())
+        self.assertFalse((self.base / "shortcut-called").exists())
+        self.assertFalse((self.base / "manager.previous").exists())
+        self.assertEqual(list(self.base.glob("manager.update.*")), [])
 
     def test_oversized_manager_download_is_stopped_and_cleaned_before_execution(self):
         manager = self.base / "manager"

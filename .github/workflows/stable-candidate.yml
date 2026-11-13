@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       tls_candidate:
-        description: Build one TLS candidate and verify synthetic protocol
+        description: Select an isolated audit check
         type: choice
-        options: ['none', 'old', 'new']
+        options: ['none', 'manager', 'old', 'new']
         default: 'none'
   push:
     branches: [dev/telemt-stable-compat-20261107]
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
-    if: inputs.tls_candidate != 'old' && inputs.tls_candidate != 'new'
+    if: inputs.tls_candidate == 'none' || github.event_name == 'push'
     runs-on: ubuntu-22.04
     timeout-minutes: 32
     steps:
@@ -40,7 +40,7 @@ jobs:
           retention-days: 7
           if-no-files-found: error
   measure:
-    if: inputs.tls_candidate != 'old' && inputs.tls_candidate != 'new'
+    if: inputs.tls_candidate == 'none' || github.event_name == 'push'
     needs: build
     runs-on: ubuntu-22.04
     timeout-minutes: 22
@@ -76,6 +76,26 @@ jobs:
           name: native-socket-evidence
           path: ${{ runner.temp }}/native-evidence/*.json
           retention-days: 14
+  manager-update:
+    if: inputs.tls_candidate == 'manager'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prepare syntax checker
+        run: |
+          sudo timeout 90 apt-get update -qq
+          sudo timeout 120 apt-get install -y --no-install-recommends shellcheck
+      - name: Verify release updater and rollback against private fixtures
+        run: |
+          bash -n telemt-dual-hop.sh
+          shellcheck -x -S style telemt-dual-hop.sh
+          python3 -m unittest discover -s tests -p 'test_release_lock.py' -v
+          timeout --kill-after=5 40 python3 -m unittest discover -s tests -p 'test_install_command.py' -v
+          sudo timeout --kill-after=5 60 python3 -m unittest discover -s tests -p 'test_manager_lifecycle.py' -v
+          sudo timeout --kill-after=5 60 python3 -m unittest discover -s tests -p 'test_performance.py' -k manager -v
   tls-candidate:
     if: inputs.tls_candidate == 'old' || inputs.tls_candidate == 'new'
     runs-on: ubuntu-22.04

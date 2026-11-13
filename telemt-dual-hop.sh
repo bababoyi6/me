@@ -157,7 +157,7 @@ usage() {
   a                                         安装后打开控制面板（自动使用 sudo）
   a status                                  快速查看状态
   a update                                  检查内置的稳定版锁（可简写为 a u）
-  a update --release vX.Y.Z --sha256 SHA256  安装已独立核验摘要的稳定版
+  a update --release vX.Y.Z --sha256 SHA256   安装已独立核验摘要的稳定版
   a update-rollback                         恢复上次 a update 前的管理脚本
   a core-upgrade --maintenance               后端固定版本核心升级（需先排空）
   a core-baseline --maintenance              x86_64 切回已发布稳定基线（需先排空）
@@ -393,13 +393,19 @@ install_self() {
 }
 
 activate_manager() {
-  local candidate=$1 staged backup="" prior_backup="" previous="${TDH_MANAGER}.previous"
+  local candidate=$1 expected=${2:-} staged checksum backup="" prior_backup="" previous="${TDH_MANAGER}.previous"
   assert_manager_paths
   queue_manager_guard "$candidate"
   staged=$(mktemp "${TDH_MANAGER}.update.XXXXXX")
   if ! install -m 0755 "$candidate" "$staged"; then
     rm -f "$staged"
     die "无法准备新管理器；当前版本未作任何修改。"
+  fi
+  if [[ -n $expected ]]; then
+    if ! checksum=$(sha256sum < "$staged") || [[ ${checksum%% *} != "$expected" ]]; then
+      rm -f -- "$staged"
+      die "待安装管理脚本的 SHA256 与版本锁不符。"
+    fi
   fi
   # Unique adjacent files and rename keep replacement atomic on this filesystem.
   if [[ -f $TDH_MANAGER ]] && ! cmp -s "$staged" "$TDH_MANAGER"; then
@@ -475,6 +481,7 @@ assert_manager_paths() {
 }
 
 update_manager() (
+  set -Eeuo pipefail
   local tag=$TDH_STABLE_MANAGER_TAG expected=$TDH_STABLE_MANAGER_SHA256
   local download_dir download_tmp version installed_version size checksum
   if (( $# != 0 )); then
@@ -503,6 +510,9 @@ update_manager() (
 
   download_dir=$(mktemp -d "${TDH_MANAGER}.download.XXXXXX")
   trap 'rm -f -- "$download_dir/manager"; rmdir -- "$download_dir"' EXIT
+  trap 'exit 129' HUP
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
   download_tmp=$download_dir/manager
   info "正在获取固定版本 ${tag} 的管理脚本……"
   if ! (ulimit -f 1024 || exit 1
@@ -525,7 +535,7 @@ update_manager() (
   if ! BASH_ENV= bash -n "$download_tmp" || ! BASH_ENV= timeout 60 bash "$download_tmp" --self-test >/dev/null; then
     die "新脚本未通过内置自检；当前版本未作任何修改。"
   fi
-  activate_manager "$download_tmp"
+  activate_manager "$download_tmp" "$expected"
   ok "管理脚本已更新到 ${version}（SHA256: ${expected}）。退出面板后重新输入 a。"
 )
 
@@ -3462,19 +3472,10 @@ wireguard_handshake_is_fresh() {
 }
 
 telemt_binary_is_expected() {
-  local version expected checksum owner mode links directory
-  [[ -f $TDH_BIN && -x $TDH_BIN && ! -L $TDH_BIN ]] || return 1
-  read -r owner mode links < <(stat -c '%u %a %h' -- "$TDH_BIN")
-  [[ $owner == "$EUID" && $links == 1 && $mode =~ ^[0-7]{1,4}$ ]] || return 1
-  (( (8#$mode & 0022) == 0 )) || return 1
-  directory=$(dirname "$TDH_BIN")
-  while [[ $directory != / ]]; do
-    [[ -d $directory && ! -L $directory ]] || return 1
-    read -r owner mode < <(stat -c '%u %a' -- "$directory")
-    [[ ( $owner == 0 || $owner == "$EUID" ) && $mode =~ ^[0-7]{1,4}$ ]] || return 1
-    (( (8#$mode & 0022) == 0 || (8#$mode & 01000) != 0 )) || return 1
-    directory=$(dirname "$directory")
-  done
+  local version expected checksum
+  [[ -x $TDH_BIN ]] || return 1
+  trusted_local_file "$TDH_BIN" || return 1
+  trusted_local_directory "$(dirname "$TDH_BIN")" || return 1
   # Authenticate existing bytes BEFORE executing even --version as root.
   checksum=$(sha256sum "$TDH_BIN" | awk '{print $1}')
   case $(uname -m):$checksum in
