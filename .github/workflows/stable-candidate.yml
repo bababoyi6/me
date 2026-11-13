@@ -159,7 +159,7 @@ jobs:
         run: |
           sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
           sudo modprobe tcp_bbr
-          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-tls-mixed-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=540 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/mixed_path_lab.py --new-tls-candidate --profile rtt100 --native-directory "$RUNNER_TEMP/tls-core" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/tls-evidence/mixed.json"
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-mixed-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=540 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/mixed_path_lab.py --new-tls-candidate --profile rtt100 --native-directory "$RUNNER_TEMP/tls-core" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/tls-evidence/mixed.json"
           python3 tests/mixed_experience_analysis.py --require-parity "$RUNNER_TEMP/tls-evidence/mixed.json" "$RUNNER_TEMP/tls-evidence/mixed-analysis.json"
       - uses: actions/upload-artifact@v4
         if: always()
