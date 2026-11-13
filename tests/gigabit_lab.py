@@ -25,6 +25,25 @@ from tls_candidate_lab import candidate_binary
 
 FILE_BYTES = 128 * 1024**2
 ARMS = ('balanced2', 'candidate', 'candidate-shaped')
+WINDOW_MODES = ('default','larger_max')
+
+
+def set_tcp_limits(namespaces, mode, defaults):
+    observed = {}
+    for ns in namespaces:
+        prefix = ('ip','netns','exec',ns,'sysctl')
+        keys = ('net.ipv4.tcp_rmem','net.ipv4.tcp_wmem')
+        if ns not in defaults:
+            defaults[ns] = [list(map(int,command(*prefix,'-n',key).split())) for key in keys]
+        for key,values in zip(keys,defaults[ns],strict=True):
+            target = values if mode=='default' else [*values[:2],32*1024**2]
+            if list(map(int,command(*prefix,'-n',key).split())) != target:
+                command(*prefix,'-wq',f'{key}={" ".join(map(str,target))}')
+            if list(map(int,command(*prefix,'-n',key).split())) != target:
+                raise RuntimeError('private TCP autotuning limit mismatch')
+        observed[ns] = [list(map(int,command(*prefix,'-n',key).split())) for key in keys]
+        command('ip','netns','exec',ns,'ip','tcp_metrics','flush','all')
+    return observed
 
 
 def capacity(net, evidence, entry_cpu, backend_cpu):
@@ -174,10 +193,14 @@ def main(args):
     if len(cpus)<4:
         raise RuntimeError('four logical CPUs required')
     source = os.environ['TDH_SOURCE_COMMIT']
-    candidate, pin = candidate_binary(args.candidate,'new',source)
-    if pin['sha256']!=TLS_CANDIDATE_SHA:
-        raise RuntimeError('unexpected candidate binary')
-    report = {'source_commit':source,'binary_sha256':{'candidate':pin['sha256'],'balanced2':TLS_BASELINE[1]},
+    window_test = args.proxy_window
+    identities = {'balanced2':TLS_BASELINE[1]}
+    if not window_test:
+        candidate, pin = candidate_binary(args.candidate,'new',source)
+        if pin['sha256']!=TLS_CANDIDATE_SHA:
+            raise RuntimeError('unexpected candidate binary')
+        identities['candidate'] = pin['sha256']
+    report = {'source_commit':source,'binary_sha256':identities,
               'rtt_ms':100,'rate_mbps':1000,'payload_bytes_per_file':FILE_BYTES,
               'resources_before':before,'capacity':[],'rows':[],'complete':False}
     net = None
@@ -204,7 +227,8 @@ def main(args):
                                     for ns in (NAMES[0],*BACKENDS)}
             report['iperf_version'] = command('iperf3','--version').splitlines()[0]
             report['cpu_assignment'] = dict(entry=cpus[0],backends=cpus[1:3],dc=cpus[3])
-            capacity(net,report['capacity'],cpus[0],cpus[1])
+            if not window_test:
+                capacity(net,report['capacity'],cpus[0],cpus[1])
             write(args.output,report)
             for ns,address in zip(BACKENDS,('198.18.0.1','198.18.0.5'),strict=True):
                 command('ip','-n',ns,'address','add',address+'/32','dev','lo')
@@ -212,13 +236,17 @@ def main(args):
             clients = [Child('client',NAMES[0],cpus[0],{},children) for _ in DOMAINS]
             front = start_frontend(net)
             os.sched_setaffinity(front.pid,{cpus[0]})
-            for turn, order in enumerate((ARMS,ARMS[::-1]),1):
+            modes = WINDOW_MODES if window_test else ARMS
+            defaults = {}
+            for turn, order in enumerate((modes,modes[::-1]),1):
                 for arm in order:
                     shaped = arm=='candidate-shaped'
+                    limits = set_tcp_limits((NAMES[0],*BACKENDS),arm,defaults) if window_test else None
                     if shaped:
                         shape_backends_and_entry((450,450,450,450),install=True)
-                    binary = baseline if arm=='balanced2' else candidate
-                    version = [TLS_BASELINE[1],TLS_BASELINE[2]] if arm=='balanced2' else [pin['sha256'],pin['version']]
+                    use_baseline = window_test or arm=='balanced2'
+                    binary = baseline if use_baseline else candidate
+                    version = [TLS_BASELINE[1],TLS_BASELINE[2]] if use_baseline else [pin['sha256'],pin['version']]
                     cores = []
                     try:
                         for ns,cpu in zip(BACKENDS,cpus[1:3],strict=True):
@@ -226,6 +254,8 @@ def main(args):
                                 'synthetic_tls_front':True,'experimental_binary':version},children))
                         row = {'arm':arm,'round':turn,'queues_before':snapshot(),
                                **workloads(clients,dc,cores,front),'queues_after':snapshot()}
+                        if window_test:
+                            row['tcp_limits'] = limits
                         report['rows'].append(row)
                         write(args.output,report)
                     finally:
@@ -234,7 +264,12 @@ def main(args):
                         if shaped:
                             for ns,dev in LINKS:
                                 command('ip','netns','exec',ns,'tc','qdisc','del','dev',dev,'root')
-            report['summary'] = summarize(report)
+            if window_test:
+                report['summary'] = {'larger_vs_default':[
+                    verify_pair(*[next(r for r in report['rows'] if (r['round'],r['arm'])==(turn,mode))
+                                  for mode in WINDOW_MODES]) for turn in (1,2)]}
+            else:
+                report['summary'] = summarize(report)
             report['complete'] = True
         except (Exception,KeyboardInterrupt) as exc:
             report['failure'] = {'type':type(exc).__name__,'detail':str(exc)[:1000]}
@@ -273,7 +308,6 @@ def control_only(output):
               'iperf_version':command('iperf3','--version').splitlines()[0],
               'rows':{'default':[],'larger_max':[]},'limits':{},'complete':False}
     paths = {'tcp':('192.0.2.1','198.51.100.2'),'wireguard':('10.77.1.1','10.77.1.2')}
-    keys = ('net.ipv4.tcp_rmem','net.ipv4.tcp_wmem')
     net = None
     with tempfile.TemporaryDirectory(prefix='tdh-audit-gigabit-control-') as folder:
         try:
@@ -283,21 +317,9 @@ def control_only(output):
             net.setup()
             command('ip','netns','exec',NAMES[0],'tc','qdisc','replace','dev','tdh-la0','root',
                     'tbf','rate','1000mbit','burst','256kb','limit','31250000')
+            defaults = {}
             for mode, rows in report['rows'].items():
-                report['limits'][mode] = {}
-                for ns in (NAMES[0],BACKENDS[0]):
-                    prefix = ('ip','netns','exec',ns,'sysctl')
-                    limits = []
-                    for key in keys:
-                        values = command(*prefix,'-n',key).split()
-                        if mode=='larger_max':
-                            command(*prefix,'-wq',f'{key}={" ".join(values[:2])} {32*1024**2}')
-                            values = command(*prefix,'-n',key).split()
-                            if int(values[-1])!=32*1024**2:
-                                raise RuntimeError('private TCP autotuning limit mismatch')
-                        limits.append([int(v) for v in values])
-                    report['limits'][mode][ns] = limits
-                    command('ip','netns','exec',ns,'ip','tcp_metrics','flush','all')
+                report['limits'][mode] = set_tcp_limits((NAMES[0],BACKENDS[0]),mode,defaults)
                 if mode=='default':
                     capacity(net,rows,cpus[0],cpus[1])
                 else:
@@ -326,9 +348,12 @@ if __name__=='__main__':
     parser.add_argument('--candidate', type=Path)
     parser.add_argument('--balanced2-archive', type=Path)
     parser.add_argument('--control-only', action='store_true')
+    parser.add_argument('--proxy-window', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     signal.signal(signal.SIGTERM,lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     args = parser.parse_args()
-    if not args.control_only and (not args.candidate or not args.balanced2_archive):
+    if args.proxy_window and (args.control_only or not args.balanced2_archive):
+        parser.error('proxy window comparison requires the released archive')
+    if not (args.control_only or args.proxy_window) and (not args.candidate or not args.balanced2_archive):
         parser.error('proxy measurements require both pinned binaries')
     raise SystemExit(control_only(args.output) if args.control_only else main(args))
