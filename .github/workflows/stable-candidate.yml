@@ -7,6 +7,10 @@ on:
         type: choice
         options: ['none', 'manager', 'old', 'new']
         default: 'none'
+      tls_parity:
+        description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
+        type: boolean
+        default: false
   push:
     branches: [dev/telemt-stable-compat-20261107]
     paths:
@@ -99,7 +103,7 @@ jobs:
   tls-candidate:
     if: inputs.tls_candidate == 'old' || inputs.tls_candidate == 'new'
     runs-on: ubuntu-22.04
-    timeout-minutes: 32
+    timeout-minutes: 44
     env:
       CANDIDATE_KIND: ${{ inputs.tls_candidate }}
       UPSTREAM_COMMIT: ${{ inputs.tls_candidate == 'old' && 'ac71d92ec41dea00a7eafd6b8d350c3486633500' || 'b594ee55270798fe21f23b721b50eab46c2e0bec' }}
@@ -135,12 +139,18 @@ jobs:
       - name: Verify both synthetic links and the local API boundary
         run: |
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=120 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" unshare --net -- sh -ec 'ip link set lo up; exec python3 tests/tls_candidate_lab.py --kind "$1" --candidate "$2/tls-core" --balanced2-archive "$2/balanced2.tar.gz" --output "$2/tls-evidence/protocol.json"' tls "$CANDIDATE_KIND" "$RUNNER_TEMP"
+      - name: Compare released baseline and candidate on the same 100 ms WireGuard path
+        if: inputs.tls_parity
+        run: |
+          sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-parity-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=420 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/long_path_lab.py --tls-candidate "$CANDIDATE_KIND" --native-directory "$RUNNER_TEMP/tls-core" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/tls-evidence/parity.json"
+          python3 tests/long_path_analysis.py "$RUNNER_TEMP/tls-evidence/parity.json" "$RUNNER_TEMP/tls-evidence/analysis.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: tls-candidate-evidence
           path: |
-            ${{ runner.temp }}/tls-evidence/protocol.json
+            ${{ runner.temp }}/tls-evidence/*.json
             ${{ runner.temp }}/tls-core/manifest.json
             ${{ runner.temp }}/tls-core/tls-before.log
           if-no-files-found: warn

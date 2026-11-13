@@ -29,6 +29,7 @@ from mtproto_transport import CryptoStream, PacketStream, dc_ciphers, mtproxy_co
 from telemt_probe import SECRETS, TOKEN, port, request
 from lab_artifacts import register_artifact
 from lab_files import file_sha256, link_private_binary
+from release_pins import TLS_CANDIDATES
 
 # Extracted binaries from the checksum-verified official GNU archives.
 BINARIES = {
@@ -39,10 +40,7 @@ BINARIES = {
     "cd34e20e9f5c4457579479e321eba2e65496712f0e794df6acb5b63d2ee01dcd": "telemt 3.5.5",
     "feb1d8779de0b86c6c43d1b871020ec94b11fad9fec5612b07b278edfd2181ff": "telemt 3.5.14",
 }
-TLS_CANDIDATE_VERSIONS = {
-    'telemt 3.5.5+tdh.balanced2.security1',
-    'telemt 3.5.17+tdh.main.b594ee5.balanced1',
-}
+TLS_CANDIDATE_VERSIONS = {pin[3] for pin in TLS_CANDIDATES.values()}
 
 
 def sanitize_startup_log(text):

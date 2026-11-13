@@ -20,10 +20,11 @@ from kernel_observer import observe_sockets, qdiscs_in_namespace
 from stable_acceptance import PINS, stats, summary
 from paired_performance import resources, write
 from core_install import archive_payload
-from release_pins import NATIVE_BASES, RELEASES
+from release_pins import NATIVE_BASES, RELEASES, TLS_CANDIDATES
 from queue_analysis import VARIANTS as QUEUE_VARIANTS, ORDERS as QUEUE_ORDERS
 from queue_probe import LatencyProbe, original_wg_policy, configure_wg_fq
 from legacy_queue_analysis import VARIANTS as LEGACY_VARIANTS, ORDERS as LEGACY_ORDERS
+from tls_candidate_lab import candidate_binary
 
 HERE=Path(__file__).resolve()
 VARIANTS=('balanced2','stable','stable-auto')
@@ -44,7 +45,8 @@ def worker(role,cpu):
             lab=FullLab(options['binary'],listen_endpoint=('10.77.1.2',24431),start_haproxy=False,
                 dc_endpoint=('198.18.0.1',26000),offline_lab=True,
                 experimental_binary=options.get('experimental_binary') or ((PINS[kind][1],PINS[kind][2]) if kind=='balanced2' else None),
-                socket_library=options.get('library'),socket_mode=options.get('policy','pass'))
+                socket_library=options.get('library'),socket_mode=options.get('policy','pass'),
+                synthetic_tls_front=options.get('synthetic_tls_front', False))
             policy=lab.telemt_config.read_text().replace(f'127.0.0.1:{lab.api}','127.0.0.1:$API')
             ready={'pid':lab.telemt.pid,'version':lab.version,'config_policy_sha256':hashlib.sha256(policy.encode()).hexdigest()}
         elif role=='dc':
@@ -156,13 +158,17 @@ def main(args):
     native=bool(args.native_directory)
     equal=args.equal_load_study
     legacy=args.legacy_queue_study
+    tls_candidate=args.tls_candidate
     queue=args.queue_study or equal or legacy
     stress=args.sustained_stress
     if stress and (not native or queue):raise RuntimeError('stress requires the native-only layout')
-    if sum((args.queue_study,equal,legacy,stress))>1:raise RuntimeError('choose one study layout')
+    if sum((args.queue_study,equal,legacy,stress,bool(tls_candidate)))>1:raise RuntimeError('choose one study layout')
     if queue and not native:raise RuntimeError('queue study requires pinned native pair')
     if legacy and not args.balanced2_archive:raise RuntimeError('legacy study requires exact balanced2 fixture')
+    if tls_candidate and (not native or not args.balanced2_archive):
+        raise RuntimeError('TLS parity requires a candidate directory and released balanced2 archive')
     variants=LEGACY_VARIANTS if legacy else QUEUE_VARIANTS if queue and not equal else ('control','balanced') if native else VARIANTS
+    if tls_candidate:variants=('balanced2','candidate')
     profiles=(100,) if native else (0,100)
     report={'scope':'split-process real FakeTLS/HAProxy/WireGuard/native cores; synthetic DC only',
         'plan':'legacy-queue' if legacy else 'sustained' if stress else 'equal-load' if equal else 'queue' if queue else 'native' if native else 'official',
@@ -172,6 +178,7 @@ def main(args):
         'payload_bytes_per_stream':4*1024**2 if stress else PAYLOAD,'rate_mbps':200,'cpu_assignment':{'core':backend_cpu,'client_and_haproxy':frontend_cpu,'dc':dc_cpu},
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),
         'resources_before':before,'controls':[],'rows':[],'idle_checks':[]}
+    if tls_candidate:report.update(plan='tls-candidate-parity',tls_candidate=tls_candidate)
     children=[];probes=[];net=None;front=None;expected=0
     write(output,report)
     try:
@@ -186,7 +193,17 @@ def main(args):
                 command('ip','-n',NAMES[2],'address','add','198.18.0.1/32','dev','lo')
                 binaries={}
                 native_manifest=None
-                if native:
+                candidate_pin=None
+                if tls_candidate:
+                    bundle=Path(args.native_directory)
+                    candidate, candidate_pin=candidate_binary(bundle,tls_candidate,report['source_commit'])
+                    pins=PINS['balanced2']
+                    payload,_=archive_payload(args.balanced2_archive,pins[0],pins[2].removeprefix('telemt '),pins[1],False)
+                    path=root/'balanced2';path.write_bytes(payload);path.chmod(0o755)
+                    binaries.update(balanced2=str(path),candidate=str(candidate))
+                    report['binary_sha256']={'balanced2':pins[1],'candidate':candidate_pin['sha256']}
+                    report['candidate_manifest']=json.loads((bundle/'manifest.json').read_text())
+                elif native:
                     bundle=Path(args.native_directory)
                     native_manifest=json.loads((bundle/'manifest.json').read_text())
                     if native_manifest['upstream_commit'] not in NATIVE_BASES:raise RuntimeError('native upstream mismatch')
@@ -247,7 +264,7 @@ backend telemt
                             report['controls'].append({'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U','queue_packet_limit':packet_limit,
                                 'seconds':8 if native else 4,'omit_seconds':3 if native else 1,
                                 'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
-                    for turn in range(1 if stress else 4 if native else 3):
+                    for turn in range(2 if tls_candidate else 1 if stress else 4 if native else 3):
                         offset=turn%len(variants)
                         order=LEGACY_ORDERS[turn] if legacy else QUEUE_ORDERS[turn] if queue and not equal else variants[offset:]+variants[:offset]
                         for variant in order:
@@ -260,7 +277,11 @@ backend telemt
                                 if variant!='wg-fq' and applied_wg!=original_wg:raise RuntimeError('WG baseline restoration drift')
                             kind=('balanced2' if variant.startswith('legacy-') else 'balanced') if legacy else 'balanced' if queue and not equal else variant if native else 'balanced2' if variant=='balanced2' else 'stable'
                             options={'kind':kind,'binary':binaries[kind]}
-                            if native and kind!='balanced2':
+                            if tls_candidate:
+                                options['synthetic_tls_front']=True
+                                if kind=='candidate':
+                                    options['experimental_binary']=[candidate_pin['sha256'],candidate_pin['version']]
+                            elif native and kind!='balanced2':
                                 pin=native_manifest['binaries'][kind]
                                 options['experimental_binary']=[pin['sha256'],pin['version']]
                             if variant=='stable-auto':options.update(library=str(library),policy='auto')
@@ -312,6 +333,9 @@ backend telemt
                                         'backend_rss_after_bytes':stats(backend.ready['pid'])['rss_bytes'],'backend_thread_affinities':affinities,
                                         'sampled_backend_peak_rss_bytes':max(rss_samples),
                                         'harness_limited':cpu['client']+cpu['haproxy']+cpu['controller']>=70 or cpu['dc']>=70}
+                                    if tls_candidate:
+                                        row['sha256_verified'] = all(v['sha256_verified'] for v in result['rows'])
+                                        row['backend_fds_after'] = stats(backend.ready['pid'])['fds']
                                     if queue:row.update(path_probe=path_probe,qdisc_samples=qdisc_samples,wg_policy=applied_wg)
                                     if legacy:row.update(queue_packet_limit=1500 if variant.endswith('bounded') else 10000,router_packet_limits=router_limits)
                                     report['rows'].append(row);expected+=len(result['rows'])
@@ -370,6 +394,7 @@ if __name__=='__main__':
     parser.add_argument('--balanced2-archive')
     parser.add_argument('--output')
     parser.add_argument('--native-directory')
+    parser.add_argument('--tls-candidate',choices=TLS_CANDIDATES)
     parser.add_argument('--queue-study',action='store_true')
     parser.add_argument('--equal-load-study',action='store_true')
     parser.add_argument('--sustained-stress',action='store_true')

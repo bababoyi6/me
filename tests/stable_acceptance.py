@@ -17,12 +17,10 @@ import tempfile
 import time
 
 from e2e_lab import FullLab, sanitize_startup_log
-from release_pins import RELEASES
+from release_pins import RELEASES, TLS_BASELINE
 
 PINS = {
-    'balanced2': ('b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5',
-                  '5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100',
-                  'telemt 3.5.5+tdh.balanced2'),
+    'balanced2': TLS_BASELINE,
     'stable': ('e6f46b2f3becf29bfd555cec8a059e429f7c082c1af402499b3a7940cf8ebd34',
                '1954f18faeb9f5838e9444880f2ffb00704c6bd5b2836bc86dd64611537d49b8', 'telemt 3.5.16'),
 }
