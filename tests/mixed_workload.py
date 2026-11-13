@@ -33,20 +33,25 @@ def finish_idle(streams):
         return list(pool.map(finish,streams))
 
 
-def run_mixed(endpoint, logical_clients, *, candidate_screen=False):
+def run_mixed(endpoint, logical_clients, *, candidate_screen=False, domain=None):
     if logical_clients not in (30,50,100):raise ValueError('unregistered cohort')
+    if domain is not None and domain not in SECRETS:
+        raise ValueError('unregistered synthetic domain')
+    domains=(domain,) if domain else tuple(SECRETS)
     payload_bytes = 2 * PAYLOAD if candidate_screen else PAYLOAD
     held=[];lock=threading.Lock();stop=threading.Event()
     result={'logical_clients':logical_clients,'idle_connections':logical_clients-11,
             'baseline':{'message':[],'new_connection':[]},'loaded':{'message':[],'new_connection':[]},
             'bulk':[],'errors':[],'new_connections_completed':0,'complete':False}
     origin=time.monotonic();phase='idle_setup'
+    if domain is not None:
+        result['monotonic_origin_seconds']=origin
     def connect(index):
         sock=socket.create_connection(('127.0.0.1',endpoint.front),timeout=8)
         with lock:held.append(sock)
         sock.settimeout(25)
-        domain=tuple(SECRETS)[index%2]
-        stream=mtproxy_connect(sock,domain,SECRETS[domain])
+        selected=domains[index%len(domains)]
+        stream=mtproxy_connect(sock,selected,SECRETS[selected])
         stream.sendall(struct.pack('!cQQ',b'e',64,128))
         exchange(stream,0)
         return stream
@@ -67,7 +72,7 @@ def run_mixed(endpoint, logical_clients, *, candidate_screen=False):
                 if phase=='loaded' and stop.is_set():break
                 active=sum(not f.done() for f in bulk) if bulk else 0
                 start=time.monotonic()
-                row=FullLab.transfer(endpoint,('apple.com','gs.apple.com')[worker%2],
+                row=FullLab.transfer(endpoint,domains[worker%len(domains)],
                     'D',1024,125000000,persistent=True,io_timeout=25)
                 with lock:result['new_connections_completed']+=1
                 result[phase]['new_connection'].append({'offset_seconds':start-origin,
@@ -99,7 +104,7 @@ def run_mixed(endpoint, logical_clients, *, candidate_screen=False):
         if result['errors']:raise RuntimeError('baseline probes failed')
         def bulk_transfer(index):
             start=time.monotonic()
-            row=FullLab.transfer(endpoint,tuple(SECRETS)[index%2],'D' if index<4 else 'U',payload_bytes,
+            row=FullLab.transfer(endpoint,domains[index%len(domains)],'D' if index<4 else 'U',payload_bytes,
                                  125000000,persistent=True,io_timeout=25)
             row.update(start_offset_seconds=start-origin,end_offset_seconds=time.monotonic()-origin)
             return row

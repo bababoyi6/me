@@ -32,25 +32,30 @@ PAYLOAD=32*1024**2
 
 
 def worker(role,cpu):
-    expected=NAMES[0] if role=='client' else NAMES[2]
+    namespace=os.stat('/proc/self/ns/net').st_ino
+    allowed=(NAMES[0],) if role=='client' else (NAMES[2],'tdh-audit-b2')
+    expected=next((name for name in allowed if Path('/run/netns',name).exists()
+                   and Path('/run/netns',name).stat().st_ino==namespace),None)
     if (os.geteuid()!=0 or os.environ.get('GITHUB_ACTIONS')!='true' or
-            os.stat('/proc/self/ns/net').st_ino!=os.stat('/run/netns/'+expected).st_ino):
+            expected is None):
         raise RuntimeError('worker requires its owned CI namespace')
+    second=expected=='tdh-audit-b2'
+    dc_endpoint=('198.18.0.5' if second else '198.18.0.1',26000)
     os.sched_setaffinity(0,{cpu})
     options=json.loads(sys.stdin.readline())
     lab=dc=None
     try:
         if role=='core':
             kind=options['kind']
-            lab=FullLab(options['binary'],listen_endpoint=('10.77.1.2',24431),start_haproxy=False,
-                dc_endpoint=('198.18.0.1',26000),offline_lab=True,
+            lab=FullLab(options['binary'],listen_endpoint=('10.77.2.2' if second else '10.77.1.2',24431),start_haproxy=False,
+                dc_endpoint=dc_endpoint,offline_lab=True,
                 experimental_binary=options.get('experimental_binary') or ((PINS[kind][1],PINS[kind][2]) if kind=='balanced2' else None),
                 socket_library=options.get('library'),socket_mode=options.get('policy','pass'),
                 synthetic_tls_front=options.get('synthetic_tls_front', False))
             policy=lab.telemt_config.read_text().replace(f'127.0.0.1:{lab.api}','127.0.0.1:$API')
             ready={'pid':lab.telemt.pid,'version':lab.version,'config_policy_sha256':hashlib.sha256(policy.encode()).hexdigest()}
         elif role=='dc':
-            dc=MockDc('198.18.0.1',26000,socket_timeout=25,enable_echo=options.get('mixed',False))
+            dc=MockDc(*dc_endpoint,socket_timeout=25,enable_echo=options.get('mixed',False))
             ready={'pid':os.getpid()}
         else:ready={'pid':os.getpid()}
         print(json.dumps(ready),flush=True)
@@ -63,7 +68,13 @@ def worker(role,cpu):
                 endpoint=SimpleNamespace(real_dc=False,listen=24431,front=24443)
                 if request['command']=='mixed':
                     from mixed_workload import run_mixed
-                    result=run_mixed(endpoint,request['logical_clients'],candidate_screen=request.get('candidate_screen',False))
+                    result=run_mixed(endpoint,request['logical_clients'],candidate_screen=request.get('candidate_screen',False),
+                                     domain=request.get('domain'))
+                elif request['command']=='single':
+                    if request['domain'] not in ('apple.com','gs.apple.com'):
+                        raise ValueError('unregistered synthetic domain')
+                    result=FullLab.transfer(endpoint,request['domain'],'D',4096,125000000,
+                                            persistent=True,io_timeout=8)
                 elif request['command']=='probe-client-policy':
                     if type(request.get('nodelay')) is not bool:raise RuntimeError('explicit client flag required')
                     result={'rows':[FullLab.transfer(endpoint,('apple.com','gs.apple.com')[i%2],
@@ -88,7 +99,7 @@ def worker(role,cpu):
                                     'reason':sanitize_startup_log(str(error))[:256]})
                     result={'rows':rows,'errors':errors}
             elif role=='core' and request['command']=='observe':
-                result=observe_sockets(lab.telemt.pid,24431,namespace=NAMES[2])
+                result=observe_sockets(lab.telemt.pid,24431,namespace=expected)
             else:raise RuntimeError('unexpected core request')
             print(json.dumps(result),flush=True)
     finally:
