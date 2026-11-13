@@ -40,9 +40,15 @@ def main(args):
     queue_screen=getattr(args,'queue_screen',False)
     queue_core=getattr(args,'queue_core','balanced2')
     managed=getattr(args,'managed_backend_queue',False)
-    candidate_screen=args.new_tls_candidate
+    candidate_queue=args.new_tls_queue
+    candidate_screen=args.new_tls_candidate or candidate_queue
+    if candidate_queue and (args.new_tls_candidate or queue_screen or managed):
+        raise RuntimeError('choose one candidate study')
     if candidate_screen and (queue_screen or managed or args.client_diagnostic or args.profile!='rtt100'):
         raise RuntimeError('new TLS mixed screen requires the 100 ms profile')
+    if candidate_queue:
+        queue_screen=True
+        queue_core='candidate'
     if not candidate_screen and not args.stable_archive:
         raise RuntimeError('official archive required for the historical modes')
     if managed and not queue_screen:raise RuntimeError('managed backend queue requires registered screening mode')
@@ -66,6 +72,9 @@ def main(args):
         report['queue_telemetry']='plain-tc-v2'
         report['scope']='one pinned core only; four AB/BA mixed pairs, 30 logical connections; pre-encryption 180Mbps HTB/fq_codel versus unchanged 200Mbps WAN'
         if managed:report['scope']='exact opt-in controller on backend WG only; entry unchanged; four AB/BA mixed pairs, 30 logical connections'
+    if candidate_queue:
+        report['plan']='tls-candidate-shaper-v1'
+        report['scope']='two AB/BA pairs, 30 logical connections, 32 MiB per file; dual-end 180 Mbps HTB/fq_codel before encryption'
     children=[];net=None;front=None;dc=None;expected=0
     write(output,report)
     try:
@@ -171,7 +180,7 @@ backend line_b
                             if state['completed']!=expected or state['errors']:raise RuntimeError('diagnostic DC mismatch')
                             continue
                         idle_before=stats(backend.ready['pid'])
-                        cohorts=(30,) if candidate_screen else (30,30) if queue_screen else ((30,50,100) if turn%2==0 else (100,50,30))
+                        cohorts=(30,30) if queue_screen else (30,) if candidate_screen else ((30,50,100) if turn%2==0 else (100,50,30))
                         for position,cohort in enumerate(cohorts):
                             shaped=bool(position if turn%2==0 else 1-position)
                             if queue_screen:
@@ -264,5 +273,6 @@ if __name__=='__main__':
     parser.add_argument('--queue-core',choices=('balanced2','native17'),default='balanced2')
     parser.add_argument('--managed-backend-queue',action='store_true')
     parser.add_argument('--new-tls-candidate',action='store_true')
+    parser.add_argument('--new-tls-queue',action='store_true')
     signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
     raise SystemExit(main(parser.parse_args()))
