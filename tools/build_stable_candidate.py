@@ -83,7 +83,10 @@ def main():
                 '        unsent_queue_bulk::configure_unsent_queue(socket.as_raw_fd())?;\n    }\n'+fallback,1)
             socket.write_text(prefix+'pub fn configure_client_socket('+client+'pub fn create_outgoing_socket_bound('+outgoing)
             tests=source/'src/transport/socket/tests.rs'
-            tests.write_text(tests.read_text()+'\n'+(ROOT/'patches/stable_socket_tests.rs').read_text())
+            socket_tests = (ROOT/'patches/stable_socket_tests.rs').read_text()
+            if args.client_unsent_limit:
+                socket_tests += '\n' + (ROOT/'patches/client_lowat_test.rs').read_text()
+            tests.write_text(tests.read_text()+'\n'+socket_tests)
         for filename in ('Cargo.toml','Cargo.lock'):
             path=source/filename;text=path.read_text();old=f'version = "{previous}"'
             if text.count(old)!=1:raise RuntimeError('package identity drift')
@@ -91,7 +94,7 @@ def main():
         previous=version
         if args.security_main:
             manifest['cargo_lock_sha256'] = sha(source / 'Cargo.lock')
-            if not args.build_only:
+            if not (args.build_only or args.client_unsent_limit):
                 run(['cargo','test','--locked','--release','--bin','telemt','inner_content_type_position_is_not_constant'],source)
                 run(['cargo','test','--locked','--release','--bin','telemt','maestro::tls_bootstrap::tests::'],source)
         run(['cargo','build','--locked','--release','--bin','telemt'],source)

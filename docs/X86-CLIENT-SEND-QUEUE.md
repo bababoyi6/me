@@ -13,4 +13,6 @@
 
 构建器的可选参数 `--security-main --client-unsent-limit` 在固定的候选 B 上复用现有 256 KiB `TCP_NOTSENT_LOWAT`，新增到 Telemt 接受的客户端 socket。在本项目拓扑里，该 socket 的对端是入口 HAProxy。候选使用独立版本 `3.5.17+tdh.main.b594ee5.clientlowat1`，构建清单记录阈值。保持 TCP 自动发送缓冲和已有短 RTT 接收策略。Linux 用该阈值约束应用继续提交未发送数据的条件，已经发出但还未确认的数据仍由 TCP 窗口和拥塞控制管理。256 KiB 沿用现有 DC 侧的起始值，实际队列峰值可能超过该阈值。[Linux TCP 参数文档](https://www.kernel.org/doc/html/latest/networking/ip-sysctl.html#tcp-notsent-lowat-unsigned-integer)
 
-单 socket 阈值能否降低总体延迟仍需对照。共享 WireGuard 带宽的分配由队列层处理。未来验证时，先核对实际 socket 读取到的阈值和 TCP 自动发送缓冲状态，再登记候选身份。两组采用相同的 TCP 缓冲上限和 WAN 队列，只切换此选项，检查完整性、吞吐、带载 p95、内核未发送量、CPU 和内存。若未发送量降低而带载延迟仍超标，再回到 WireGuard 加密前的队列分配。本次完成源码改动，Linux 构建、候选实验身份登记和运行验证仍待执行。
+在 `stable-candidate.yml` 选择 `new-client-lowat`。同一个固定上游提交和工具链构建 B 及带阈值的候选，在 Linux 回环上读取实际 socket 选项并确认发送缓冲初始值。两组使用相同的 100 ms RTT、1,000 Mbps WAN、32 MiB TCP 自动缓冲上限和原队列，按 AB/BA 交换顺序。每轮分别测两条 SNI 单流双向及双隧道各 30 个逻辑连接的混合负载。
+
+逐对筛选要求所有单流以及双隧道上下行各保留至少 95% 吞吐。同一线路的小消息和新连接带载 p95 各不超过基线的 110%，且相对本候选空载增量不超过 100 ms。每路每类有效带载探测至少 20 条，文件负载重叠至少 1 秒。大发送流的内核未发送量采样峰值至少减少 50%。同时记录数据完整性、清理、CPU、内存和异常。单连接阈值对共享 WireGuard 队列的影响由结果判定。

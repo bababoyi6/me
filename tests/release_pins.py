@@ -18,4 +18,6 @@ TLS_CANDIDATES = {
             'telemt 3.5.5+tdh.balanced2.security1'),
     'new': ('balanced', 'upstream_commit', 'b594ee55270798fe21f23b721b50eab46c2e0bec',
             'telemt 3.5.17+tdh.main.b594ee5.balanced1'),
+    'clientlowat': ('balanced', 'upstream_commit', 'b594ee55270798fe21f23b721b50eab46c2e0bec',
+                    'telemt 3.5.17+tdh.main.b594ee5.clientlowat1'),
 }

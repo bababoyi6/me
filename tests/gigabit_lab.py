@@ -26,6 +26,7 @@ from tls_candidate_lab import candidate_binary
 FILE_BYTES = 128 * 1024**2
 ARMS = ('balanced2', 'candidate', 'candidate-shaped')
 WINDOW_MODES = ('default','larger_max')
+LOWAT_MODES = ('candidate','clientlowat')
 
 
 def set_tcp_limits(namespaces, mode, defaults):
@@ -183,6 +184,31 @@ def summarize(report):
     }
 
 
+def summarize_client_lowat(report):
+    expected = [(turn,arm) for turn,order in enumerate((LOWAT_MODES,LOWAT_MODES[::-1]),1) for arm in order]
+    if [(r['round'],r['arm']) for r in report['rows']] != expected:
+        raise ValueError('client send backlog trial order or coverage differs')
+    pairs = []
+    for turn in (1,2):
+        rows = {r['arm']:r for r in report['rows'] if r['round']==turn}
+        original, candidate = (rows[arm] for arm in LOWAT_MODES)
+        if original['tcp_limits'] != candidate['tcp_limits']:
+            raise ValueError('TCP ceilings differ across the pair')
+        result = verify_pair(original,candidate)
+        peaks = {}
+        for arm,row in rows.items():
+            samples = [s['notsent_bytes'] for sample in row['samples'] for core in sample['core_sockets']
+                       for s in core if s['role']=='client' and s.get('bytes_acked',0)>1_000_000
+                       and 'notsent_bytes' in s]
+            peaks[arm] = max(samples,default=None)
+        backlog_reduced = (all(v is not None for v in peaks.values())
+                           and peaks['candidate']>0 and peaks['clientlowat']<=.5*peaks['candidate'])
+        pairs.append(dict(result,round=turn,peak_client_notsent_bytes=peaks,
+                          backlog_reduced=backlog_reduced,
+                          transport_gate_passed=result['relative_and_latency_passed'] and backlog_reduced))
+    return {'pairs':pairs,'transport_gate_passed':all(p['transport_gate_passed'] for p in pairs)}
+
+
 def main(args):
     if os.geteuid()!=0 or os.environ.get('GITHUB_ACTIONS')!='true':
         raise RuntimeError('disposable CI only')
@@ -194,12 +220,20 @@ def main(args):
         raise RuntimeError('four logical CPUs required')
     source = os.environ['TDH_SOURCE_COMMIT']
     window_test = args.proxy_window
-    identities = {'balanced2':TLS_BASELINE[1]}
+    lowat_test = args.client_lowat is not None
+    identities = {} if lowat_test else {'balanced2':TLS_BASELINE[1]}
     if not window_test:
         candidate, pin = candidate_binary(args.candidate,'new',source)
         if pin['sha256']!=TLS_CANDIDATE_SHA:
             raise RuntimeError('unexpected candidate binary')
         identities['candidate'] = pin['sha256']
+    if lowat_test:
+        lowat, lowat_pin = candidate_binary(args.client_lowat,'clientlowat',source)
+        manifest = json.loads((args.client_lowat/'manifest.json').read_bytes())
+        if (manifest.get('client_tcp_notsent_lowat_bytes')!=256*1024
+                or lowat_pin['sha256']==pin['sha256']):
+            raise RuntimeError('client send backlog candidate differs from registered policy')
+        identities['clientlowat'] = lowat_pin['sha256']
     report = {'source_commit':source,'binary_sha256':identities,
               'rtt_ms':100,'rate_mbps':1000,'payload_bytes_per_file':FILE_BYTES,
               'resources_before':before,'capacity':[],'rows':[],'complete':False}
@@ -209,12 +243,13 @@ def main(args):
     with tempfile.TemporaryDirectory(prefix='tdh-audit-gigabit-') as folder:
         root = Path(folder)
         try:
-            baseline = root/'telemt-balanced2'
-            payload,_ = archive_payload(args.balanced2_archive,TLS_BASELINE[0],
-                                         TLS_BASELINE[2].removeprefix('telemt '),TLS_BASELINE[1],False)
-            baseline.write_bytes(payload)
-            baseline.chmod(0o755)
-            del payload
+            if not lowat_test:
+                baseline = root/'telemt-balanced2'
+                payload,_ = archive_payload(args.balanced2_archive,TLS_BASELINE[0],
+                                             TLS_BASELINE[2].removeprefix('telemt '),TLS_BASELINE[1],False)
+                baseline.write_bytes(payload)
+                baseline.chmod(0o755)
+                del payload
             net = Network(SimpleNamespace(root=folder,wg='wg',iperf='iperf3',start_iperf=False,
                                           rtt_ms=100,rate_mbps=1000,loss_percent=0,mtu=1420,
                                           queue_limit_packets=50000))
@@ -227,7 +262,7 @@ def main(args):
                                     for ns in (NAMES[0],*BACKENDS)}
             report['iperf_version'] = command('iperf3','--version').splitlines()[0]
             report['cpu_assignment'] = dict(entry=cpus[0],backends=cpus[1:3],dc=cpus[3])
-            if not window_test:
+            if not (window_test or lowat_test):
                 capacity(net,report['capacity'],cpus[0],cpus[1])
             write(args.output,report)
             for ns,address in zip(BACKENDS,('198.18.0.1','198.18.0.5'),strict=True):
@@ -236,17 +271,22 @@ def main(args):
             clients = [Child('client',NAMES[0],cpus[0],{},children) for _ in DOMAINS]
             front = start_frontend(net)
             os.sched_setaffinity(front.pid,{cpus[0]})
-            modes = WINDOW_MODES if window_test else ARMS
+            modes = LOWAT_MODES if lowat_test else WINDOW_MODES if window_test else ARMS
             defaults = {}
             for turn, order in enumerate((modes,modes[::-1]),1):
                 for arm in order:
                     shaped = arm=='candidate-shaped'
-                    limits = set_tcp_limits((NAMES[0],*BACKENDS),arm,defaults) if window_test else None
+                    limits = None
+                    if window_test or lowat_test:
+                        limits = set_tcp_limits((NAMES[0],*BACKENDS),'larger_max' if lowat_test else arm,defaults)
                     if shaped:
                         shape_backends_and_entry((450,450,450,450),install=True)
-                    use_baseline = window_test or arm=='balanced2'
-                    binary = baseline if use_baseline else candidate
-                    version = [TLS_BASELINE[1],TLS_BASELINE[2]] if use_baseline else [pin['sha256'],pin['version']]
+                    if arm=='clientlowat':
+                        binary, version = lowat, [lowat_pin['sha256'],lowat_pin['version']]
+                    elif window_test or arm=='balanced2':
+                        binary, version = baseline, [TLS_BASELINE[1],TLS_BASELINE[2]]
+                    else:
+                        binary, version = candidate, [pin['sha256'],pin['version']]
                     cores = []
                     try:
                         for ns,cpu in zip(BACKENDS,cpus[1:3],strict=True):
@@ -254,7 +294,7 @@ def main(args):
                                 'synthetic_tls_front':True,'experimental_binary':version},children))
                         row = {'arm':arm,'round':turn,'queues_before':snapshot(),
                                **workloads(clients,dc,cores,front),'queues_after':snapshot()}
-                        if window_test:
+                        if limits is not None:
                             row['tcp_limits'] = limits
                         report['rows'].append(row)
                         write(args.output,report)
@@ -264,7 +304,9 @@ def main(args):
                         if shaped:
                             for ns,dev in LINKS:
                                 command('ip','netns','exec',ns,'tc','qdisc','del','dev',dev,'root')
-            if window_test:
+            if lowat_test:
+                report['summary'] = summarize_client_lowat(report)
+            elif window_test:
                 report['summary'] = {'larger_vs_default':[
                     verify_pair(*[next(r for r in report['rows'] if (r['round'],r['arm'])==(turn,mode))
                                   for mode in WINDOW_MODES]) for turn in (1,2)]}
@@ -292,7 +334,7 @@ def main(args):
                           accepted=report['complete'] and not errors and not any(delta.values())
                           and after['pids_current']==1)
             write(args.output,report)
-    return 0 if report['accepted'] else 1
+    return 0 if report['accepted'] and (not lowat_test or report['summary']['transport_gate_passed']) else 1
 
 
 def control_only(output):
@@ -349,11 +391,14 @@ if __name__=='__main__':
     parser.add_argument('--balanced2-archive', type=Path)
     parser.add_argument('--control-only', action='store_true')
     parser.add_argument('--proxy-window', action='store_true')
+    parser.add_argument('--client-lowat', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     signal.signal(signal.SIGTERM,lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     args = parser.parse_args()
     if args.proxy_window and (args.control_only or not args.balanced2_archive):
         parser.error('proxy window comparison requires the released archive')
-    if not (args.control_only or args.proxy_window) and (not args.candidate or not args.balanced2_archive):
+    if args.client_lowat and (args.control_only or args.proxy_window or not args.candidate):
+        parser.error('client send backlog comparison requires both candidate builds')
+    if not (args.control_only or args.proxy_window or args.client_lowat) and (not args.candidate or not args.balanced2_archive):
         parser.error('proxy measurements require both pinned binaries')
     raise SystemExit(control_only(args.output) if args.control_only else main(args))

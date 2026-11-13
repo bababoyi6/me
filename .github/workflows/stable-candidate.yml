@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window']
+        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -145,7 +145,7 @@ jobs:
     env:
       CANDIDATE_KIND: ${{ startsWith(inputs.tls_candidate, 'new') && 'new' || 'old' }}
       UPSTREAM_COMMIT: ${{ startsWith(inputs.tls_candidate, 'new') && 'b594ee55270798fe21f23b721b50eab46c2e0bec' || 'ac71d92ec41dea00a7eafd6b8d350c3486633500' }}
-      FOLLOWUP_SCREEN: ${{ inputs.tls_candidate == 'new-mixed' || inputs.tls_candidate == 'new-queue' || inputs.tls_candidate == 'new-dual' || inputs.tls_candidate == 'new-gigabit' }}
+      FOLLOWUP_SCREEN: ${{ startsWith(inputs.tls_candidate, 'new-') }}
       PYTHONPATH: ${{ github.workspace }}/tools
     steps:
       - uses: actions/checkout@v4
@@ -174,7 +174,7 @@ jobs:
             timeout --kill-after=10 1400 python3 tools/build_stable_candidate.py --source upstream --output "$RUNNER_TEMP/tls-core" --security-main
           fi
       - name: Fetch fixed released baseline
-        if: inputs.tls_candidate != 'new-dual'
+        if: inputs.tls_candidate != 'new-dual' && inputs.tls_candidate != 'new-client-lowat'
         run: |
           curl -q -fL --connect-timeout 10 --max-time 90 --max-filesize 11000000 --proto '=https' --proto-redir '=https' --tlsv1.2 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
           printf '%s  %s\n' b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5 "$RUNNER_TEMP/balanced2.tar.gz" | sha256sum --check
@@ -219,6 +219,18 @@ jobs:
           sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
           sudo modprobe tcp_bbr
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-gigabit-${GITHUB_RUN_ID}" -p CPUQuota=400% -p MemoryMax=2048M -p MemoryHigh=1700M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=840 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/gigabit_lab.py --candidate "$RUNNER_TEMP/tls-core" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/tls-evidence/gigabit.json"
+      - name: Build the client send backlog variant on the same dependencies
+        if: inputs.tls_candidate == 'new-client-lowat'
+        run: |
+          git -C upstream restore -- Cargo.toml Cargo.lock src/transport/socket.rs src/transport/socket/tests.rs
+          rm -f -- upstream/src/transport/socket/{low_rtt_receive,unsent_queue_bulk}.rs
+          timeout --kill-after=10 1400 python3 tools/build_stable_candidate.py --source upstream --output "$RUNNER_TEMP/tls-lowat" --security-main --client-unsent-limit
+      - name: Measure the client send backlog option at 100 ms
+        if: inputs.tls_candidate == 'new-client-lowat'
+        run: |
+          sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool
+          sudo modprobe tcp_bbr
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-client-lowat-${GITHUB_RUN_ID}" -p CPUQuota=400% -p MemoryMax=2048M -p MemoryHigh=1700M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=450 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/gigabit_lab.py --candidate "$RUNNER_TEMP/tls-core" --client-lowat "$RUNNER_TEMP/tls-lowat" --output "$RUNNER_TEMP/tls-evidence/client-lowat.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -227,6 +239,7 @@ jobs:
             ${{ runner.temp }}/tls-evidence/*.json
             ${{ runner.temp }}/tls-core/manifest.json
             ${{ runner.temp }}/tls-core/tls-before.log
+            ${{ runner.temp }}/tls-lowat/manifest.json
           if-no-files-found: warn
           retention-days: 7
       - uses: actions/upload-artifact@v4
