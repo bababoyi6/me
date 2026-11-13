@@ -228,7 +228,7 @@ jobs:
       - name: Measure the client send backlog option at 100 ms
         if: inputs.tls_candidate == 'new-client-lowat'
         run: |
-          sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool
+          sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
           sudo modprobe tcp_bbr
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-client-lowat-${GITHUB_RUN_ID}" -p CPUQuota=400% -p MemoryMax=2048M -p MemoryHigh=1700M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=450 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/gigabit_lab.py --candidate "$RUNNER_TEMP/tls-core" --client-lowat "$RUNNER_TEMP/tls-lowat" --output "$RUNNER_TEMP/tls-evidence/client-lowat.json"
       - uses: actions/upload-artifact@v4
