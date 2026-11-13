@@ -1,0 +1,88 @@
+--- a/src/tls_front/tests/emulator_security_tests.rs
++++ b/src/tls_front/tests/emulator_security_tests.rs
+@@ -1,11 +1,13 @@
++use std::collections::HashSet;
+ use std::time::SystemTime;
+ 
+-use crate::crypto::SecureRandom;
++use crate::crypto::{SecureRandom, sha256_hmac};
+ use crate::protocol::constants::{
+     TLS_RECORD_APPLICATION, TLS_RECORD_CHANGE_CIPHER, TLS_RECORD_HANDSHAKE,
+ };
+ use crate::protocol::tls::{
+-    ClientHelloTlsVersion, ServerHelloKeyShare, TLS_NAMED_GROUP_X25519MLKEM768,
++    ClientHelloTlsVersion, ServerHelloKeyShare, TLS_DIGEST_LEN, TLS_DIGEST_POS,
++    TLS_NAMED_GROUP_X25519MLKEM768,
+ };
+ use crate::tls_front::emulator::build_emulated_server_hello;
+ use crate::tls_front::types::{
+@@ -156,3 +158,69 @@
+         "ALPN marker must not displace selected certificate payload"
+     );
+ }
++
++fn inner_content_type_bytes(
++    cached: &CachedTlsData,
++    client_tls_version: ClientHelloTlsVersion,
++) -> HashSet<u8> {
++    let rng = SecureRandom::new();
++    let mut seen = HashSet::new();
++    for _ in 0..32 {
++        let response = build_emulated_server_hello(
++            b"secret",
++            &[0x33; 32],
++            &[0x43; 16],
++            cached,
++            true,
++            true,
++            client_tls_version,
++            [0x13, 0x01],
++            &test_server_key_share(),
++            &rng,
++            None,
++            0,
++        );
++        let mut record = response.as_slice();
++        while !record.is_empty() {
++            assert!(record.len() >= 5);
++            let size = usize::from(u16::from_be_bytes([record[3], record[4]]));
++            assert!(record.len() >= 5 + size);
++            record = &record[5 + size..];
++        }
++        let digest = TLS_DIGEST_POS..TLS_DIGEST_POS + TLS_DIGEST_LEN;
++        let mut authenticated = [0x33; TLS_DIGEST_LEN].to_vec();
++        authenticated.extend_from_slice(&response);
++        authenticated[TLS_DIGEST_LEN + digest.start..TLS_DIGEST_LEN + digest.end].fill(0);
++        assert_eq!(&response[digest], &sha256_hmac(b"secret", &authenticated));
++        let payload = first_app_data_payload(&response);
++        assert!(payload.len() > 17);
++        seen.insert(payload[payload.len() - 17]);
++    }
++    seen
++}
++
++#[test]
++fn emulated_server_hello_inner_content_type_position_is_not_constant() {
++    let cached = make_cached(None);
++
++    let seen = inner_content_type_bytes(&cached, ClientHelloTlsVersion::Tls13);
++    assert!(
++        seen.len() > 1,
++        "byte at the TLS 1.3 inner content type position must not be a fixed plaintext marker"
++    );
++}
++
++#[test]
++fn emulated_server_hello_with_cert_payload_inner_content_type_position_is_not_constant() {
++    let cert_msg = vec![0x0b, 0x00, 0x00, 0x05, 0x00, 0xaa, 0xbb, 0xcc, 0xdd];
++    let cached = make_cached(Some(TlsCertPayload {
++        cert_chain_der: vec![vec![0x30, 0x01, 0x00]],
++        certificate_message: cert_msg,
++    }));
++
++    let seen = inner_content_type_bytes(&cached, ClientHelloTlsVersion::Tls12);
++    assert!(
++        seen.len() > 1,
++        "byte after the certificate payload must not be a fixed plaintext content type marker"
++    );
++}

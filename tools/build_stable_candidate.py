@@ -10,6 +10,7 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 COMMIT='66708d2866f3f3a4541c4fa67984d408e71a8af4'
+SECURITY_COMMIT='b594ee55270798fe21f23b721b50eab46c2e0bec'
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -22,22 +23,30 @@ def run(argv,source,timeout=1200):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source',required=True);parser.add_argument('--output',required=True)
+    parser.add_argument('--security-main', action='store_true',
+                        help='Build only the socket candidate on the pinned post-3.5.17 upstream commit')
     args=parser.parse_args();source=Path(args.source).resolve();output=Path(args.output).resolve()
     if sys.platform!='linux' or os.environ.get('GITHUB_ACTIONS')!='true':raise RuntimeError('disposable CI only')
-    if subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip()!=COMMIT:
+    upstream = SECURITY_COMMIT if args.security_main else COMMIT
+    if subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip()!=upstream:
         raise RuntimeError('upstream commit mismatch')
     if subprocess.check_output(['git','status','--porcelain'],cwd=source):raise RuntimeError('dirty upstream refused')
     rust=subprocess.check_output(['rustc','-V'],text=True).strip()
     if rust.split()[1]!='1.99.1':raise RuntimeError('pinned Rust required')
     output.mkdir(mode=0o700)
     os.environ.update(CARGO_BUILD_JOBS='3',CARGO_PROFILE_RELEASE_LTO='thin',CARGO_PROFILE_RELEASE_CODEGEN_UNITS='8',CMAKE_BUILD_PARALLEL_LEVEL='3')
-    manifest={'upstream_commit':COMMIT,'manager_commit':os.environ['GITHUB_SHA'],'rust':rust,
+    manifest={'upstream_commit':upstream,'manager_commit':os.environ['GITHUB_SHA'],'rust':rust,
         'lto':'thin','codegen_units':8,'production_default_changed':False,'binaries':{},
         'builder_sha256':sha(Path(__file__)),'helpers':{},'scope':'unofficial synthetic lab candidates only; no publication or deployment'}
     previous='3.5.17'
     socket=source/'src/transport/socket.rs'
     original=socket.read_text()
-    for name,version in (('control','3.5.17+tdh.control1'),('balanced','3.5.17+tdh.balanced1')):
+    variants = [('control','3.5.17+tdh.control1'),('balanced','3.5.17+tdh.balanced1')]
+    if args.security_main:
+        variants = [('balanced', '3.5.17+tdh.main.b594ee5.balanced1')]
+        manifest['cargo'] = subprocess.check_output(['cargo', '--version'], text=True).strip()
+        manifest['architecture'] = os.uname().machine
+    for name,version in variants:
         if name=='balanced':
             text=original
             for helper in ('low_rtt_receive','unsent_queue_bulk'):
@@ -64,6 +73,10 @@ def main():
             if text.count(old)!=1:raise RuntimeError('package identity drift')
             path.write_text(text.replace(old,f'version = "{version}"'))
         previous=version
+        if args.security_main:
+            manifest['cargo_lock_sha256'] = sha(source / 'Cargo.lock')
+            run(['cargo','test','--locked','--release','--bin','telemt','inner_content_type_position_is_not_constant'],source)
+            run(['cargo','test','--locked','--release','--bin','telemt','maestro::tls_bootstrap::tests::'],source)
         run(['cargo','build','--locked','--release','--bin','telemt'],source)
         run(['cargo','test','--locked','--release','--bin','telemt','transport::socket::tests::'],source)
         binary=source/'target/release/telemt'

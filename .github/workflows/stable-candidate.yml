@@ -1,6 +1,12 @@
 name: Build and qualify optional native stable socket port
 on:
   workflow_dispatch:
+    inputs:
+      tls_candidate:
+        description: Build one TLS candidate and verify synthetic protocol
+        type: choice
+        options: ['none', 'old', 'new']
+        default: 'none'
   push:
     branches: [dev/telemt-stable-compat-20261107]
     paths:
@@ -12,6 +18,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
+    if: inputs.tls_candidate != 'old' && inputs.tls_candidate != 'new'
     runs-on: ubuntu-22.04
     timeout-minutes: 32
     steps:
@@ -33,6 +40,7 @@ jobs:
           retention-days: 7
           if-no-files-found: error
   measure:
+    if: inputs.tls_candidate != 'old' && inputs.tls_candidate != 'new'
     needs: build
     runs-on: ubuntu-22.04
     timeout-minutes: 22
@@ -68,3 +76,52 @@ jobs:
           name: native-socket-evidence
           path: ${{ runner.temp }}/native-evidence/*.json
           retention-days: 14
+  tls-candidate:
+    if: inputs.tls_candidate == 'old' || inputs.tls_candidate == 'new'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 32
+    env:
+      CANDIDATE_KIND: ${{ inputs.tls_candidate }}
+      UPSTREAM_COMMIT: ${{ inputs.tls_candidate == 'old' && 'ac71d92ec41dea00a7eafd6b8d350c3486633500' || 'b594ee55270798fe21f23b721b50eab46c2e0bec' }}
+      PYTHONPATH: ${{ github.workspace }}/tools
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: telemt/telemt
+          ref: ${{ env.UPSTREAM_COMMIT }}
+          path: upstream
+          persist-credentials: false
+      - name: Prepare pinned Rust and disposable dependencies
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal --no-self-update
+          rustup default 1.99.1
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 python3-cryptography
+          mkdir -m 700 "$RUNNER_TEMP/tls-evidence"
+      - name: Build and test one candidate
+        run: |
+          if [[ $CANDIDATE_KIND == old ]]; then
+            timeout --kill-after=10 1400 python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/tls-core" --candidate balanced2-security
+          else
+            timeout --kill-after=10 1400 python3 tools/build_stable_candidate.py --source upstream --output "$RUNNER_TEMP/tls-core" --security-main
+          fi
+      - name: Fetch fixed released baseline
+        run: |
+          curl -q -fL --connect-timeout 10 --max-time 90 --max-filesize 11000000 --proto '=https' --proto-redir '=https' --tlsv1.2 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
+          printf '%s  %s\n' b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5 "$RUNNER_TEMP/balanced2.tar.gz" | sha256sum --check
+      - name: Verify both synthetic links and the local API boundary
+        run: |
+          sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=120 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" unshare --net -- sh -ec 'ip link set lo up; exec python3 tests/tls_candidate_lab.py --kind "$1" --candidate "$2/tls-core" --balanced2-archive "$2/balanced2.tar.gz" --output "$2/tls-evidence/protocol.json"' tls "$CANDIDATE_KIND" "$RUNNER_TEMP"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tls-candidate-evidence
+          path: |
+            ${{ runner.temp }}/tls-evidence/protocol.json
+            ${{ runner.temp }}/tls-core/manifest.json
+            ${{ runner.temp }}/tls-core/tls-before.log
+          if-no-files-found: warn
+          retention-days: 7
