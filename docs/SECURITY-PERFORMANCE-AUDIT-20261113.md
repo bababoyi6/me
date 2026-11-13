@@ -50,9 +50,9 @@ GitHub Releases API 返回最新正式版 **3.5.17**，标签对象 `881210fd4c3
 
 Windows 上对匿名下载的 balanced2 归档核对包 SHA256 `b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5`、x86_64 ELF 和二进制 SHA256 `5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100`。发行归档内嵌 `build-provenance.json` 给出确切 builder 和 helper；归档中的基础补丁不涉及 TLS。旧候选构建时重新比对该历史输入、Rust 1.99.1、2 jobs、thin LTO、8 codegen units、两个 helper 和未发送阈值。两条路线记录工具链、源码提交、锁文件和产物摘要，重新编译可追溯，尚无相同二进制摘要保证。 [历史构建清单](benchmarks/bulk-admission-20261024/results/core-manifest.json)
 
-复现入口是已有 [stable-candidate.yml](../.github/workflows/stable-candidate.yml) 的手动输入。分支进入已授权的私有 CI 后，分别用 `tls_candidate=manager`、`tls_candidate=old` 和 `tls_candidate=new` 派发，执行管理器权限及回退回归、单条核心构建及回环协议烟测。核心烟测使用 1 CPU、512 MiB、无 swap、最多 128 个任务、120 秒截止。样本数据为合成，runner 生成的 `tls-candidate-evidence` 包含测试结果与产物身份。
+分支进入已授权的私有 CI 后，在 [stable-candidate.yml](../.github/workflows/stable-candidate.yml) 手动派发一次，选择默认 `tls_candidate=focused`。管理器权限及回退回归通过后才构建旧核心候选，随后依次执行 TLS 回归、回环协议检查与 100 ms 对照。失败会终止后续检查并保留已有证据。回环检查使用 1 CPU、512 MiB、无 swap、最多 128 个任务、120 秒截止。证据保存在 `tls-candidate-evidence`，旧核心在私有 CI 成功后可从 `balanced2-security-build` 下载带摘要的审查包。单项模式保留供定位失败；新核心的实验构建留待有明确需求时再派发。
 
-核心烟测通过后可在同次任务用 `tls_parity=true` 执行首轮 WireGuard 对照。复用历史分进程工具，固定 100 ms/200 Mbps、32 MiB、双向 1/4 流、AB/BA 两轮，候选和发行 balanced2 使用相同模拟 TLS 配置。整组 3 CPU/1.5 GiB/无 swap，单独绑核心一逻辑 CPU，420 秒截止。逐对门槛为吞吐 ≥95%、实际客户端 TCP 中位 RTT ≤110%、容量对照 ≥100 Mbps、负载发生侧 CPU <70%，同时要求身份、完整性、资源和清理证据。只据此决定是否值得进入混合和完整弱网矩阵。
+首轮 WireGuard 对照复用历史分进程工具，固定 100 ms/200 Mbps、32 MiB、双向 1/4 流、AB/BA 两轮，候选和发行 balanced2 使用相同模拟 TLS 配置。整组 3 CPU/1.5 GiB/无 swap，单独绑核心一逻辑 CPU，420 秒截止。逐对门槛为吞吐 ≥95%、实际客户端 TCP 中位 RTT ≤110%、容量对照 ≥100 Mbps、负载发生侧 CPU <70%，同时要求身份、完整性、资源和清理证据。单项核心模式可选 `tls_parity=true`。这个结果只决定是否值得进入混合和完整弱网验收。
 
 ## 性能与稳定性证据
 

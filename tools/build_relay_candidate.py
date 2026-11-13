@@ -91,8 +91,8 @@ def main():
                 'builder_sha256': digest(Path(__file__)),
                 'normalized_patch_sha256': digest(normalized_patch),
                 'default_installer_changed': False, 'binaries': {}}
-    candidate_version = {'fair':'3.5.5+tdh.fair1','queue':'3.5.5+tdh.queue1','balanced':'3.5.5+tdh.balanced1','bulk':'3.5.5+tdh.balanced2'}[args.candidate]
-    variants = [('control', '3.5.5+tdh.audit2'), (args.candidate, candidate_version)]
+    candidate_version = {'fair':'3.5.5+tdh.fair1','queue':'3.5.5+tdh.queue1','balanced':'3.5.5+tdh.balanced1','bulk':'3.5.5+tdh.balanced2'}[candidate_kind]
+    variants = [('control', '3.5.5+tdh.audit2'), (candidate_kind, candidate_version)]
     if args.candidate == 'queue':
         variants.insert(0, ('fixed', '3.5.5+tdh.audit1'))
     if args.candidate == 'bulk':

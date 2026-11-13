@@ -5,8 +5,8 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['none', 'manager', 'old', 'new']
-        default: 'none'
+        options: ['focused', 'none', 'manager', 'old', 'new']
+        default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
         type: boolean
@@ -81,7 +81,7 @@ jobs:
           path: ${{ runner.temp }}/native-evidence/*.json
           retention-days: 14
   manager-update:
-    if: inputs.tls_candidate == 'manager'
+    if: inputs.tls_candidate == 'manager' || inputs.tls_candidate == 'focused'
     runs-on: ubuntu-22.04
     timeout-minutes: 6
     steps:
@@ -99,14 +99,19 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_release_lock.py' -v
           timeout --kill-after=5 40 python3 -m unittest discover -s tests -p 'test_install_command.py' -v
           sudo timeout --kill-after=5 60 python3 -m unittest discover -s tests -p 'test_manager_lifecycle.py' -v
-          sudo timeout --kill-after=5 60 python3 -m unittest discover -s tests -p 'test_performance.py' -k manager -v
+          sudo timeout --kill-after=5 60 python3 -m unittest discover -s tests -p 'test_performance.py' -k manager -k test_update_ -k test_shortcut_failure -k test_stalled_selftest -v
   tls-candidate:
-    if: inputs.tls_candidate == 'old' || inputs.tls_candidate == 'new'
+    needs: manager-update
+    if: >-
+      ${{ !cancelled() && (
+        (inputs.tls_candidate == 'focused' && needs.manager-update.result == 'success') ||
+        inputs.tls_candidate == 'old' || inputs.tls_candidate == 'new'
+      ) }}
     runs-on: ubuntu-22.04
     timeout-minutes: 44
     env:
-      CANDIDATE_KIND: ${{ inputs.tls_candidate }}
-      UPSTREAM_COMMIT: ${{ inputs.tls_candidate == 'old' && 'ac71d92ec41dea00a7eafd6b8d350c3486633500' || 'b594ee55270798fe21f23b721b50eab46c2e0bec' }}
+      CANDIDATE_KIND: ${{ inputs.tls_candidate == 'new' && 'new' || 'old' }}
+      UPSTREAM_COMMIT: ${{ inputs.tls_candidate == 'new' && 'b594ee55270798fe21f23b721b50eab46c2e0bec' || 'ac71d92ec41dea00a7eafd6b8d350c3486633500' }}
       PYTHONPATH: ${{ github.workspace }}/tools
     steps:
       - uses: actions/checkout@v4
@@ -140,11 +145,11 @@ jobs:
         run: |
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=120 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" unshare --net -- sh -ec 'ip link set lo up; exec python3 tests/tls_candidate_lab.py --kind "$1" --candidate "$2/tls-core" --balanced2-archive "$2/balanced2.tar.gz" --output "$2/tls-evidence/protocol.json"' tls "$CANDIDATE_KIND" "$RUNNER_TEMP"
       - name: Compare released baseline and candidate on the same 100 ms WireGuard path
-        if: inputs.tls_parity
+        if: inputs.tls_parity || inputs.tls_candidate == 'focused'
         run: |
           sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-parity-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=420 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/long_path_lab.py --tls-candidate "$CANDIDATE_KIND" --native-directory "$RUNNER_TEMP/tls-core" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/tls-evidence/parity.json"
-          python3 tests/long_path_analysis.py "$RUNNER_TEMP/tls-evidence/parity.json" "$RUNNER_TEMP/tls-evidence/analysis.json"
+          python3 tests/long_path_analysis.py --require-initial-screen "$RUNNER_TEMP/tls-evidence/parity.json" "$RUNNER_TEMP/tls-evidence/analysis.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -154,4 +159,13 @@ jobs:
             ${{ runner.temp }}/tls-core/manifest.json
             ${{ runner.temp }}/tls-core/tls-before.log
           if-no-files-found: warn
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success() && github.event.repository.private && env.CANDIDATE_KIND == 'old'
+        with:
+          name: balanced2-security-build
+          path: |
+            ${{ runner.temp }}/tls-core.tar.gz
+            ${{ runner.temp }}/tls-core.tar.gz.sha256
+          if-no-files-found: error
           retention-days: 7

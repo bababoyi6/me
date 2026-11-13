@@ -157,7 +157,13 @@ def analyze(data):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('metrics');parser.add_argument('output');args=parser.parse_args()
+    parser.add_argument('metrics')
+    parser.add_argument('output')
+    parser.add_argument('--require-initial-screen', action='store_true',
+                        help='Exit nonzero if the TLS candidate parity screen did not pass')
+    args=parser.parse_args()
     result=analyze(json.loads(Path(args.metrics).read_text()))
     result['analysis_sha256']=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     Path(args.output).write_text(json.dumps(result,indent=2)+'\n')
+    if args.require_initial_screen and result.get('initial_screen_passed') is not True:
+        raise SystemExit('100 ms parity screen did not pass; see the analysis report')
