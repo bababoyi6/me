@@ -532,7 +532,7 @@ update_manager() (
     die "新版本涉及配置协议升级，不能快捷更新；请查看发布说明后手动升级。"
   fi
   queue_manager_guard "$download_tmp"
-  if ! BASH_ENV= bash -n "$download_tmp" || ! BASH_ENV= timeout 60 bash "$download_tmp" --self-test >/dev/null; then
+  if ! BASH_ENV='' bash -n "$download_tmp" || ! BASH_ENV='' timeout 60 bash "$download_tmp" --self-test >/dev/null; then
     die "新脚本未通过内置自检；当前版本未作任何修改。"
   fi
   activate_manager "$download_tmp" "$expected"
@@ -546,7 +546,7 @@ rollback_manager() {
   queue_manager_guard "$previous"
   [[ $(extract_release_value "$previous" TDH_CONFIG_SCHEMA) == "$TDH_CONFIG_SCHEMA" && \
      $(extract_release_value "$previous" TDH_PROTOCOL_VERSION) == "$TDH_PROTOCOL_VERSION" ]] || die "备份协议不兼容，拒绝回退。"
-  if ! BASH_ENV= bash -n "$previous" || ! BASH_ENV= timeout 60 bash "$previous" --self-test >/dev/null; then
+  if ! BASH_ENV='' bash -n "$previous" || ! BASH_ENV='' timeout 60 bash "$previous" --self-test >/dev/null; then
     die "备份自检失败。"
   fi
   tmp=$(mktemp "${TDH_MANAGER}.rollback.XXXXXX")
