@@ -4,7 +4,7 @@ import unittest
 
 from mixed_experience_analysis import analyze, quantiles, VARIANTS
 from legacy_queue_analysis import NATIVE_SHA, LEGACY_SHA
-from release_pins import RELEASES
+from release_pins import RELEASES, TLS_CANDIDATES
 
 
 def fixture():
@@ -36,6 +36,32 @@ def fixture():
 
 
 class MixedExperienceAnalysisTests(unittest.TestCase):
+    def test_candidate_requires_matching_manifest_and_two_ordered_pairs(self):
+        data=fixture()
+        artifact, source_field, commit, version=TLS_CANDIDATES['new']
+        digest='b'*64
+        manager_commit='a'*40
+        data.update(plan='tls-mixed-x86-v1',source_commit=manager_commit,
+                    binary_sha256={'balanced2':LEGACY_SHA,'candidate':digest},
+                    candidate_manifest={source_field:commit,'manager_commit':manager_commit,
+                        'architecture':'x86_64','binaries':{artifact:{'sha256':digest,'version':version}}})
+        index={(r['round'],r['variant']):r for r in data['rows'] if r['cohort']==30}
+        data['rows']=[index[key] for key in ((1,'balanced2'),(1,'native17'),(2,'native17'),(2,'balanced2'))]
+        for row in data['rows']:
+            if row['variant']=='native17':
+                row['variant']='candidate'
+            for flow in row['result']['bulk']:
+                flow['bytes']=32*1024**2
+        data['mock_dc']['completed']=sum(r['result']['dc_connections'] for r in data['rows'])+16
+        self.assertTrue(analyze(data)['performance_parity_all_cases'])
+        wrong_digest=copy.deepcopy(data)
+        wrong_digest['binary_sha256']['candidate']='c'*64
+        with self.assertRaisesRegex(ValueError,'binary identity'):
+            analyze(wrong_digest)
+        data['rows'][2],data['rows'][3]=data['rows'][3],data['rows'][2]
+        with self.assertRaisesRegex(ValueError,'schedule'):
+            analyze(data)
+
     def test_full_joint_parity_is_separate_from_production_approval(self):
         result=analyze(fixture())
         self.assertTrue(result['performance_parity_all_cases'])

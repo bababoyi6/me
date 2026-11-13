@@ -22,6 +22,7 @@ from release_pins import RELEASES
 from legacy_queue_analysis import NATIVE_SHA, UPSTREAM, BUILD_SOURCE
 from path_capacity import controls as capacity_controls
 from queue_probe import original_wg_policy, configure_private_shaper, private_wg_snapshot
+from tls_candidate_lab import candidate_binary
 
 PROFILES={'low':(0,200,0),'rtt100':(100,200,0),'rtt200':(200,200,0),'weak':(100,100,.1)}
 VARIANTS=('balanced2','official17','native17')
@@ -39,6 +40,11 @@ def main(args):
     queue_screen=getattr(args,'queue_screen',False)
     queue_core=getattr(args,'queue_core','balanced2')
     managed=getattr(args,'managed_backend_queue',False)
+    candidate_screen=args.new_tls_candidate
+    if candidate_screen and (queue_screen or managed or args.client_diagnostic or args.profile!='rtt100'):
+        raise RuntimeError('new TLS mixed screen requires the 100 ms profile')
+    if not candidate_screen and not args.stable_archive:
+        raise RuntimeError('official archive required for the historical modes')
     if managed and not queue_screen:raise RuntimeError('managed backend queue requires registered screening mode')
     if queue_screen and (args.client_diagnostic or args.profile!='rtt100'):
         raise RuntimeError('shaper screen is registered only for the 100ms mixed workload')
@@ -51,6 +57,9 @@ def main(args):
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name'))}
     if args.client_diagnostic:
         report['scope']='one client TCP_NODELAY variable; sequential new FakeTLS+1KiB/ACK, four AB/BA rounds per pinned core; no bulk/idle workload or throughput claim'
+    if candidate_screen:
+        report['plan']='tls-mixed-x86-v1'
+        report['scope']+='; 30 logical connections, 32 MiB per file, AB/BA'
     if queue_screen:
         report['plan']='managed-backend-screen-v1' if managed else 'private-shaper-screen-v1'
         report['queue_core']=queue_core
@@ -63,15 +72,23 @@ def main(args):
         with tempfile.TemporaryDirectory(prefix='tdh-audit-mixed-') as folder:
             root=Path(folder)
             bundle=Path(args.native_directory);manifest=json.loads((bundle/'manifest.json').read_text())
-            if (manifest['upstream_commit']!=UPSTREAM or manifest['manager_commit']!=BUILD_SOURCE or
-                    manifest['binaries']['balanced']['sha256']!=NATIVE_SHA):raise RuntimeError('native identity drift')
             binaries={};pins={'balanced2':PINS['balanced2'],'official17':RELEASES['3.5.17']}
-            for variant,archive in (('balanced2',args.balanced2_archive),('official17',args.stable_archive)):
+            archives=[('balanced2',args.balanced2_archive)]
+            if not candidate_screen:
+                archives.append(('official17',args.stable_archive))
+            for variant,archive in archives:
                 pin=pins[variant];payload,_=archive_payload(archive,pin[0],pin[2].removeprefix('telemt '),pin[1],False)
                 target=root/variant;target.write_bytes(payload);target.chmod(0o755);binaries[variant]=str(target)
-            native=(bundle/'telemt-balanced').read_bytes()
-            if hashlib.sha256(native).hexdigest()!=NATIVE_SHA:raise RuntimeError('native binary digest mismatch')
-            target=root/'native17';target.write_bytes(native);target.chmod(0o755);binaries['native17']=str(target)
+            if candidate_screen:
+                binary, _ = candidate_binary(bundle,'new',report['source_commit'])
+                binaries['candidate']=str(binary)
+                report['candidate_manifest']=manifest
+            else:
+                if (manifest['upstream_commit']!=UPSTREAM or manifest['manager_commit']!=BUILD_SOURCE or
+                        manifest['binaries']['balanced']['sha256']!=NATIVE_SHA):raise RuntimeError('native identity drift')
+                native=(bundle/'telemt-balanced').read_bytes()
+                if hashlib.sha256(native).hexdigest()!=NATIVE_SHA:raise RuntimeError('native binary digest mismatch')
+                target=root/'native17';target.write_bytes(native);target.chmod(0o755);binaries['native17']=str(target)
             report['binary_sha256']={key:hashlib.sha256(Path(path).read_bytes()).hexdigest() for key,path in binaries.items()}
             net=Network(SimpleNamespace(root=str(root),wg='wg',iperf='iperf3',start_iperf=True,
                 rtt_ms=rtt,rate_mbps=rate,loss_percent=loss,mtu=1420))
@@ -125,10 +142,14 @@ backend line_b
                 stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             time.sleep(.3)
             if front.poll() is not None:raise RuntimeError('private SNI frontend startup failed')
-            for turn in range(4 if queue_screen else (1 if args.client_diagnostic else 3)):
-                order=(queue_core,) if queue_screen else VARIANTS[turn:]+VARIANTS[:turn]
+            variants=('balanced2','candidate') if candidate_screen else VARIANTS
+            rounds=2 if candidate_screen else 4 if queue_screen else 1 if args.client_diagnostic else 3
+            for turn in range(rounds):
+                order=(queue_core,) if queue_screen else variants[turn:]+variants[:turn]
                 for variant in order:
                     options={'kind':'balanced2' if variant=='balanced2' else 'balanced','binary':binaries[variant]}
+                    if candidate_screen:
+                        options['synthetic_tls_front']=True
                     if variant!='balanced2':options['experimental_binary']=[report['binary_sha256'][variant],
                         RELEASES['3.5.17'][2] if variant=='official17' else manifest['binaries']['balanced']['version']]
                     backend=Child('core',NAMES[2],backend_cpu,options,children)
@@ -150,7 +171,7 @@ backend line_b
                             if state['completed']!=expected or state['errors']:raise RuntimeError('diagnostic DC mismatch')
                             continue
                         idle_before=stats(backend.ready['pid'])
-                        cohorts=(30,30) if queue_screen else ((30,50,100) if turn%2==0 else (100,50,30))
+                        cohorts=(30,) if candidate_screen else (30,30) if queue_screen else ((30,50,100) if turn%2==0 else (100,50,30))
                         for position,cohort in enumerate(cohorts):
                             shaped=bool(position if turn%2==0 else 1-position)
                             if queue_screen:
@@ -164,7 +185,7 @@ backend line_b
                             usage=resource.getrusage(resource.RUSAGE_CHILDREN);child_cpu=usage.ru_utime+usage.ru_stime
                             sockets=[];queues=[];rss=[];cpu_intervals=[];last=-1
                             previous=snapshots;previous_time=start
-                            client.send({'command':'mixed','logical_clients':cohort})
+                            client.send({'command':'mixed','logical_clients':cohort,'candidate_screen':candidate_screen})
                             while not select.select([client.process.stdout],[],[],.1)[0]:
                                 if time.monotonic()-start>115:raise RuntimeError('mixed trial deadline')
                                 if time.monotonic()-start-last>=1:
@@ -236,11 +257,12 @@ backend line_b
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile',choices=tuple(PROFILES),required=True)
-    parser.add_argument('--balanced2-archive',required=True);parser.add_argument('--stable-archive',required=True)
+    parser.add_argument('--balanced2-archive',required=True);parser.add_argument('--stable-archive')
     parser.add_argument('--native-directory',required=True);parser.add_argument('--output',required=True)
     parser.add_argument('--client-diagnostic',action='store_true')
     parser.add_argument('--queue-screen',action='store_true')
     parser.add_argument('--queue-core',choices=('balanced2','native17'),default='balanced2')
     parser.add_argument('--managed-backend-queue',action='store_true')
+    parser.add_argument('--new-tls-candidate',action='store_true')
     signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
     raise SystemExit(main(parser.parse_args()))

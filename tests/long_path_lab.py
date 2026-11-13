@@ -63,7 +63,7 @@ def worker(role,cpu):
                 endpoint=SimpleNamespace(real_dc=False,listen=24431,front=24443)
                 if request['command']=='mixed':
                     from mixed_workload import run_mixed
-                    result=run_mixed(endpoint,request['logical_clients'])
+                    result=run_mixed(endpoint,request['logical_clients'],candidate_screen=request.get('candidate_screen',False))
                 elif request['command']=='probe-client-policy':
                     if type(request.get('nodelay')) is not bool:raise RuntimeError('explicit client flag required')
                     result={'rows':[FullLab.transfer(endpoint,('apple.com','gs.apple.com')[i%2],

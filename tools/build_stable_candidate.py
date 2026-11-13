@@ -25,7 +25,11 @@ def main():
     parser.add_argument('--source',required=True);parser.add_argument('--output',required=True)
     parser.add_argument('--security-main', action='store_true',
                         help='Build only the socket candidate on the pinned post-3.5.17 upstream commit')
+    parser.add_argument('--build-only', action='store_true',
+                        help='Build the same fixed candidate for a follow-up performance run')
     args=parser.parse_args();source=Path(args.source).resolve();output=Path(args.output).resolve()
+    if args.build_only and not args.security_main:
+        parser.error('--build-only requires --security-main')
     if sys.platform!='linux' or os.environ.get('GITHUB_ACTIONS')!='true':raise RuntimeError('disposable CI only')
     upstream = SECURITY_COMMIT if args.security_main else COMMIT
     if subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip()!=upstream:
@@ -75,10 +79,12 @@ def main():
         previous=version
         if args.security_main:
             manifest['cargo_lock_sha256'] = sha(source / 'Cargo.lock')
-            run(['cargo','test','--locked','--release','--bin','telemt','inner_content_type_position_is_not_constant'],source)
-            run(['cargo','test','--locked','--release','--bin','telemt','maestro::tls_bootstrap::tests::'],source)
+            if not args.build_only:
+                run(['cargo','test','--locked','--release','--bin','telemt','inner_content_type_position_is_not_constant'],source)
+                run(['cargo','test','--locked','--release','--bin','telemt','maestro::tls_bootstrap::tests::'],source)
         run(['cargo','build','--locked','--release','--bin','telemt'],source)
-        run(['cargo','test','--locked','--release','--bin','telemt','transport::socket::tests::'],source)
+        if not args.build_only:
+            run(['cargo','test','--locked','--release','--bin','telemt','transport::socket::tests::'],source)
         binary=source/'target/release/telemt'
         actual=subprocess.check_output([str(binary),'--version'],text=True,timeout=5).strip()
         if actual!='telemt '+version:raise RuntimeError('built identity mismatch')

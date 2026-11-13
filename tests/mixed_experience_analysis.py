@@ -6,7 +6,7 @@ from pathlib import Path
 import statistics
 
 from legacy_queue_analysis import NATIVE_SHA, LEGACY_SHA
-from release_pins import RELEASES
+from release_pins import RELEASES, TLS_CANDIDATES
 
 VARIANTS=('balanced2','official17','native17')
 PROFILES={'low':(0,200,0),'rtt100':(100,200,0),'rtt200':(200,200,0),'weak':(100,100,.1)}
@@ -23,7 +23,7 @@ def quantiles(values):
             'p99_population_inference':False,'max':max(ordered)}
 
 
-def trial(row):
+def trial(row, payload_bytes=16*1024**2):
     r=row['result']
     if (r.get('complete') is not True or r.get('errors')!=[] or r.get('logical_clients')!=row['cohort'] or
             r.get('idle_connections')!=row['cohort']-11 or len(r.get('idle_recovery_ms',[]))!=row['cohort']-11):
@@ -32,7 +32,7 @@ def trial(row):
     if len(bulk)!=5 or sorted(v.get('direction') for v in bulk)!=['D']*4+['U']:
         raise ValueError('bulk role drift')
     for v in bulk:
-        if v.get('bytes')!=16*1024**2 or v.get('sha256_verified') is not True or v.get('persistent_dc') is not True:
+        if v.get('bytes')!=payload_bytes or v.get('sha256_verified') is not True or v.get('persistent_dc') is not True:
             raise ValueError('integrity/payload/ACK not verified')
         for k in ('elapsed_seconds','start_offset_seconds','end_offset_seconds'):
             if not number(v.get(k)):raise ValueError('missing bulk timing')
@@ -76,13 +76,37 @@ def trial(row):
 
 
 def analyze(report):
-    if (report.get('plan')!='mixed-experience-v1' or report.get('accepted') is not True or report.get('complete') is not True or
+    plan=report.get('plan')
+    candidate_screen=plan=='tls-mixed-x86-v1'
+    if (plan not in ('mixed-experience-v1','tls-mixed-x86-v1') or report.get('accepted') is not True or report.get('complete') is not True or
             report.get('private_processes_closed') is not True or report.get('namespaces_removed') is not True or
             report.get('cleanup_errors')!=[] or report.get('oom_delta')!={'oom':0,'oom_kill':0}):raise ValueError('execution or cleanup incomplete')
     profile=report.get('profile')
     if profile not in PROFILES or tuple(report.get(k) for k in ('rtt_ms','rate_mbps','loss_percent'))!=PROFILES[profile]:
         raise ValueError('unregistered network conditions')
-    if report.get('binary_sha256')!={'balanced2':LEGACY_SHA,'official17':RELEASES['3.5.17'][1],'native17':NATIVE_SHA}:
+    pins={'balanced2':LEGACY_SHA,'official17':RELEASES['3.5.17'][1],'native17':NATIVE_SHA}
+    variants=VARIANTS
+    cohorts=(30,50,100)
+    rounds=3
+    payload_bytes=16*1024**2
+    if candidate_screen:
+        if profile!='rtt100':
+            raise ValueError('new TLS mixed screen requires the 100 ms profile')
+        artifact, source_field, commit, version=TLS_CANDIDATES['new']
+        manifest=report.get('candidate_manifest',{})
+        pin=manifest.get('binaries',{}).get(artifact,{})
+        digest=pin.get('sha256')
+        if (manifest.get(source_field)!=commit or not report.get('source_commit')
+                or manifest.get('manager_commit')!=report['source_commit'] or manifest.get('architecture')!='x86_64'
+                or pin.get('version')!=version or not isinstance(digest,str) or len(digest)!=64
+                or any(c not in '0123456789abcdef' for c in digest)):
+            raise ValueError('candidate identity drift')
+        pins={'balanced2':LEGACY_SHA,'candidate':digest}
+        variants=('balanced2','candidate')
+        cohorts=(30,)
+        rounds=2
+        payload_bytes=32*1024**2
+    if report.get('binary_sha256')!=pins:
         raise ValueError('binary identity drift')
     budget=report.get('resources_before',{});after=report.get('resources_after',{})
     if budget.get('cpu_max')!='300000 100000' or budget.get('memory_max')!=str(1536*1024**2) or budget.get('swap_max')!='0':
@@ -90,24 +114,25 @@ def analyze(report):
     if after.get('pids_current')!=1 or not number(after.get('memory_peak')) or after['memory_peak']>1536*1024**2:
         raise ValueError('resource/cleanup evidence invalid')
     rows=report.get('rows',[])
-    expected=[(t+1,v,n) for t in range(3) for v in VARIANTS[t:]+VARIANTS[:t] for n in ((30,50,100) if t%2==0 else (100,50,30))]
+    expected=[(t+1,v,n) for t in range(rounds) for v in variants[t:]+variants[:t]
+              for n in (cohorts if t%2==0 else cohorts[::-1])]
     if [(r.get('round'),r.get('variant'),r.get('cohort')) for r in rows]!=expected:raise ValueError('schedule or coverage drift')
     policies={row.get('config_policy_sha256') for row in rows}
     if len(policies)!=1 or not all(isinstance(p,str) and len(p)==64 for p in policies):raise ValueError('configuration mismatch')
     if any(not r.get('backend_thread_affinities') or any(a!=[report['cpu_assignment']['core']] for a in r['backend_thread_affinities']) for r in rows):
         raise ValueError('single core identity drift')
-    expected_dc=sum(r['result']['dc_connections'] for r in rows)+9*4
+    expected_dc=sum(r['result']['dc_connections'] for r in rows)+rounds*len(variants)*4
     if report.get('mock_dc')!={'completed':expected_dc,'errors':[]}:raise ValueError('DC integrity/completion mismatch')
     controls=report.get('controls',[])
     if sorted(c.get('direction') for c in controls)!=['D','U'] or any(not number(c.get('mbps')) for c in controls):
         raise ValueError('missing TCP capacity controls')
     capacity_limited=any(c['mbps']<report['rate_mbps']*.5 for c in controls)
-    derived={(r['round'],r['variant'],r['cohort']):trial(r) for r in rows}
+    derived={(r['round'],r['variant'],r['cohort']):trial(r,payload_bytes) for r in rows}
     comparisons=[]
-    for n in (30,50,100):
-        for variant in VARIANTS[1:]:
+    for n in cohorts:
+        for variant in variants[1:]:
             pairs=[]
-            for turn in (1,2,3):
+            for turn in range(1,rounds+1):
                 old=derived[turn,'balanced2',n];new=derived[turn,variant,n]
                 pair={'round':turn,'throughput_ratio':new['bulk_mbps']/old['bulk_mbps'],
                     'download_ratio':new['D_mbps']/old['D_mbps'],'upload_ratio':new['U_mbps']/old['U_mbps'],
@@ -122,15 +147,21 @@ def analyze(report):
                 pairs.append(pair)
             comparisons.append({'cohort':n,'variant':variant,'pairs':pairs,
                 'all_pairs_qualified_and_parity':all(p['qualified'] and p['parity'] for p in pairs)})
-    return {'profile':profile,'protocol_passed':True,'capacity_limited':capacity_limited,
+    result={'profile':profile,'protocol_passed':True,'capacity_limited':capacity_limited,
         'sample_limited_trials':sum(v['sample_limited'] for v in derived.values()),
         'harness_limited_trials':sum(v['harness_limited'] for v in derived.values()),'comparisons':comparisons,
         'trials':[dict(round=t,variant=v,cohort=n,**value) for (t,v,n),value in derived.items()],
         'performance_parity_all_cases':all(c['all_pairs_qualified_and_parity'] for c in comparisons),
         'production_approval':False,'p99_note':'finite-sample nearest rank only; no stable population tail claim'}
+    if candidate_screen:
+        result.update(source_commit=report['source_commit'],binary_sha256=pins,plan=plan)
+    return result
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('input');parser.add_argument('output');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('input');parser.add_argument('output')
+    parser.add_argument('--require-parity',action='store_true');args=parser.parse_args()
     result=analyze(json.loads(Path(args.input).read_text()))
     Path(args.output).write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
+    if args.require_parity and not result['performance_parity_all_cases']:
+        raise SystemExit('Mixed workload parity did not pass; see the analysis report')

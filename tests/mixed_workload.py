@@ -33,8 +33,9 @@ def finish_idle(streams):
         return list(pool.map(finish,streams))
 
 
-def run_mixed(endpoint, logical_clients):
+def run_mixed(endpoint, logical_clients, *, candidate_screen=False):
     if logical_clients not in (30,50,100):raise ValueError('unregistered cohort')
+    payload_bytes = 2 * PAYLOAD if candidate_screen else PAYLOAD
     held=[];lock=threading.Lock();stop=threading.Event()
     result={'logical_clients':logical_clients,'idle_connections':logical_clients-11,
             'baseline':{'message':[],'new_connection':[]},'loaded':{'message':[],'new_connection':[]},
@@ -98,7 +99,7 @@ def run_mixed(endpoint, logical_clients):
         if result['errors']:raise RuntimeError('baseline probes failed')
         def bulk_transfer(index):
             start=time.monotonic()
-            row=FullLab.transfer(endpoint,tuple(SECRETS)[index%2],'D' if index<4 else 'U',PAYLOAD,
+            row=FullLab.transfer(endpoint,tuple(SECRETS)[index%2],'D' if index<4 else 'U',payload_bytes,
                                  125000000,persistent=True,io_timeout=25)
             row.update(start_offset_seconds=start-origin,end_offset_seconds=time.monotonic()-origin)
             return row
