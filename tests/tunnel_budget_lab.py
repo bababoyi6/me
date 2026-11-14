@@ -186,7 +186,7 @@ def compare_proxy(trials):
     return checks
 
 
-def diagnose_proxy(net, front, clients, cores, dc):
+def diagnose_proxy(front, clients, cores, dc):
     samples = []
     pids = {'entry': front.pid, **{f'client{i}': c.process.pid for i,c in enumerate(clients,1)},
             **{f'dc{i}': c.process.pid for i,c in enumerate(dc,1)},
@@ -234,21 +234,26 @@ def connection_phases(trial):
                 stages = {name:value for name,value in timing.items() if name.endswith('_ms')
                           and name != 'started_epoch_ms'}
                 start = timing['started_epoch_ms']
+                ready = start + stages['local_connect_ms'] + stages['to_transport_ready_ms']
+                # The TCP connect syscall can complete well before HAProxy accepts the socket.
+                # Its accept and backend connection must precede client-side transport readiness.
                 candidates = [item for item in by_port[timing['client_port']]
-                              if start-2 <= item[0] <= start+stages['local_connect_ms']+20]
+                              if start-2 <= item[0] and item[0]+item[3]+item[4] <= ready+2]
                 if len(candidates) != 1:
                     raise RuntimeError(f'expected one HAProxy session in probe accept window, found {len(candidates)}')
-                _, backend, server, wait, connect, retries, termination = candidates[0]
+                accepted_at, backend, server, wait, connect, retries, termination = candidates[0]
                 if ((backend,server) != expected or min(wait,connect,int(retries)) < 0
                         or not sample['sha256_verified'] or min(stages.values()) < 0
                         or sum(stages.values()) > sample['elapsed_ms'] + .01):
                     raise RuntimeError('connection phase timing or backend join mismatch')
-                residual = stages['to_transport_ready_ms'] - wait - connect
+                accept_delay = max(0, accepted_at-start-stages['local_connect_ms'])
+                residual = stages['to_transport_ready_ms'] - accept_delay - wait - connect
                 if residual < -2:
                     raise RuntimeError('HAProxy timings exceed client transport phase')
-                probes.append(dict(stages, backend_queue_ms=wait, backend_connect_ms=connect,
+                probes.append(dict(stages, frontend_accept_delay_ms=accept_delay,
+                                   backend_queue_ms=wait, backend_connect_ms=connect,
                                    transport_after_backend_ms=max(0,residual), elapsed_ms=sample['elapsed_ms']))
-                sample['haproxy'] = {'backend':backend, 'server':server, 'queue_ms':wait,
+                sample['haproxy'] = {'backend':backend, 'server':server, 'accepted_epoch_ms':accepted_at, 'queue_ms':wait,
                                      'connect_ms':connect, 'retries':int(retries), 'termination':termination}
             if len(probes) < 20:
                 raise RuntimeError('insufficient new connection phase timings')
@@ -260,7 +265,7 @@ def connection_phases(trial):
     return results
 
 
-def proxy_measure(net, cpus, report, output, archive, children, *, diagnose):
+def proxy_measure(net, cpus, report, output, archive, children, *, diagnose, affinity_control):
     binary = net.root/'balanced2'
     payload,_ = archive_payload(archive,TLS_BASELINE[0],TLS_BASELINE[2].removeprefix('telemt '),TLS_BASELINE[1],False)
     binary.write_bytes(payload)
@@ -277,14 +282,23 @@ def proxy_measure(net, cpus, report, output, archive, children, *, diagnose):
                                 'synthetic_tls_front':True},children)
              for ns,cpu in zip(BACKENDS,cpus[1:3],strict=True)]
     if diagnose:
-        trial = diagnose_proxy(net,front,clients,cores,dc)
-        trial['haproxy_log'] = [line for line in (net.root/'haproxy-timings.log').read_text(encoding='ascii').splitlines()
-                                if line.startswith('tdh ')]
-        report['trials'].append(trial)
-        write(output,report)
-        if trial['result']['bulk_overlap_seconds'] < 1 or not trial['samples']:
-            raise RuntimeError('insufficient concurrent load observation')
-        report['comparison'] = connection_phases(trial)
+        log = net.root/'haproxy-timings.log'
+        arms = (('shared-client',cpus[0]), ('shared-dc',cpus[3]), ('shared-client',cpus[0])) if affinity_control else (
+            ('shared-client',cpus[0]),)
+        for arm,cpu in arms:
+            for task in Path(f'/proc/{front.pid}/task').iterdir():
+                os.sched_setaffinity(int(task.name),{cpu})
+            with log.open('r',encoding='ascii') as source:
+                source.seek(0,os.SEEK_END)
+                trial = diagnose_proxy(front,clients,cores,dc)
+                trial.update(arm=arm, entry_cpu=cpu,
+                             haproxy_log=[line.rstrip('\n') for line in source if line.startswith('tdh ')])
+            report['trials'].append(trial)
+            write(output,report)
+            if trial['result']['bulk_overlap_seconds'] < 1 or not trial['samples']:
+                raise RuntimeError('insufficient concurrent load observation')
+            trial['connection_phases'] = connection_phases(trial)
+            write(output,report)
         return
     for solo,modes in ((True,(False,True)),(False,(True,False))):
         for mode in modes:
@@ -293,7 +307,7 @@ def proxy_measure(net, cpus, report, output, archive, children, *, diagnose):
     report['comparison'] = compare_proxy(report['trials'])
 
 
-def main(output, archive=None, *, diagnose=False):
+def main(output, archive=None, *, diagnose=False, affinity_control=False):
     if diagnose and archive is None:
         raise ValueError('proxy diagnostics require the pinned balanced2 archive')
     if os.geteuid()!=0 or os.environ.get('GITHUB_ACTIONS')!='true':
@@ -305,7 +319,7 @@ def main(output, archive=None, *, diagnose=False):
     if len(cpus)!=4:
         raise RuntimeError('four logical CPUs required')
     report = {'source_commit':os.environ['TDH_SOURCE_COMMIT'],'trials':[],'complete':False,
-              'proxy':archive is not None, 'diagnose':diagnose}
+              'proxy':archive is not None, 'diagnose':diagnose, 'affinity_control':affinity_control}
     children = []
     net = None
     with tempfile.TemporaryDirectory(prefix='tdh-audit-tunnel-budget-') as folder:
@@ -319,7 +333,8 @@ def main(output, archive=None, *, diagnose=False):
             report['tcp_limits'] = set_tcp_limits((NAMES[0],*BACKENDS),'larger_max',{})
             shape_backends_and_entry((SHARE,)*4,install=True)
             if archive:
-                proxy_measure(net,cpus,report,output,archive,children,diagnose=diagnose)
+                proxy_measure(net,cpus,report,output,archive,children,diagnose=diagnose,
+                              affinity_control=affinity_control)
             else:
                 servers = ((NAMES[0],'10.77.1.1',cpus[0]),(NAMES[0],'10.77.2.1',cpus[3]),
                            (BACKENDS[0],'10.77.1.2',cpus[1]),(BACKENDS[1],'10.77.2.2',cpus[2]))
@@ -363,5 +378,8 @@ def main(output, archive=None, *, diagnose=False):
 
 if __name__=='__main__':
     signal.signal(signal.SIGTERM,lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
+    mode = sys.argv[3:]
+    if mode not in ([],['--diagnose'],['--affinity-control']):
+        raise SystemExit('unsupported tunnel budget mode')
     raise SystemExit(main(Path(sys.argv[1]),Path(sys.argv[2]) if len(sys.argv)>2 else None,
-                          diagnose=sys.argv[3:] == ['--diagnose']))
+                          diagnose=bool(mode),affinity_control=mode == ['--affinity-control']))

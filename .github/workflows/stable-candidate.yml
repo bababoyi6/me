@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose']
+        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -50,6 +50,8 @@ jobs:
             fi
             if [[ $TEST_MODE == gigabit-tunnel-diagnose ]]; then
               args+=(--diagnose)
+            elif [[ $TEST_MODE == gigabit-tunnel-affinity ]]; then
+              args+=(--affinity-control)
             fi
             sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tunnel-budget-${GITHUB_RUN_ID}" -p CPUQuota=400% -p MemoryMax=2048M -p MemoryHigh=1700M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=360 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/tunnel_budget_lab.py "${args[@]}"
             exit
