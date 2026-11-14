@@ -26,7 +26,7 @@ from core_upgrade import BackendService, upgrade, rollback, refresh_connect_poli
 from e2e_lab import FullLab, MockDc
 from lab_config import generate_telemt
 from stable_acceptance import PINS
-from release_pins import RELEASES, NATIVE_BASES
+from release_pins import RELEASES, NATIVE_BASES, TLS_CANDIDATES, OLD_TLS_RTT_RECHECK_SHA256
 from telemt_probe import port, TOKEN, request
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -60,6 +60,8 @@ def main():
     candidate.add_argument('--stable-archive')
     candidate.add_argument('--candidate-directory')
     parser.add_argument('--candidate-package')
+    parser.add_argument('--old-tls-candidate',action='store_true',
+                        help='Check the fixed balanced2 TLS repair candidate instead of a newer native candidate')
     baseline=parser.add_mutually_exclusive_group(required=True)
     baseline.add_argument('--balanced2-archive')
     baseline.add_argument('--previous-stable-archive')
@@ -69,6 +71,8 @@ def main():
     args = parser.parse_args()
     if args.candidate_package and not args.candidate_directory:
         parser.error('candidate package requires the pinned native directory')
+    if args.old_tls_candidate and (not args.candidate_directory or not args.balanced2_archive or args.candidate_package):
+        parser.error('old TLS candidate requires its directory and released balanced2 baseline only')
     if args.baseline_switch and (not args.stable_archive or not args.balanced2_archive):
         parser.error('baseline switch requires official and balanced2 archives')
     if args.baseline_switch and (os.environ.get('GITHUB_ACTIONS')!='true' or
@@ -104,16 +108,27 @@ def main():
                     raise RuntimeError('native candidate requires owned CI namespace')
                 bundle=Path(args.candidate_directory)
                 manifest=json.loads((bundle/'manifest.json').read_text())
-                pin=manifest['binaries']['balanced']
-                base=NATIVE_BASES.get(manifest['upstream_commit'])
-                if (base is None or
-                        pin['version']!='telemt '+base+'+tdh.balanced1' or
-                        digest(bundle/'telemt-balanced')!=pin['sha256']):
-                    raise RuntimeError('native candidate identity mismatch')
+                if args.old_tls_candidate:
+                    pin=manifest['binaries']['bulk']
+                    candidate_binary=bundle/'telemt-bulk'
+                    if (manifest.get('source_commit')!=TLS_CANDIDATES['old'][2] or
+                            manifest.get('project_commit')!=os.environ.get('TDH_SOURCE_COMMIT') or
+                            pin['version']!=TLS_CANDIDATES['old'][3] or
+                            pin['sha256']!=OLD_TLS_RTT_RECHECK_SHA256 or
+                            digest(candidate_binary)!=pin['sha256']):
+                        raise RuntimeError('old TLS candidate identity mismatch')
+                else:
+                    pin=manifest['binaries']['balanced']
+                    candidate_binary=bundle/'telemt-balanced'
+                    base=NATIVE_BASES.get(manifest['upstream_commit'])
+                    if (base is None or
+                            pin['version']!='telemt '+base+'+tdh.balanced1' or
+                            digest(candidate_binary)!=pin['sha256']):
+                        raise RuntimeError('native candidate identity mismatch')
                 candidate_archive=Path(args.candidate_package) if args.candidate_package else root/'native.tar.gz'
                 if not args.candidate_package:
                     with tarfile.open(candidate_archive,'x:gz') as archive:
-                        archive.add(bundle/'telemt-balanced',arcname='telemt',recursive=False)
+                        archive.add(candidate_binary,arcname='telemt',recursive=False)
                 candidate_version=pin['version'].removeprefix('telemt ')
                 candidate_pins=(digest(candidate_archive),pin['sha256'],pin['version'])
                 report['native_manifest']=manifest

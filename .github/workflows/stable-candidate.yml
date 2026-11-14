@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'entry-health', 'backend-recovery', 'old', 'old-rtt-recheck', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
+        options: ['focused', 'none', 'manager', 'entry-health', 'backend-recovery', 'old', 'old-rtt-recheck', 'old-system', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -174,14 +174,14 @@ jobs:
     if: >-
       ${{ !cancelled() && (
         (inputs.tls_candidate == 'focused' && needs.manager-update.result == 'success') ||
-        inputs.tls_candidate == 'old' || inputs.tls_candidate == 'old-rtt-recheck' || startsWith(inputs.tls_candidate, 'new')
+        inputs.tls_candidate == 'old' || startsWith(inputs.tls_candidate, 'old-') || startsWith(inputs.tls_candidate, 'new')
       ) }}
     runs-on: ubuntu-22.04
     timeout-minutes: 44
     env:
       CANDIDATE_KIND: ${{ startsWith(inputs.tls_candidate, 'new') && 'new' || 'old' }}
       UPSTREAM_COMMIT: ${{ startsWith(inputs.tls_candidate, 'new') && 'b594ee55270798fe21f23b721b50eab46c2e0bec' || 'ac71d92ec41dea00a7eafd6b8d350c3486633500' }}
-      FOLLOWUP_SCREEN: ${{ startsWith(inputs.tls_candidate, 'new-') }}
+      FOLLOWUP_SCREEN: ${{ startsWith(inputs.tls_candidate, 'new-') || inputs.tls_candidate == 'old-system' }}
       PYTHONPATH: ${{ github.workspace }}/tools
     steps:
       - uses: actions/checkout@v4
@@ -231,6 +231,11 @@ jobs:
           sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
           sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-rtt-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=420 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/long_path_lab.py --tls-candidate old --tls-rtt-recheck --native-directory "$RUNNER_TEMP/tls-core" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/tls-evidence/rtt-recheck.json"
           python3 tests/long_path_analysis.py --require-rtt-recheck "$RUNNER_TEMP/tls-evidence/rtt-recheck.json" "$RUNNER_TEMP/tls-evidence/rtt-recheck-analysis.json"
+      - name: Check fixed old candidate install restart health and rollback in a private namespace
+        if: inputs.tls_candidate == 'old-system'
+        run: |
+          printf '%s  %s\n' 11e9d2a89bf5fb8f159355f03dc53c8cc60636b69bfd5e0505457dc03d6922fe "$RUNNER_TEMP/tls-core/telemt-bulk" | sha256sum --check
+          sudo env GITHUB_ACTIONS=true TDH_SOURCE_COMMIT="$GITHUB_SHA" timeout --kill-after=10 300 unshare --net sh -c 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/tls-core" --old-tls-candidate --balanced2-archive "$1/balanced2.tar.gz" --output "$1/tls-evidence/system.json"' old "$RUNNER_TEMP"
       - name: Compare 30 mixed connections on the same 100 ms WireGuard path
         if: inputs.tls_candidate == 'new-mixed'
         run: |
