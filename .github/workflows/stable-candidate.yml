@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'entry-health', 'backend-recovery', 'old', 'old-rtt-recheck', 'old-system', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
+        options: ['focused', 'none', 'manager', 'entry-health', 'backend-recovery', 'old', 'old-rtt-recheck', 'old-system', 'old-cache', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -179,7 +179,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 44
     env:
-      CANDIDATE_KIND: ${{ startsWith(inputs.tls_candidate, 'new') && 'new' || 'old' }}
+      CANDIDATE_KIND: ${{ inputs.tls_candidate == 'old-cache' && 'oldcache' || (startsWith(inputs.tls_candidate, 'new') && 'new' || 'old') }}
       UPSTREAM_COMMIT: ${{ startsWith(inputs.tls_candidate, 'new') && 'b594ee55270798fe21f23b721b50eab46c2e0bec' || 'ac71d92ec41dea00a7eafd6b8d350c3486633500' }}
       FOLLOWUP_SCREEN: ${{ startsWith(inputs.tls_candidate, 'new-') || inputs.tls_candidate == 'old-system' }}
       PYTHONPATH: ${{ github.workspace }}/tools
@@ -202,7 +202,9 @@ jobs:
           mkdir -m 700 "$RUNNER_TEMP/tls-evidence"
       - name: Build and test one candidate
         run: |
-          if [[ $CANDIDATE_KIND == old ]]; then
+          if [[ $CANDIDATE_KIND == oldcache ]]; then
+            timeout --kill-after=10 1400 python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/tls-core" --candidate balanced2-security2
+          elif [[ $CANDIDATE_KIND == old ]]; then
             timeout --kill-after=10 1400 python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/tls-core" --candidate balanced2-security
           elif [[ $FOLLOWUP_SCREEN == true ]]; then
             timeout --kill-after=10 1400 python3 tools/build_stable_candidate.py --source upstream --output "$RUNNER_TEMP/tls-core" --security-main --build-only
@@ -291,7 +293,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
       - uses: actions/upload-artifact@v4
-        if: success() && github.event.repository.private && env.CANDIDATE_KIND == 'old'
+        if: success() && github.event.repository.private && (env.CANDIDATE_KIND == 'old' || env.CANDIDATE_KIND == 'oldcache')
         with:
           name: balanced2-security-build
           path: |

@@ -17,6 +17,8 @@ TLS_PATCHES = (
     ROOT / 'patches/telemt-tls-emulator.patch',
     ROOT / 'patches/telemt-3.5.5-tls-cache-retry.patch',
 )
+CACHE_PATCH = ROOT / 'patches/telemt-3.5.5-tls-cache-disk.patch'
+CACHE_HELPER = ROOT / 'patches/tls_cache_disk.rs'
 
 
 def digest(path):
@@ -31,7 +33,7 @@ def run(*argv, cwd, timeout=120):
     return subprocess.run(argv, cwd=cwd, check=True, text=True, timeout=timeout)
 
 
-def verify_tls_backport(source, build):
+def verify_tls_backport(source, build, cache_disk=False):
     fixture, emulator, cache = TLS_PATCHES
     run('git', 'apply', '--check', *(str(path) for path in TLS_PATCHES), cwd=source)
     run('git', 'apply', str(fixture), cwd=source)
@@ -48,20 +50,30 @@ def verify_tls_backport(source, build):
             result.count('must not be a fixed plaintext') != 2):
         raise RuntimeError('baseline did not fail both marker assertions; see tls-before.log')
     run('git', 'apply', str(emulator), str(cache), cwd=source)
+    if cache_disk:
+        run('git', 'apply', '--check', str(CACHE_PATCH), cwd=source)
+        run('git', 'apply', str(CACHE_PATCH), cwd=source)
+        helper = source / 'src/tls_front/cache/disk_io.rs'
+        helper.parent.mkdir(exist_ok=True)
+        helper.write_bytes(CACHE_HELPER.read_bytes())
     run(*command, 'tls_front::emulator::', cwd=source, timeout=1200)
     run(*command, 'maestro::tls_bootstrap::tests::', cwd=source, timeout=1200)
+    if cache_disk:
+        run(*command, 'tls_front::cache::disk_io::tests::', cwd=source, timeout=1200)
+        run(*command, 'tls_front::cache::tests::disk_load_', cwd=source, timeout=1200)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', required=True)
     parser.add_argument('--output', required=True)
-    parser.add_argument('--candidate', choices=('fair', 'queue', 'balanced', 'bulk', 'balanced2-security'), default='fair')
+    parser.add_argument('--candidate', choices=('fair', 'queue', 'balanced', 'bulk', 'balanced2-security', 'balanced2-security2'), default='fair')
     parser.add_argument('--reference-archive')
     args = parser.parse_args()
     source = Path(args.source).resolve()
     output = Path(args.output).resolve()
-    security = args.candidate == 'balanced2-security'
+    security = args.candidate in ('balanced2-security', 'balanced2-security2')
+    cache_disk = args.candidate == 'balanced2-security2'
     if security and (sys.platform != 'linux' or os.environ.get('GITHUB_ACTIONS') != 'true'
                      or args.reference_archive):
         parser.error('security build requires disposable Linux CI and no reference binaries')
@@ -99,9 +111,9 @@ def main():
         variants = [('fixed','3.5.5+tdh.audit1'), ('control','3.5.5+tdh.audit2'),
                     ('balanced','3.5.5+tdh.balanced1'), ('bulk',candidate_version)]
     if security:
-        variants = [('bulk', '3.5.5+tdh.balanced2.security1')]
+        variants = [('bulk', '3.5.5+tdh.balanced2.security2' if cache_disk else '3.5.5+tdh.balanced2.security1')]
         manifest.update(
-            tls_patches={path.name: digest(path) for path in TLS_PATCHES},
+            tls_patches={path.name: digest(path) for path in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER) if cache_disk else ()))},
             upstream_changes=['ae85b1566872c6ecac95a2c498ccea50f64ddc10',
                               '3f5feb33d4d64e53f69851c1ed110c0aa388e3c1'],
             cargo=subprocess.check_output(['cargo', '--version'], text=True).strip(),
@@ -194,7 +206,7 @@ def main():
             path.write_text(text.replace(f'version = "{previous_version}"', f'version = "{version}"'))
         previous_version = version
         if security:
-            verify_tls_backport(source, output)
+            verify_tls_backport(source, output, cache_disk)
             manifest['cargo_lock_sha256'] = digest(source / 'Cargo.lock')
         run('cargo', 'build', '--release', '--locked', '--bin', 'telemt', cwd=source, timeout=1200)
         binary = source / 'target/release/telemt'
@@ -216,12 +228,13 @@ def main():
     shutil.copyfile(ROOT / 'patches/unsent_queue_bulk.rs', output / 'unsent_queue_bulk.rs')
     shutil.copyfile(ROOT / 'patches/low_rtt_receive.rs', output / 'low_rtt_receive.rs')
     if security:
-        for tls_patch in TLS_PATCHES:
+        for tls_patch in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER) if cache_disk else ())):
             shutil.copyfile(tls_patch, output / tls_patch.name)
         shutil.copyfile(historical_path, output / 'balanced2-reference-manifest.json')
         (output / 'NOTICE.txt').write_text(
             'Unofficial modified Telemt 3.5.5. Upstream license and copyright retained.\n'
-            'Includes balanced2 Linux socket and relay changes and backports of Telemt PRs #966 and #968.\n'
+            'Includes balanced2 Linux socket and relay changes, backports of Telemt PRs #966 and #968, '
+            + ('and bounded atomic TLS cache I/O.\n' if cache_disk else 'and the original TLS cache I/O.\n') +
             'Profile recovery returns to regular refresh after seven fast attempts.\n'
             'Experimental build for isolated verification; no upstream endorsement.\n'
         )

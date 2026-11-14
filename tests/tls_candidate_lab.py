@@ -30,7 +30,7 @@ def assert_authentication_rejected(lab):
 def candidate_binary(directory, candidate, source_commit):
     kind, source_field, source, version = TLS_CANDIDATES[candidate]
     manifest = json.loads((directory / 'manifest.json').read_text())
-    project_field = 'project_commit' if candidate == 'old' else 'manager_commit'
+    project_field = 'project_commit' if candidate in ('old', 'oldcache') else 'manager_commit'
     pin = manifest['binaries'][kind]
     binary = directory / ('telemt-' + kind)
     if (manifest[source_field] != source or manifest[project_field] != source_commit or

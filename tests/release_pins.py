@@ -17,6 +17,8 @@ OLD_TLS_RTT_RECHECK_SHA256 = '11e9d2a89bf5fb8f159355f03dc53c8cc60636b69bfd5e0505
 TLS_CANDIDATES = {
     'old': ('bulk', 'source_commit', 'ac71d92ec41dea00a7eafd6b8d350c3486633500',
             'telemt 3.5.5+tdh.balanced2.security1'),
+    'oldcache': ('bulk', 'source_commit', 'ac71d92ec41dea00a7eafd6b8d350c3486633500',
+                 'telemt 3.5.5+tdh.balanced2.security2'),
     'new': ('balanced', 'upstream_commit', 'b594ee55270798fe21f23b721b50eab46c2e0bec',
             'telemt 3.5.17+tdh.main.b594ee5.balanced1'),
     'clientlowat': ('balanced', 'upstream_commit', 'b594ee55270798fe21f23b721b50eab46c2e0bec',
