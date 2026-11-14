@@ -2457,7 +2457,8 @@ TDH_ENTRY_MAINTENANCE_PY
 recover_backend() {
   local action=start deadline
   if (( $# != 0 )); then
-    (( $# == 1 )) && [[ $1 == --restart ]] || die "用法：a recover [--restart]"
+    (( $# == 1 )) || die "用法：a recover [--restart]"
+    [[ $1 == --restart ]] || die "用法：a recover [--restart]"
     action=restart
   fi
   load_state || die "未安装节点。"
