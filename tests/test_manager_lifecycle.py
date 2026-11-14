@@ -66,7 +66,7 @@ apt_get_with_lock_wait() { return 99; }
         return result
 
     def old_manager(self, version="1.3.1"):
-        data = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.0"', f'TDH_VERSION="{version}"'.encode())
+        data = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.1"', f'TDH_VERSION="{version}"'.encode())
         self.manager.write_bytes(data)
         self.manager.chmod(0o755)
         return data
@@ -80,7 +80,7 @@ apt_get_with_lock_wait() { return 99; }
         result = subprocess.run(["bash", str(self.shortcut), "--help"], env=self.env,
                                 capture_output=True, text=True, timeout=5)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Telemt Dual-Hop 1.7.0", result.stdout)
+        self.assertIn("Telemt Dual-Hop 1.7.1", result.stdout)
 
     def test_backend_recover_preserves_active_services_and_waits_for_health(self):
         fixture = '''
@@ -115,7 +115,7 @@ health_agent_is_up() {
             with self.subTest(role=role):
                 self.protected["state.env"] = f"TDH_ROLE={role}\nCONFIG_SCHEMA=5\nPORT_A=443\nPORT_B=443\n".encode()
                 (self.base / "state.env").write_bytes(self.protected["state.env"])
-                old = self.old_manager()
+                old = self.old_manager("1.7.0")
                 self.invoke()
                 self.invoke()
                 self.assertEqual((self.base / "manager.previous").read_bytes(), old)
@@ -236,7 +236,7 @@ health_agent_is_up() {
     def test_rollback_stage_and_rename_failures_preserve_both_versions(self):
         old = self.old_manager("1.4.1")
         previous = self.base / "manager.previous"
-        expected = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.0"', b'TDH_VERSION="1.3.1"')
+        expected = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.1"', b'TDH_VERSION="1.3.1"')
         previous.write_bytes(expected)
         for prelude in ("install() { return 74; }", "mv() { return 73; }"):
             with self.subTest(failure=prelude):
