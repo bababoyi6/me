@@ -95,7 +95,7 @@ def snapshot():
 def start_frontend(net, *, connection_timings=False):
     cfg = net.root/'haproxy.cfg'
     traffic_log = ('    log stdout format raw local0\n'
-                   '    log-format "tdh %cp %b %s %Tw %Tc %rc %ts"\n') if connection_timings else ''
+                   '    log-format "tdh %cp %Ts %ms %b %s %Tw %Tc %rc %ts"\n') if connection_timings else ''
     cfg.write_text(f'''global
     nbthread 1
     stats socket {net.root}/haproxy.sock mode 600 level admin

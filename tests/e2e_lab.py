@@ -387,6 +387,8 @@ backend telemt
             raise ValueError('explicit lab client socket policy required')
         if trace_timing and (direct or direction != 'D' or size != 1024 or not persistent or read_pause):
             raise ValueError('phase timing requires a synthetic 1 KiB frontend download probe')
+        if trace_timing:
+            started_epoch_ms = time.time_ns() // 1_000_000
         started = time.monotonic()
         phase, observed = "connect", None
         client_port = None
@@ -444,6 +446,7 @@ backend telemt
         if trace_timing:
             result['phase_timing'] = {
                 'client_port': client_port,
+                'started_epoch_ms': started_epoch_ms,
                 'local_connect_ms': (connected - started) * 1000,
                 'to_transport_ready_ms': (ready - connected) * 1000,
                 'to_first_payload_ms': (observed.first_data_at - ready) * 1000,

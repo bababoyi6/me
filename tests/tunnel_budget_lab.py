@@ -215,14 +215,12 @@ def diagnose_proxy(net, front, clients, cores, dc):
     return {'result':result, 'samples':samples}
 
 
-def connection_phases(trial, log):
+def connection_phases(trial):
     by_port = defaultdict(list)
-    with log.open(encoding='ascii') as source:
-        for line in source:
-            if not line.startswith('tdh '):
-                continue
-            _, port, backend, server, wait, connect, retries, termination = line.split()
-            by_port[int(port)].append((backend, server, int(wait), int(connect), retries, termination))
+    for line in trial['haproxy_log']:
+        _, port, seconds, millis, backend, server, wait, connect, retries, termination = line.split()
+        accepted_at = int(seconds)*1000 + int(millis)
+        by_port[int(port)].append((accepted_at,backend,server,int(wait),int(connect),retries,termination))
     results = []
     for line_index, row in enumerate(trial['result']['rows']):
         expected = (('line_a','first'),('line_b','second'))[line_index]
@@ -233,8 +231,14 @@ def connection_phases(trial, log):
                 if phase == 'loaded' and sample['active_bulk'] == 0:
                     continue
                 timing = sample['phase_timing']
-                (backend, server, wait, connect, retries, termination), = by_port[timing['client_port']]
-                stages = {name:value for name,value in timing.items() if name != 'client_port'}
+                stages = {name:value for name,value in timing.items() if name.endswith('_ms')
+                          and name != 'started_epoch_ms'}
+                start = timing['started_epoch_ms']
+                candidates = [item for item in by_port[timing['client_port']]
+                              if start-2 <= item[0] <= start+stages['local_connect_ms']+20]
+                if len(candidates) != 1:
+                    raise RuntimeError(f'expected one HAProxy session in probe accept window, found {len(candidates)}')
+                _, backend, server, wait, connect, retries, termination = candidates[0]
                 if ((backend,server) != expected or min(wait,connect,int(retries)) < 0
                         or not sample['sha256_verified'] or min(stages.values()) < 0
                         or sum(stages.values()) > sample['elapsed_ms'] + .01):
@@ -274,11 +278,13 @@ def proxy_measure(net, cpus, report, output, archive, children, *, diagnose):
              for ns,cpu in zip(BACKENDS,cpus[1:3],strict=True)]
     if diagnose:
         trial = diagnose_proxy(net,front,clients,cores,dc)
+        trial['haproxy_log'] = [line for line in (net.root/'haproxy-timings.log').read_text(encoding='ascii').splitlines()
+                                if line.startswith('tdh ')]
         report['trials'].append(trial)
         write(output,report)
         if trial['result']['bulk_overlap_seconds'] < 1 or not trial['samples']:
             raise RuntimeError('insufficient concurrent load observation')
-        report['comparison'] = connection_phases(trial,net.root/'haproxy-timings.log')
+        report['comparison'] = connection_phases(trial)
         return
     for solo,modes in ((True,(False,True)),(False,(True,False))):
         for mode in modes:
