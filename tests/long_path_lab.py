@@ -175,6 +175,7 @@ def main(args):
     equal=args.equal_load_study
     legacy=args.legacy_queue_study
     tls_candidate=args.tls_candidate
+    tls_rtt_recheck=args.tls_rtt_recheck
     queue=args.queue_study or equal or legacy
     stress=args.sustained_stress
     if stress and (not native or queue):raise RuntimeError('stress requires the native-only layout')
@@ -183,6 +184,8 @@ def main(args):
     if legacy and not args.balanced2_archive:raise RuntimeError('legacy study requires exact balanced2 fixture')
     if tls_candidate and (not native or not args.balanced2_archive):
         raise RuntimeError('TLS parity requires a candidate directory and released balanced2 archive')
+    if tls_rtt_recheck and tls_candidate!='old':
+        raise RuntimeError('the focused RTT recheck requires the fixed old TLS candidate')
     variants=LEGACY_VARIANTS if legacy else QUEUE_VARIANTS if queue and not equal else ('control','balanced') if native else VARIANTS
     if tls_candidate:variants=('balanced2','candidate')
     profiles=(100,) if native else (0,100)
@@ -194,7 +197,8 @@ def main(args):
         'payload_bytes_per_stream':4*1024**2 if stress else PAYLOAD,'rate_mbps':200,'cpu_assignment':{'core':backend_cpu,'client_and_haproxy':frontend_cpu,'dc':dc_cpu},
         'cpu_model':next(s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),
         'resources_before':before,'controls':[],'rows':[],'idle_checks':[]}
-    if tls_candidate:report.update(plan='tls-candidate-parity',tls_candidate=tls_candidate)
+    if tls_candidate:report.update(plan='tls-rtt-recheck' if tls_rtt_recheck else 'tls-candidate-parity',
+                                   tls_candidate=tls_candidate)
     children=[];probes=[];net=None;front=None;expected=0
     write(output,report)
     try:
@@ -280,7 +284,7 @@ backend telemt
                             report['controls'].append({'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U','queue_packet_limit':packet_limit,
                                 'seconds':8 if native else 4,'omit_seconds':3 if native else 1,
                                 'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
-                    for turn in range(2 if tls_candidate else 1 if stress else 4 if native else 3):
+                    for turn in range(4 if tls_rtt_recheck else 2 if tls_candidate else 1 if stress else 4 if native else 3):
                         offset=turn%len(variants)
                         order=LEGACY_ORDERS[turn] if legacy else QUEUE_ORDERS[turn] if queue and not equal else variants[offset:]+variants[:offset]
                         for variant in order:
@@ -309,7 +313,9 @@ backend telemt
                                 if warm['errors']:raise RuntimeError('protocol warmup failed')
                                 expected+=4
                                 baseline=stats(backend.ready['pid']) if stress else None
-                                cases=[(n,d) for n in ((30,50,100) if stress else (1,4)) for d in (('D',) if queue else ('U','D'))]
+                                cases=([(1,'D')] if tls_rtt_recheck else
+                                       [(n,d) for n in ((30,50,100) if stress else (1,4))
+                                        for d in (('D',) if queue else ('U','D'))])
                                 for streams,direction in cases[::1 if turn%2==0 else -1]:
                                     ids={'backend':backend.ready['pid'],'client':client.ready['pid'],'dc':dc.ready['pid'],'haproxy':front.pid}
                                     snapshots={k:stats(pid) for k,pid in ids.items()}
@@ -411,6 +417,8 @@ if __name__=='__main__':
     parser.add_argument('--output')
     parser.add_argument('--native-directory')
     parser.add_argument('--tls-candidate',choices=TLS_CANDIDATES)
+    parser.add_argument('--tls-rtt-recheck',action='store_true',
+                        help='Four AB/BA rounds of only the previously failed old-candidate one-flow download cohort')
     parser.add_argument('--queue-study',action='store_true')
     parser.add_argument('--equal-load-study',action='store_true')
     parser.add_argument('--sustained-stress',action='store_true')

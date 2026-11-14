@@ -5,7 +5,7 @@ import json
 import math
 from pathlib import Path
 import statistics
-from release_pins import NATIVE_BASES, RELEASES, TLS_BASELINE, TLS_CANDIDATES
+from release_pins import NATIVE_BASES, RELEASES, TLS_BASELINE, TLS_CANDIDATES, OLD_TLS_RTT_RECHECK_SHA256
 
 VARIANTS=('balanced2','stable','stable-auto')
 KEYS={(r,t,v,n,d) for r in (0,100) for t in (1,2,3) for v in VARIANTS for n in (1,4) for d in ('U','D')}
@@ -16,11 +16,12 @@ def number(value, *, zero=False):
 
 
 def analyze(data):
-    if data.get('plan','official') not in ('official','native','equal-load','tls-candidate-parity'):raise ValueError('unknown experiment plan')
-    tls_parity = data.get('plan') == 'tls-candidate-parity'
+    if data.get('plan','official') not in ('official','native','equal-load','tls-candidate-parity','tls-rtt-recheck'):raise ValueError('unknown experiment plan')
+    rtt_recheck = data.get('plan') == 'tls-rtt-recheck'
+    tls_parity = data.get('plan') in ('tls-candidate-parity','tls-rtt-recheck')
     equal=data.get('plan')=='equal-load'
     native=data.get('plan','official') in ('native','equal-load')
-    directions=('D',) if equal else ('U','D')
+    directions=('D',) if equal or rtt_recheck else ('U','D')
     if equal and data.get('transfer_rate_per_stream')!=2500000:raise ValueError('equal offered-load drift')
     base=NATIVE_BASES.get(data.get('native_manifest',{}).get('upstream_commit')) if native else None
     if native and base is None:raise ValueError('unknown native upstream identity')
@@ -28,8 +29,9 @@ def analyze(data):
     if official not in RELEASES:raise ValueError('unknown official release')
     profiles=(100,) if native or tls_parity else (0,100)
     variants=('balanced2','candidate') if tls_parity else ('control','balanced') if native else VARIANTS
-    rounds=(1,2) if tls_parity else (1,2,3,4) if native else (1,2,3)
-    expected_keys={(r,t,v,n,d) for r in profiles for t in rounds for v in variants for n in (1,4) for d in directions}
+    rounds=(1,2,3,4) if rtt_recheck else (1,2) if tls_parity else (1,2,3,4) if native else (1,2,3)
+    streams=(1,) if rtt_recheck else (1,4)
+    expected_keys={(r,t,v,n,d) for r in profiles for t in rounds for v in variants for n in streams for d in directions}
     if (data.get('accepted') is not True or data.get('complete') is not True or
             data.get('namespaces_removed') is not True or data.get('private_processes_closed') is not True or
             data.get('cleanup_errors')!=[] or data.get('oom_delta')!={'oom':0,'oom_kill':0}):
@@ -44,6 +46,8 @@ def analyze(data):
         candidate = TLS_CANDIDATES.get(data.get('tls_candidate'))
         if candidate is None:
             raise ValueError('unknown TLS candidate')
+        if rtt_recheck and data['tls_candidate']!='old':
+            raise ValueError('focused RTT recheck requires the old TLS candidate')
         versions = {'balanced2': TLS_BASELINE[2], 'candidate': candidate[3]}
         digests = data.get('binary_sha256', {})
         candidate_digest = digests.get('candidate')
@@ -56,6 +60,8 @@ def analyze(data):
                 not isinstance(candidate_digest, str) or len(candidate_digest) != 64 or
                 any(c not in '0123456789abcdef' for c in candidate_digest)):
             raise ValueError('TLS candidate identity mismatch')
+        if rtt_recheck and candidate_digest != OLD_TLS_RTT_RECHECK_SHA256:
+            raise ValueError('focused RTT recheck binary changed')
         if (manifest.get(source_field) != source_commit or manifest.get(project_field) != data['source_commit']
                 or pin.get('sha256') != candidate_digest or pin.get('version') != version):
             raise ValueError('TLS candidate manifest mismatch')
@@ -65,7 +71,7 @@ def analyze(data):
         order = [('balanced2', 'candidate'), ('candidate', 'balanced2')]
         for turn in rounds:
             actual = [row['variant'] for row in rows if row['round'] == turn]
-            if actual != [v for v in order[turn-1] for _ in range(4)]:
+            if actual != [v for v in order[(turn-1)%2] for _ in range(1 if rtt_recheck else 4)]:
                 raise ValueError('AB/BA trial order drift')
     for row in rows:
         version=('telemt '+base+('+tdh.control1' if row['variant']=='control' else '+tdh.balanced1')) if native else ('telemt 3.5.5+tdh.balanced2' if row['variant']=='balanced2' else 'telemt '+official)
@@ -97,7 +103,7 @@ def analyze(data):
     pairs = ((('balanced2', 'candidate'),) if tls_parity else
              (('control','balanced'),) if native else (('balanced2','stable'),('stable','stable-auto')))
     for rtt in profiles:
-        for n in (1,4):
+        for n in streams:
             for direction in directions:
                 for left,right in pairs:
                     old=[index[rtt,t,left,n,direction] for t in rounds]
@@ -108,7 +114,7 @@ def analyze(data):
                     observed=[]
                     for row in old+new:
                         values=[s.get('rtt_ms') for s in row.get('socket_samples',[]) if s.get('role')=='client']
-                        if not values or any(not number(v,zero=True) for v in values):
+                        if not values or (rtt_recheck and len(values)<2) or any(not number(v,zero=True) for v in values):
                             raise ValueError('missing client-side measured RTT')
                         observed.append(statistics.median(values))
                     rtt_valid=all(80<=v<=200 for v in observed) if rtt else all(v<20 for v in observed)
@@ -117,13 +123,17 @@ def analyze(data):
                            'REPEATABLE_FASTER' if min(ratios)>1.10 else 'REPEATABLE_SLOWER' if max(ratios)<.90 else 'NO_CLEAR_CHANGE')
                     parity = {}
                     if tls_parity:
-                        rtt_ratios = [b / a for a, b in zip(observed[:2], observed[2:]) if a > 0]
-                        parity = {
-                            'tcp_rtt_ratios': rtt_ratios,
-                            'throughput_and_rtt_screen': (not limited and control_index[rtt,direction] >= 100
+                        rtt_ratios = [b / a for a, b in zip(observed[:len(rounds)], observed[len(rounds):]) if a > 0]
+                        parity = {'tcp_rtt_ratios': rtt_ratios}
+                        if rtt_recheck:
+                            parity['rtt_recheck_passed'] = (not limited and control_index[rtt,direction] >= 100
+                                and len(rtt_ratios) == 4 and all(80 <= v <= 200 for v in observed)
+                                and min(ratios) >= .95 and statistics.median(rtt_ratios) <= 1.10
+                                and max(rtt_ratios) <= 1.20)
+                        else:
+                            parity['throughput_and_rtt_screen'] = (not limited and control_index[rtt,direction] >= 100
                                 and len(rtt_ratios) == 2 and all(v >= 80 for v in observed)
-                                and min(ratios) >= .95 and max(rtt_ratios) <= 1.10),
-                        }
+                                and min(ratios) >= .95 and max(rtt_ratios) <= 1.10)
                     equal_ping=None
                     if equal:
                         probe_cpu=[r['cpu_percent_one_core'].get('probe_children') for r in old+new]
@@ -144,12 +154,18 @@ def analyze(data):
                         'candidate_median_mbps':statistics.median(v['mbps'] for v in new),
                         'measured_client_rtt_medians_ms':observed,'equal_load_path_ping_p95_ms':equal_ping,**parity})
     if tls_parity:
-        return {'source_commit':data['source_commit'],'transport_accepted':True,
+        result={'source_commit':data['source_commit'],'transport_accepted':True,
                 'measured_payload_flows':sum(r['completed'] for r in rows),
                 'binary_sha256':digests,'comparisons':comparisons,'production_approval':False,
-                'initial_screen_passed':all(c['throughput_and_rtt_screen'] for c in comparisons),
-                'scope':'100ms one/four-flow duplex cohorts, two AB/BA rounds, synthetic DC only',
-                'rule':'each candidate/baseline pair: throughput >=95%, client TCP median RTT <=110%, TCP capacity >=100Mbps, harness below 70% CPU'}
+                'scope':('100ms one-flow download only, four AB/BA rounds, synthetic DC' if rtt_recheck else
+                         '100ms one/four-flow duplex cohorts, two AB/BA rounds, synthetic DC only'),
+                'rule':('four paired downloads: each throughput >=95%; median TCP RTT ratio <=110%; each ratio <=120%; >=2 client RTT samples per cohort; TCP capacity >=100Mbps; harness below 70% CPU' if rtt_recheck else
+                        'each candidate/baseline pair: throughput >=95%, client TCP median RTT <=110%, TCP capacity >=100Mbps, harness below 70% CPU')}
+        if rtt_recheck:
+            result['targeted_rtt_recheck_passed']=all(c['rtt_recheck_passed'] for c in comparisons)
+        else:
+            result['initial_screen_passed']=all(c['throughput_and_rtt_screen'] for c in comparisons)
+        return result
     return {'source_commit':data['source_commit'],'transport_accepted':True,'measured_payload_flows':sum(r['completed'] for r in rows),
         'comparisons':comparisons,'scope':('mechanism check at 20Mbps per stream, not a maximum-throughput comparison or production rate cap' if equal else 'one host, four balanced AB/BA rounds; same-toolchain native candidates; synthetic DC only' if native else 'one host, three rotated rounds; synthetic DC and lab-only preload; no production recommendation'),
         'rule':'all paired ratios >1.10 for exploratory faster, all <0.90 for slower; CPU <70%, TCP control >=100Mbps, measured RTT required'}
@@ -161,9 +177,13 @@ if __name__=='__main__':
     parser.add_argument('output')
     parser.add_argument('--require-initial-screen', action='store_true',
                         help='Exit nonzero if the TLS candidate parity screen did not pass')
+    parser.add_argument('--require-rtt-recheck', action='store_true',
+                        help='Exit nonzero if the focused old-candidate RTT recheck did not pass')
     args=parser.parse_args()
     result=analyze(json.loads(Path(args.metrics).read_text()))
     result['analysis_sha256']=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     Path(args.output).write_text(json.dumps(result,indent=2)+'\n')
     if args.require_initial_screen and result.get('initial_screen_passed') is not True:
         raise SystemExit('100 ms parity screen did not pass; see the analysis report')
+    if args.require_rtt_recheck and result.get('targeted_rtt_recheck_passed') is not True:
+        raise SystemExit('focused RTT recheck did not pass; see the analysis report')

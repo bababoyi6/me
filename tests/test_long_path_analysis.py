@@ -2,7 +2,7 @@
 import copy
 import unittest
 from long_path_analysis import analyze, KEYS
-from release_pins import TLS_BASELINE, TLS_CANDIDATES
+from release_pins import TLS_BASELINE, TLS_CANDIDATES, OLD_TLS_RTT_RECHECK_SHA256
 
 
 def fixture():
@@ -19,6 +19,50 @@ def fixture():
 
 
 class LongPathAnalysisTests(unittest.TestCase):
+    def test_focused_tls_rtt_recheck_keeps_identity_samples_and_release_gate_separate(self):
+        base = fixture()
+        template = next(r for r in base['rows'] if r['rtt_ms']==100 and r['streams']==1 and r['direction']=='D')
+        base.update(plan='tls-rtt-recheck', tls_candidate='old',
+                    binary_sha256={'balanced2': TLS_BASELINE[1], 'candidate': OLD_TLS_RTT_RECHECK_SHA256},
+                    candidate_manifest={'source_commit': TLS_CANDIDATES['old'][2],
+                                        'project_commit': 'fixture',
+                                        'binaries': {'bulk': {'sha256': OLD_TLS_RTT_RECHECK_SHA256, 'version': TLS_CANDIDATES['old'][3]}}},
+                    resources_before={'cpu_max': '300000 100000', 'memory_max': str(1536*1024**2),
+                                      'swap_max': '0'},
+                    resources_after={'pids_current': 1})
+        base['controls'] = [r for r in base['controls'] if r['configured_rtt_ms']==100]
+        base['rows'] = []
+        for turn in range(1,5):
+            order = ('balanced2','candidate') if turn%2 else ('candidate','balanced2')
+            for variant in order:
+                row = copy.deepcopy(template)
+                row.update(round=turn, variant=variant,
+                           version=TLS_BASELINE[2] if variant=='balanced2' else TLS_CANDIDATES['old'][3],
+                           sha256_verified=True,
+                           socket_samples=[{'role':'client','rtt_ms':100},
+                                           {'role':'client','rtt_ms':101}])
+                base['rows'].append(row)
+        result = analyze(base)
+        self.assertTrue(result['targeted_rtt_recheck_passed'])
+        self.assertFalse(result['production_approval'])
+        self.assertEqual(result['measured_payload_flows'],8)
+        for change in ('few_samples','slow_rtt','slow_throughput'):
+            data = copy.deepcopy(base)
+            candidate = next(r for r in data['rows'] if r['variant']=='candidate')
+            if change=='few_samples':
+                candidate['socket_samples'].pop()
+                with self.assertRaisesRegex(ValueError,'measured RTT'):analyze(data)
+                continue
+            if change=='slow_rtt':
+                candidate['socket_samples']=[{'role':'client','rtt_ms':122}]*2
+            else:
+                candidate['mbps']=94
+            self.assertFalse(analyze(data)['targeted_rtt_recheck_passed'])
+        data=copy.deepcopy(base);data['rows'].pop()
+        with self.assertRaisesRegex(ValueError,'cohort'):analyze(data)
+        data=copy.deepcopy(base);data['binary_sha256']['candidate']='a'*64
+        with self.assertRaisesRegex(ValueError,'binary changed'):analyze(data)
+
     def test_tls_parity_requires_both_orders_and_both_performance_limits(self):
         data = fixture()
         data.update(plan='tls-candidate-parity', tls_candidate='old',
