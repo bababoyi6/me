@@ -82,6 +82,34 @@ apt_get_with_lock_wait() { return 99; }
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Telemt Dual-Hop 1.7.0", result.stdout)
 
+    def test_backend_recover_preserves_active_services_and_waits_for_health(self):
+        fixture = '''
+load_state() { TDH_ROLE=${TEST_ROLE:-backend1}; WG_INTERFACE=tdh-b1; LOCAL_WG_IP=10.77.1.2; }
+require_current_state() { :; }
+systemctl() { printf '%s\\n' "$*"; [[ ${TEST_SERVICE_FAIL:-} != "$1 $2" ]]; }
+sleep() { SECONDS=$((SECONDS + 1)); }
+diagnose() { printf 'diagnose\\n'; }
+probes=0
+health_agent_is_up() {
+  [[ $* == '10.77.1.2 19101' ]] || return 9
+  (( probes+=1 )); (( probes >= ${TEST_READY_AFTER:-3} ))
+}
+'''
+        units = 'telemt-dual-hop-telemt.service telemt-dual-hop-health-agent.service'
+        for arguments, action in (('', 'start'), ('--restart', 'restart')):
+            result = self.invoke(f'recover_backend {arguments}; [[ $probes == 3 ]]', prelude=fixture)
+            self.assertEqual(result.stdout.splitlines(), ['start wg-quick@tdh-b1.service',
+                                                          f'{action} {units}', 'diagnose'])
+        for prefix, args, expected in (
+            ('TEST_READY_AFTER=100', '', ['start wg-quick@tdh-b1.service', f'start {units}']),
+            ('TEST_ROLE=entry', '', []),
+            ('', '--unknown', []),
+            ('TEST_SERVICE_FAIL="start wg-quick@tdh-b1.service"', '', ['start wg-quick@tdh-b1.service']),
+        ):
+            with self.subTest(prefix=prefix, args=args):
+                result = self.invoke(f'{prefix} recover_backend {args}', prelude=fixture, ok=False)
+                self.assertEqual(result.stdout.splitlines(), expected)
+
     def test_repeat_install_and_rollback_preserve_three_role_identities(self):
         for role in ("entry", "backend1", "backend2"):
             with self.subTest(role=role):

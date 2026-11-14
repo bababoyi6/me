@@ -170,7 +170,8 @@ usage() {
   a health-rollback --maintenance           回退上一次健康代理更新
   a connect-refresh --maintenance           备份并应用有界 DC 连接重试
   a connect-rollback --maintenance          恢复上一次 DC 连接配置
-  a recover                                 后端隧道与服务恢复
+  a recover                                 启动后端缺失服务并等待就绪
+  a recover --restart                       重启后端核心与健康代理（会断开该节点连接）
   a perf [2-30]                             只读脱敏性能采样（默认 5 秒）
   a queue status                            查看后端实验队列（默认关闭）
   a queue enable 180 200 --experimental --maintenance
@@ -2454,11 +2455,26 @@ TDH_ENTRY_MAINTENANCE_PY
 }
 
 recover_backend() {
+  local action=start deadline
+  if (( $# != 0 )); then
+    (( $# == 1 )) && [[ $1 == --restart ]] || die "用法：a recover [--restart]"
+    action=restart
+  fi
   load_state || die "未安装节点。"
   require_current_state
   [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "此命令仅用于后端。"
-  systemctl start "wg-quick@${WG_INTERFACE}.service"
-  systemctl restart telemt-dual-hop-telemt.service telemt-dual-hop-health-agent.service
+  if [[ $action == restart ]]; then
+    warn "正在重启本后端核心，已有连接会断开。"
+  fi
+  systemctl start "wg-quick@${WG_INTERFACE}.service" || die "WireGuard 启动失败，请运行 a diagnose。"
+  systemctl "$action" telemt-dual-hop-telemt.service telemt-dual-hop-health-agent.service || \
+    die "后端服务操作失败，请运行 a diagnose。"
+  # A newly started health agent needs multiple DC samples before admitting connections.
+  deadline=$(( SECONDS + 45 ))
+  until health_agent_is_up "$LOCAL_WG_IP" "$TDH_AGENT_PORT"; do
+    (( SECONDS < deadline )) || die "后端健康检查未在等待期限内就绪，请运行 a diagnose。"
+    sleep 1
+  done
   diagnose
 }
 
@@ -4949,7 +4965,7 @@ main() {
     connect-refresh|connect-rollback)
       (( $# == 2 )) || die "用法：a $1 --maintenance"
       if [[ $1 == connect-refresh ]]; then manage_core refresh-connect "$2"; else manage_core rollback-connect "$2"; fi ;;
-    recover) recover_backend ;;
+    recover) recover_backend "${@:2}" ;;
     queue)
       shift
       case ${1:-} in

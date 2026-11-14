@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'entry-health', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
+        options: ['focused', 'none', 'manager', 'entry-health', 'backend-recovery', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -143,7 +143,7 @@ jobs:
           bash -n telemt-dual-hop.sh
           timeout --kill-after=5 50 python3 -m unittest discover -s tests -p 'test_entry_maintenance.py' -v
   manager-update:
-    if: inputs.tls_candidate == 'manager' || inputs.tls_candidate == 'focused'
+    if: inputs.tls_candidate == 'manager' || inputs.tls_candidate == 'focused' || inputs.tls_candidate == 'backend-recovery'
     runs-on: ubuntu-22.04
     timeout-minutes: 6
     steps:
@@ -151,10 +151,12 @@ jobs:
         with:
           persist-credentials: false
       - name: Prepare syntax checker
+        if: inputs.tls_candidate != 'backend-recovery'
         run: |
           sudo timeout 90 apt-get update -qq
           sudo timeout 120 apt-get install -y --no-install-recommends shellcheck
       - name: Verify release updater and rollback against private fixtures
+        if: inputs.tls_candidate != 'backend-recovery'
         run: |
           bash -n telemt-dual-hop.sh
           shellcheck -x -S style telemt-dual-hop.sh
@@ -162,6 +164,11 @@ jobs:
           timeout --kill-after=5 40 python3 -m unittest discover -s tests -p 'test_install_command.py' -v
           sudo timeout --kill-after=5 60 python3 -m unittest discover -s tests -p 'test_manager_lifecycle.py' -v
           sudo timeout --kill-after=5 60 python3 -m unittest discover -s tests -p 'test_performance.py' -k manager -k test_update_ -k test_shortcut_failure -k test_stalled_selftest -v
+      - name: Verify backend recovery leaves active units running
+        if: inputs.tls_candidate == 'backend-recovery'
+        run: |
+          bash -n telemt-dual-hop.sh
+          timeout 20 python3 -m unittest discover -s tests -p 'test_manager_lifecycle.py' -k test_backend_recover_preserves_active_services_and_waits_for_health -v
   tls-candidate:
     needs: manager-update
     if: >-

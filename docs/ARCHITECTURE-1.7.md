@@ -67,7 +67,7 @@ HAProxy 使用 master-worker USR2 校验后重载，旧 worker 排空原连接�
 
 后端崩溃、隧道中断后，新的 TCP 连接可以改走备用；原 TCP 会话不能迁移。客户端需要重连。核心维护必须先在入口排空新连接，等待原会话结束或明确接受其断开。
 
-数据面短暂断链且 WG 接口仍存在时，内核 WireGuard 会在链路恢复后重新握手。显式 `systemctl stop wg-quick@...` 会因 `Requires=` 停止后端依赖；重新 start WG 不保证这些依赖自动重新启动，因此提供 `a recover` 显式恢复本后端隧道、Telemt 和健康代理。它不修改内核、防火墙、SSH 或全局路由配置。
+数据面短暂断链且 WG 接口仍存在时，内核 WireGuard 会在链路恢复后重新握手。显式 `systemctl stop wg-quick@...` 会因 `Requires=` 停止后端依赖。开发版 `a recover` 对隧道、Telemt 和健康代理执行 `start`，已运行的核心继续处理现有连接。服务启动操作完成后，给健康代理约 45 秒完成就绪检查，再执行 `a diagnose`。如需主动重启核心，使用 `a recover --restart`，该操作会断开此后端的已有连接。[systemctl 命令语义](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#start%20PATTERN%E2%80%A6)
 
 安装器原有 enable 自启动逻辑保留。1.7 候选已在三个 Ubuntu 22.04 KVM 客体中验证真实安装、重复安装、维护升级/回退及正常关机后启动；三个 boot ID 均变化、持久文件内容一致，两条线路恢复真实 req_pq/resPQ 公共握手。客体共享 CI 主机、均为 1 CPU/1GiB，不代表三台跨地区 VPS；镜像预装依赖后克隆，非三套裸机从零验收，精确提交与结果见工程报告。
 
