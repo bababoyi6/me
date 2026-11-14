@@ -136,12 +136,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Verify the generated HAProxy check and failover on loopback
+      - name: Verify the entry health migration and rollback on loopback
         run: |
           sudo timeout 90 apt-get update -qq
           sudo timeout 120 apt-get install -y --no-install-recommends haproxy
           bash -n telemt-dual-hop.sh
-          timeout --kill-after=5 40 python3 -m unittest discover -s tests -p 'test_performance.py' -k test_real_generated_config_and_telemt_security -v
+          timeout --kill-after=5 50 python3 -m unittest discover -s tests -p 'test_entry_maintenance.py' -v
   manager-update:
     if: inputs.tls_candidate == 'manager' || inputs.tls_candidate == 'focused'
     runs-on: ubuntu-22.04
