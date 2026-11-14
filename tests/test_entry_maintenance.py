@@ -79,7 +79,8 @@ class EntryMaintenanceTests(unittest.TestCase):
         prefix = original_lab.split('\nbackend telemt_a\n', 1)[0] + '\n'
         path = lab.root/'managed.cfg'
         path.write_bytes(b'global\n    maxconn 2048\n\ndefaults\n    mode tcp\n'
-                         b'    timeout connect 1s\n    timeout client 15s\n    timeout server 15s\n\n'+LEGACY)
+                         b'    timeout connect 1s\n    timeout client 15s\n    timeout server 15s\n\n'
+                         b'frontend config_check\n    bind 127.0.0.1:24444\n    default_backend telemt_a\n\n'+LEGACY)
         original = path.read_bytes()
         path.chmod(0o640)
         backup = path.with_name(path.name+'.health-previous')
@@ -87,7 +88,7 @@ class EntryMaintenanceTests(unittest.TestCase):
 
         def reload():
             reloads.append(path.read_bytes())
-            content = path.read_text().split('backend ',1)[1]
+            content = path.read_text().split('\n\nbackend ',1)[1]
             content = 'backend ' + content
             for index, (backend, agent) in enumerate(zip(lab.backends,lab.agents),1):
                 port = str(agent.server_address[1])
@@ -114,9 +115,9 @@ class EntryMaintenanceTests(unittest.TestCase):
         self.assertEqual(path.read_bytes(), original)
         self.assertEqual(len(reloads),2)
         def fail_migration(request, tracked, *, require_ready):
+            wait_runtime(request, tracked, require_ready=require_ready)
             if tracked:
                 raise MaintenanceError('injected health timeout')
-            return wait_runtime(request, tracked, require_ready=require_ready)
 
         with patch('entry_maintenance.wait_runtime', side_effect=fail_migration):
             with self.assertRaisesRegex(MaintenanceError, '已恢复'):
