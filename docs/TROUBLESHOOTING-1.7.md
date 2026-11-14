@@ -4,6 +4,8 @@
 
 先用 `a status`、`a diagnose`、`a perf 5` 收集脱敏观察。`a links`、`state.env`、WG 配置、API 令牌、加入码及回执均含凭据，不贴到公共日志。以下操作必须在获准维护的节点上执行，本轮没有执行生产命令。
 
+开发分支的 `a perf` 增加 `pressure_stall_usec_delta` 和服务 `cpu_control`，采样期间只读取本机。前者按 CPU、内存、I/O 给出资源等待微秒数。后者在 cgroup v2 可用时报告本组 CPU 配额、周期和本次采样的节流增量。`unlimited` 只表示当前 cgroup 没有自己的配额，父级仍可能限额。空对象或 `null` 表示相应计数不可用。结合 CPU steal、TCP RTT 和队列看，有助于避免把 VPS 的算力竞争误判成 TCP 缓冲不足。[Linux PSI](https://docs.kernel.org/accounting/psi.html) · [cgroup v2 CPU 控制](https://docs.kernel.org/admin-guide/cgroup-v2.html#cpu-interface-files)
+
 | 现象 | 定位顺序 | 恢复方式/边界 |
 |---|---|---|
 | 高延迟单流吞吐下降，但 CPU 不高 | 核对实际核心、WG RTT 与 TCP 的 rb/tb；3.5.16 固定缓冲在 100ms 实验出现明显限制 | 参考长链路报告，保留旧核心回退；不要用更换 Secret 或盲目放大 sysctl 处理。原生移植仍是未发布候选，四流排队延迟待优化 |

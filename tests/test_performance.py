@@ -116,6 +116,19 @@ if state_is_current; then exit 1; fi
         self.assertIsNone(namespace["cpu_usage"]([10] * 8, [0] * 8)["busy_percent"])
         namespace["read"] = lambda path: "oom_kill 2\npgmajfault 5\npswpin 0\npswpout 0\nSYNTHETIC_SECRET 123\n" if path == "/proc/vmstat" else ""
         self.assertEqual(namespace["counters"](), {"Vm.oom_kill": 2, "Vm.pgmajfault": 5, "Vm.pswpin": 0, "Vm.pswpout": 0})
+        files = {"/proc/pressure/cpu": "some avg10=2.00 avg60=0.30 avg300=0.10 total=1100\n",
+                 "/sys/fs/cgroup/system.slice/tdh.service/cpu.max": "40000 100000\n",
+                 "/sys/fs/cgroup/system.slice/tdh.service/cpu.stat": "nr_periods 10\nnr_throttled 3\nthrottled_usec 1200\n"}
+        namespace["read"] = lambda path: files.get(Path(path).as_posix(), "")
+        self.assertEqual(namespace["pressure_totals"](), {"cpu.some": 1100})
+        self.assertEqual(namespace["cpu_control"]("/system.slice/tdh.service"),
+                         {"quota_usec": 40000, "period_usec": 100000, "unlimited": False,
+                          "nr_periods": 10, "nr_throttled": 3, "throttled_usec": 1200})
+        self.assertIsNone(namespace["cpu_control"]("/system.slice/../tdh.service"))
+        self.assertIsNone(namespace["cpu_control"]("/system.slice/absent.service"))
+        self.assertEqual(namespace["counter_deltas"]({"cpu.some": 1000, "io.some": 500},
+                         {"cpu.some": 1100, "io.some": 10, "memory.some": 50}),
+                         {"cpu.some": 100, "io.some": None, "memory.some": None})
 
     def test_report_command_timeout_and_output_limit(self):
         source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]

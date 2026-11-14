@@ -4152,6 +4152,25 @@ def cpu_usage(before, after):
     return {"busy_percent": round(100 * (total - delta[3] - delta[4] - delta[7]) / total, 2),
             "steal_percent": round(100 * delta[7] / total, 2)}
 
+def cpu_control(path):
+    if not path or not re.fullmatch(r"/[A-Za-z0-9_.@/-]+", path) or ".." in path.split("/"):
+        return None
+    root = pathlib.Path("/sys/fs/cgroup" + path)
+    quota = read(root / "cpu.max").split()
+    usage = numeric_fields(read(root / "cpu.stat"), {"nr_periods", "nr_throttled", "throttled_usec"})
+    if len(quota) != 2 or not integer(quota[1]) or (quota[0] != "max" and not integer(quota[0])):
+        return None
+    return {"quota_usec": integer(quota[0]), "period_usec": int(quota[1]),
+            "unlimited": quota[0] == "max", **usage}
+
+def pressure_totals():
+    result = {}
+    for resource in ("cpu", "memory", "io"):
+        for kind, total in re.findall(r"^(some|full) [^\r\n]*\btotal=(\d+)$",
+                                      read("/proc/pressure/" + resource), re.M):
+            result[f"{resource}.{kind}"] = int(total)
+    return result
+
 def processes():
     result = {}
     for name in ("haproxy", "telemt", "health-agent"):
@@ -4178,7 +4197,8 @@ def processes():
                 pass
         result[name] = {"running": bool(pid), "ticks": ticks, "rss_bytes": rss, "fds": fds,
                         "fd_limit": integer(props.get("LimitNOFILE", "")),
-                        "tasks": integer(props.get("TasksCurrent", "")), "identity": sorted(pids), "at": time.monotonic()}
+                        "tasks": integer(props.get("TasksCurrent", "")), "identity": sorted(pids),
+                        "cpu_control": cpu_control(group), "at": time.monotonic()}
     return result
 
 def interfaces(details=False):
@@ -4260,6 +4280,10 @@ def sockets():
             row[field + "_max"] = values[-1] if values else None
     return groups
 
+def counter_deltas(before, after):
+    return {key: value - before[key] if key in before and value >= before[key] else None
+            for key, value in after.items()}
+
 def haproxy():
     try:
         with socket.socket(socket.AF_UNIX) as s:
@@ -4312,9 +4336,9 @@ seconds = int(sys.argv[1])
 role_match = re.search(r"^TDH_ROLE=(entry|backend1|backend2)$", read(sys.argv[2]), re.M)
 role = role_match[1] if role_match else "unknown"
 start = time.monotonic()
-c0, p0, i0, n0 = cpu(), processes(), interfaces(), counters()
+c0, p0, i0, n0, pressure0 = cpu(), processes(), interfaces(), counters(), pressure_totals()
 time.sleep(seconds)
-c1, p1, i1, n1 = cpu(), processes(), interfaces(True), counters()
+c1, p1, i1, n1, pressure1 = cpu(), processes(), interfaces(True), counters(), pressure_totals()
 elapsed = time.monotonic() - start
 for name, row in p1.items():
     previous = p0.get(name, {})
@@ -4323,6 +4347,10 @@ for name, row in p1.items():
     duration = row.pop("at") - previous.get("at", start)
     row["sample_seconds"] = round(duration, 3)
     row["cpu_percent_one_core"] = round(100 * (ticks - previous["ticks"]) / os.sysconf("SC_CLK_TCK") / duration, 2) if same_process else None
+    if control := row["cpu_control"]:
+        prior = (previous.get("cpu_control") or {}) if same_process else {}
+        values = {key: control.pop(key) for key in ("nr_periods", "nr_throttled", "throttled_usec") if key in control}
+        control.update({key + "_delta": value for key, value in counter_deltas(prior, values).items()})
 for name, row in i1.items():
     for field in ("rx_bytes", "tx_bytes", "rx_dropped", "tx_dropped", "rx_errors", "tx_errors"):
         old, new = i0.get(name, {}).get(field), row[field]
@@ -4347,7 +4375,7 @@ report = {"说明": "只读本机采样；无主动测速、无上传；null 表
           "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), "versions": versions,
           "memory_kib": numeric_fields(read("/proc/meminfo"), {"MemTotal", "MemAvailable", "SwapFree", "SwapTotal"}),
           "cpu": cpu_load, "services": p1, "interfaces": i1, "tcp": sockets(), "wireguard": wg,
-          "system_counters_delta": {k: v - n0[k] if k in n0 and v >= n0[k] else None for k, v in n1.items()},
+          "system_counters_delta": counter_deltas(n0, n1), "pressure_stall_usec_delta": counter_deltas(pressure0, pressure1),
           "vm_counters_total": {k: v for k, v in n1.items() if k.startswith("Vm.")},
           "sysctl": sysctls, "haproxy": haproxy(), "telemt": telemt(), "direct_buffer_pressure": None}
 print(json.dumps(report, ensure_ascii=False, indent=2))
