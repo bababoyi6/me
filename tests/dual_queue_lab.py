@@ -65,18 +65,24 @@ def second_tunnel(net):
 def shape_backends_and_entry(rates, *, install=False):
     """Use one private queue per tunnel endpoint. Update the class in place."""
     for (namespace, device), rate in zip(LINKS, rates, strict=True):
-        prefix = ('ip', 'netns', 'exec', namespace, 'tc')
-        if install:
-            command('ip', '-n', namespace, 'link', 'set', device, 'txqueuelen', '1000')
-            command(*prefix, 'qdisc', 'add', 'dev', device, 'root', 'handle', '1:', 'htb', 'default', '10')
-        command(*prefix, 'class', 'add' if install else 'change', 'dev', device,
-                'parent', '1:', 'classid', '1:10', 'htb', 'rate', f'{rate}mbit',
-                'ceil', f'{rate}mbit', 'quantum', '1514')
-        if install:
-            command(*prefix, 'qdisc', 'add', 'dev', device, 'parent', '1:10', 'handle', '10:', 'fq_codel')
-        observed = command(*prefix, '-d', 'class', 'show', 'dev', device)
-        if f'rate {rate}Mbit ceil {rate}Mbit' not in observed:
-            raise RuntimeError('queue rate differs from requested budget')
+        shape_endpoint(namespace, device, rate, install=install)
+
+
+def shape_endpoint(namespace, device, rate, *, install=False):
+    if (namespace, device) not in LINKS:
+        raise ValueError('expected a private tunnel endpoint')
+    prefix = ('ip', 'netns', 'exec', namespace, 'tc')
+    if install:
+        command('ip', '-n', namespace, 'link', 'set', device, 'txqueuelen', '1000')
+        command(*prefix, 'qdisc', 'add', 'dev', device, 'root', 'handle', '1:', 'htb', 'default', '10')
+    command(*prefix, 'class', 'add' if install else 'change', 'dev', device,
+            'parent', '1:', 'classid', '1:10', 'htb', 'rate', f'{rate}mbit',
+            'ceil', f'{rate}mbit', 'quantum', '1514')
+    if install:
+        command(*prefix, 'qdisc', 'add', 'dev', device, 'parent', '1:10', 'handle', '10:', 'fq_codel')
+    observed = command(*prefix, '-d', 'class', 'show', 'dev', device)
+    if f'rate {rate}Mbit ceil {rate}Mbit' not in observed:
+        raise RuntimeError('queue rate differs from requested budget')
 
 
 def snapshot():
