@@ -83,6 +83,13 @@ class LongPathAnalysisTests(unittest.TestCase):
                 data['rows'].extend(dict(row, round=turn, variant=variant, version=version,
                                          sha256_verified=True) for row in template)
         self.assertTrue(analyze(data)['initial_screen_passed'])
+        cache = copy.deepcopy(data)
+        cache['tls_candidate'] = 'oldcache'
+        cache['candidate_manifest']['binaries']['bulk']['version'] = TLS_CANDIDATES['oldcache'][3]
+        for row in cache['rows']:
+            if row['variant'] == 'candidate':
+                row['version'] = TLS_CANDIDATES['oldcache'][3]
+        self.assertTrue(analyze(cache)['initial_screen_passed'])
         for field, value in (('mbps', 94), ('socket_samples', [{'role': 'client', 'rtt_ms': 112}])):
             modified = copy.deepcopy(data)
             modified['rows'][4][field] = value

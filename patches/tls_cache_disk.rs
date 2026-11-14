@@ -78,7 +78,7 @@ fn read_entry(path: &Path, domain: &str) -> io::Result<(Vec<u8>, SystemTime)> {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "unsafe TLS cache entry"));
     }
     let mut bytes = Vec::with_capacity(before.len() as usize);
-    file.by_ref().take((MAX_BYTES + 1) as u64).read_to_end(&mut bytes)?;
+    Read::take(&mut file, (MAX_BYTES + 1) as u64).read_to_end(&mut bytes)?;
     let after = file.metadata()?;
     if bytes.len() > MAX_BYTES
         || before.dev() != after.dev()

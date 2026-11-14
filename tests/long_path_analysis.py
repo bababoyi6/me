@@ -53,7 +53,7 @@ def analyze(data):
         candidate_digest = digests.get('candidate')
         artifact, source_field, source_commit, version = candidate
         manifest = data.get('candidate_manifest', {})
-        project_field = 'project_commit' if data['tls_candidate'] == 'old' else 'manager_commit'
+        project_field = 'project_commit' if data['tls_candidate'] in ('old', 'oldcache') else 'manager_commit'
         pin = manifest.get('binaries', {}).get(artifact, {})
         budget, after = data.get('resources_before', {}), data.get('resources_after', {})
         if (digests.get('balanced2') != TLS_BASELINE[1] or
