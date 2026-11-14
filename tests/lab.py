@@ -120,11 +120,13 @@ class Agent(socketserver.ThreadingTCPServer):
 
 class AgentHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        self.request.sendall(b"up\n" if self.server.backend.agent_up else b"down\n")
+        backend = self.server.backend
+        reply = getattr(backend, 'agent_reply', None)
+        self.request.sendall(reply if reply is not None else (b"up\n" if backend.agent_up else b"down\n"))
 
 
 class Lab:
-    def __init__(self, binary, splice=False, master=False):
+    def __init__(self, binary, splice=False, master=False, *, managed_backends=None):
         self.tmp = tempfile.TemporaryDirectory(prefix="tdh-lab-")
         self.root = Path(self.tmp.name)
         self.backends = [Backend(b"1"), Backend(b"2")]
@@ -151,13 +153,20 @@ frontend mtp_tls
     use_backend telemt_b if {{ req.ssl_sni -i gs.apple.com }}
     default_backend telemt_a
 """
-        for name, order in (("a", [0, 1]), ("b", [1, 0])):
-            config += f"backend telemt_{name}\n{option}"
-            for pos, idx in enumerate(order):
-                config += (f"    server vps{idx + 1} 127.0.0.1:{self.backends[idx].server_address[1]}"
-                           f" check port {self.agents[idx].server_address[1]} inter 100ms fall 3 rise 2"
-                           f" send-proxy-v2 agent-check agent-port {self.agents[idx].server_address[1]}"
-                           f" agent-inter 100ms" + (" backup" if pos else "") + "\n")
+        if managed_backends is not None:
+            for index, (backend, agent) in enumerate(zip(self.backends, self.agents), 1):
+                managed_backends = managed_backends.replace(f'10.77.{index}.2:24431',
+                    f'127.0.0.1:{backend.server_address[1]}').replace(f'10.77.{index}.2:19101',
+                    f'127.0.0.1:{agent.server_address[1]}')
+            config += managed_backends
+        else:
+            for name, order in (("a", [0, 1]), ("b", [1, 0])):
+                config += f"backend telemt_{name}\n{option}"
+                for pos, idx in enumerate(order):
+                    config += (f"    server vps{idx + 1} 127.0.0.1:{self.backends[idx].server_address[1]}"
+                               f" check port {self.agents[idx].server_address[1]} inter 100ms fall 3 rise 2"
+                               f" send-proxy-v2 agent-check agent-port {self.agents[idx].server_address[1]}"
+                               f" agent-inter 100ms" + (" backup" if pos else "") + "\n")
         (self.root / "haproxy.cfg").write_text(config)
         self.process = subprocess.Popen([binary] + (["-W"] if master else []) + ["-db", "-f", str(self.root / "haproxy.cfg")],
                                         stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)

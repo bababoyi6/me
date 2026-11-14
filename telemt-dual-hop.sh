@@ -3536,14 +3536,22 @@ frontend mtp_tls
     use_backend telemt_b if sni_line_b
     default_backend tls_fallback_unknown
 
+backend telemt_health
+    option tcp-check
+    # Health-agent ready line: up followed by LF.
+    tcp-check expect rbinary ^75700[aA]\$
+    default-server inter 2s fastinter 500ms fall 3 rise 2
+    server vps1 10.77.1.2:${TDH_AGENT_PORT} check
+    server vps2 10.77.2.2:${TDH_AGENT_PORT} check
+
 backend telemt_a
-    server vps1 10.77.1.2:${TDH_TELEMT_PORT} check port ${TDH_AGENT_PORT} inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port ${TDH_AGENT_PORT} agent-inter 2s
-    server vps2 10.77.2.2:${TDH_TELEMT_PORT} check port ${TDH_AGENT_PORT} inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port ${TDH_AGENT_PORT} agent-inter 2s backup
+    server vps1 10.77.1.2:${TDH_TELEMT_PORT} track telemt_health/vps1 send-proxy-v2
+    server vps2 10.77.2.2:${TDH_TELEMT_PORT} track telemt_health/vps2 send-proxy-v2 backup
     server apple_a ${TDH_DOMAIN_A}:443 check inter 10s fall 3 rise 2 backup resolvers system_dns resolve-prefer ipv4 init-addr libc,none
 
 backend telemt_b
-    server vps2 10.77.2.2:${TDH_TELEMT_PORT} check port ${TDH_AGENT_PORT} inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port ${TDH_AGENT_PORT} agent-inter 2s
-    server vps1 10.77.1.2:${TDH_TELEMT_PORT} check port ${TDH_AGENT_PORT} inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port ${TDH_AGENT_PORT} agent-inter 2s backup
+    server vps2 10.77.2.2:${TDH_TELEMT_PORT} track telemt_health/vps2 send-proxy-v2
+    server vps1 10.77.1.2:${TDH_TELEMT_PORT} track telemt_health/vps1 send-proxy-v2 backup
     server apple_b ${TDH_DOMAIN_B}:443 check inter 10s fall 3 rise 2 backup resolvers system_dns resolve-prefer ipv4 init-addr libc,none
 
 backend tls_fallback_unknown
@@ -3961,7 +3969,7 @@ status_entry() {
   printf '\nHAProxy 后端：\n'
   if [[ -S /run/telemt-dual-hop/haproxy.sock ]]; then
     printf 'show stat\n' | timeout 3 socat - UNIX-CONNECT:/run/telemt-dual-hop/haproxy.sock 2>/dev/null | \
-      awk -F, 'NR==1 || $1=="telemt_a" || $1=="telemt_b" {print $1, $2, $18}'
+      awk -F, 'NR==1 || $1=="telemt_a" || $1=="telemt_b" || $1=="telemt_health" {print $1, $2, $18}'
   else
     warn "HAProxy Runtime Socket 不存在。"
   fi
@@ -4268,7 +4276,7 @@ def haproxy():
         return [{k: r[k] for k in ("pxname", "svname", "status") if k in r} |
                 {k: integer(r.get(k, "")) for k in ("qcur", "qmax", "scur", "smax", "slim", "bin", "bout",
                  "econ", "eresp", "wretr", "wredis", "chkfail", "chkdown", "downtime", "qtime", "ctime", "rtime", "ttime")}
-                for r in rows if r.get("pxname") in ("mtp_tls", "telemt_a", "telemt_b")
+                for r in rows if r.get("pxname") in ("mtp_tls", "telemt_a", "telemt_b", "telemt_health")
                 and r.get("svname") in ("FRONTEND", "BACKEND", "vps1", "vps2")
                 and re.fullmatch(r"[A-Z0-9 /()+_-]{1,40}|DOWN \(agent\)", r.get("status", ""))]
     except (OSError, ValueError, UnicodeError):

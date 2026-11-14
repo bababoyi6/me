@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
+        options: ['focused', 'none', 'manager', 'entry-health', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose', 'gigabit-tunnel-affinity']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -128,6 +128,20 @@ jobs:
           name: native-socket-evidence
           path: ${{ runner.temp }}/native-evidence/*.json
           retention-days: 14
+  entry-health:
+    if: inputs.tls_candidate == 'entry-health'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify the generated HAProxy check and failover on loopback
+        run: |
+          sudo timeout 90 apt-get update -qq
+          sudo timeout 120 apt-get install -y --no-install-recommends haproxy
+          bash -n telemt-dual-hop.sh
+          timeout --kill-after=5 40 python3 -m unittest discover -s tests -p 'test_performance.py' -k test_real_generated_config_and_telemt_security -v
   manager-update:
     if: inputs.tls_candidate == 'manager' || inputs.tls_candidate == 'focused'
     runs-on: ubuntu-22.04
