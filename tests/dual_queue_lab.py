@@ -139,7 +139,7 @@ def set_second_route(root, enabled):
                 raise RuntimeError('HAProxy admin command rejected')
 
 
-def run_cohort(clients, dc, *, failed_over, payload_bytes=32*1024**2, observe=None):
+def run_cohort(clients, dc, *, failed_over, payload_bytes=32*1024**2, observe=None, domains=DOMAINS):
     before = [w.call({'command':'stats'}) for w in dc]
     with ThreadPoolExecutor(max_workers=2) as executor:
         def workload(pair):
@@ -147,14 +147,15 @@ def run_cohort(clients, dc, *, failed_over, payload_bytes=32*1024**2, observe=No
             client.send({'command':'mixed','logical_clients':30,'candidate_screen':True,
                          'domain':domain,'payload_bytes':payload_bytes})
             return client.receive(110)
-        futures = [executor.submit(workload,pair) for pair in zip(clients,DOMAINS,strict=True)]
+        futures = [executor.submit(workload,pair) for pair in zip(clients,domains,strict=True)]
         if observe:
             observe(futures)
         rows = [future.result() for future in futures]
     if any(row.get('errors') or not row.get('complete') for row in rows):
         raise RuntimeError('mixed workload failed: '+json.dumps([row['errors'] for row in rows]))
-    expected = [row['dc_connections'] for row in rows]
-    expected = [sum(expected),0] if failed_over else expected
+    expected = [0,0]
+    for domain,row in zip(domains,rows,strict=True):
+        expected[0 if failed_over else DOMAINS.index(domain)] += row['dc_connections']
     for _ in range(10):
         after = [w.call({'command':'stats'}) for w in dc]
         counts = [new['completed']-old['completed'] for old,new in zip(before, after, strict=True)]
