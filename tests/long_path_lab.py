@@ -69,7 +69,8 @@ def worker(role,cpu):
                 if request['command']=='mixed':
                     from mixed_workload import run_mixed
                     result=run_mixed(endpoint,request['logical_clients'],candidate_screen=request.get('candidate_screen',False),
-                                     domain=request.get('domain'),payload_bytes=request.get('payload_bytes'))
+                                     domain=request.get('domain'),payload_bytes=request.get('payload_bytes'),
+                                     trace_timing=request.get('trace_timing',False))
                 elif request['command']=='single':
                     if request['domain'] not in ('apple.com','gs.apple.com'):
                         raise ValueError('unregistered synthetic domain')

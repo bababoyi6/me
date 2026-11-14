@@ -33,7 +33,7 @@ def finish_idle(streams):
         return list(pool.map(finish,streams))
 
 
-def run_mixed(endpoint, logical_clients, *, candidate_screen=False, domain=None, payload_bytes=None):
+def run_mixed(endpoint, logical_clients, *, candidate_screen=False, domain=None, payload_bytes=None, trace_timing=False):
     if logical_clients not in (30,50,100):raise ValueError('unregistered cohort')
     if domain is not None and domain not in SECRETS:
         raise ValueError('unregistered synthetic domain')
@@ -76,11 +76,14 @@ def run_mixed(endpoint, logical_clients, *, candidate_screen=False, domain=None,
                 active=sum(not f.done() for f in bulk) if bulk else 0
                 start=time.monotonic()
                 row=FullLab.transfer(endpoint,domains[worker%len(domains)],
-                    'D',1024,125000000,persistent=True,io_timeout=25)
+                    'D',1024,125000000,persistent=True,io_timeout=25,trace_timing=trace_timing)
                 with lock:result['new_connections_completed']+=1
-                result[phase]['new_connection'].append({'offset_seconds':start-origin,
+                sample = {'offset_seconds':start-origin,
                     'elapsed_ms':row['elapsed_seconds']*1000,'fake_tls_ms':row['handshake_ms'],
-                    'active_bulk':active,'sha256_verified':row['sha256_verified']})
+                    'active_bulk':active,'sha256_verified':row['sha256_verified']}
+                if trace_timing:
+                    sample['phase_timing'] = row['phase_timing']
+                result[phase]['new_connection'].append(sample)
                 if phase=='loaded':stop.wait(.1)
                 else:time.sleep(.05)
         with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:

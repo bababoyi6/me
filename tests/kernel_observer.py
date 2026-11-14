@@ -10,6 +10,7 @@ import socket
 import struct
 import threading
 import time
+from contextlib import contextmanager
 
 HEADER = struct.Struct('=IHHII')
 MAX_BYTES = 4 * 1024**2
@@ -119,7 +120,7 @@ def socket_inodes(pid, deadline):
     return result
 
 
-def decode_socket(body, inodes, listen, *, namespace='tdh-audit-a'):
+def decode_socket(body, inodes, listen, *, namespace='tdh-audit-a', frontend=False):
     if namespace not in SOCKET_ENDPOINTS:
         raise ObservationError('socket namespace outside lab scope')
     if len(body) < 72 or body[0] != socket.AF_INET:
@@ -130,8 +131,18 @@ def decode_socket(body, inodes, listen, *, namespace='tdh-audit-a'):
     sport, dport = struct.unpack_from('!HH', body, 4)
     src, dst = socket.inet_ntoa(body[8:12]), socket.inet_ntoa(body[24:28])
     address, dc_endpoint = SOCKET_ENDPOINTS[namespace]
-    role = ('client' if (src, sport) == (address, listen) else
-            'dc' if (dst, dport) == dc_endpoint else None)
+    if frontend:
+        if namespace != NAMES[0]:
+            raise ObservationError('frontend sockets require the entry namespace')
+        if (src, sport, dst) == ('127.0.0.1', listen, '127.0.0.1'):
+            role = 'entry_to_client'
+        elif dport == 24431 and dst in ('10.77.1.2', '10.77.2.2'):
+            role = 'entry_to_core'
+        else:
+            return None
+    else:
+        role = ('client' if (src, sport) == (address, listen) else
+                'dc' if (dst, dport) == dc_endpoint else None)
     if role is None:
         return None
     attrs = attributes(body[72:])
@@ -153,7 +164,7 @@ def decode_socket(body, inodes, listen, *, namespace='tdh-audit-a'):
     return item
 
 
-def observe_sockets(pid, listen, *, namespace='tdh-audit-a'):
+def observe_sockets(pid, listen, *, namespace='tdh-audit-a', frontend=False):
     # Only a named, isolated lab role: bounded dump and process inode ownership.
     if namespace not in SOCKET_ENDPOINTS:
         raise ObservationError('socket namespace outside lab scope')
@@ -169,7 +180,8 @@ def observe_sockets(pid, listen, *, namespace='tdh-audit-a'):
     if remaining <= 0:
         raise ObservationError('late socket observation setup')
     rows = dump(4, 20, request, timeout=remaining)
-    result = [item for body in rows if (item := decode_socket(body, inodes, listen, namespace=namespace)) is not None]
+    result = [item for body in rows if (item := decode_socket(
+        body, inodes, listen, namespace=namespace, frontend=frontend)) is not None]
     if time.monotonic() > deadline:
         raise ObservationError('late socket observation')
     return result
@@ -181,7 +193,7 @@ def decode_qdisc(body):
     _, index, _, _, _ = struct.unpack_from('=B3xiIII', body)
     attrs = attributes(body[20:])
     kind = attrs.get(1, b'').rstrip(b'\0').decode('ascii')
-    if kind not in ('fq', 'netem'):
+    if kind not in ('fq', 'fq_codel', 'netem', 'tbf'):
         return None
     result = {'dev': socket.if_indextoname(index), 'kind': kind}
     stats = attributes(attrs[7]) if 7 in attrs else {}
@@ -206,11 +218,11 @@ def decode_qdisc(body):
     return result
 
 
-def qdiscs_in_namespace(name):
+@contextmanager
+def private_namespace(name):
     """Temporarily enter only an allowlisted lab netns; restore this thread always."""
-    if name not in NAMES or threading.current_thread() is not threading.main_thread():
+    if name not in (*NAMES, 'tdh-audit-b2') or threading.current_thread() is not threading.main_thread():
         raise ObservationError('namespace or thread outside lab scope')
-    deadline = time.monotonic() + 2
     libc = ctypes.CDLL(None, use_errno=True)
     libc.setns.argtypes = (ctypes.c_int, ctypes.c_int)
     libc.setns.restype = ctypes.c_int
@@ -226,12 +238,7 @@ def qdiscs_in_namespace(name):
         target = os.open('/run/netns/' + name, os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW)
         enter(target)
         try:
-            remaining = deadline - time.monotonic()
-            if remaining <= 0:
-                raise ObservationError('late qdisc observation setup')
-            bodies = dump(0, 38, struct.pack('=B3xiIII', socket.AF_UNSPEC, 0, 0, 0, 0),
-                          response_kind=36, timeout=remaining)
-            result = [row for body in bodies if (row := decode_qdisc(body)) is not None]
+            yield
         finally:
             # Restoration failure is fatal, not a recoverable missing sample.
             try:
@@ -242,6 +249,17 @@ def qdiscs_in_namespace(name):
         if target is not None:
             os.close(target)
         os.close(original)
+
+
+def qdiscs_in_namespace(name):
+    deadline = time.monotonic() + 2
+    with private_namespace(name):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise ObservationError('late qdisc observation setup')
+        bodies = dump(0, 38, struct.pack('=B3xiIII', socket.AF_UNSPEC, 0, 0, 0, 0),
+                      response_kind=36, timeout=remaining)
+        result = [row for body in bodies if (row := decode_qdisc(body)) is not None]
     if time.monotonic() > deadline:
         raise ObservationError('late qdisc observation')
     return result

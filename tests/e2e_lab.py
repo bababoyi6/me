@@ -63,11 +63,15 @@ def close_on_error(resource):
 
 
 class ObservedReader:
-    def __init__(self, stream):
+    def __init__(self, stream, *, trace_timing=False):
         self.stream, self.bytes = stream, 0
+        self.trace_timing = trace_timing
+        self.first_data_at = None
 
     def recv(self, count):
         block = self.stream.recv(count)
+        if self.trace_timing and self.first_data_at is None and block:
+            self.first_data_at = time.monotonic()
         self.bytes += len(block)
         return block
 
@@ -368,7 +372,7 @@ backend telemt
     def identity(self):
         return {"user": self.uid, "group": self.gid, "extra_groups": []} if os.geteuid() == 0 else {}
 
-    def transfer(self, domain, direction, size, rate, direct=False, fragment=False, io_timeout=8, persistent=False, read_pause=0, receive_buffer=0, send_buffer=0, client_nodelay=False):
+    def transfer(self, domain, direction, size, rate, direct=False, fragment=False, io_timeout=8, persistent=False, read_pause=0, receive_buffer=0, send_buffer=0, client_nodelay=False, *, trace_timing=False):
         if self.real_dc:
             raise ValueError("synthetic file operations are confined to the mock DC")
         if not 2 <= io_timeout <= 30:
@@ -381,11 +385,15 @@ backend telemt
             raise ValueError('bounded lab send buffer required')
         if type(client_nodelay) is not bool:
             raise ValueError('explicit lab client socket policy required')
+        if trace_timing and (direct or direction != 'D' or size != 1024 or not persistent or read_pause):
+            raise ValueError('phase timing requires a synthetic 1 KiB frontend download probe')
         started = time.monotonic()
         phase, observed = "connect", None
         client_port = None
         try:
             with socket.create_connection(("127.0.0.1", self.listen if direct else self.front), timeout=8) as sock:
+                if trace_timing:
+                    connected = time.monotonic()
                 client_port = sock.getsockname()[1]
                 if client_nodelay:
                     sock.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
@@ -404,16 +412,20 @@ backend telemt
                     time.sleep(read_pause)
                 phase = "payload"
                 if direction == "D":
-                    observed = ObservedReader(stream)
+                    observed = ObservedReader(stream, trace_timing=trace_timing)
                     digest = receive_payload(observed, size)
                 else:
                     digest = send_payload(stream, size, rate)
                 if persistent and direction == "D":
+                    if trace_timing:
+                        payload_received = time.monotonic()
                     phase = "ack"
                     stream.sendall(b"ACK!")
                 phase = "digest"
                 if exact(stream, 32) != digest:
                     raise RuntimeError("synthetic payload SHA256 mismatch")
+                if trace_timing:
+                    verified = time.monotonic()
                 if persistent and direction == "U":
                     phase = "ack"
                     stream.sendall(b"ACK!")
@@ -425,10 +437,20 @@ backend telemt
             exc.lab_elapsed_seconds = time.monotonic() - started
             exc.lab_client_port = client_port
             raise
-        return {"direction": direction, "domain_index": list(SECRETS).index(domain) + 1,
+        result = {"direction": direction, "domain_index": list(SECRETS).index(domain) + 1,
                 "path": "telemt" if direct else "haproxy-telemt", "bytes": size,
                 "elapsed_seconds": time.monotonic() - started, "handshake_ms": (ready - started) * 1000,
                 "sha256_verified": True, "persistent_dc": persistent,"client_nodelay":actual_nodelay}
+        if trace_timing:
+            result['phase_timing'] = {
+                'client_port': client_port,
+                'local_connect_ms': (connected - started) * 1000,
+                'to_transport_ready_ms': (ready - connected) * 1000,
+                'to_first_payload_ms': (observed.first_data_at - ready) * 1000,
+                'remaining_payload_ms': (payload_received - observed.first_data_at) * 1000,
+                'ack_digest_ms': (verified - payload_received) * 1000,
+            }
+        return result
 
     def real_probe(self, dc=2):
         if not self.real_dc:

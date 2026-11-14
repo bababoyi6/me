@@ -92,8 +92,10 @@ def snapshot():
     } for ns, dev in LINKS}
 
 
-def start_frontend(net):
+def start_frontend(net, *, connection_timings=False):
     cfg = net.root/'haproxy.cfg'
+    traffic_log = ('    log stdout format raw local0\n'
+                   '    log-format "tdh %cp %b %s %Tw %Tc %rc %ts"\n') if connection_timings else ''
     cfg.write_text(f'''global
     nbthread 1
     stats socket {net.root}/haproxy.sock mode 600 level admin
@@ -103,7 +105,7 @@ defaults
     timeout client 30s
     timeout server 30s
 frontend lab
-    bind 127.0.0.1:24443
+{traffic_log}    bind 127.0.0.1:24443
     tcp-request inspect-delay 2s
     tcp-request content accept if {{ req.ssl_hello_type 1 }}
     use_backend line_b if {{ req.ssl_sni -i gs.apple.com }}
@@ -115,8 +117,12 @@ backend line_b
     server second 10.77.2.2:24431 send-proxy-v2
     server first 10.77.1.2:24431 send-proxy-v2 backup
 ''', encoding='ascii')
-    process = subprocess.Popen(['ip','netns','exec',NAMES[0],'haproxy','-db','-f',str(cfg)],
-                               stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    args = ['ip','netns','exec',NAMES[0],'haproxy','-db','-f',str(cfg)]
+    if connection_timings:
+        with (net.root/'haproxy-timings.log').open('wb') as log:
+            process = subprocess.Popen(args,stdout=log,stderr=subprocess.DEVNULL)
+    else:
+        process = subprocess.Popen(args,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
     net.processes.append(process)
     for _ in range(30):
         if process.poll() is not None:
@@ -139,13 +145,14 @@ def set_second_route(root, enabled):
                 raise RuntimeError('HAProxy admin command rejected')
 
 
-def run_cohort(clients, dc, *, failed_over, payload_bytes=32*1024**2, observe=None, domains=DOMAINS):
+def run_cohort(clients, dc, *, failed_over, payload_bytes=32*1024**2, observe=None, domains=DOMAINS,
+               trace_timing=False):
     before = [w.call({'command':'stats'}) for w in dc]
     with ThreadPoolExecutor(max_workers=2) as executor:
         def workload(pair):
             client, domain = pair
             client.send({'command':'mixed','logical_clients':30,'candidate_screen':True,
-                         'domain':domain,'payload_bytes':payload_bytes})
+                         'domain':domain,'payload_bytes':payload_bytes,'trace_timing':trace_timing})
             return client.receive(110)
         futures = [executor.submit(workload,pair) for pair in zip(clients,domains,strict=True)]
         if observe:

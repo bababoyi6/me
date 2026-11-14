@@ -5,7 +5,7 @@ on:
       tls_candidate:
         description: Select an isolated audit check
         type: choice
-        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy']
+        options: ['focused', 'none', 'manager', 'old', 'new', 'new-mixed', 'new-queue', 'new-dual', 'new-gigabit', 'gigabit-control', 'gigabit-proxy-window', 'new-client-lowat', 'gigabit-tunnel-budget', 'gigabit-tunnel-proxy', 'gigabit-tunnel-diagnose']
         default: 'focused'
       tls_parity:
         description: Also run the bounded 100 ms AB/BA throughput screen after protocol smoke
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Measure the effect of private TCP autotuning ceilings
+      - name: Measure private gigabit path capacity or latency
         env:
           PYTHONPATH: ${{ github.workspace }}/tools
           TEST_MODE: ${{ inputs.tls_candidate }}
@@ -43,10 +43,13 @@ jobs:
           sudo modprobe tcp_bbr
           if [[ $TEST_MODE == gigabit-tunnel-* ]]; then
             args=("$RUNNER_TEMP/gigabit-control.json")
-            if [[ $TEST_MODE == gigabit-tunnel-proxy ]]; then
+            if [[ $TEST_MODE != gigabit-tunnel-budget ]]; then
               sudo timeout 180 apt-get install -y --no-install-recommends haproxy
               curl -q -fL --connect-timeout 10 --max-time 90 --max-filesize 11000000 --proto '=https' --proto-redir '=https' --tlsv1.2 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
               args+=("$RUNNER_TEMP/balanced2.tar.gz")
+            fi
+            if [[ $TEST_MODE == gigabit-tunnel-diagnose ]]; then
+              args+=(--diagnose)
             fi
             sudo systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tunnel-budget-${GITHUB_RUN_ID}" -p CPUQuota=400% -p MemoryMax=2048M -p MemoryHigh=1700M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=360 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/tunnel_budget_lab.py "${args[@]}"
             exit
