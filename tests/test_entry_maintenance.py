@@ -114,6 +114,8 @@ class EntryMaintenanceTests(unittest.TestCase):
         self.assertEqual(migrate_health(path,True,lab.stat,reload), 'rolled-back')
         self.assertEqual(path.read_bytes(), original)
         self.assertEqual(len(reloads),2)
+        wait_runtime(lab.stat,False,require_ready=True)
+
         def fail_migration(request, tracked, *, require_ready):
             wait_runtime(request, tracked, require_ready=require_ready)
             if tracked:
