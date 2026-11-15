@@ -1,0 +1,97 @@
+--- a/src/tls_front/cache.rs
++++ b/src/tls_front/cache.rs
+@@ -30,6 +30,15 @@
+         && now
+             .duration_since(cached.fetched_at)
+             .is_ok_and(|age| age > TLS_PROFILE_MAX_AGE)
++}
++
++fn profile_expiry_delay(cached: &CachedTlsData, now: SystemTime) -> Option<Duration> {
++    if cached.domain == "default" {
++        return None;
++    }
++    let age = now.duration_since(cached.fetched_at).ok()?;
++    (age <= TLS_PROFILE_MAX_AGE)
++        .then(|| TLS_PROFILE_MAX_AGE - age + Duration::from_millis(1))
+ }
+ 
+ static FULL_CERT_SENT_IPS_GAUGE: AtomicU64 = AtomicU64::new(0);
+@@ -226,6 +235,16 @@
+             })
+             .cloned()
+             .collect()
++    }
++
++    /// Wake the refresh task when an in-memory fetched profile first becomes stale.
++    pub(crate) async fn next_profile_expiry_delay(&self, domains: &[String]) -> Option<Duration> {
++        let guard = self.memory.read().await;
++        let now = SystemTime::now();
++        domains
++            .iter()
++            .filter_map(|domain| guard.get(domain).and_then(|entry| profile_expiry_delay(entry, now)))
++            .min()
+     }
+ 
+     fn full_cert_sent_shard_index(client_ip: IpAddr) -> usize {
+@@ -672,6 +691,23 @@
+             .await;
+         assert_eq!(cache.get("stale.example").await.domain, "stale.example");
+         assert!(cache.default_profile_domains(&domains).await.is_empty());
++        let next = cache.next_profile_expiry_delay(&domains).await.unwrap();
++        assert!(next > Duration::from_secs(3500));
++        assert!(next <= Duration::from_secs(3601));
++    }
++
++    #[test]
++    fn fetched_profile_expiry_wakes_before_regular_refresh() {
++        let now = UNIX_EPOCH + Duration::from_secs(100 * 3600);
++        let mut fetched = cached_with_cert_info("fresh.example", None, Vec::new());
++        fetched.fetched_at = now - Duration::from_secs(71 * 3600);
++        assert_eq!(profile_expiry_delay(&fetched, now), Some(Duration::from_secs(3600) + Duration::from_millis(1)));
++        fetched.fetched_at = now - TLS_PROFILE_MAX_AGE;
++        assert_eq!(profile_expiry_delay(&fetched, now), Some(Duration::from_millis(1)));
++        fetched.fetched_at = now - Duration::from_secs(73 * 3600);
++        assert_eq!(profile_expiry_delay(&fetched, now), None);
++        fetched.domain = "default".to_string();
++        assert_eq!(profile_expiry_delay(&fetched, now), None);
+     }
+ 
+     #[tokio::test]
+--- a/src/maestro/tls_bootstrap.rs
++++ b/src/maestro/tls_bootstrap.rs
+@@ -153,14 +153,29 @@
+             .default_profile_domains(&context.domains)
+             .await;
+         let (delay, retry) = schedule.next_delay(!pending.is_empty());
+-        tokio::time::sleep(delay).await;
+-        if !retry {
++        let wake = if retry {
++            delay
++        } else {
++            context
++                .cache
++                .next_profile_expiry_delay(&context.domains)
++                .await
++                .map_or(delay, |remaining| delay.min(remaining))
++        };
++        tokio::time::sleep(wake).await;
++        if retry || wake < delay {
++            let pending = context
++                .cache
++                .default_profile_domains(&context.domains)
++                .await;
++            if !pending.is_empty() {
++                context
++                    .fetch_with_budget(&pending, "TLS emulation stale/default profile retry failed")
++                    .await;
++            }
++        } else {
+             context
+                 .fetch_all_with_budget("TLS emulation refresh failed")
+-                .await;
+-        } else {
+-            context
+-                .fetch_with_budget(&pending, "TLS emulation retry failed")
+                 .await;
+         }
+     }

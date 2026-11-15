@@ -20,6 +20,7 @@ TLS_PATCHES = (
 CACHE_PATCH = ROOT / 'patches/telemt-3.5.5-tls-cache-disk.patch'
 CACHE_HELPER = ROOT / 'patches/tls_cache_disk.rs'
 LIVE_EXPIRY_PATCH = ROOT / 'patches/telemt-3.5.5-tls-cache-live-expiry.patch'
+EXPIRY_WAKE_PATCH = ROOT / 'patches/telemt-3.5.5-tls-cache-expiry-wakeup.patch'
 
 
 def digest(path):
@@ -59,12 +60,15 @@ def verify_tls_backport(source, build, cache_disk=False):
         helper.write_bytes(CACHE_HELPER.read_bytes())
         run('git', 'apply', '--check', str(LIVE_EXPIRY_PATCH), cwd=source)
         run('git', 'apply', str(LIVE_EXPIRY_PATCH), cwd=source)
+        run('git', 'apply', '--check', str(EXPIRY_WAKE_PATCH), cwd=source)
+        run('git', 'apply', str(EXPIRY_WAKE_PATCH), cwd=source)
     run(*command, 'tls_front::emulator::', cwd=source, timeout=1200)
     run(*command, 'maestro::tls_bootstrap::tests::', cwd=source, timeout=1200)
     if cache_disk:
         run(*command, 'tls_front::cache::disk_io::tests::', cwd=source, timeout=1200)
         run(*command, 'tls_front::cache::tests::disk_load_', cwd=source, timeout=1200)
         run(*command, 'tls_front::cache::tests::live_stale_', cwd=source, timeout=1200)
+        run(*command, 'tls_front::cache::tests::fetched_profile_expiry_', cwd=source, timeout=1200)
 
 
 def main():
@@ -115,9 +119,9 @@ def main():
         variants = [('fixed','3.5.5+tdh.audit1'), ('control','3.5.5+tdh.audit2'),
                     ('balanced','3.5.5+tdh.balanced1'), ('bulk',candidate_version)]
     if security:
-        variants = [('bulk', '3.5.5+tdh.balanced2.security2.1' if cache_disk else '3.5.5+tdh.balanced2.security1')]
+        variants = [('bulk', '3.5.5+tdh.balanced2.security2.2' if cache_disk else '3.5.5+tdh.balanced2.security1')]
         manifest.update(
-            tls_patches={path.name: digest(path) for path in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER, LIVE_EXPIRY_PATCH) if cache_disk else ()))},
+            tls_patches={path.name: digest(path) for path in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER, LIVE_EXPIRY_PATCH, EXPIRY_WAKE_PATCH) if cache_disk else ()))},
             upstream_changes=['ae85b1566872c6ecac95a2c498ccea50f64ddc10',
                               '3f5feb33d4d64e53f69851c1ed110c0aa388e3c1'],
             cargo=subprocess.check_output(['cargo', '--version'], text=True).strip(),
@@ -232,13 +236,13 @@ def main():
     shutil.copyfile(ROOT / 'patches/unsent_queue_bulk.rs', output / 'unsent_queue_bulk.rs')
     shutil.copyfile(ROOT / 'patches/low_rtt_receive.rs', output / 'low_rtt_receive.rs')
     if security:
-        for tls_patch in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER, LIVE_EXPIRY_PATCH) if cache_disk else ())):
+        for tls_patch in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER, LIVE_EXPIRY_PATCH, EXPIRY_WAKE_PATCH) if cache_disk else ())):
             shutil.copyfile(tls_patch, output / tls_patch.name)
         shutil.copyfile(historical_path, output / 'balanced2-reference-manifest.json')
         (output / 'NOTICE.txt').write_text(
             'Unofficial modified Telemt 3.5.5. Upstream license and copyright retained.\n'
             'Includes balanced2 Linux socket and relay changes, backports of Telemt PRs #966 and #968, '
-            + ('and bounded atomic TLS cache I/O with live 72-hour expiry.\n' if cache_disk else 'and the original TLS cache I/O.\n') +
+            + ('and bounded atomic TLS cache I/O with live 72-hour expiry and expiry-time refresh.\n' if cache_disk else 'and the original TLS cache I/O.\n') +
             'Profile recovery returns to regular refresh after seven fast attempts.\n'
             'Experimental build for isolated verification; no upstream endorsement.\n'
         )
