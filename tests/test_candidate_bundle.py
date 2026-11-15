@@ -24,6 +24,7 @@ class CandidateBundleTests(unittest.TestCase):
         self.native=json.loads((ROOT/'docs/bulk-core-manifest-20261024.json').read_text())
         for info in self.native['binaries'].values():
             info.update(sha256=self.binary_sha,bytes=len(binary))
+        self.native['builder_sha256']=package.sha256((ROOT/'tools/build_relay_candidate.py').read_bytes())
 
     def pair(self, mutate=None):
         files={'LICENSE':(ROOT/'patches/TELEMT-LICENSE.txt').read_bytes(),'NOTICE.txt':b'Synthetic native fixture'}
@@ -75,3 +76,10 @@ class CandidateBundleTests(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         package.bundle(archive,self.root/'output.tar.gz')
                 self.assertFalse((self.root/'output.tar.gz').exists())
+
+    def test_changed_builder_source_is_refused(self):
+        archive=self.pair(lambda files:files.update({'build_relay_candidate.py':b'changed builder'}))
+        with patch.multiple(package,PAIR_SHA256=package.sha256(archive.read_bytes()),CORE_SHA256=self.binary_sha):
+            with self.assertRaisesRegex(ValueError,'candidate source identity mismatch'):
+                package.bundle(archive,self.root/'output.tar.gz')
+        self.assertFalse((self.root/'output.tar.gz').exists())
