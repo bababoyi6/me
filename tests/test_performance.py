@@ -399,14 +399,16 @@ timeout() {
         self.assertNotIn("performance_apply()", SCRIPT.read_text())
         self.assertNotIn("perf-apply)", SCRIPT.read_text())
 
-    def test_runtime_templates_match_production_baseline(self):
+    def test_runtime_templates_match_reviewed_baseline_and_health_change(self):
         import hashlib
-        manifest = json.loads((ROOT / "tests/fixtures/runtime-template-hashes.json").read_text())
-        text = SCRIPT.read_text()
+        manifest = json.loads((ROOT / "tests/fixtures/runtime-template-hashes.json").read_text(encoding="utf-8"))
+        text = SCRIPT.read_text(encoding="utf-8")
+        overrides = manifest["maintenance_overrides"]
+        self.assertEqual(set(overrides), {"write_haproxy_config"})
         for name, expected in manifest["functions"].items():
             start = text.index(name + "() {\n")
             end = text.index("\n}\n", start) + 3
-            self.assertEqual(hashlib.sha256(text[start:end].encode()).hexdigest(), expected, name)
+            self.assertEqual(hashlib.sha256(text[start:end].encode()).hexdigest(), overrides.get(name, expected), name)
 
     def test_iperf_aggregate_cap_and_no_raw_error_output(self):
         import importlib.util
