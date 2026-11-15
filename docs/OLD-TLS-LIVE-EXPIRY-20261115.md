@@ -16,6 +16,8 @@
 
 PR 自动 `validate` 首轮失败是历史候选打包测试的合成 manifest 仍固定旧构建器摘要。只更新测试夹具以匹配当前构建器，并添加“篡改构建器必拒绝”的断言后，`validate` 与 `relay-regression` 均通过；生产打包器的摘要校验规则未改。这些通过结果只属于 `security2.1` 的 SHA，不能替代 `security2.2` 的验证。
 
-## `security2.2` 固定构建与待验证项
+## `security2.2` 固定构建与资格检查
 
-[CI 43696895907](https://github.com/bababoyi6/me/actions/runs/43696895907) 重建 `security2.2` 并通过 TLS、磁盘缓存、运行中老化与过期点唤醒的 Rust 定向用例。清单记录固定二进制 SHA256 `0b901711296707c23da7e8edda5509f108bd351f6e4b9c72f0f69a1b1fe71388`、`default_installer_changed=false`。仍需在同一 SHA 上复核隔离协议、源恢复和系统回退；完成前不合并候选源码。即使通过，也不构成正式默认核心、真实客户端、公网或长期稳定性批准。
+[CI 43696895907](https://github.com/bababoyi6/me/actions/runs/43696895907) 重建 `security2.2` 并通过 TLS、磁盘缓存、运行中老化与过期点唤醒的 Rust 定向用例。清单记录固定二进制 SHA256 `0b901711296707c23da7e8edda5509f108bd351f6e4b9c72f0f69a1b1fe71388`、`default_installer_changed=false`。运行中老化用例使用受控的历史抓取时间，验证 72 小时边界和抓取成功后的恢复；不是实际等待 72 小时的耐久实验。
+
+[CI 43698098368](https://github.com/bababoyi6/me/actions/runs/43698098368) 重建出相同二进制 SHA 和补丁集，并通过隔离协议/API 边界、两域私有 TLS 源恢复与停源冷加载、真实 systemd 安装/升级/重启/健康/回退。原始清单与三份报告的候选提交一致且均 `accepted=true`。协议 8 次、恢复 12 次、系统 4 次合成传输摘要均通过；两域从默认 profile 更新为 `merged`，源恢复约 20.26 秒，0600 缓存停源重启后保持不变。记录的 OOM/OOM kill 增量为零，私有进程已关闭；回退恢复旧二进制，配置与 token 未变，临时单元已清理。PR 自动 `validate` 与 `relay-regression` 也通过。以上支持合并候选源码与验证工具；正式默认核心、真实客户端、公网和长期稳定性仍无批准结论。
