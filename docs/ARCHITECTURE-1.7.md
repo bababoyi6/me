@@ -41,12 +41,12 @@ Telegram 官方客户端
 | 服务/准入 | 本机认证 API `/v1/health/ready` 返回 HTTP 200、`ok=true`、`ready=true` | 不证明所有 DC 或真实客户端正常 |
 | 本地端口 | 健康代理 TCP 连接本机 WG `24431` | 不验证 MTProto 握手 |
 | 上游网络 | 并行连接五个固定 DC 的 TCP 443，多数票 `3/5` | 仅可达性，不是逐 DC 协议成功率 |
-| 入口观察 | HAProxy TCP 检查健康代理端口 + agent `up/down` | 隧道断开或代理退出后能摘除后端 |
+| 入口观察 | 开发分支生成的 HAProxy 配置每台后端只检查一次健康代理，两条线路共享判定 | 只有健康代理返回 `up` 就绪行才通过。空响应、非就绪内容、超时或拒绝连接计作失败 |
 | 协议/业务 | 独立有界 Fake TLS/MTProto 验收和官方客户端复验 | 不在常驻健康代理中进行高频握手 |
 
 API+端口每秒采样，连续失败 3 次降级、连续成功 2 次恢复；一次降级后至少等待 10 秒。DC 每 10 秒采样，连续 2 轮多数不可达降级、连续 3 轮多数可达恢复；降级后至少等待 30 秒。冷却只阻止提前恢复，不延迟正在服务节点的故障摘除。时间从失败采样开始计算，实际周期还包含最多 2 秒连接超时。
 
-API 样本超过 5 秒、DC 样本超过 25 秒即失效；监控线程退出会让代理进程退出，由已有 systemd `Restart=always` 恢复。HAProxy 继续检查 **代理端口**：若只检查 Telemt 端口，健康代理崩溃而 Telemt 仍监听时，agent-check 的连接错误不能可靠替代摘除判断。
+API 样本超过 5 秒、DC 样本超过 25 秒即失效；监控线程退出会让代理进程退出，由已有 systemd `Restart=always` 恢复。开发分支的入口生成器改用私有 `telemt_health` 后端执行内容检查，正常间隔 2 秒，状态转换中的间隔为 500 ms，连续失败三次摘除、连续成功两次恢复。线路 A 和 B 的 `track` 指向同一健康源，各自仍可通过 Runtime API 排空或恢复。已安装的旧配置可使用显式的 `a entry-health-refresh` 迁移。`a update` 只更新管理器文件。[入口回归](https://github.com/bababoyi6/me/actions/runs/43574451734)
 
 11月9日增加整轮检查进度保护：API超过15秒、DC超过45秒没有完成新检查（包括冷启动首轮）时，健康代理退出，由现有systemd恢复。主循环每秒检查；先按5/25秒样本期限停止放行，不能被仍存活的卡住线程永久拖住。普通API/DC返回不健康仍只走原滞回，不因故障票重启。重启对象仅是健康代理，不是Telemt；不新增常驻进程、公网端口或生产TCP调参。真实HTTP持续零星字节反例与恢复结果见[本轮报告](STABILITY-MIXED-20261109.md)。
 
@@ -67,7 +67,7 @@ HAProxy 使用 master-worker USR2 校验后重载，旧 worker 排空原连接�
 
 后端崩溃、隧道中断后，新的 TCP 连接可以改走备用；原 TCP 会话不能迁移。客户端需要重连。核心维护必须先在入口排空新连接，等待原会话结束或明确接受其断开。
 
-数据面短暂断链且 WG 接口仍存在时，内核 WireGuard 会在链路恢复后重新握手。显式 `systemctl stop wg-quick@...` 会因 `Requires=` 停止后端依赖；重新 start WG 不保证这些依赖自动重新启动，因此提供 `a recover` 显式恢复本后端隧道、Telemt 和健康代理。它不修改内核、防火墙、SSH 或全局路由配置。
+数据面短暂断链且 WG 接口仍存在时，内核 WireGuard 会在链路恢复后重新握手。显式 `systemctl stop wg-quick@...` 会因 `Requires=` 停止后端依赖。开发版 `a recover` 对隧道、Telemt 和健康代理执行 `start`，已运行的核心继续处理现有连接。服务启动操作完成后，给健康代理约 45 秒完成就绪检查，再执行 `a diagnose`。如需主动重启核心，使用 `a recover --restart`，该操作会断开此后端的已有连接。[systemctl 命令语义](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#start%20PATTERN%E2%80%A6)
 
 安装器原有 enable 自启动逻辑保留。1.7 候选已在三个 Ubuntu 22.04 KVM 客体中验证真实安装、重复安装、维护升级/回退及正常关机后启动；三个 boot ID 均变化、持久文件内容一致，两条线路恢复真实 req_pq/resPQ 公共握手。客体共享 CI 主机、均为 1 CPU/1GiB，不代表三台跨地区 VPS；镜像预装依赖后克隆，非三套裸机从零验收，精确提交与结果见工程报告。
 

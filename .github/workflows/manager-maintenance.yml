@@ -1,0 +1,29 @@
+name: Verify isolated manager maintenance changes
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  manager:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prepare bounded local dependencies
+        run: |
+          sudo timeout 90 apt-get update -qq
+          sudo timeout 120 apt-get install -y --no-install-recommends haproxy shellcheck
+      - name: Check manager syntax and release lock
+        run: |
+          bash -n telemt-dual-hop.sh
+          shellcheck -x -S style telemt-dual-hop.sh
+          timeout --kill-after=5 30 python3 -m unittest discover -s tests -p 'test_release_lock.py' -v
+          timeout --kill-after=5 60 python3 -m unittest discover -s tests -p 'test_install_command.py' -v
+      - name: Check entry health migration and route recovery
+        run: |
+          timeout --kill-after=5 90 python3 -m unittest discover -s tests -p 'test_entry_maintenance.py' -v
+          sudo timeout --kill-after=5 90 python3 -m unittest discover -s tests -p 'test_manager_lifecycle.py' -v
+      - name: Check diagnostic and manager fixtures
+        run: sudo timeout --kill-after=5 150 python3 -m unittest discover -s tests -p 'test_performance.py' -v

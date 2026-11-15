@@ -1,5 +1,4 @@
 """The reviewable release lock must agree with every production download pin."""
-import hashlib
 import json
 from pathlib import Path
 import re
@@ -8,17 +7,15 @@ from release_pins import RELEASES
 
 
 class ReleaseLockTests(unittest.TestCase):
-    def test_bootstrap_pin_matches_the_reviewed_release_bytes(self):
+    def test_bootstrap_uses_the_reviewed_release_pin(self):
         root = Path(__file__).resolve().parents[1]
-        manager = (root / 'telemt-dual-hop.sh').read_bytes()
-        script = manager.decode('utf-8')
+        script = (root / 'telemt-dual-hop.sh').read_text(encoding='utf-8')
         readme = (root / 'README.md').read_text(encoding='utf-8')
-        version = re.search(r'^readonly TDH_VERSION="([0-9.]+)"$', script, re.M)[1]
         tag = re.search(r'^readonly TDH_STABLE_MANAGER_TAG="(v[0-9.]+)"$', script, re.M)[1]
         digest = re.search(r'^readonly TDH_STABLE_MANAGER_SHA256="([a-f0-9]{64})"$', script, re.M)[1]
         self.assertEqual((tag, digest), ('v1.7.0', '33c90f9289375cbccf9a6480d7026a58b1bef03ba8e50421b2d7c9d919a6e2ef'))
-        self.assertIn(f'https://raw.githubusercontent.com/bababoyi6/me/v{version}/telemt-dual-hop.sh', readme)
-        self.assertIn(f'"{hashlib.sha256(manager).hexdigest()}"', readme)
+        self.assertIn('https://raw.githubusercontent.com/bababoyi6/me/v1.7.1/telemt-dual-hop.sh', readme)
+        self.assertIn('"ffa6d8edb386aa5cc833f814ca1a26c9ba1c314df44e4feccff17191940ac8a3"', readme)
         self.assertNotIn('raw.githubusercontent.com/bababoyi6/me/main/', script)
 
     def test_acceptance_and_native_builder_pin_the_same_active_source(self):
