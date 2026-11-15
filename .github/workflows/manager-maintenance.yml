@@ -1,6 +1,18 @@
 name: Verify isolated manager maintenance changes
 on:
   workflow_dispatch:
+  push:
+    branches: [dev/20261115-manager-maintenance]
+    paths:
+      - .github/workflows/manager-maintenance.yml
+      - telemt-dual-hop.sh
+      - tools/entry_maintenance.py
+      - tests/lab.py
+      - tests/test_entry_maintenance.py
+      - tests/test_install_command.py
+      - tests/test_manager_lifecycle.py
+      - tests/test_performance.py
+      - tests/test_release_lock.py
 permissions:
   contents: read
 jobs:
