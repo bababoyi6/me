@@ -8,6 +8,7 @@ import resource
 from pathlib import Path
 import select
 import signal
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -255,15 +256,19 @@ backend telemt
                             argv=['ip','netns','exec',NAMES[0],'iperf3','-c','10.77.1.2','-t','8' if native else '4','-O','3' if native else '1',
                                   '-b','200M','-P','1','-J','--connect-timeout','3000']
                             if reverse:argv.append('-R')
-                            try:control=json.loads(command(*argv,timeout=30))
-                            except subprocess.TimeoutExpired:
-                                report['control_error']={'type':'TimeoutExpired','deadline_seconds':30,
-                                    'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U'}
-                                raise
-                            if control.get('error'):raise RuntimeError('TCP path control failed')
+                            trials=[]
+                            for _ in range(3 if tls_candidate else 1):
+                                try:control=json.loads(command(*argv,timeout=30))
+                                except subprocess.TimeoutExpired:
+                                    report['control_error']={'type':'TimeoutExpired','deadline_seconds':30,
+                                        'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U'}
+                                    raise
+                                if control.get('error'):raise RuntimeError('TCP path control failed')
+                                trials.append(control['end']['sum_received']['bits_per_second']/1e6)
                             report['controls'].append({'configured_rtt_ms':rtt,'direction':'D' if reverse else 'U','queue_packet_limit':packet_limit,
                                 'seconds':8 if native else 4,'omit_seconds':3 if native else 1,
-                                'receiver_mbps':control['end']['sum_received']['bits_per_second']/1e6})
+                                'receiver_mbps':statistics.median(trials),
+                                **({'trials_mbps':trials} if tls_candidate else {})})
                     for turn in range(2 if tls_candidate else 1 if stress else 4 if native else 3):
                         offset=turn%len(variants)
                         order=LEGACY_ORDERS[turn] if legacy else QUEUE_ORDERS[turn] if queue and not equal else variants[offset:]+variants[:offset]

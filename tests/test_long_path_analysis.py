@@ -30,6 +30,8 @@ class LongPathAnalysisTests(unittest.TestCase):
                     resources_before={'cpu_max': '300000 100000', 'memory_max': str(1536*1024**2),
                                       'swap_max': '0'}, resources_after={'pids_current': 1})
         data['controls'] = [row for row in data['controls'] if row['configured_rtt_ms'] == 100]
+        for control in data['controls']:
+            control['trials_mbps'] = [190, 190, 190]
         template = [row for row in data['rows'] if row['round'] == 1 and row['rtt_ms'] == 100
                     and row['variant'] == 'balanced2']
         data['rows'] = []
@@ -47,6 +49,12 @@ class LongPathAnalysisTests(unittest.TestCase):
         modified['binary_sha256']['candidate'] = 'a' * 64
         with self.assertRaisesRegex(ValueError, 'identity mismatch'):
             analyze(modified)
+        modified = copy.deepcopy(data)
+        modified['controls'][0]['trials_mbps'] = [78, 78, 190]
+        with self.assertRaisesRegex(ValueError, 'repeated TCP path control'):
+            analyze(modified)
+        modified['controls'][0]['receiver_mbps'] = 78
+        self.assertFalse(analyze(modified)['initial_screen_passed'])
         data['rows'][:8] = data['rows'][4:8] + data['rows'][:4]
         with self.assertRaisesRegex(ValueError, 'AB/BA'):
             analyze(data)

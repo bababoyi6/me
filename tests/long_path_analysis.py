@@ -93,6 +93,13 @@ def analyze(data):
     if len(controls)!=2*len(profiles) or {(r['configured_rtt_ms'],r['direction']) for r in controls}!={(r,d) for r in profiles for d in ('U','D')}:
         raise ValueError('missing TCP path control')
     if any(not number(r.get('receiver_mbps')) for r in controls):raise ValueError('invalid TCP path control')
+    if tls_parity:
+        for control in controls:
+            trials = control.get('trials_mbps')
+            if (not isinstance(trials, list) or len(trials) != 3 or
+                    any(not number(value) for value in trials) or
+                    control['receiver_mbps'] != statistics.median(trials)):
+                raise ValueError('invalid repeated TCP path control')
     control_index={(r['configured_rtt_ms'],r['direction']):r['receiver_mbps'] for r in controls}
     comparisons=[]
     pairs = ((('balanced2', 'candidate'),) if tls_parity else
