@@ -17,4 +17,6 @@
 
 [CI 43600838842](https://github.com/bababoyi6/me/actions/runs/43600838842) 在 `8fbaba5` 上通过 Rust 回归、合成协议与 100 ms 双向 1/4 流、两轮 AB/BA 对照。`security2` 二进制 SHA256 为 `72ab8e27f5a688264379eb76f5474ff791840615bcc06ed271f7e17afe84962d`。40 条计量流完整，四组候选/基线吞吐比的最低值 0.9769，客户端 RTT 比例最高 1.0519；四组均满足本轮相对初筛规则。四流下载的两种核心客户端 RTT 中位数都超过 200 ms，本轮没有证明绝对带载低延迟。分析器明确返回 `production_approval=false`。Windows 从原始 JSON 重算得到相同字段；两份文件仅换行格式不同。原始记录保存在 `lab-control/evidence/2026-11-14-old-tls-cache/`。
 
-首次 [CI 43600253833](https://github.com/bababoyi6/me/actions/runs/43600253833) 在 Rust 编译时因新辅助文件的 `by_ref()` 同时匹配读写 trait 而失败；`8fbaba5` 改用明确的 `Read::take` 后重跑通过。首次失败没有进行协议或性能测试。接下来以该固定二进制摘要复核隔离系统生命周期。
+首次 [CI 43600253833](https://github.com/bababoyi6/me/actions/runs/43600253833) 在 Rust 编译时因新辅助文件的 `by_ref()` 同时匹配读写 trait 而失败；`8fbaba5` 改用明确的 `Read::take` 后重跑通过。首次失败没有进行协议或性能测试。
+
+2026-11-15 的 [CI 43687163563](https://github.com/bababoyi6/me/actions/runs/43687163563) 在 `5fc4cf9` 重建出相同 SHA256。隔离系统测试通过首次安装、升级及重复升级、四次双向传输摘要、systemd 崩溃重启、健康代理冷启动/断线/恢复、配置和 token 保留、回滚及临时单元清理。测试使用合成 DC，且该系统用例关闭 TLS 模拟，因此不能证明真实 TLS 配置源恢复或缓存热路径的持续运行表现。正式发布判断仍需单独处理这些证据缺口。
