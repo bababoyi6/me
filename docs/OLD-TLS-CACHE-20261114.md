@@ -27,4 +27,4 @@
 
 首次 [CI 43689870073](https://github.com/bababoyi6/me/actions/runs/43689870073) 在固定二进制 SHA 校验通过后，被测试资源守卫拦下：systemd 单元名未使用守卫要求的 `tdh-paired-` 前缀，恢复场景没有运行。`a7570df` 仅修正单元名；失败记录保留。
 
-[重跑 CI 43691065834](https://github.com/bababoyi6/me/actions/runs/43691065834) 通过。原始 `recovery.json` 和构建清单的提交与二进制 SHA 一致。`apple.com` 与 `gs.apple.com` 起初都是默认 profile；临时源上线后约 19.90 秒，两域均更新为 `merged` 非默认 profile。缓存文件各为 0600、单硬链接、普通文件，大小约 21 KiB。源关闭后重启，两域仍从未变化的缓存文件恢复；三个阶段合计 12 次双向合成传输摘要校验通过。资源限制为 1 CPU、512 MiB、零 swap，记录的 OOM 与 OOM kill 增量均为零，临时进程已清理。[本地原始证据](../../lab-control/evidence/2026-11-15-old-tls-recovery/README.md)。这证明该固定候选在隔离条件下的默认回退、源恢复和冷加载路径；不扩大为生产发布、真实客户端或长期稳定性批准。
+[重跑 CI 43691065834](https://github.com/bababoyi6/me/actions/runs/43691065834) 通过。原始 `recovery.json` 和构建清单的提交与二进制 SHA 一致。`apple.com` 与 `gs.apple.com` 起初都是默认 profile；临时源上线后约 19.90 秒，两域均更新为 `merged` 非默认 profile。缓存文件各为 0600、单硬链接、普通文件，大小约 21 KiB。源关闭后重启，两域仍从未变化的缓存文件恢复；三个阶段合计 12 次双向合成传输摘要校验通过。资源限制为 1 CPU、512 MiB、零 swap，记录的 OOM 与 OOM kill 增量均为零，临时进程已清理。原始 artifact 下载保存在父工作区 `lab-control/evidence/2026-11-15-old-tls-recovery/`。这证明该固定候选在隔离条件下的默认回退、源恢复和冷加载路径；不扩大为生产发布、真实客户端或长期稳定性批准。
