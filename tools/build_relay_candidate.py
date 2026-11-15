@@ -115,7 +115,7 @@ def main():
         variants = [('fixed','3.5.5+tdh.audit1'), ('control','3.5.5+tdh.audit2'),
                     ('balanced','3.5.5+tdh.balanced1'), ('bulk',candidate_version)]
     if security:
-        variants = [('bulk', '3.5.5+tdh.balanced2.security2' if cache_disk else '3.5.5+tdh.balanced2.security1')]
+        variants = [('bulk', '3.5.5+tdh.balanced2.security2.1' if cache_disk else '3.5.5+tdh.balanced2.security1')]
         manifest.update(
             tls_patches={path.name: digest(path) for path in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER, LIVE_EXPIRY_PATCH) if cache_disk else ()))},
             upstream_changes=['ae85b1566872c6ecac95a2c498ccea50f64ddc10',

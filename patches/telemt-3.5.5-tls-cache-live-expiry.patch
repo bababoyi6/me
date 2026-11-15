@@ -64,7 +64,7 @@
              })
              .cloned()
              .collect()
-@@ -628,6 +648,27 @@
+@@ -628,6 +648,33 @@
      }
  
      #[tokio::test]
@@ -74,9 +74,9 @@
 +        let mut stale = cached_with_cert_info("stale.example", None, Vec::new());
 +        stale.fetched_at = SystemTime::now() - Duration::from_secs(73 * 3600);
 +        cache.set("stale.example", stale).await;
-+        cache
-+            .set("fresh.example", cached_with_cert_info("fresh.example", None, Vec::new()))
-+            .await;
++        let mut fresh = cached_with_cert_info("fresh.example", None, Vec::new());
++        fresh.fetched_at = SystemTime::now() - Duration::from_secs(71 * 3600);
++        cache.set("fresh.example", fresh).await;
 +
 +        assert_eq!(cache.get("stale.example").await.domain, "default");
 +        assert_eq!(cache.get("fresh.example").await.domain, "fresh.example");
@@ -86,6 +86,12 @@
 +        assert!(health[0].is_default);
 +        assert_eq!(health[0].source, "default");
 +        assert!(!health[1].is_default);
++
++        cache
++            .set("stale.example", cached_with_cert_info("stale.example", None, Vec::new()))
++            .await;
++        assert_eq!(cache.get("stale.example").await.domain, "stale.example");
++        assert!(cache.default_profile_domains(&domains).await.is_empty());
 +    }
 +
 +    #[tokio::test]
