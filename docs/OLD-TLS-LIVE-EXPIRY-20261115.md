@@ -9,3 +9,9 @@
 ## 固定构建
 
 [CI 43693974552](https://github.com/bababoyi6/me/actions/runs/43693974552) 的 `build` 阶段通过。Rust 定向测试涵盖 TLS 模拟、引导重试、磁盘缓存与新加入的运行中老化用例。清单记录的二进制 SHA256 为 `b8802392eee9044a26a2e7dafca50b5fb16949260705b3ddb3d62565466ff204`，版本为 `telemt 3.5.5+tdh.balanced2.security2.1`，`default_installer_changed=false`。该运行只完成构建与 Rust 用例，尚无新二进制的系统或传输结论。
+
+## 定向资格检查
+
+[CI 43695291722](https://github.com/bababoyi6/me/actions/runs/43695291722) 在同一固定 SHA 上通过隔离协议/API 边界、两域私有 TLS 源恢复及停源冷加载、系统安装/升级/重启/健康/回退。原始清单的 `project_commit` 与三份报告中的候选身份一致；协议对照两种核心共 8 次合成传输、恢复流程 12 次、系统生命周期 4 次传输均通过摘要校验。两域从默认 profile 更新为 `merged`，源恢复约 14.73 秒；0600 缓存文件在停源重启前后摘要未变。资源报告无 OOM/OOM kill，私有进程已关闭；系统回退恢复旧二进制，配置和 token 保持一致，临时单元已清理。
+
+PR 自动 `validate` 首轮失败是历史候选打包测试的合成 manifest 仍固定旧构建器摘要。只更新测试夹具以匹配当前构建器，并添加“篡改构建器必拒绝”的断言后，`validate` 与 `relay-regression` 均通过；生产打包器的摘要校验规则未改。以上验证支持把补丁和工具合入源码仓库，但不构成正式默认核心、真实客户端、公网或长期稳定性批准。
