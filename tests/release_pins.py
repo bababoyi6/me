@@ -14,6 +14,7 @@ TLS_BASELINE = (
     'telemt 3.5.5+tdh.balanced2',
 )
 OLD_TLS_RTT_RECHECK_SHA256 = '11e9d2a89bf5fb8f159355f03dc53c8cc60636b69bfd5e0505457dc03d6922fe'
+OLD_TLS_CACHE_SHA256 = '72ab8e27f5a688264379eb76f5474ff791840615bcc06ed271f7e17afe84962d'
 TLS_CANDIDATES = {
     'old': ('bulk', 'source_commit', 'ac71d92ec41dea00a7eafd6b8d350c3486633500',
             'telemt 3.5.5+tdh.balanced2.security1'),

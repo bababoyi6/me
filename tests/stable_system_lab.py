@@ -26,7 +26,7 @@ from core_upgrade import BackendService, upgrade, rollback, refresh_connect_poli
 from e2e_lab import FullLab, MockDc
 from lab_config import generate_telemt
 from stable_acceptance import PINS
-from release_pins import RELEASES, NATIVE_BASES, TLS_CANDIDATES, OLD_TLS_RTT_RECHECK_SHA256
+from release_pins import RELEASES, NATIVE_BASES, TLS_CANDIDATES, OLD_TLS_RTT_RECHECK_SHA256, OLD_TLS_CACHE_SHA256
 from telemt_probe import port, TOKEN, request
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -62,6 +62,8 @@ def main():
     parser.add_argument('--candidate-package')
     parser.add_argument('--old-tls-candidate',action='store_true',
                         help='Check the fixed balanced2 TLS repair candidate instead of a newer native candidate')
+    parser.add_argument('--old-tls-cache-candidate',action='store_true',
+                        help='Check the fixed balanced2 TLS cache security2 candidate')
     baseline=parser.add_mutually_exclusive_group(required=True)
     baseline.add_argument('--balanced2-archive')
     baseline.add_argument('--previous-stable-archive')
@@ -71,7 +73,10 @@ def main():
     args = parser.parse_args()
     if args.candidate_package and not args.candidate_directory:
         parser.error('candidate package requires the pinned native directory')
-    if args.old_tls_candidate and (not args.candidate_directory or not args.balanced2_archive or args.candidate_package):
+    old_kind = 'oldcache' if args.old_tls_cache_candidate else 'old' if args.old_tls_candidate else None
+    if args.old_tls_candidate and args.old_tls_cache_candidate:
+        parser.error('choose one old TLS candidate')
+    if old_kind and (not args.candidate_directory or not args.balanced2_archive or args.candidate_package):
         parser.error('old TLS candidate requires its directory and released balanced2 baseline only')
     if args.baseline_switch and (not args.stable_archive or not args.balanced2_archive):
         parser.error('baseline switch requires official and balanced2 archives')
@@ -108,13 +113,14 @@ def main():
                     raise RuntimeError('native candidate requires owned CI namespace')
                 bundle=Path(args.candidate_directory)
                 manifest=json.loads((bundle/'manifest.json').read_text())
-                if args.old_tls_candidate:
+                if old_kind:
                     pin=manifest['binaries']['bulk']
                     candidate_binary=bundle/'telemt-bulk'
-                    if (manifest.get('source_commit')!=TLS_CANDIDATES['old'][2] or
+                    expected_sha=OLD_TLS_CACHE_SHA256 if old_kind=='oldcache' else OLD_TLS_RTT_RECHECK_SHA256
+                    if (manifest.get('source_commit')!=TLS_CANDIDATES[old_kind][2] or
                             manifest.get('project_commit')!=os.environ.get('TDH_SOURCE_COMMIT') or
-                            pin['version']!=TLS_CANDIDATES['old'][3] or
-                            pin['sha256']!=OLD_TLS_RTT_RECHECK_SHA256 or
+                            pin['version']!=TLS_CANDIDATES[old_kind][3] or
+                            pin['sha256']!=expected_sha or
                             digest(candidate_binary)!=pin['sha256']):
                         raise RuntimeError('old TLS candidate identity mismatch')
                 else:
