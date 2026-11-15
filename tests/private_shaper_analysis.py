@@ -3,14 +3,17 @@ import argparse
 import json
 import math
 from pathlib import Path
+import statistics
 
 from mixed_experience_analysis import trial, number
 from legacy_queue_analysis import LEGACY_SHA, NATIVE_SHA
 from path_capacity import validate as capacity_validate
+from release_pins import TLS_CANDIDATES, OLD_TLS_CACHE_SHA256
 
 
 def analyze(report):
-    if (report.get('plan') not in ('private-shaper-screen-v1','managed-backend-screen-v1') or report.get('accepted') is not True or
+    candidate_queue=report.get('plan')=='tls-cache-shaper-v1'
+    if (report.get('plan') not in ('private-shaper-screen-v1','managed-backend-screen-v1','tls-cache-shaper-v1') or report.get('accepted') is not True or
         report.get('oom_delta')!={'oom':0,'oom_kill':0} or report.get('cleanup_errors')!=[] or
         report.get('resources_after',{}).get('pids_current')!=1 or
         report.get('binary_sha256',{}).get('balanced2')!=LEGACY_SHA):
@@ -18,8 +21,11 @@ def analyze(report):
     if tuple(report.get(k) for k in ('rtt_ms','rate_mbps','loss_percent'))!=(100,200,0):
         raise ValueError('network drift')
     controls=report.get('controls',[])
-    if (sorted(c.get('direction') for c in controls)!=['D','U'] or
-        any(c.get('receiver_local') is not True or not number(c.get('mbps')) or c['mbps']<100 for c in controls)):
+    expected_directions=['D']*(3 if candidate_queue else 1)+['U']*(3 if candidate_queue else 1)
+    if (sorted(c.get('direction') for c in controls)!=expected_directions or
+        any(c.get('receiver_local') is not True or not number(c.get('mbps')) for c in controls)):
+        raise ValueError('capacity evidence insufficient')
+    if any(statistics.median(c['mbps'] for c in controls if c['direction']==direction)<100 for direction in ('U','D')):
         raise ValueError('capacity evidence insufficient')
     if any(not math.isclose(capacity_validate(c['raw']),c['mbps'],rel_tol=.001) for c in controls):
         raise ValueError('capacity raw evidence mismatch')
@@ -27,11 +33,23 @@ def analyze(report):
     if budget.get('cpu_max')!='300000 100000' or budget.get('memory_max')!=str(1536*1024**2) or budget.get('swap_max')!='0':
         raise ValueError('resource budget drift')
     rows=report.get('rows',[])
-    expected=[(t+1,p) for t in range(4) for p in (('original','shaped180') if t%2==0 else ('shaped180','original'))]
+    rounds=2 if candidate_queue else 4
+    expected=[(t+1,p) for t in range(rounds) for p in (('original','shaped180') if t%2==0 else ('shaped180','original'))]
     if [(r.get('round'),r.get('queue_policy')) for r in rows]!=expected:
         raise ValueError('registered AB/BA schedule incomplete')
     core=report.get('queue_core','balanced2')
-    if core not in ('balanced2','native17') or report.get('binary_sha256',{}).get(core)!=({'balanced2':LEGACY_SHA,'native17':NATIVE_SHA}[core]):
+    pins={'balanced2':LEGACY_SHA,'native17':NATIVE_SHA}
+    if candidate_queue:
+        artifact, source_field, source_commit, version=TLS_CANDIDATES['oldcache']
+        manifest=report.get('candidate_manifest',{})
+        pin=manifest.get('binaries',{}).get(artifact,{})
+        if (core!='candidate' or manifest.get(source_field)!=source_commit or
+                manifest.get('project_commit')!=report.get('source_commit') or
+                pin.get('sha256')!=OLD_TLS_CACHE_SHA256 or pin.get('version')!=version or
+                report.get('binary_sha256')!={'balanced2':LEGACY_SHA,'candidate':OLD_TLS_CACHE_SHA256}):
+            raise ValueError('TLS cache candidate identity mismatch')
+        pins['candidate']=OLD_TLS_CACHE_SHA256
+    if core not in pins or report.get('binary_sha256',{}).get(core)!=pins[core]:
         raise ValueError('selected core identity mismatch')
     if any(r.get('variant')!=core or r.get('cohort')!=30 for r in rows):
         raise ValueError('workload or core drift')
@@ -40,12 +58,12 @@ def analyze(report):
         raise ValueError('CPU measurement or affinity incomplete')
     if len({r['config_policy_sha256'] for r in rows})!=1:
         raise ValueError('configuration mismatch')
-    expected_dc=sum(r['result']['dc_connections'] for r in rows)+4*4
+    expected_dc=sum(r['result']['dc_connections'] for r in rows)+rounds*4
     if report.get('mock_dc')!={'completed':expected_dc,'errors':[]}:
         raise ValueError('integrity or DC completion mismatch')
     derived=[dict(round=r['round'],policy=r['queue_policy'],group_cpu_seconds=r['group_cpu_seconds'],**trial(r)) for r in rows]
     pairs=[]
-    for turn in range(1,5):
+    for turn in range(1,rounds+1):
         old,new=(next(r for r in derived if r['round']==turn and r['policy']==p) for p in ('original','shaped180'))
         pair={'round':turn,'download_ratio':new['D_mbps']/old['D_mbps'],'upload_ratio':new['U_mbps']/old['U_mbps'],
               'message_p95_ratio':new['loaded_message_ms']['p95']/old['loaded_message_ms']['p95'],
@@ -65,5 +83,9 @@ def analyze(report):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('input');parser.add_argument('output');args=parser.parse_args()
-    Path(args.output).write_text(json.dumps(analyze(json.loads(Path(args.input).read_text())),indent=2,allow_nan=False)+'\n')
+    parser=argparse.ArgumentParser();parser.add_argument('input');parser.add_argument('output')
+    parser.add_argument('--require-gain',action='store_true');args=parser.parse_args()
+    result=analyze(json.loads(Path(args.input).read_text()))
+    Path(args.output).write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
+    if args.require_gain and not result['all_pairs_joint_gain']:
+        raise SystemExit('private queue joint gain not established; see analysis report')
