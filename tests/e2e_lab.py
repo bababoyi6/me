@@ -176,12 +176,18 @@ class FullLab:
                  dc_endpoint=None, socket_library=None, socket_mode="pass", small_copy=False,
                  listen_endpoint=None, start_haproxy=True, experimental_binary=None,artifact_registry=None,
                  shared_binary_root=None,startup_report=None,offline_lab=False,connection_logs=False,
-                 connect_policy='unchanged', synthetic_tls_front=False):
+                 connect_policy='unchanged', synthetic_tls_front=False,
+                 tls_origin_port=None, tls_metrics_port=None):
         if offline_lab and real_dc:
             raise ValueError('offline bootstrap is confined to synthetic DC tests')
         if synthetic_tls_front and (not offline_lab or
                 os.readlink('/proc/self/ns/net') == os.readlink('/proc/1/ns/net')):
             raise ValueError('synthetic TLS front requires an isolated network namespace')
+        if (tls_origin_port is not None or tls_metrics_port is not None) and not synthetic_tls_front:
+            raise ValueError('local TLS source overrides require the isolated synthetic TLS lab')
+        if any(port_number is not None and not 1024 <= port_number <= 65535
+               for port_number in (tls_origin_port, tls_metrics_port)):
+            raise ValueError('local TLS source ports must be unprivileged TCP ports')
         if startup_report is not None and (real_dc or artifact_registry is None):
             raise ValueError('startup diagnostics require a private synthetic experimental lab')
         if connection_logs and (startup_report is None or real_dc):
@@ -252,7 +258,15 @@ class FullLab:
                 # readiness before any listener exists. No public bootstrap is
                 # needed for synthetic transport; leave production templates intact.
                 if synthetic_tls_front:
-                    text = text.replace('mask_port = 443', 'mask_host = "127.0.0.1"\nmask_port = 1')
+                    text = text.replace('mask_port = 443',
+                        f'mask_host = "127.0.0.1"\nmask_port = {tls_origin_port or 1}')
+                    if tls_origin_port is not None:
+                        text = text.replace('[access.users]\n',
+                            '[censorship.tls_fetch]\nprofiles = ["modern_chrome_like"]\n'
+                            'attempt_timeout_ms = 200\ntotal_budget_ms = 2000\n\n[access.users]\n')
+                    if tls_metrics_port is not None:
+                        text = text.replace('[server]\n',
+                            f'[server]\nmetrics_listen = "127.0.0.1:{tls_metrics_port}"\n')
                 else:
                     text = text.replace('tls_emulation = true', 'tls_emulation = false')
                 text = text.replace('[network]\n', '[network]\nstun_use = false\nhttp_ip_detect_urls = []\n')
