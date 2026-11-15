@@ -2,6 +2,7 @@
 import copy
 import unittest
 from long_path_analysis import analyze, KEYS
+from release_pins import TLS_BASELINE, TLS_CANDIDATES, OLD_TLS_CACHE_SHA256
 
 
 def fixture():
@@ -18,6 +19,38 @@ def fixture():
 
 
 class LongPathAnalysisTests(unittest.TestCase):
+    def test_security2_parity_requires_pinned_binary_and_both_orders(self):
+        data = fixture()
+        data.update(plan='tls-candidate-parity', tls_candidate='oldcache',
+                    binary_sha256={'balanced2': TLS_BASELINE[1], 'candidate': OLD_TLS_CACHE_SHA256},
+                    candidate_manifest={'source_commit': TLS_CANDIDATES['oldcache'][2],
+                                        'project_commit': 'fixture',
+                                        'binaries': {'bulk': {'sha256': OLD_TLS_CACHE_SHA256,
+                                                              'version': TLS_CANDIDATES['oldcache'][3]}}},
+                    resources_before={'cpu_max': '300000 100000', 'memory_max': str(1536*1024**2),
+                                      'swap_max': '0'}, resources_after={'pids_current': 1})
+        data['controls'] = [row for row in data['controls'] if row['configured_rtt_ms'] == 100]
+        template = [row for row in data['rows'] if row['round'] == 1 and row['rtt_ms'] == 100
+                    and row['variant'] == 'balanced2']
+        data['rows'] = []
+        for turn, variants in enumerate((('balanced2', 'candidate'), ('candidate', 'balanced2')), 1):
+            for variant in variants:
+                version = TLS_BASELINE[2] if variant == 'balanced2' else TLS_CANDIDATES['oldcache'][3]
+                data['rows'].extend(dict(row, round=turn, variant=variant, version=version,
+                                         sha256_verified=True) for row in template)
+        self.assertTrue(analyze(data)['initial_screen_passed'])
+        for field, value in (('mbps', 94), ('socket_samples', [{'role': 'client', 'rtt_ms': 112}])):
+            modified = copy.deepcopy(data)
+            modified['rows'][4][field] = value
+            self.assertFalse(analyze(modified)['initial_screen_passed'])
+        modified = copy.deepcopy(data)
+        modified['binary_sha256']['candidate'] = 'a' * 64
+        with self.assertRaisesRegex(ValueError, 'identity mismatch'):
+            analyze(modified)
+        data['rows'][:8] = data['rows'][4:8] + data['rows'][:4]
+        with self.assertRaisesRegex(ValueError, 'AB/BA'):
+            analyze(data)
+
     def test_equal_load_has_its_own_latency_and_instrumentation_gates(self):
         data=fixture();data.update(plan='equal-load',transfer_rate_per_stream=2500000,
             native_manifest={'upstream_commit':'66708d2866f3f3a4541c4fa67984d408e71a8af4'})

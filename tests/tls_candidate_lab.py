@@ -13,7 +13,7 @@ from e2e_lab import FullLab
 from lab_files import file_sha256
 from mtproto_transport import faketls_handshake
 from paired_performance import resources, write
-from release_pins import TLS_BASELINE, TLS_CANDIDATES
+from release_pins import TLS_BASELINE, TLS_CANDIDATES, OLD_TLS_CACHE_SHA256
 from telemt_probe import SECRETS, request
 from core_install import archive_payload
 
@@ -34,6 +34,7 @@ def candidate_binary(directory, candidate, source_commit):
     pin = manifest['binaries'][kind]
     binary = directory / ('telemt-' + kind)
     if (manifest[source_field] != source or manifest[project_field] != source_commit or
+            (candidate == 'oldcache' and pin['sha256'] != OLD_TLS_CACHE_SHA256) or
             pin['version'] != version or not 0 < binary.stat().st_size <= 64 * 1024**2 or
             file_sha256(binary) != pin['sha256']):
         raise RuntimeError('candidate manifest or binary mismatch')
