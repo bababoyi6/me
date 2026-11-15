@@ -13,7 +13,7 @@ TLS_BASELINE = (
     '5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100',
     'telemt 3.5.5+tdh.balanced2',
 )
-OLD_TLS_CACHE_SHA256 = 'b8802392eee9044a26a2e7dafca50b5fb16949260705b3ddb3d62565466ff204'
+OLD_TLS_CACHE_SHA256 = '0b901711296707c23da7e8edda5509f108bd351f6e4b9c72f0f69a1b1fe71388'
 TLS_CANDIDATES = {
     'oldcache': ('bulk', 'source_commit', 'ac71d92ec41dea00a7eafd6b8d350c3486633500',
                  'telemt 3.5.5+tdh.balanced2.security2.2'),
