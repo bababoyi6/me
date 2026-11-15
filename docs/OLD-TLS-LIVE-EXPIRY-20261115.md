@@ -21,3 +21,11 @@ PR 自动 `validate` 首轮失败是历史候选打包测试的合成 manifest �
 [CI 43696895907](https://github.com/bababoyi6/me/actions/runs/43696895907) 重建 `security2.2` 并通过 TLS、磁盘缓存、运行中老化与过期点唤醒的 Rust 定向用例。清单记录固定二进制 SHA256 `0b901711296707c23da7e8edda5509f108bd351f6e4b9c72f0f69a1b1fe71388`、`default_installer_changed=false`。运行中老化用例使用受控的历史抓取时间，验证 72 小时边界和抓取成功后的恢复；不是实际等待 72 小时的耐久实验。
 
 [CI 43698098368](https://github.com/bababoyi6/me/actions/runs/43698098368) 重建出相同二进制 SHA 和补丁集，并通过隔离协议/API 边界、两域私有 TLS 源恢复与停源冷加载、真实 systemd 安装/升级/重启/健康/回退。原始清单与三份报告的候选提交一致且均 `accepted=true`。协议 8 次、恢复 12 次、系统 4 次合成传输摘要均通过；两域从默认 profile 更新为 `merged`，源恢复约 20.26 秒，0600 缓存停源重启后保持不变。记录的 OOM/OOM kill 增量为零，私有进程已关闭；回退恢复旧二进制，配置与 token 未变，临时单元已清理。PR 自动 `validate` 与 `relay-regression` 也通过。以上支持合并候选源码与验证工具；正式默认核心、真实客户端、公网和长期稳定性仍无批准结论。
+
+## 100 ms 成对性能初筛
+
+[CI 43719942306](https://github.com/bababoyi6/me/actions/runs/43719942306) 首轮在同一固定 SHA 上完成了 40 条计量传输，但单次上传 TCP 容量对照仅 78.58 Mbps，低于预设 100 Mbps 门槛，因此初筛未通过；该轮应用层上传随后达到 104.88–156.40 Mbps。为避免把一次容量波动当作稳定链路能力，工具改为同一 CI runner 连测三次并取中位数，仍保留 100 Mbps 门槛。
+
+[CI 43721366145](https://github.com/bababoyi6/me/actions/runs/43721366145) 重新构建相同 `security2.2` SHA，在固定 100 ms / 200 Mbps 隔离 WireGuard 路径上，按 AB/BA 两轮比较已发布 `balanced2` 与候选的单流和四流双向吞吐及客户端 TCP RTT。上传、下载 TCP 容量对照中位数分别为 176.41、176.24 Mbps；上传三次原值为 176.41、176.49、78.22 Mbps。40 条计量传输全部通过摘要验证，吞吐逐对比值为 96.76%–103.06%，候选 RTT 相对基线最大增幅约 2.56%；3 CPU / 1.5 GiB / 无 swap 预算内峰值约 242.61 MiB，无 OOM，临时进程与网络命名空间均已清理。预设**相对性能初筛通过**，没有测出可重复的核心吞吐提升。
+
+四流下载时，基线与候选的客户端 TCP 中位 RTT 约 220–226 ms，均超过 200 ms。该绝对带载延迟问题仍在，已有混合负载证据将主要积压指向隔离路径队列；本次初筛不能证明生产延迟达标，也不构成正式核心发布或部署批准。真实 Telegram 客户端、公网 TLS 源与公网容量验证按用户决定暂缓。本地原始回执见 `lab-control/evidence/2026-11-15-security2-performance/`。
