@@ -1,0 +1,94 @@
+--- a/src/tls_front/cache.rs
++++ b/src/tls_front/cache.rs
+@@ -23,6 +23,14 @@
+ const FULL_CERT_SENT_SWEEP_INTERVAL_SECS: u64 = 30;
+ const FULL_CERT_SENT_MAX_IPS: usize = 65_536;
+ const FULL_CERT_SENT_SHARDS: usize = 64;
++const TLS_PROFILE_MAX_AGE: Duration = Duration::from_secs(72 * 3600);
++
++fn profile_is_stale(cached: &CachedTlsData, now: SystemTime) -> bool {
++    cached.domain != "default"
++        && now
++            .duration_since(cached.fetched_at)
++            .is_ok_and(|age| age > TLS_PROFILE_MAX_AGE)
++}
+ 
+ static FULL_CERT_SENT_IPS_GAUGE: AtomicU64 = AtomicU64::new(0);
+ static FULL_CERT_SENT_CAP_DROPS: AtomicU64 = AtomicU64::new(0);
+@@ -135,10 +143,15 @@
+ 
+     pub async fn get(&self, sni: &str) -> Arc<CachedTlsData> {
+         let guard = self.memory.read().await;
+-        guard
++        let cached = guard
+             .get(sni)
+             .cloned()
+-            .unwrap_or_else(|| self.default.clone())
++            .unwrap_or_else(|| self.default.clone());
++        if profile_is_stale(&cached, SystemTime::now()) {
++            self.default.clone()
++        } else {
++            cached
++        }
+     }
+ 
+     pub async fn contains_domain(&self, domain: &str) -> bool {
+@@ -161,10 +174,15 @@
+                 continue;
+             }
+ 
+-            let cached = guard
++            let stored = guard
+                 .get(domain)
+                 .cloned()
+                 .unwrap_or_else(|| self.default.clone());
++            let cached = if profile_is_stale(&stored, now) {
++                self.default.clone()
++            } else {
++                stored
++            };
+             let mut behavior = cached.behavior_profile.clone();
+             behavior.refresh_server_hello_summary(&cached.server_hello_template);
+             let age_seconds = now
+@@ -199,10 +217,12 @@
+     /// Returns configured domains that still resolve to the synthetic default profile.
+     pub(crate) async fn default_profile_domains(&self, domains: &[String]) -> Vec<String> {
+         let guard = self.memory.read().await;
++        let now = SystemTime::now();
+         domains
+             .iter()
+             .filter(|domain| {
+-                guard.get(domain.as_str()).unwrap_or(&self.default).domain == "default"
++                let cached = guard.get(domain.as_str()).unwrap_or(&self.default);
++                cached.domain == "default" || profile_is_stale(cached, now)
+             })
+             .cloned()
+             .collect()
+@@ -628,6 +648,27 @@
+     }
+ 
+     #[tokio::test]
++    async fn live_stale_profile_uses_default_and_is_marked_for_retry() {
++        let domains = vec!["stale.example".to_string(), "fresh.example".to_string()];
++        let cache = TlsFrontCache::new(&domains, 1024, "tlsfront-test-cache");
++        let mut stale = cached_with_cert_info("stale.example", None, Vec::new());
++        stale.fetched_at = SystemTime::now() - Duration::from_secs(73 * 3600);
++        cache.set("stale.example", stale).await;
++        cache
++            .set("fresh.example", cached_with_cert_info("fresh.example", None, Vec::new()))
++            .await;
++
++        assert_eq!(cache.get("stale.example").await.domain, "default");
++        assert_eq!(cache.get("fresh.example").await.domain, "fresh.example");
++        assert_eq!(cache.default_profile_domains(&domains).await, vec!["stale.example".to_string()]);
++        let (health, suppressed) = cache.profile_health_snapshot(&domains, 2).await;
++        assert_eq!(suppressed, 0);
++        assert!(health[0].is_default);
++        assert_eq!(health[0].source, "default");
++        assert!(!health[1].is_default);
++    }
++
++    #[tokio::test]
+     async fn test_take_full_cert_budget_for_ip_uses_ttl() {
+         let cache = TlsFrontCache::new(&["example.com".to_string()], 1024, "tlsfront-test-cache");
+         let ip: IpAddr = "127.0.0.1".parse().expect("ip");

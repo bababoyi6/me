@@ -7,10 +7,19 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tarfile
 
 SOURCE_COMMIT = 'ac71d92ec41dea00a7eafd6b8d350c3486633500'
 ROOT = Path(__file__).resolve().parents[1]
+TLS_PATCHES = (
+    ROOT / 'patches/telemt-tls-emulator-tests.patch',
+    ROOT / 'patches/telemt-tls-emulator.patch',
+    ROOT / 'patches/telemt-3.5.5-tls-cache-retry.patch',
+)
+CACHE_PATCH = ROOT / 'patches/telemt-3.5.5-tls-cache-disk.patch'
+CACHE_HELPER = ROOT / 'patches/tls_cache_disk.rs'
+LIVE_EXPIRY_PATCH = ROOT / 'patches/telemt-3.5.5-tls-cache-live-expiry.patch'
 
 
 def digest(path):
@@ -25,15 +34,53 @@ def run(*argv, cwd, timeout=120):
     return subprocess.run(argv, cwd=cwd, check=True, text=True, timeout=timeout)
 
 
+def verify_tls_backport(source, build, cache_disk=False):
+    fixture, emulator, cache = TLS_PATCHES
+    run('git', 'apply', '--check', *(str(path) for path in TLS_PATCHES), cwd=source)
+    run('git', 'apply', str(fixture), cwd=source)
+    command = ['cargo', 'test', '--release', '--locked', '--bin', 'telemt']
+    # Require the baseline regression to fail at the intended assertion.
+    with (build / 'tls-before.log').open('w+', encoding='utf-8') as log:
+        baseline = subprocess.run(
+            [*command, 'inner_content_type_position_is_not_constant'],
+            cwd=source, stdout=log, stderr=subprocess.STDOUT, timeout=1200,
+        )
+        log.seek(0)
+        result = log.read()
+    if (baseline.returncode != 101 or '2 failed' not in result or
+            result.count('must not be a fixed plaintext') != 2):
+        raise RuntimeError('baseline did not fail both marker assertions; see tls-before.log')
+    run('git', 'apply', str(emulator), str(cache), cwd=source)
+    if cache_disk:
+        run('git', 'apply', '--check', str(CACHE_PATCH), cwd=source)
+        run('git', 'apply', str(CACHE_PATCH), cwd=source)
+        helper = source / 'src/tls_front/cache/disk_io.rs'
+        helper.parent.mkdir(exist_ok=True)
+        helper.write_bytes(CACHE_HELPER.read_bytes())
+        run('git', 'apply', '--check', str(LIVE_EXPIRY_PATCH), cwd=source)
+        run('git', 'apply', str(LIVE_EXPIRY_PATCH), cwd=source)
+    run(*command, 'tls_front::emulator::', cwd=source, timeout=1200)
+    run(*command, 'maestro::tls_bootstrap::tests::', cwd=source, timeout=1200)
+    if cache_disk:
+        run(*command, 'tls_front::cache::disk_io::tests::', cwd=source, timeout=1200)
+        run(*command, 'tls_front::cache::tests::disk_load_', cwd=source, timeout=1200)
+        run(*command, 'tls_front::cache::tests::live_stale_', cwd=source, timeout=1200)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', required=True)
     parser.add_argument('--output', required=True)
-    parser.add_argument('--candidate', choices=('fair', 'queue', 'balanced', 'bulk'), default='fair')
+    parser.add_argument('--candidate', choices=('fair', 'queue', 'balanced', 'bulk', 'balanced2-security', 'balanced2-security2'), default='fair')
     parser.add_argument('--reference-archive')
     args = parser.parse_args()
     source = Path(args.source).resolve()
     output = Path(args.output).resolve()
+    security = args.candidate in ('balanced2-security', 'balanced2-security2')
+    cache_disk = args.candidate == 'balanced2-security2'
+    if security and (sys.platform != 'linux' or os.environ.get('GITHUB_ACTIONS') != 'true'
+                     or args.reference_archive):
+        parser.error('security build requires disposable Linux CI and no reference binaries')
     assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=source, text=True).strip() == SOURCE_COMMIT
     assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=source)
     output.mkdir(mode=0o700)
@@ -50,26 +97,47 @@ def main():
     run('git', 'apply', str(normalized_patch), cwd=source)
     helper = source / 'src/proxy/relay/adaptive_copy/flushed_copy.rs'
     assert digest(helper) == digest(ROOT / 'patches/flushed_copy.rs')
+    candidate_kind = 'bulk' if security else args.candidate
     manifest = {'classification': 'CI_EXPERIMENTAL_CORE_PAIR', 'source_commit': SOURCE_COMMIT,
                 'project_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                 'rust': rust, 'jobs': 2, 'lto': 'thin', 'codegen_units': 8,
                 'base_patch_sha256': digest(patch),
                 'candidate_kind': args.candidate,
-                'candidate_helper_sha256': digest(ROOT / {'fair':'patches/fair_copy.rs','queue':'patches/unsent_queue.rs','balanced':'patches/low_rtt_receive.rs','bulk':'patches/unsent_queue_bulk.rs'}[args.candidate]),
+                'candidate_helper_sha256': digest(ROOT / {'fair':'patches/fair_copy.rs','queue':'patches/unsent_queue.rs','balanced':'patches/low_rtt_receive.rs','bulk':'patches/unsent_queue_bulk.rs'}[candidate_kind]),
                 'builder_sha256': digest(Path(__file__)),
                 'normalized_patch_sha256': digest(normalized_patch),
                 'default_installer_changed': False, 'binaries': {}}
-    candidate_version = {'fair':'3.5.5+tdh.fair1','queue':'3.5.5+tdh.queue1','balanced':'3.5.5+tdh.balanced1','bulk':'3.5.5+tdh.balanced2'}[args.candidate]
-    variants = [('control', '3.5.5+tdh.audit2'), (args.candidate, candidate_version)]
+    candidate_version = {'fair':'3.5.5+tdh.fair1','queue':'3.5.5+tdh.queue1','balanced':'3.5.5+tdh.balanced1','bulk':'3.5.5+tdh.balanced2'}[candidate_kind]
+    variants = [('control', '3.5.5+tdh.audit2'), (candidate_kind, candidate_version)]
     if args.candidate == 'queue':
         variants.insert(0, ('fixed', '3.5.5+tdh.audit1'))
     if args.candidate == 'bulk':
         variants = [('fixed','3.5.5+tdh.audit1'), ('control','3.5.5+tdh.audit2'),
                     ('balanced','3.5.5+tdh.balanced1'), ('bulk',candidate_version)]
-    if args.candidate in ('balanced','bulk'):
+    if security:
+        variants = [('bulk', '3.5.5+tdh.balanced2.security2' if cache_disk else '3.5.5+tdh.balanced2.security1')]
+        manifest.update(
+            tls_patches={path.name: digest(path) for path in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER, LIVE_EXPIRY_PATCH) if cache_disk else ()))},
+            upstream_changes=['ae85b1566872c6ecac95a2c498ccea50f64ddc10',
+                              '3f5feb33d4d64e53f69851c1ed110c0aa388e3c1'],
+            cargo=subprocess.check_output(['cargo', '--version'], text=True).strip(),
+            architecture=os.uname().machine,
+            balanced2_reference_sha256='5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100',
+        )
+    if candidate_kind in ('balanced','bulk'):
         manifest.update(receive_helper_sha256=digest(ROOT/'patches/low_rtt_receive.rs'),
-                        outgoing_queue_helper_sha256=digest(ROOT/('patches/unsent_queue_bulk.rs' if args.candidate=='bulk' else 'patches/unsent_queue.rs')),
-                        outgoing_unsent_low_water_bytes=262144 if args.candidate=='bulk' else 65536)
+                        outgoing_queue_helper_sha256=digest(ROOT/('patches/unsent_queue_bulk.rs' if candidate_kind=='bulk' else 'patches/unsent_queue.rs')),
+                        outgoing_unsent_low_water_bytes=262144 if candidate_kind=='bulk' else 65536)
+    if security:
+        historical_path = ROOT / 'docs/benchmarks/bulk-admission-20261024/results/core-manifest.json'
+        historical = json.loads(historical_path.read_text())
+        for field in ('source_commit', 'rust', 'jobs', 'lto', 'codegen_units',
+                      'base_patch_sha256', 'normalized_patch_sha256', 'receive_helper_sha256',
+                      'outgoing_queue_helper_sha256', 'outgoing_unsent_low_water_bytes'):
+            if manifest[field] != historical[field]:
+                raise RuntimeError(f'balanced2 provenance mismatch: {field}')
+        if manifest['balanced2_reference_sha256'] != historical['binaries']['bulk']['sha256']:
+            raise RuntimeError('balanced2 reference binary does not match the historical build')
     if args.reference_archive:
         reference = Path(args.reference_archive).resolve()
         reference_commits = {
@@ -141,6 +209,9 @@ def main():
             assert text.count(f'version = "{previous_version}"') == 1
             path.write_text(text.replace(f'version = "{previous_version}"', f'version = "{version}"'))
         previous_version = version
+        if security:
+            verify_tls_backport(source, output, cache_disk)
+            manifest['cargo_lock_sha256'] = digest(source / 'Cargo.lock')
         run('cargo', 'build', '--release', '--locked', '--bin', 'telemt', cwd=source, timeout=1200)
         binary = source / 'target/release/telemt'
         actual = subprocess.check_output([str(binary), '--version'], text=True, timeout=5).strip()
@@ -160,6 +231,17 @@ def main():
     shutil.copyfile(ROOT / 'patches/unsent_queue.rs', output / 'unsent_queue.rs')
     shutil.copyfile(ROOT / 'patches/unsent_queue_bulk.rs', output / 'unsent_queue_bulk.rs')
     shutil.copyfile(ROOT / 'patches/low_rtt_receive.rs', output / 'low_rtt_receive.rs')
+    if security:
+        for tls_patch in (*TLS_PATCHES, *((CACHE_PATCH, CACHE_HELPER, LIVE_EXPIRY_PATCH) if cache_disk else ())):
+            shutil.copyfile(tls_patch, output / tls_patch.name)
+        shutil.copyfile(historical_path, output / 'balanced2-reference-manifest.json')
+        (output / 'NOTICE.txt').write_text(
+            'Unofficial modified Telemt 3.5.5. Upstream license and copyright retained.\n'
+            'Includes balanced2 Linux socket and relay changes, backports of Telemt PRs #966 and #968, '
+            + ('and bounded atomic TLS cache I/O with live 72-hour expiry.\n' if cache_disk else 'and the original TLS cache I/O.\n') +
+            'Profile recovery returns to regular refresh after seven fast attempts.\n'
+            'Experimental build for isolated verification; no upstream endorsement.\n'
+        )
     shutil.copyfile(Path(__file__), output / 'build_relay_candidate.py')
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     archive = output.with_suffix('.tar.gz')
