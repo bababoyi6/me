@@ -15,7 +15,7 @@ PINS={
                 'e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4'),
     'balanced2':('3.5.5+tdh.balanced2','b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5',
                  '5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100'),
-    'security2.2':('3.5.5+tdh.balanced2.security2.2','18e872f1ebe18ea13a5179a68e2824b6dcd2ce145682adede8b6b0955d22b8fe',
+    'security2.2':('3.5.5+tdh.balanced2.security2.2','38b6bf95c6fd02c6ee3f160aac11163808d7f80ecc0c0702a08edc37c63aecbb',
                    '0b901711296707c23da7e8edda5509f108bd351f6e4b9c72f0f69a1b1fe71388'),
     'audit2':('3.5.5+tdh.audit2','c205183e479716f015378e4e2241103ae8d488e06f6ef65946be0bd94624f356',
               '2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1'),
