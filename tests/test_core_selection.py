@@ -15,6 +15,8 @@ PINS={
                 'e8ff277bbb8ec4676d6264e593fe2a0d255facec8f1cb305e357a3859198ffd4'),
     'balanced2':('3.5.5+tdh.balanced2','b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5',
                  '5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100'),
+    'security2.2':('3.5.5+tdh.balanced2.security2.2','38b6bf95c6fd02c6ee3f160aac11163808d7f80ecc0c0702a08edc37c63aecbb',
+                   '0b901711296707c23da7e8edda5509f108bd351f6e4b9c72f0f69a1b1fe71388'),
     'audit2':('3.5.5+tdh.audit2','c205183e479716f015378e4e2241103ae8d488e06f6ef65946be0bd94624f356',
               '2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1'),
 }
@@ -69,21 +71,22 @@ telemt_binary_is_expected'''
                 os.kill(pid,signal.SIGKILL);os.waitpid(pid,0)
 
     def test_default_and_explicit_fallback_bind_version_archive_binary_and_url(self):
-        for channel in (None,'','official','balanced2','audit2'):
+        for channel in (None,'','official','balanced2','security2.2','audit2'):
             if channel is None:
                 result=self.shell('unset TDH_NEW_INSTALL_CORE; select_amd64_core')
             else:
                 result=self.shell('select_amd64_core',TDH_NEW_INSTALL_CORE=channel)
             self.assertEqual(result.returncode,0,result.stderr)
             asset,version,archive,binary,url=result.stdout.strip().split('\t')
-            expected=PINS[channel or 'balanced2']
+            expected=PINS[channel or 'security2.2']
             self.assertEqual((version,archive,binary),expected)
             if channel=='official':
                 self.assertEqual(asset,'telemt-x86_64-linux-gnu.tar.gz')
                 self.assertEqual(url,f'https://github.com/telemt/telemt/releases/download/{version}/{asset}')
                 continue
             suffix=version.replace('+','-')
-            self.assertEqual(asset,f'telemt-{suffix}-x86_64-linux-gnu.tar.gz')
+            install_suffix='-install' if (channel or 'security2.2')=='security2.2' else ''
+            self.assertEqual(asset,f'telemt-{suffix}-x86_64-linux-gnu{install_suffix}.tar.gz')
             self.assertEqual(url,f'https://github.com/bababoyi6/me/releases/download/telemt-core-{suffix}/{asset}')
 
     def test_unknown_channel_rejected_before_download(self):
@@ -159,13 +162,33 @@ manage_core upgrade --maintenance balanced2
             self.assertIn('https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz',
                 (Path(folder)/'fetch').read_text().splitlines())
 
+    def test_security2_switch_binds_published_archive_and_version_to_existing_transaction(self):
+        with tempfile.TemporaryDirectory() as folder:
+            body='''load_state() { TDH_ROLE=backend1; WG_INTERFACE=tdh-b1; LOCAL_WG_IP=10.77.1.2; return 0; }
+require_current_state() { :; }
+telemt_binary_is_expected() { return 0; }
+uname() { echo x86_64; }
+curl() { printf '%s\\n' "$@" > "$TDH_BASE/fetch"; }
+python3() { printf '%s\\n' "$@" > "$TDH_BASE/args"; cat >/dev/null; }
+manage_core upgrade --maintenance security2.2
+'''
+            result=self.shell(body,TDH_BASE=folder,TDH_BIN=folder+'/telemt',TDH_CONFIG_DIR=folder+'/config',TDH_STATE=folder+'/state')
+            self.assertEqual(result.returncode,0,result.stderr)
+            args=(Path(folder)/'args').read_text().splitlines()
+            self.assertEqual(args[1],'upgrade');self.assertIn('--audited',args)
+            for key,expected in (('--version',PINS['security2.2'][0]),('--archive-sha',PINS['security2.2'][1]),('--binary-sha',PINS['security2.2'][2])):
+                self.assertEqual(args[args.index(key)+1],expected)
+            self.assertIn('https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2.security2.2/telemt-3.5.5-tdh.balanced2.security2.2-x86_64-linux-gnu-install.tar.gz',
+                (Path(folder)/'fetch').read_text().splitlines())
+
     def test_baseline_switch_rejects_arm_and_missing_maintenance_before_mutation(self):
-        for arch,ack in (('aarch64','--maintenance'),('x86_64','')):
-            with self.subTest(arch=arch,ack=ack),tempfile.TemporaryDirectory() as folder:
-                result=self.shell('uname() { echo "$TEST_ARCH"; }; manage_core upgrade "$TEST_ACK" balanced2',
-                    TDH_BASE=folder,TEST_ARCH=arch,TEST_ACK=ack)
-                self.assertNotEqual(result.returncode,0)
-                self.assertEqual(list(Path(folder).iterdir()),[])
+        for target in ('balanced2','security2.2'):
+            for arch,ack in (('aarch64','--maintenance'),('x86_64','')):
+                with self.subTest(target=target,arch=arch,ack=ack),tempfile.TemporaryDirectory() as folder:
+                    result=self.shell('uname() { echo "$TEST_ARCH"; }; manage_core upgrade "$TEST_ACK" "$TEST_TARGET"',
+                        TDH_BASE=folder,TEST_ARCH=arch,TEST_ACK=ack,TEST_TARGET=target)
+                    self.assertNotEqual(result.returncode,0)
+                    self.assertEqual(list(Path(folder).iterdir()),[])
 
     def test_both_legacy_official_architectures_require_the_exact_binary(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -179,8 +202,9 @@ telemt_binary_is_expected''', TDH_BIN=str(binary),TEST_ARCH=arch,TEST_HASH=sha)
                 self.assertEqual(result.returncode,0,result.stderr)
 
     def test_core_panel_requires_explicit_maintenance_and_keeps_default_readonly(self):
-        for reply,expected in (('',''),('\n',''),('1\nNO\n',''),('1\nMAINTENANCE\n','upgrade --maintenance balanced2'),
-                               ('2\nMAINTENANCE\n','upgrade --maintenance'),('3\nMAINTENANCE\n','rollback --maintenance')):
+        for reply,expected in (('',''),('\n',''),('1\nNO\n',''),('1\nMAINTENANCE\n','upgrade --maintenance security2.2'),
+                               ('2\nMAINTENANCE\n','upgrade --maintenance balanced2'),
+                               ('3\nMAINTENANCE\n','upgrade --maintenance'),('4\nMAINTENANCE\n','rollback --maintenance')):
             with self.subTest(reply=reply),tempfile.TemporaryDirectory() as folder:
                 body='''load_state() { TDH_ROLE=backend1; return 0; }
 require_current_state() { :; }
