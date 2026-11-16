@@ -1,0 +1,221 @@
+--- a/src/tls_front/cache.rs
++++ b/src/tls_front/cache.rs
+@@ -1,4 +1,8 @@
+ use std::collections::HashMap;
++
++#[cfg(unix)]
++#[path = "cache/disk_io.rs"]
++mod disk_io;
+ use std::collections::hash_map::DefaultHasher;
+ use std::hash::{Hash, Hasher};
+ use std::net::IpAddr;
+@@ -41,6 +45,7 @@
+     full_cert_sent_shards: Vec<RwLock<HashMap<IpAddr, Instant>>>,
+     full_cert_sent_last_sweep_epoch_secs: AtomicU64,
+     disk_path: PathBuf,
++    disk_domains: Vec<String>,
+ }
+ 
+ /// Read-only health view for one configured TLS front domain.
+@@ -124,6 +129,7 @@
+                 .collect(),
+             full_cert_sent_last_sweep_epoch_secs: AtomicU64::new(0),
+             disk_path: disk_path.as_ref().to_path_buf(),
++            disk_domains: domains.iter().filter(|domain| valid_cache_domain(domain)).cloned().collect(),
+         }
+     }
+ 
+@@ -331,60 +337,45 @@
+     }
+ 
+     pub async fn load_from_disk(&self) {
+-        let path = self.disk_path.clone();
+-        if tokio::fs::create_dir_all(&path).await.is_err() {
+-            return;
+-        }
+         let mut loaded = 0usize;
+-        if let Ok(mut dir) = tokio::fs::read_dir(&path).await {
+-            while let Ok(Some(entry)) = dir.next_entry().await {
+-                if let Ok(name) = entry.file_name().into_string() {
+-                    if !name.ends_with(".json") {
+-                        continue;
+-                    }
+-                    if let Ok(data) = tokio::fs::read(entry.path()).await
+-                        && let Ok(mut cached) = serde_json::from_slice::<CachedTlsData>(&data)
+-                    {
+-                        if cached.domain.is_empty()
+-                            || cached.domain.len() > 255
+-                            || !cached
+-                                .domain
+-                                .chars()
+-                                .all(|c| c.is_ascii_alphanumeric() || c == '.' || c == '-')
+-                        {
+-                            warn!(file = %name, "Skipping TLS cache entry with invalid domain");
+-                            continue;
+-                        }
+-                        if !cert_info_matches_domain(&cached) {
+-                            warn!(
+-                                file = %name,
+-                                domain = %cached.domain,
+-                                "Skipping TLS cache entry with mismatched certificate metadata"
+-                            );
+-                            continue;
+-                        }
+-                        // fetched_at is skipped during deserialization; approximate with file mtime if available.
+-                        if let Ok(meta) = entry.metadata().await
+-                            && let Ok(modified) = meta.modified()
+-                        {
+-                            cached.fetched_at = modified;
+-                        }
+-                        // Drop entries older than 72h
+-                        if let Ok(age) = cached.fetched_at.elapsed()
+-                            && age > Duration::from_secs(72 * 3600)
+-                        {
+-                            warn!(domain = %cached.domain, "Skipping stale TLS cache entry (>72h)");
+-                            continue;
+-                        }
+-                        cached
+-                            .behavior_profile
+-                            .refresh_server_hello_summary(&cached.server_hello_template);
+-                        let domain = cached.domain.clone();
+-                        self.set(&domain, cached).await;
+-                        loaded += 1;
+-                    }
++        for domain in &self.disk_domains {
++            let name = format!("{domain}.json");
++            #[cfg(unix)]
++            let entry = disk_io::read_entry_async(self.disk_path.clone(), domain.clone()).await;
++            #[cfg(not(unix))]
++            let entry = async {
++                let path = self.disk_path.join(&name);
++                let metadata = tokio::fs::symlink_metadata(&path).await?;
++                if !metadata.file_type().is_file() || metadata.len() > 1024 * 1024 {
++                    return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "unsafe TLS cache entry"));
+                 }
+-            }
++                let bytes = tokio::fs::read(&path).await?;
++                if bytes.len() > 1024 * 1024 {
++                    return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "oversized TLS cache entry"));
++                }
++                Ok((bytes, metadata.modified()?))
++            }.await;
++            let Ok((data, modified)) = entry else { continue };
++            let Ok(mut cached) = serde_json::from_slice::<CachedTlsData>(&data) else { continue };
++            if cached.domain != *domain {
++                warn!(file = %name, "Skipping TLS cache entry with mismatched domain");
++                continue;
++            }
++            if !cert_info_matches_domain(&cached) {
++                warn!(file = %name, domain = %cached.domain,
++                    "Skipping TLS cache entry with mismatched certificate metadata");
++                continue;
++            }
++            cached.fetched_at = modified;
++            if let Ok(age) = cached.fetched_at.elapsed()
++                && age > Duration::from_secs(72 * 3600)
++            {
++                warn!(domain = %cached.domain, "Skipping stale TLS cache entry (>72h)");
++                continue;
++            }
++            cached.behavior_profile.refresh_server_hello_summary(&cached.server_hello_template);
++            self.set(domain, cached).await;
++            loaded += 1;
+         }
+         if loaded > 0 {
+             info!(count = loaded, "Loaded TLS cache entries from disk");
+@@ -392,14 +383,25 @@
+     }
+ 
+     async fn persist(&self, domain: &str, data: &CachedTlsData) {
+-        if tokio::fs::create_dir_all(&self.disk_path).await.is_err() {
++        if !self.disk_domains.iter().any(|configured| configured == domain)
++            || data.domain != domain
++        {
+             return;
+         }
+-        let fname = format!("{}.json", domain.replace(['/', '\\'], "_"));
+-        let path = self.disk_path.join(fname);
+-        if let Ok(json) = serde_json::to_vec_pretty(data) {
+-            // best-effort write
+-            let _ = tokio::fs::write(path, json).await;
++        let Ok(json) = serde_json::to_vec_pretty(data) else { return };
++        if json.len() > 1024 * 1024 {
++            warn!(domain, bytes = json.len(), "Skipping oversized TLS cache persistence");
++            return;
++        }
++        #[cfg(unix)]
++        let result = disk_io::write_entry_async(self.disk_path.clone(), domain.to_string(), json).await;
++        #[cfg(not(unix))]
++        let result = async {
++            tokio::fs::create_dir_all(&self.disk_path).await?;
++            tokio::fs::write(self.disk_path.join(format!("{domain}.json")), json).await
++        }.await;
++        if let Err(error) = result {
++            warn!(domain, %error, "Failed to persist TLS cache entry");
+         }
+     }
+ 
+@@ -494,6 +496,12 @@
+         return false;
+     };
+     prefix.ends_with('.') && !prefix[..prefix.len() - 1].contains('.')
++}
++
++fn valid_cache_domain(domain: &str) -> bool {
++    !domain.is_empty()
++        && domain.len() <= 255
++        && domain.bytes().all(|c| c.is_ascii_alphanumeric() || c == b'.' || c == b'-')
+ }
+ 
+ fn normalize_dns_name(value: &str) -> String {
+@@ -534,6 +542,50 @@
+         }
+     }
+ 
++    #[cfg(unix)]
++    #[tokio::test]
++    async fn disk_load_accepts_only_configured_matching_fresh_domains() {
++        let root = tempfile::tempdir().unwrap();
++        let cache = TlsFrontCache::new(&["good.example".to_string()], 1024, root.path());
++        for (file_domain, data_domain) in [
++            ("good.example", "wrong.example"),
++            ("outside.example", "outside.example"),
++        ] {
++            let data = cached_with_cert_info(data_domain, Some(data_domain), Vec::new());
++            disk_io::write_entry_async(
++                root.path().to_path_buf(), file_domain.to_string(),
++                serde_json::to_vec(&data).unwrap(),
++            ).await.unwrap();
++        }
++        cache.load_from_disk().await;
++        assert_eq!(cache.get("good.example").await.domain, "default");
++        assert_eq!(cache.get("outside.example").await.domain, "default");
++
++        let data = cached_with_cert_info("good.example", Some("good.example"), Vec::new());
++        disk_io::write_entry_async(
++            root.path().to_path_buf(), "good.example".to_string(),
++            serde_json::to_vec(&data).unwrap(),
++        ).await.unwrap();
++        cache.load_from_disk().await;
++        assert_eq!(cache.get("good.example").await.domain, "good.example");
++    }
++
++    #[cfg(unix)]
++    #[tokio::test]
++    async fn disk_load_rejects_stale_entry() {
++        let root = tempfile::tempdir().unwrap();
++        let data = cached_with_cert_info("good.example", Some("good.example"), Vec::new());
++        disk_io::write_entry_async(
++            root.path().to_path_buf(), "good.example".to_string(),
++            serde_json::to_vec(&data).unwrap(),
++        ).await.unwrap();
++        let file = std::fs::File::options().write(true).open(root.path().join("good.example.json")).unwrap();
++        file.set_modified(SystemTime::now() - Duration::from_secs(73 * 3600)).unwrap();
++        let cache = TlsFrontCache::new(&["good.example".to_string()], 1024, root.path());
++        cache.load_from_disk().await;
++        assert_eq!(cache.get("good.example").await.domain, "default");
++    }
++
+     #[test]
+     fn cert_info_domain_match_accepts_exact_san() {
+         let cached = cached_with_cert_info("b.com", Some("a.com"), vec!["b.com"]);

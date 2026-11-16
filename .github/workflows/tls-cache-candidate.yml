@@ -1,0 +1,80 @@
+name: Verify isolated old TLS cache candidate
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Build, qualify, or compare the pinned binary in private fixtures
+        type: choice
+        options: ['build', 'qualify', 'performance', 'queue']
+        default: 'build'
+permissions:
+  contents: read
+concurrency:
+  group: old-tls-cache-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  candidate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 36
+    env:
+      PYTHONPATH: ${{ github.workspace }}/tools
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: telemt/telemt
+          ref: ac71d92ec41dea00a7eafd6b8d350c3486633500
+          path: upstream
+          persist-credentials: false
+      - name: Prepare pinned Rust and disposable dependencies
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal --no-self-update
+          rustup default 1.99.1
+          sudo timeout 120 apt-get update -qq
+          sudo timeout 180 apt-get install -y --no-install-recommends haproxy iproute2 python3-cryptography
+          mkdir -m 700 "$RUNNER_TEMP/tls-evidence"
+      - name: Build and test patched candidate
+        run: |
+          timeout --kill-after=10 1400 python3 tools/build_relay_candidate.py --source upstream --output "$RUNNER_TEMP/tls-core" --candidate balanced2-security2
+          sha256sum "$RUNNER_TEMP/tls-core/telemt-bulk"
+      - name: Fetch fixed released baseline
+        if: inputs.stage == 'qualify' || inputs.stage == 'performance' || inputs.stage == 'queue'
+        run: |
+          curl -q -fL --connect-timeout 10 --max-time 90 --max-filesize 11000000 --proto '=https' --proto-redir '=https' --tlsv1.2 https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz -o "$RUNNER_TEMP/balanced2.tar.gz"
+          printf '%s  %s\n' b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5 "$RUNNER_TEMP/balanced2.tar.gz" | sha256sum --check
+      - name: Verify isolated protocol and API boundary
+        if: inputs.stage == 'qualify'
+        run: |
+          sudo timeout --kill-after=10 150 systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-protocol-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=120 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" unshare --net -- sh -ec 'ip link set lo up; exec python3 tests/tls_candidate_lab.py --kind oldcache --candidate "$1/tls-core" --balanced2-archive "$1/balanced2.tar.gz" --output "$1/tls-evidence/protocol.json"' protocol "$RUNNER_TEMP"
+      - name: Recover profiles and reload cache with source down
+        if: inputs.stage == 'qualify'
+        run: |
+          sudo timeout --kill-after=10 210 systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-recovery-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=180 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" unshare --net -- sh -ec 'ip link set lo up; exec python3 tests/tls_recovery_lab.py --candidate "$1/tls-core" --output "$1/tls-evidence/recovery.json"' recovery "$RUNNER_TEMP"
+      - name: Verify isolated install upgrade restart health and rollback
+        if: inputs.stage == 'qualify'
+        run: |
+          sudo env GITHUB_ACTIONS=true TDH_SOURCE_COMMIT="$GITHUB_SHA" timeout --kill-after=10 300 unshare --net sh -ec 'ip link set lo up; exec python3 tests/stable_system_lab.py --candidate-directory "$1/tls-core" --old-tls-cache-candidate --balanced2-archive "$1/balanced2.tar.gz" --output "$1/tls-evidence/system.json"' system "$RUNNER_TEMP"
+      - name: Compare 100 ms paired throughput and loaded RTT
+        if: inputs.stage == 'performance'
+        run: |
+          sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
+          sudo timeout --kill-after=10 450 systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-parity-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=420 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/long_path_lab.py --tls-candidate oldcache --native-directory "$RUNNER_TEMP/tls-core" --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --output "$RUNNER_TEMP/tls-evidence/parity.json"
+          python3 tests/long_path_analysis.py --require-initial-screen "$RUNNER_TEMP/tls-evidence/parity.json" "$RUNNER_TEMP/tls-evidence/analysis.json"
+      - name: Compare private dual-end queue on fixed security2.2
+        if: inputs.stage == 'queue'
+        run: |
+          sudo timeout 180 apt-get install -y --no-install-recommends wireguard-tools ethtool iperf3
+          sudo modprobe tcp_bbr
+          sudo timeout --kill-after=10 570 systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-queue-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=540 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/mixed_path_lab.py --tls-cache-queue --profile rtt100 --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --native-directory "$RUNNER_TEMP/tls-core" --output "$RUNNER_TEMP/tls-evidence/queue.json"
+          python3 tests/private_shaper_analysis.py --require-gain "$RUNNER_TEMP/tls-evidence/queue.json" "$RUNNER_TEMP/tls-evidence/queue-analysis.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: old-tls-cache-evidence
+          path: |
+            ${{ runner.temp }}/tls-core/manifest.json
+            ${{ runner.temp }}/tls-core/tls-before.log
+            ${{ runner.temp }}/tls-evidence/*.json
+          retention-days: 14

@@ -7,3 +7,14 @@ RELEASES={
 }
 NATIVE_BASES={'84e5b827a6619fb2e09ad3d09f253cdffe04bc2f':'3.5.16',
               '66708d2866f3f3a4541c4fa67984d408e71a8af4':'3.5.17'}
+
+TLS_BASELINE = (
+    'b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5',
+    '5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100',
+    'telemt 3.5.5+tdh.balanced2',
+)
+OLD_TLS_CACHE_SHA256 = '0b901711296707c23da7e8edda5509f108bd351f6e4b9c72f0f69a1b1fe71388'
+TLS_CANDIDATES = {
+    'oldcache': ('bulk', 'source_commit', 'ac71d92ec41dea00a7eafd6b8d350c3486633500',
+                 'telemt 3.5.5+tdh.balanced2.security2.2'),
+}
