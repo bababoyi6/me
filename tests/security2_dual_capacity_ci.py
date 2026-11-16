@@ -9,12 +9,14 @@ import statistics
 import subprocess
 import sys
 
+REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / 'tools'))
+
 from core_install import archive_payload
 from release_pins import OLD_TLS_CACHE_SHA256, TLS_BASELINE, TLS_CANDIDATES
 from tls_candidate_lab import candidate_binary
 
 
-REPO = Path(__file__).resolve().parents[1]
 ORDER = ('balanced2', 'security2', 'security2', 'balanced2')
 
 
