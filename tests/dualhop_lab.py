@@ -33,6 +33,7 @@ profile=parser.add_mutually_exclusive_group()
 profile.add_argument('--soak',action='store_true')
 profile.add_argument('--benchmark',action='store_true')
 profile.add_argument('--candidate-check',action='store_true')
+profile.add_argument('--candidate-capacity',action='store_true')
 profile.add_argument('--endurance-seconds',type=int,choices=(60,86400),default=0)
 parser.add_argument('--rtt',type=int,choices=(10,20,50,100,200),default=10)
 parser.add_argument('--loss-percent',type=float,choices=(0,.1,.5),default=0)
@@ -45,9 +46,11 @@ if (args.loss_percent or args.jitter_ms) and args.build!='stable':
     parser.error('new impairment profiles require the pinned stable build')
 if args.candidate_check and (args.build!='bulk' or not args.separate_dc or args.rtt not in (100,200)):
     parser.error('candidate path check requires bulk, separate mock DC and 100/200ms entry RTT')
+if args.candidate_capacity and (args.build!='bulk' or not args.separate_dc or args.rtt!=100):
+    parser.error('candidate capacity requires bulk, separate mock DC and 100ms entry RTT')
 if args.endurance_seconds and (args.build!='bulk' or not args.separate_dc or args.rtt!=100):
     parser.error('endurance requires bulk, separate mock DC and 100ms entry RTT')
-if args.build=='bulk' and not (args.candidate_check or args.endurance_seconds):
+if args.build=='bulk' and not (args.candidate_check or args.candidate_capacity or args.endurance_seconds):
     parser.error('bulk requires a bounded candidate or endurance check')
 ROOT=Path(args.root).resolve()
 HERE=Path(__file__).resolve()
@@ -86,7 +89,7 @@ def backend():
         endpoint=(f'198.18.0.{1 if args.index==1 else 5}',26000) if args.separate_dc else None
         return FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,
                        experimental_binary=experimental,dc_endpoint=endpoint,artifact_registry=ROOT/'artifact-registry',
-                       shared_binary_root=ROOT if args.candidate_check or args.endurance_seconds else None,
+                       shared_binary_root=ROOT if args.candidate_check or args.candidate_capacity or args.endurance_seconds else None,
                        startup_report=ROOT/'results'/f'stable-backend{args.index}-startup.json' if args.build=='stable' else None,
                        offline_lab=args.build=='stable')
     lab=create_lab()
@@ -330,7 +333,8 @@ frontend mtp_tls
                 wait_state(True)
                 routed('apple.com','U',1,4096)
                 states=[json.loads((shared/f'backend{i}.json').read_text()) for i in (1,2)]
-                observed=validate(rows,states)
+                expected_version=json.loads((ROOT/'bulk-build.json').read_text())['version']
+                observed=validate(rows,states,expected_version)
                 after_wg=wg_totals()
                 wireguard={name:{key:after_wg[name][key]-before_wg[name][key] for key in ('rx','tx')} for name in before_wg}
                 validate_wireguard(rows,wireguard)
@@ -361,6 +365,57 @@ frontend mtp_tls
                     'backend_states':states,'wireguard_before_bytes':before_wg,
                     'accepted':False,'retry_performed':False})
                 raise
+        if args.candidate_capacity:
+            from candidate_contract import validate_wireguard
+            for domain,expected in (('apple.com',1),('gs.apple.com',2)):
+                for direction in ('D','U'):
+                    routed(domain,direction,expected,fragment=True)
+            def totals():
+                result={}
+                for device in ('wg-lab','wg-lab2'):
+                    records=[line.split() for line in command(args.wg,'show',device,'transfer').splitlines()]
+                    if not records or any(len(row)!=3 for row in records):
+                        raise RuntimeError('private WireGuard counters unavailable')
+                    result[device]={'rx':sum(int(row[1]) for row in records),
+                                    'tx':sum(int(row[2]) for row in records)}
+                return result
+            before_wg=totals()
+            capacity=[]
+            for direction in ('D','U'):
+                before=counts()
+                started=time.monotonic()
+                with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+                    futures={pool.submit(transfer,domain,direction,8*1024**2,125000000,True):index
+                             for domain,index in (('apple.com',1),('gs.apple.com',2))}
+                    pair=[]
+                    for future,index in futures.items():
+                        row=future.result(timeout=30)
+                        row['backend_index']=index
+                        pair.append(row)
+                elapsed=time.monotonic()-started
+                delta=[new-old for old,new in zip(before,counts())]
+                if delta!=[1,1] or not all(row['sha256_verified'] for row in pair):
+                    raise RuntimeError('concurrent dual route or payload integrity failed')
+                capacity.append({'direction':direction,'bytes':sum(row['bytes'] for row in pair),
+                                 'elapsed_seconds':elapsed,
+                                 'aggregate_mbps':sum(row['bytes'] for row in pair)*8/elapsed/1e6})
+                rows.extend(pair)
+            after_wg=totals()
+            wireguard={name:{key:after_wg[name][key]-before_wg[name][key] for key in ('rx','tx')}
+                       for name in before_wg}
+            validate_wireguard(rows[4:],wireguard)
+            states=[json.loads((shared/f'backend{i}.json').read_text()) for i in (1,2)]
+            if any(state['errors'] or state['telemt']!=states[0]['telemt'] for state in states):
+                raise RuntimeError('concurrent candidate backend state failed')
+            result={'classification':'SINGLE_VPS_DUAL_TUNNEL_CAPACITY_SCREEN',
+                    'scope':'two concurrent private HAProxy/WG+PSK tunnels, two identical cores and synthetic DC; no public or production capacity claim',
+                    'telemt':states[0]['telemt'],'rtt_ms_configured':args.rtt,
+                    'shared_entry_link_mbps':100,'payload_bytes':sum(row['bytes'] for row in rows),
+                    'wireguard_transfer_delta_bytes':wireguard,'capacity':capacity,'rows':rows,
+                    'backend_errors':[state['errors'] for state in states]}
+            save(ROOT/'results/candidate-dual-capacity.json',result)
+            print(json.dumps({key:value for key,value in result.items() if key!='rows'}),flush=True)
+            return
         for domain,expected in (('apple.com',1),('gs.apple.com',2)):
             for direction in ('D','U'): routed(domain,direction,expected,fragment=True)
         if args.benchmark:
@@ -497,6 +552,7 @@ def run():
                                       '--loss-percent',str(args.loss_percent),'--jitter-ms',str(args.jitter_ms),
                                       *(['--separate-dc'] if args.separate_dc else []),
                                       *(['--candidate-check'] if args.candidate_check else []),
+                                      *(['--candidate-capacity'] if args.candidate_capacity else []),
                                       *(['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else []),
                                       'backend','--shared',str(shared),'--index',str(number)],
                                      stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
@@ -507,8 +563,8 @@ def run():
                 if process.poll() is not None: raise RuntimeError('backend startup failed: '+process.stderr.read().decode()[:2000])
             assert time.monotonic()<deadline,'backend readiness deadline'
             time.sleep(.2)
-        entry_args=['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else ['--candidate-check'] if args.candidate_check else ['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
-        entry_deadline=args.endurance_seconds+120 if args.endurance_seconds else 90 if args.candidate_check else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
+        entry_args=['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else ['--candidate-check'] if args.candidate_check else ['--candidate-capacity'] if args.candidate_capacity else ['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
+        entry_deadline=args.endurance_seconds+120 if args.endurance_seconds else 90 if args.candidate_check else 150 if args.candidate_capacity else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
         result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),'ip','netns','exec',NAMES[0],
                                'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--stable-release',args.stable_release,'--rtt',str(args.rtt),
                                '--loss-percent',str(args.loss_percent),'--jitter-ms',str(args.jitter_ms),

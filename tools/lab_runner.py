@@ -75,7 +75,7 @@ def main():
     parser.add_argument("--root", required=True)
     parser.add_argument("--haproxy", default="haproxy")
     parser.add_argument("--wg", default="wg")
-    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed", "candidate", "delivery", "endurance"), default="smoke")
+    parser.add_argument("--profile", choices=("smoke", "ab", "soak", "observer", "socket", "mixed", "candidate", "candidate-capacity", "delivery", "endurance"), default="smoke")
     parser.add_argument('--endurance-seconds',type=int,choices=(60,86400),default=60)
     parser.add_argument('--logical-clients',type=int,choices=(30,60,100),default=30)
     parser.add_argument("--rtt", type=int, choices=(20, 50, 100, 200), default=100)
@@ -100,7 +100,7 @@ def main():
         parser.error("minimum stream tier exceeds maximum")
     if sys.platform != "linux":
         parser.error("Linux is required")
-    if args.memory_high_percent != 75 and args.profile not in ('ab','candidate'):
+    if args.memory_high_percent != 75 and args.profile not in ('ab','candidate','candidate-capacity'):
         parser.error('non-default soft memory policy requires the private ab/candidate profile')
     if args.profile=='candidate' and args.rtt not in (100,200):
         parser.error('candidate path check requires a high-RTT entry link')
@@ -180,6 +180,10 @@ def main():
         worker = [sys.executable, str(REPO/'tests/dualhop_lab.py'), '--root', str(root),
                   '--build','bulk','--haproxy',args.haproxy,'--wg',args.wg,'--rtt',str(args.rtt),
                   '--separate-dc','--candidate-check','run']
+    elif args.profile == 'candidate-capacity':
+        worker = [sys.executable, str(REPO/'tests/dualhop_lab.py'), '--root', str(root),
+                  '--build','bulk','--haproxy',args.haproxy,'--wg',args.wg,'--rtt','100',
+                  '--separate-dc','--candidate-capacity','run']
     elif args.profile == 'endurance':
         worker=[sys.executable,str(REPO/'tests/dualhop_lab.py'),'--root',str(root),
                 '--build','bulk','--haproxy',args.haproxy,'--wg',args.wg,'--rtt','100',
@@ -189,7 +193,7 @@ def main():
                   "--haproxy", args.haproxy, "--wg", args.wg, "--rtt", str(args.rtt), "--separate-dc",
                   *(["--soak"] if args.profile == "soak" else []), "run"]
     unit = "tdh-audit-" + uuid.uuid4().hex[:12]
-    if args.profile in ('candidate','delivery'):
+    if args.profile in ('candidate','candidate-capacity','delivery'):
         report['budget']['runtime_max_seconds']=180
     if args.profile=='endurance':
         report['budget']['runtime_max_seconds']=args.endurance_seconds+180
@@ -211,6 +215,9 @@ def main():
     if args.profile=='candidate':
         plan['classification']='SINGLE_VPS_CANDIDATE_PATH'
         plan['payload_max_bytes']=2*1024**2
+    if args.profile=='candidate-capacity':
+        plan['classification']='SINGLE_VPS_DUAL_TUNNEL_CAPACITY_SCREEN'
+        plan['payload_max_bytes']=33*1024**2
     if args.profile=='delivery':
         plan['classification']='CI_CORE_DELIVERY'
         plan['payload_max_bytes']=72*1024**2
