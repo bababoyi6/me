@@ -42,6 +42,22 @@ jobs:
           assert set(documents) == {'TELEMT-LICENSE.txt', 'NOTICE.txt', 'source.patch',
                                     'build-provenance.json', 'manifest.json'}
           PY
+      - name: Exercise the production fresh-install path on the fixed bundle
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if ! id telemt >/dev/null 2>&1; then
+            sudo useradd --system --no-create-home --shell /usr/sbin/nologin telemt
+          fi
+          sudo install -d -m 0755 "$RUNNER_TEMP/security2-install-lab"
+          sudo env GITHUB_ACTIONS=true PYTHONPATH="$GITHUB_WORKSPACE/tests" timeout --kill-after=5 45 \
+            python3 - "$RUNNER_TEMP/security2-install.tar.gz" "$RUNNER_TEMP/security2-install-lab" <<'PY'
+          from pathlib import Path
+          import sys
+          from core_delivery_ci import install_case
+          target, report = install_case(Path(sys.argv[2])/'fresh', 'security2.2', Path(sys.argv[1]))
+          assert report['accepted'] is True and target.is_file()
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: security2-audited-install-bundle
