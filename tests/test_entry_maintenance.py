@@ -126,6 +126,7 @@ class EntryMaintenanceTests(unittest.TestCase):
                 migrate_health(path,False,lab.stat,reload)
         self.assertEqual(path.read_bytes(), original)
         self.assertEqual(len(reloads),4)
+        wait_runtime(lab.stat,False,require_ready=True)
 
         from entry_maintenance import publish as real_publish
         injected = False
