@@ -7,7 +7,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.7.1"
+readonly TDH_VERSION="1.7.2"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.17"
@@ -40,8 +40,8 @@ readonly TDH_MANAGER="${TDH_MANAGER:-/usr/local/sbin/telemt-dual-hop}"
 readonly TDH_SHORTCUT="${TDH_SHORTCUT:-/usr/local/bin/a}"
 # Keep this pin independent of the downloaded bytes. Advance it only after
 # verifying a published manager release. See docs/MANAGER-UPDATE.md.
-readonly TDH_STABLE_MANAGER_TAG="v1.7.0"
-readonly TDH_STABLE_MANAGER_SHA256="33c90f9289375cbccf9a6480d7026a58b1bef03ba8e50421b2d7c9d919a6e2ef"
+readonly TDH_STABLE_MANAGER_TAG="v1.7.1"
+readonly TDH_STABLE_MANAGER_SHA256="ffa6d8edb386aa5cc833f814ca1a26c9ba1c314df44e4feccff17191940ac8a3"
 readonly TDH_HAPROXY_CFG="${TDH_HAPROXY_CFG:-${TDH_BASE}/haproxy.cfg}"
 readonly TDH_LOCK="${TDH_LOCK:-/run/lock/telemt-dual-hop.lock}"
 readonly TDH_DOMAIN_A="apple.com"
