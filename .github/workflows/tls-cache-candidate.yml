@@ -5,7 +5,7 @@ on:
       stage:
         description: Build, qualify, or compare the pinned binary in private fixtures
         type: choice
-        options: ['build', 'qualify', 'performance', 'queue']
+        options: ['build', 'qualify', 'performance', 'queue', 'dualpath']
         default: 'build'
 permissions:
   contents: read
@@ -69,6 +69,18 @@ jobs:
           sudo modprobe tcp_bbr
           sudo timeout --kill-after=10 570 systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-tls-queue-${GITHUB_RUN_ID}" -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 -p TasksMax=512 -p RuntimeMaxSec=540 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/mixed_path_lab.py --tls-cache-queue --profile rtt100 --balanced2-archive "$RUNNER_TEMP/balanced2.tar.gz" --native-directory "$RUNNER_TEMP/tls-core" --output "$RUNNER_TEMP/tls-evidence/queue.json"
           python3 tests/private_shaper_analysis.py --require-gain "$RUNNER_TEMP/tls-evidence/queue.json" "$RUNNER_TEMP/tls-evidence/queue-analysis.json"
+      - name: Verify fixed security2.2 on two private encrypted tunnels
+        if: inputs.stage == 'dualpath'
+        run: |
+          sudo timeout 120 apt-get install -y --no-install-recommends wireguard-tools ethtool
+          sudo env GITHUB_ACTIONS=true GITHUB_SHA="$GITHUB_SHA" RUNNER_TEMP="$RUNNER_TEMP" timeout --kill-after=10 300 python3 tests/security2_dual_path_ci.py --candidate "$RUNNER_TEMP/tls-core"
+      - name: Preserve sanitized two-tunnel report
+        if: always() && inputs.stage == 'dualpath'
+        run: |
+          if sudo test -f "$RUNNER_TEMP/tdh-audit-security2-dualpath/results/candidate-path-bulk.json"; then
+            sudo cp "$RUNNER_TEMP/tdh-audit-security2-dualpath/results/candidate-path-bulk.json" "$RUNNER_TEMP/tls-evidence/dualpath.json"
+            sudo chown "$(id -u):$(id -g)" "$RUNNER_TEMP/tls-evidence/dualpath.json"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

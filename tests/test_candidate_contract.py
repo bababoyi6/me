@@ -27,6 +27,16 @@ class CandidatePathContractTests(unittest.TestCase):
         rows,states=self.fixture()
         self.assertEqual(len(validate(rows,states)),2)
 
+    def test_explicit_candidate_version_checks_both_backends(self):
+        rows,states=self.fixture()
+        version='telemt 3.5.5+tdh.balanced2.security2.2'
+        for state in states:
+            state['telemt']=version
+        self.assertEqual(len(validate(rows,states,version)),2)
+        states[1]['telemt']=VERSION
+        with self.assertRaises(ValueError):
+            validate(rows,states,version)
+
     def test_low_or_unknown_rtt_and_wrong_candidate_do_not_pass(self):
         rows,states=self.fixture()
         for mutation in ({'client_sockets':[]},{'client_sockets':[{'rtt_ms':1}]},{'telemt':'telemt 3.5.5+tdh.audit2'},

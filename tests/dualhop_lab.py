@@ -330,7 +330,8 @@ frontend mtp_tls
                 wait_state(True)
                 routed('apple.com','U',1,4096)
                 states=[json.loads((shared/f'backend{i}.json').read_text()) for i in (1,2)]
-                observed=validate(rows,states)
+                expected_version=json.loads((ROOT/'bulk-build.json').read_text())['version']
+                observed=validate(rows,states,expected_version)
                 after_wg=wg_totals()
                 wireguard={name:{key:after_wg[name][key]-before_wg[name][key] for key in ('rx','tx')} for name in before_wg}
                 validate_wireguard(rows,wireguard)

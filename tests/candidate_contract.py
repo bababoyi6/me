@@ -16,7 +16,7 @@ def validate_wireguard(rows, counters):
             raise ValueError('private encrypted tunnel traffic evidence incomplete')
 
 
-def validate(rows, backends):
+def validate(rows, backends, expected_version=VERSION):
     if len(rows)!=7 or {(r['domain_index'],r['direction']) for r in rows[:4]}!={(1,'D'),(1,'U'),(2,'D'),(2,'U')}:
         raise ValueError('candidate path needs both domains and directions plus failover/recovery')
     if ([r['backend_index'] for r in rows[:4]]!=[1,1,2,2] or
@@ -30,7 +30,7 @@ def validate(rows, backends):
         raise ValueError('two independent candidate backends required')
     observed=[]
     for state in backends:
-        if state['telemt']!=VERSION or state['errors'] or state.get('socket_observation_errors'):
+        if state['telemt']!=expected_version or state['errors'] or state.get('socket_observation_errors'):
             raise ValueError('candidate identity or backend telemetry failed')
         values=[s['rtt_ms'] for s in state.get('client_sockets',[])
                 if type(s.get('rtt_ms')) in (int,float) and math.isfinite(s['rtt_ms']) and s['rtt_ms']>0]
