@@ -5,7 +5,7 @@ on:
       stage:
         description: Build, qualify, or compare the pinned binary in private fixtures
         type: choice
-        options: ['build', 'qualify', 'performance', 'queue', 'dualpath', 'public-source', 'dual-capacity']
+        options: ['build', 'qualify', 'performance', 'queue', 'dualpath', 'public-source', 'dual-capacity', 'package']
         default: 'build'
 permissions:
   contents: read
@@ -96,6 +96,19 @@ jobs:
           if sudo test -f "$RUNNER_TEMP/tls-evidence/dual-capacity.json"; then
             sudo chown "$(id -u):$(id -g)" "$RUNNER_TEMP/tls-evidence/dual-capacity.json"
           fi
+      - name: Verify fixed security2.2 archive and source materials
+        if: inputs.stage == 'package'
+        run: |
+          timeout --kill-after=5 30 python3 tools/verify_security2_package.py --archive "$RUNNER_TEMP/tls-core.tar.gz" --checksum-file "$RUNNER_TEMP/tls-core.tar.gz.sha256" --project-commit "$GITHUB_SHA"
+      - uses: actions/upload-artifact@v4
+        if: inputs.stage == 'package'
+        with:
+          name: security2-preview-package
+          path: |
+            ${{ runner.temp }}/tls-core.tar.gz
+            ${{ runner.temp }}/tls-core.tar.gz.sha256
+          retention-days: 14
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: always()
         with:
