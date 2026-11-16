@@ -7,7 +7,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.7.2"
+readonly TDH_VERSION="1.7.3"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.17"
@@ -26,6 +26,10 @@ readonly TELEMT_CORE_VERSION_AMD64="3.5.5+tdh.balanced2"
 readonly TELEMT_CORE_ARCHIVE_SHA256_AMD64="b4fec3efd10288a9f211ad958337fa314a15486e72fd5c50ab870f22a19737e5"
 readonly TELEMT_CORE_BINARY_SHA256_AMD64="5dc5d9b5ac43a0f12a402159e127b3b69e18ccb355c99b0322e73d870d907100"
 readonly TELEMT_CORE_URL_AMD64="https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2/telemt-3.5.5-tdh.balanced2-x86_64-linux-gnu.tar.gz"
+readonly TELEMT_SECURITY2_VERSION_AMD64="3.5.5+tdh.balanced2.security2.2"
+readonly TELEMT_SECURITY2_ARCHIVE_SHA256_AMD64="18e872f1ebe18ea13a5179a68e2824b6dcd2ce145682adede8b6b0955d22b8fe"
+readonly TELEMT_SECURITY2_BINARY_SHA256_AMD64="0b901711296707c23da7e8edda5509f108bd351f6e4b9c72f0f69a1b1fe71388"
+readonly TELEMT_SECURITY2_URL_AMD64="https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2.security2.2/telemt-3.5.5-tdh.balanced2.security2.2-x86_64-linux-gnu-install.tar.gz"
 readonly TELEMT_AUDIT2_VERSION="3.5.5+tdh.audit2"
 readonly TELEMT_AUDIT2_ARCHIVE_SHA256="c205183e479716f015378e4e2241103ae8d488e06f6ef65946be0bd94624f356"
 readonly TELEMT_AUDIT2_BINARY_SHA256="2e5f864461be842dbca2ee8638f3b68327f56d5f1666ea0f2622a491b2ba75d1"
@@ -40,8 +44,8 @@ readonly TDH_MANAGER="${TDH_MANAGER:-/usr/local/sbin/telemt-dual-hop}"
 readonly TDH_SHORTCUT="${TDH_SHORTCUT:-/usr/local/bin/a}"
 # Keep this pin independent of the downloaded bytes. Advance it only after
 # verifying a published manager release. See docs/MANAGER-UPDATE.md.
-readonly TDH_STABLE_MANAGER_TAG="v1.7.1"
-readonly TDH_STABLE_MANAGER_SHA256="ffa6d8edb386aa5cc833f814ca1a26c9ba1c314df44e4feccff17191940ac8a3"
+readonly TDH_STABLE_MANAGER_TAG="v1.7.2"
+readonly TDH_STABLE_MANAGER_SHA256="0ba07d571e33ce3e41e992c8c5f5d99663507f44c09c99c5983fb973ea0d02dc"
 readonly TDH_HAPROXY_CFG="${TDH_HAPROXY_CFG:-${TDH_BASE}/haproxy.cfg}"
 readonly TDH_LOCK="${TDH_LOCK:-/run/lock/telemt-dual-hop.lock}"
 readonly TDH_DOMAIN_A="apple.com"
@@ -160,7 +164,8 @@ usage() {
   a update --release vX.Y.Z --sha256 SHA256   安装已独立核验摘要的稳定版
   a update-rollback                         恢复上次 a update 前的管理脚本
   a core-upgrade --maintenance               后端固定版本核心升级（需先排空）
-  a core-baseline --maintenance              x86_64 切回已发布稳定基线（需先排空）
+  a core-security2 --maintenance             x86_64 切换到 security2.2（需先排空）
+  a core-baseline --maintenance              x86_64 切回 balanced2 基线（需先排空）
   a core-rollback --maintenance              后端核心回滚（配置变更时拒绝）
   a backend-drain 1|2                       入口排空后端的新连接
   a backend-resume 1|2                      入口恢复后端接收新连接
@@ -1263,9 +1268,9 @@ PY
 manage_core() {
   local action=$1 acknowledgement=${2:-} target=${3:-official} tmp="" asset expected binary_sha url directory version result=0
   [[ $acknowledgement == --maintenance ]] || die "请先确认另一个后端正常并在入口排空本后端，按升级文档添加 --maintenance；现有会话可能断开。"
-  [[ $target == official || ( $target == balanced2 && $action == upgrade ) ]] || die "核心维护目标无效。"
-  if [[ $target == balanced2 ]]; then
-    case $(uname -m) in x86_64|amd64) ;; *) die "已发布 balanced2 稳定基线仅支持 x86_64；ARM 不会安装其他架构核心。" ;; esac
+  [[ $target == official || ( ( $target == balanced2 || $target == security2.2 ) && $action == upgrade ) ]] || die "核心维护目标无效。"
+  if [[ $target == balanced2 || $target == security2.2 ]]; then
+    case $(uname -m) in x86_64|amd64) ;; *) die "此项目核心仅支持 x86_64；ARM 不会安装其他架构核心。" ;; esac
   fi
   load_state || die "未安装节点。"
   require_current_state
@@ -1291,7 +1296,12 @@ manage_core() {
     [[ ! -e $directory && ! -L $directory ]] || args+=(--protect "$directory")
   done
   if [[ $action == upgrade ]]; then
-    if [[ $target == balanced2 ]]; then
+    if [[ $target == security2.2 ]]; then
+      asset=${TELEMT_SECURITY2_URL_AMD64##*/} expected=$TELEMT_SECURITY2_ARCHIVE_SHA256_AMD64
+      binary_sha=$TELEMT_SECURITY2_BINARY_SHA256_AMD64 version=$TELEMT_SECURITY2_VERSION_AMD64 url=$TELEMT_SECURITY2_URL_AMD64
+      args+=(--audited)
+      info "目标为已发布核心 ${version}；保留配置与链接，当前核心按事务备份。"
+    elif [[ $target == balanced2 ]]; then
       asset=${TELEMT_CORE_URL_AMD64##*/} expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64
       binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 version=$TELEMT_CORE_VERSION_AMD64 url=$TELEMT_CORE_URL_AMD64
       args+=(--audited)
@@ -2894,9 +2904,9 @@ queue_panel() {
 
 select_amd64_core() {
   local version expected binary_sha url
-  # Preserve the released high-RTT baseline until a newer core passes the
-  # joint throughput/latency gate; latest-compatible is not latest-by-default.
-  case ${TDH_NEW_INSTALL_CORE:-balanced2} in
+  # The released security2.2 core retains balanced2 throughput in bounded
+  # comparisons and fixes FakeTLS profile expiry. Keep balanced2 selectable.
+  case ${TDH_NEW_INSTALL_CORE:-security2.2} in
     official)
       version=$TELEMT_VERSION expected=$TELEMT_SHA256_AMD64
       binary_sha=$TELEMT_BINARY_SHA256_AMD64
@@ -2904,10 +2914,13 @@ select_amd64_core() {
     balanced2)
       version=$TELEMT_CORE_VERSION_AMD64 expected=$TELEMT_CORE_ARCHIVE_SHA256_AMD64
       binary_sha=$TELEMT_CORE_BINARY_SHA256_AMD64 url=$TELEMT_CORE_URL_AMD64 ;;
+    security2.2)
+      version=$TELEMT_SECURITY2_VERSION_AMD64 expected=$TELEMT_SECURITY2_ARCHIVE_SHA256_AMD64
+      binary_sha=$TELEMT_SECURITY2_BINARY_SHA256_AMD64 url=$TELEMT_SECURITY2_URL_AMD64 ;;
     audit2)
       version=$TELEMT_AUDIT2_VERSION expected=$TELEMT_AUDIT2_ARCHIVE_SHA256
       binary_sha=$TELEMT_AUDIT2_BINARY_SHA256 url=$TELEMT_AUDIT2_URL ;;
-    *) die "新安装核心选择无效；仅支持 official、balanced2 或 audit2。" ;;
+    *) die "新安装核心选择无效；仅支持 official、balanced2、security2.2 或 audit2。" ;;
   esac
   printf '%s\t%s\t%s\t%s\t%s\n' "${url##*/}" "$version" "$expected" "$binary_sha" "$url"
 }
@@ -2922,7 +2935,7 @@ download_telemt() {
       [[ $version != "$TELEMT_VERSION" ]] || mode=official
       info "安装固定版本 Telemt ${version}（${mode}）。"
       if [[ $mode == official ]]; then
-        warn "官方 ${version} 在已验证的高 RTT 单流场景存在吞吐退化；x86_64 默认稳定基线为 balanced2。"
+        warn "官方 ${version} 在已验证的高 RTT 单流场景存在吞吐退化；x86_64 默认核心为 security2.2。"
       fi
       ;;
     aarch64|arm64)
@@ -2930,7 +2943,7 @@ download_telemt() {
       asset="telemt-aarch64-linux-gnu.tar.gz" expected=$TELEMT_SHA256_ARM64
       url="https://github.com/telemt/telemt/releases/download/${TELEMT_VERSION}/${asset}"
       version=$TELEMT_VERSION mode=official binary_sha=$TELEMT_BINARY_SHA256_ARM64
-      info "ARM 使用官方 Telemt ${version}；本轮提速核心仅验证了 x86_64。"
+      info "ARM 使用官方 Telemt ${version}；项目定制核心仅验证了 x86_64。"
       ;;
     *) die "Telemt 不支持当前架构。" ;;
   esac
@@ -3668,6 +3681,7 @@ telemt_binary_is_expected() {
     x86_64:"$TELEMT_PREVIOUS_BINARY_SHA256_AMD64"|amd64:"$TELEMT_PREVIOUS_BINARY_SHA256_AMD64"|aarch64:"$TELEMT_PREVIOUS_BINARY_SHA256_ARM64"|arm64:"$TELEMT_PREVIOUS_BINARY_SHA256_ARM64") expected="telemt ${TELEMT_PREVIOUS_VERSION}" ;;
     x86_64:"$TELEMT_LEGACY_BINARY_SHA256_AMD64"|amd64:"$TELEMT_LEGACY_BINARY_SHA256_AMD64"|aarch64:"$TELEMT_LEGACY_BINARY_SHA256_ARM64"|arm64:"$TELEMT_LEGACY_BINARY_SHA256_ARM64") expected="telemt ${TELEMT_LEGACY_VERSION}" ;;
     x86_64:"$TELEMT_CORE_BINARY_SHA256_AMD64"|amd64:"$TELEMT_CORE_BINARY_SHA256_AMD64") expected="telemt ${TELEMT_CORE_VERSION_AMD64}" ;;
+    x86_64:"$TELEMT_SECURITY2_BINARY_SHA256_AMD64"|amd64:"$TELEMT_SECURITY2_BINARY_SHA256_AMD64") expected="telemt ${TELEMT_SECURITY2_VERSION_AMD64}" ;;
     x86_64:"$TELEMT_AUDIT2_BINARY_SHA256"|amd64:"$TELEMT_AUDIT2_BINARY_SHA256") expected="telemt ${TELEMT_AUDIT2_VERSION}" ;;
     *) return 1 ;;
   esac
@@ -4745,13 +4759,14 @@ core_panel() {
   local confirmation current
   current=$(telemt_binary_is_expected --print-version) || current="未知或未通过身份校验"
   printf '\n当前核心：%s\n' "$current"
-  printf '  1) 切换到已发布 balanced2 稳定基线（x86_64）\n'
-  printf '  2) 切换到兼容的官方核心（高 RTT 已知速度代价）\n'
-  printf '  3) 回退上一核心事务\n'
+  printf '  1) 切换到 security2.2（x86_64 新安装默认）\n'
+  printf '  2) 切换到 balanced2（x86_64 上一稳定基线）\n'
+  printf '  3) 切换到兼容的官方核心（高 RTT 已知速度代价）\n'
+  printf '  4) 回退上一核心事务\n'
   printf '  0) 返回（默认）\n'
   read_panel_choice '请选择' 0 || return 0
   case $PANEL_CHOICE in
-    1|2|3) ;;
+    1|2|3|4) ;;
     0) return 0 ;;
     *) warn "无效选择。"; return 0 ;;
   esac
@@ -4760,9 +4775,10 @@ core_panel() {
   read -r confirmation </dev/tty || return 0
   [[ $confirmation == MAINTENANCE ]] || { info "已取消核心维护。"; return 0; }
   case $PANEL_CHOICE in
-    1) manage_core upgrade --maintenance balanced2 ;;
-    2) manage_core upgrade --maintenance ;;
-    3) manage_core rollback --maintenance ;;
+    1) manage_core upgrade --maintenance security2.2 ;;
+    2) manage_core upgrade --maintenance balanced2 ;;
+    3) manage_core upgrade --maintenance ;;
+    4) manage_core rollback --maintenance ;;
   esac
 }
 
@@ -4954,6 +4970,9 @@ main() {
     core-baseline)
       (( $# == 2 )) || die "用法：a core-baseline --maintenance"
       manage_core upgrade "$2" balanced2 ;;
+    core-security2)
+      (( $# == 2 )) || die "用法：a core-security2 --maintenance"
+      manage_core upgrade "$2" security2.2 ;;
     backend-drain|backend-resume)
       (( $# == 2 )) || die "用法：a $1 1|2"
       backend_maintenance "${1#backend-}" "$2" ;;

@@ -1,0 +1,44 @@
+name: Verify security2 installer bundle
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/security2-install-bundle.yml
+      - telemt-dual-hop.sh
+      - tools/security2_install_bundle.py
+      - tests/test_core_selection.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repack fixed published ELF and check installer compatibility
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          source="$RUNNER_TEMP/telemt-3.5.5-tdh.balanced2.security2.2-x86_64-linux-gnu.tar.gz"
+          bundle="$RUNNER_TEMP/security2-install.tar.gz"
+          checksums="$RUNNER_TEMP/SHA256SUMS"
+          curl -q -fL --retry 2 --connect-timeout 10 --max-time 120 --max-filesize 12000000 --proto '=https' --proto-redir '=https' --tlsv1.2 \
+            'https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2.security2.2/telemt-3.5.5-tdh.balanced2.security2.2-x86_64-linux-gnu.tar.gz' -o "$source"
+          printf '%s  %s\n' '83498b674a70bfa0834863d833306c89ff4e23f6c8832c9e336f706fd38ff169' "$source" | sha256sum --check
+          printf '%s  %s\n' '83498b674a70bfa0834863d833306c89ff4e23f6c8832c9e336f706fd38ff169' 'telemt-3.5.5-tdh.balanced2.security2.2-x86_64-linux-gnu.tar.gz' > "$checksums"
+          python3 tools/security2_install_bundle.py --source "$source" --checksums "$checksums" --output "$bundle"
+          printf '%s  %s\n' '18e872f1ebe18ea13a5179a68e2824b6dcd2ce145682adede8b6b0955d22b8fe' "$bundle" | sha256sum --check
+          PYTHONPATH=tools python3 - "$bundle" <<'PY'
+          import sys
+          from core_install import archive_payload
+          from security2_install_bundle import CANDIDATE_SHA256, VERSION
+          binary, documents = archive_payload(sys.argv[1],
+              '18e872f1ebe18ea13a5179a68e2824b6dcd2ce145682adede8b6b0955d22b8fe',
+              VERSION, CANDIDATE_SHA256, audited=True)
+          assert len(binary) == 30565696
+          assert set(documents) == {'TELEMT-LICENSE.txt', 'NOTICE.txt', 'source.patch',
+                                    'build-provenance.json', 'manifest.json'}
+          PY

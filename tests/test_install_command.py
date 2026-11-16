@@ -35,6 +35,7 @@ class InstallCommandTests(unittest.TestCase):
                 command, replacements = re.subn(r'"[a-f0-9]{64}"',
                     f'"{hashlib.sha256(candidate.read_bytes()).hexdigest()}"', command)
                 self.assertEqual(replacements, 1)
+                version = re.search(rb'^readonly TDH_VERSION="([0-9.]+)"$', candidate.read_bytes(), re.M)[1].decode()
             if payload is not None:
                 candidate = base / "payload.sh"
                 candidate.write_bytes(payload)

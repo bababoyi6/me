@@ -14,11 +14,13 @@ class ReleaseLockTests(unittest.TestCase):
         readme = (root / 'README.md').read_text(encoding='utf-8')
         tag = re.search(r'^readonly TDH_STABLE_MANAGER_TAG="(v[0-9.]+)"$', script, re.M)[1]
         digest = re.search(r'^readonly TDH_STABLE_MANAGER_SHA256="([a-f0-9]{64})"$', script, re.M)[1]
-        self.assertEqual((tag, digest), ('v1.7.1', 'ffa6d8edb386aa5cc833f814ca1a26c9ba1c314df44e4feccff17191940ac8a3'))
+        self.assertEqual((tag, digest), ('v1.7.2', '0ba07d571e33ce3e41e992c8c5f5d99663507f44c09c99c5983fb973ea0d02dc'))
         self.assertIn('https://raw.githubusercontent.com/bababoyi6/me/v1.7.2/telemt-dual-hop.sh', readme)
         self.assertIn('"0ba07d571e33ce3e41e992c8c5f5d99663507f44c09c99c5983fb973ea0d02dc"', readme)
-        self.assertEqual(hashlib.sha256((root / 'telemt-dual-hop.sh').read_bytes()).hexdigest(),
-                         '0ba07d571e33ce3e41e992c8c5f5d99663507f44c09c99c5983fb973ea0d02dc')
+        # A development manager can be newer than the frozen README bootstrap.
+        current = re.search(r'^readonly TDH_VERSION="([0-9.]+)"$', script, re.M)[1]
+        if current == '1.7.2':
+            self.assertEqual(hashlib.sha256((root / 'telemt-dual-hop.sh').read_bytes()).hexdigest(), digest)
         self.assertNotIn('raw.githubusercontent.com/bababoyi6/me/main/', script)
 
     def test_acceptance_and_native_builder_pin_the_same_active_source(self):
