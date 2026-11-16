@@ -164,11 +164,14 @@ usage() {
   a core-rollback --maintenance              后端核心回滚（配置变更时拒绝）
   a backend-drain 1|2                       入口排空后端的新连接
   a backend-resume 1|2                      入口恢复后端接收新连接
+  a entry-health-refresh                    入口迁移至共享健康检查并重载
+  a entry-health-rollback                   入口恢复迁移前配置并重载
   a health-refresh --maintenance            安装本管理器内置的健康代理
   a health-rollback --maintenance           回退上一次健康代理更新
   a connect-refresh --maintenance           备份并应用有界 DC 连接重试
   a connect-rollback --maintenance          恢复上一次 DC 连接配置
-  a recover                                 后端隧道与服务恢复
+  a recover                                 启动后端缺失服务并等待就绪
+  a recover --restart                       重启后端核心与健康代理（会断开该节点连接）
   a perf [2-30]                             只读脱敏性能采样（默认 5 秒）
   a queue status                            查看后端实验队列（默认关闭）
   a queue enable 180 200 --experimental --maintenance
@@ -2220,18 +2223,31 @@ TDH_CORE_UPGRADE_PY
 }
 
 backend_maintenance() {
-  local action=$1 index=$2
-  [[ $index == 1 || $index == 2 ]] || die "后端编号只能为 1 或 2。"
+  local action=$1 value=$2
   load_state || die "未安装节点。"
   require_current_state
   [[ $TDH_ROLE == entry ]] || die "此命令只能在入口运行。"
-  python3 - "$action" "$index" <<'TDH_ENTRY_MAINTENANCE_PY'
+  case "$action" in
+    drain|resume) [[ $value == 1 || $value == 2 ]] || die "后端编号只能为 1 或 2。" ;;
+    health-refresh|health-rollback)
+      trusted_local_directory "$(dirname "$TDH_HAPROXY_CFG")" || die "入口配置目录权限异常。"
+      value=$TDH_HAPROXY_CFG ;;
+    *) die "入口维护操作无效。" ;;
+  esac
+  python3 - "$action" "$value" <<'TDH_ENTRY_MAINTENANCE_PY'
 # BEGIN GENERATED ENTRY MAINTENANCE
 """Fixed HAProxy runtime operations; no shell, untrusted commands or peer logins."""
 import csv
 import io
+import os
+from pathlib import Path
+import re
 import socket
+import stat
+import subprocess
 import sys
+import tempfile
+import time
 
 
 class MaintenanceError(RuntimeError):
@@ -2272,11 +2288,164 @@ def maintain(action, index, request=exchange):
     return state
 
 
+HEALTH_BACKEND = b'''backend telemt_health
+    option tcp-check
+    # Health-agent ready line: up followed by LF.
+    tcp-check expect rbinary ^75700[aA]$
+    default-server inter 2s fastinter 500ms fall 3 rise 2
+    server vps1 10.77.1.2:19101 check
+    server vps2 10.77.2.2:19101 check
+
+'''
+
+
+def tracked_health_config(original):
+    """Replace the four shipped server directives in their original sections."""
+    if re.search(rb'(?m)^[ \t]*backend[ \t]+telemt_health(?:\s|$)', original):
+        raise MaintenanceError('发现已有健康后端；请检查运行状态或使用入口健康回退')
+    updated = original
+    for route, servers in ((b'a', (1, 2)), (b'b', (2, 1))):
+        header = b'backend telemt_' + route + b'\n'
+        old_lines, new_lines = [], []
+        for position, index in enumerate(servers):
+            endpoint = f'    server vps{index} 10.77.{index}.2:24431'.encode('ascii')
+            backup = b' backup' if position else b''
+            old_lines.append(endpoint + b' check port 19101 inter 2s fall 3 rise 2 send-proxy-v2'
+                             b' agent-check agent-port 19101 agent-inter 2s' + backup + b'\n')
+            new_lines.append(endpoint + f' track telemt_health/vps{index} send-proxy-v2'.encode('ascii')
+                             + backup + b'\n')
+        old_block = header + b''.join(old_lines)
+        if updated.count(old_block) != 1:
+            raise MaintenanceError('入口主备配置与已发布模板不符；请先检查自定义配置')
+        updated = updated.replace(old_block, (HEALTH_BACKEND if route == b'a' else b'')
+                                  + header + b''.join(new_lines), 1)
+    return updated
+
+
+def runtime_status(request):
+    rows = csv.DictReader(io.StringIO(request('show stat').lstrip('# ')))
+    statuses = {}
+    for row in rows:
+        key = row.get('pxname'), row.get('svname')
+        if key[0] in ('telemt_a', 'telemt_b', 'telemt_health') and key[1] in ('vps1', 'vps2'):
+            if key in statuses:
+                raise MaintenanceError('HAProxy 返回重复的后端状态')
+            statuses[key] = (row.get('status') or '', row.get('check_status') or '')
+    return statuses
+
+
+def runtime_layout(statuses, tracked):
+    backends = ('telemt_a', 'telemt_b', 'telemt_health') if tracked else ('telemt_a', 'telemt_b')
+    return statuses.keys() == {(name, server) for name in backends for server in ('vps1', 'vps2')}
+
+
+def runtime_ready(statuses, tracked):
+    return runtime_layout(statuses, tracked) and all(
+        state == 'UP' and (name != 'telemt_health' or check == 'L7OK')
+        for (name, _), (state, check) in statuses.items())
+
+
+def checked_config(path):
+    info = path.lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid()
+            or info.st_nlink != 1 or info.st_mode & 0o022 or info.st_size > 1024**2):
+        raise MaintenanceError('入口配置或备份的权限、类型或大小不符合要求')
+    return path.read_bytes(), info
+
+
+def publish(path, content, info, *, validate=False):
+    with tempfile.NamedTemporaryFile(dir=path.parent, prefix='.haproxy-', delete=False) as stream:
+        temp = Path(stream.name)
+        try:
+            os.fchown(stream.fileno(), info.st_uid, info.st_gid)
+            os.fchmod(stream.fileno(), stat.S_IMODE(info.st_mode))
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+            if validate:
+                subprocess.run(('/usr/sbin/haproxy', '-c', '-f', temp), check=True, timeout=8,
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            os.replace(temp, path)
+            directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
+        finally:
+            temp.unlink(missing_ok=True)
+
+
+def reload_entry():
+    subprocess.run(('/usr/bin/systemctl', 'reload', 'telemt-dual-hop-haproxy.service'), check=True,
+                   timeout=12, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def wait_runtime(request, tracked, *, require_ready):
+    deadline = time.monotonic() + 15
+    verify = runtime_ready if require_ready else runtime_layout
+    while time.monotonic() < deadline:
+        try:
+            if verify(runtime_status(request), tracked):
+                return
+        except (OSError, MaintenanceError):
+            pass
+        time.sleep(.25)
+    raise MaintenanceError('HAProxy 重载后未确认目标运行状态')
+
+
+def migrate_health(path, rollback, request=exchange, reload=reload_entry):
+    current, info = checked_config(path)
+    previous = path.with_name(path.name + '.health-previous')
+    have_backup = previous.exists() or previous.is_symlink()
+    if have_backup:
+        old, _ = checked_config(previous)
+        new = tracked_health_config(old)
+        if current not in (old, new):
+            raise MaintenanceError('入口配置与健康迁移备份不一致；请先检查配置漂移')
+    else:
+        if rollback:
+            raise MaintenanceError('没有可用的入口健康迁移备份')
+        old, new = current, tracked_health_config(current)
+
+    target = old if rollback else new
+    live = runtime_status(request)
+    live_tracked = any(name == 'telemt_health' for name, _ in live)
+    if not runtime_layout(live, live_tracked) or (live_tracked and not have_backup):
+        raise MaintenanceError('磁盘配置和 HAProxy 运行状态无法核对；请先运行 a status')
+    verify = runtime_layout if rollback else runtime_ready
+    if current == target and verify(live, not rollback):
+        return 'unchanged'
+    if any(state.startswith(('DRAIN', 'MAINT')) for state, _ in live.values()):
+        raise MaintenanceError('检测到后端维护状态；请先结束排空或维护')
+    if not rollback and not runtime_ready(live, live_tracked):
+        raise MaintenanceError('两条线路的四条路径未全部 UP；请先恢复后端或结束排空')
+    if not have_backup:
+        publish(previous, old, info)
+    try:
+        if current != target:
+            publish(path, target, info, validate=True)
+        reload()
+        wait_runtime(request, not rollback, require_ready=not rollback)
+    except (Exception, KeyboardInterrupt):
+        try:
+            publish(path, new if live_tracked else old, info)
+            reload()
+            wait_runtime(request, live_tracked, require_ready=False)
+        except (Exception, KeyboardInterrupt):
+            raise MaintenanceError('重载与自动恢复未能确认；已保留入口健康备份，请检查 a status') from None
+        raise MaintenanceError('新状态未能确认；已恢复操作前的配置和路由状态') from None
+    return 'rolled-back' if rollback else 'applied'
+
+
 if __name__ == '__main__':
     try:
         if len(sys.argv) != 3:
             raise ValueError('exact arguments required')
-        print('后端维护状态：'+maintain(sys.argv[1], sys.argv[2]))
+        action, value = sys.argv[1:]
+        if action in ('health-refresh', 'health-rollback'):
+            print('入口健康配置：'+migrate_health(Path(value), action == 'health-rollback'))
+        else:
+            print('后端维护状态：'+maintain(action, value))
     except Exception as error:
         detail = str(error) if isinstance(error, MaintenanceError) else '无法完成 HAProxy 操作；请运行 a status 和 a diagnose，检查两条线路后重试原命令'
         print('入口维护失败：'+detail, file=sys.stderr)
@@ -2286,11 +2455,27 @@ TDH_ENTRY_MAINTENANCE_PY
 }
 
 recover_backend() {
+  local action=start deadline
+  if (( $# != 0 )); then
+    (( $# == 1 )) || die "用法：a recover [--restart]"
+    [[ $1 == --restart ]] || die "用法：a recover [--restart]"
+    action=restart
+  fi
   load_state || die "未安装节点。"
   require_current_state
   [[ $TDH_ROLE == backend1 || $TDH_ROLE == backend2 ]] || die "此命令仅用于后端。"
-  systemctl start "wg-quick@${WG_INTERFACE}.service"
-  systemctl restart telemt-dual-hop-telemt.service telemt-dual-hop-health-agent.service
+  if [[ $action == restart ]]; then
+    warn "正在重启本后端核心，已有连接会断开。"
+  fi
+  systemctl start "wg-quick@${WG_INTERFACE}.service" || die "WireGuard 启动失败，请运行 a diagnose。"
+  systemctl "$action" telemt-dual-hop-telemt.service telemt-dual-hop-health-agent.service || \
+    die "后端服务操作失败，请运行 a diagnose。"
+  # A newly started health agent needs multiple DC samples before admitting connections.
+  deadline=$(( SECONDS + 45 ))
+  until health_agent_is_up "$LOCAL_WG_IP" "$TDH_AGENT_PORT"; do
+    (( SECONDS < deadline )) || die "后端健康检查未在等待期限内就绪，请运行 a diagnose。"
+    sleep 1
+  done
   diagnose
 }
 
@@ -3536,14 +3721,22 @@ frontend mtp_tls
     use_backend telemt_b if sni_line_b
     default_backend tls_fallback_unknown
 
+backend telemt_health
+    option tcp-check
+    # Health-agent ready line: up followed by LF.
+    tcp-check expect rbinary ^75700[aA]\$
+    default-server inter 2s fastinter 500ms fall 3 rise 2
+    server vps1 10.77.1.2:${TDH_AGENT_PORT} check
+    server vps2 10.77.2.2:${TDH_AGENT_PORT} check
+
 backend telemt_a
-    server vps1 10.77.1.2:${TDH_TELEMT_PORT} check port ${TDH_AGENT_PORT} inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port ${TDH_AGENT_PORT} agent-inter 2s
-    server vps2 10.77.2.2:${TDH_TELEMT_PORT} check port ${TDH_AGENT_PORT} inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port ${TDH_AGENT_PORT} agent-inter 2s backup
+    server vps1 10.77.1.2:${TDH_TELEMT_PORT} track telemt_health/vps1 send-proxy-v2
+    server vps2 10.77.2.2:${TDH_TELEMT_PORT} track telemt_health/vps2 send-proxy-v2 backup
     server apple_a ${TDH_DOMAIN_A}:443 check inter 10s fall 3 rise 2 backup resolvers system_dns resolve-prefer ipv4 init-addr libc,none
 
 backend telemt_b
-    server vps2 10.77.2.2:${TDH_TELEMT_PORT} check port ${TDH_AGENT_PORT} inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port ${TDH_AGENT_PORT} agent-inter 2s
-    server vps1 10.77.1.2:${TDH_TELEMT_PORT} check port ${TDH_AGENT_PORT} inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port ${TDH_AGENT_PORT} agent-inter 2s backup
+    server vps2 10.77.2.2:${TDH_TELEMT_PORT} track telemt_health/vps2 send-proxy-v2
+    server vps1 10.77.1.2:${TDH_TELEMT_PORT} track telemt_health/vps1 send-proxy-v2 backup
     server apple_b ${TDH_DOMAIN_B}:443 check inter 10s fall 3 rise 2 backup resolvers system_dns resolve-prefer ipv4 init-addr libc,none
 
 backend tls_fallback_unknown
@@ -3961,7 +4154,7 @@ status_entry() {
   printf '\nHAProxy 后端：\n'
   if [[ -S /run/telemt-dual-hop/haproxy.sock ]]; then
     printf 'show stat\n' | timeout 3 socat - UNIX-CONNECT:/run/telemt-dual-hop/haproxy.sock 2>/dev/null | \
-      awk -F, 'NR==1 || $1=="telemt_a" || $1=="telemt_b" {print $1, $2, $18}'
+      awk -F, 'NR==1 || $1=="telemt_a" || $1=="telemt_b" || $1=="telemt_health" {print $1, $2, $18}'
   else
     warn "HAProxy Runtime Socket 不存在。"
   fi
@@ -4144,6 +4337,25 @@ def cpu_usage(before, after):
     return {"busy_percent": round(100 * (total - delta[3] - delta[4] - delta[7]) / total, 2),
             "steal_percent": round(100 * delta[7] / total, 2)}
 
+def cpu_control(path):
+    if not path or not re.fullmatch(r"/[A-Za-z0-9_.@/-]+", path) or ".." in path.split("/"):
+        return None
+    root = pathlib.Path("/sys/fs/cgroup" + path)
+    quota = read(root / "cpu.max").split()
+    usage = numeric_fields(read(root / "cpu.stat"), {"nr_periods", "nr_throttled", "throttled_usec"})
+    if len(quota) != 2 or not integer(quota[1]) or (quota[0] != "max" and not integer(quota[0])):
+        return None
+    return {"quota_usec": integer(quota[0]), "period_usec": int(quota[1]),
+            "unlimited": quota[0] == "max", **usage}
+
+def pressure_totals():
+    result = {}
+    for resource in ("cpu", "memory", "io"):
+        for kind, total in re.findall(r"^(some|full) [^\r\n]*\btotal=(\d+)$",
+                                      read("/proc/pressure/" + resource), re.M):
+            result[f"{resource}.{kind}"] = int(total)
+    return result
+
 def processes():
     result = {}
     for name in ("haproxy", "telemt", "health-agent"):
@@ -4170,7 +4382,8 @@ def processes():
                 pass
         result[name] = {"running": bool(pid), "ticks": ticks, "rss_bytes": rss, "fds": fds,
                         "fd_limit": integer(props.get("LimitNOFILE", "")),
-                        "tasks": integer(props.get("TasksCurrent", "")), "identity": sorted(pids), "at": time.monotonic()}
+                        "tasks": integer(props.get("TasksCurrent", "")), "identity": sorted(pids),
+                        "cpu_control": cpu_control(group), "at": time.monotonic()}
     return result
 
 def interfaces(details=False):
@@ -4252,6 +4465,10 @@ def sockets():
             row[field + "_max"] = values[-1] if values else None
     return groups
 
+def counter_deltas(before, after):
+    return {key: value - before[key] if key in before and value >= before[key] else None
+            for key, value in after.items()}
+
 def haproxy():
     try:
         with socket.socket(socket.AF_UNIX) as s:
@@ -4268,7 +4485,7 @@ def haproxy():
         return [{k: r[k] for k in ("pxname", "svname", "status") if k in r} |
                 {k: integer(r.get(k, "")) for k in ("qcur", "qmax", "scur", "smax", "slim", "bin", "bout",
                  "econ", "eresp", "wretr", "wredis", "chkfail", "chkdown", "downtime", "qtime", "ctime", "rtime", "ttime")}
-                for r in rows if r.get("pxname") in ("mtp_tls", "telemt_a", "telemt_b")
+                for r in rows if r.get("pxname") in ("mtp_tls", "telemt_a", "telemt_b", "telemt_health")
                 and r.get("svname") in ("FRONTEND", "BACKEND", "vps1", "vps2")
                 and re.fullmatch(r"[A-Z0-9 /()+_-]{1,40}|DOWN \(agent\)", r.get("status", ""))]
     except (OSError, ValueError, UnicodeError):
@@ -4304,9 +4521,9 @@ seconds = int(sys.argv[1])
 role_match = re.search(r"^TDH_ROLE=(entry|backend1|backend2)$", read(sys.argv[2]), re.M)
 role = role_match[1] if role_match else "unknown"
 start = time.monotonic()
-c0, p0, i0, n0 = cpu(), processes(), interfaces(), counters()
+c0, p0, i0, n0, pressure0 = cpu(), processes(), interfaces(), counters(), pressure_totals()
 time.sleep(seconds)
-c1, p1, i1, n1 = cpu(), processes(), interfaces(True), counters()
+c1, p1, i1, n1, pressure1 = cpu(), processes(), interfaces(True), counters(), pressure_totals()
 elapsed = time.monotonic() - start
 for name, row in p1.items():
     previous = p0.get(name, {})
@@ -4315,6 +4532,10 @@ for name, row in p1.items():
     duration = row.pop("at") - previous.get("at", start)
     row["sample_seconds"] = round(duration, 3)
     row["cpu_percent_one_core"] = round(100 * (ticks - previous["ticks"]) / os.sysconf("SC_CLK_TCK") / duration, 2) if same_process else None
+    if control := row["cpu_control"]:
+        prior = (previous.get("cpu_control") or {}) if same_process else {}
+        values = {key: control.pop(key) for key in ("nr_periods", "nr_throttled", "throttled_usec") if key in control}
+        control.update({key + "_delta": value for key, value in counter_deltas(prior, values).items()})
 for name, row in i1.items():
     for field in ("rx_bytes", "tx_bytes", "rx_dropped", "tx_dropped", "rx_errors", "tx_errors"):
         old, new = i0.get(name, {}).get(field), row[field]
@@ -4339,7 +4560,7 @@ report = {"说明": "只读本机采样；无主动测速、无上传；null 表
           "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), "versions": versions,
           "memory_kib": numeric_fields(read("/proc/meminfo"), {"MemTotal", "MemAvailable", "SwapFree", "SwapTotal"}),
           "cpu": cpu_load, "services": p1, "interfaces": i1, "tcp": sockets(), "wireguard": wg,
-          "system_counters_delta": {k: v - n0[k] if k in n0 and v >= n0[k] else None for k, v in n1.items()},
+          "system_counters_delta": counter_deltas(n0, n1), "pressure_stall_usec_delta": counter_deltas(pressure0, pressure1),
           "vm_counters_total": {k: v for k, v in n1.items() if k.startswith("Vm.")},
           "sysctl": sysctls, "haproxy": haproxy(), "telemt": telemt(), "direct_buffer_pressure": None}
 print(json.dumps(report, ensure_ascii=False, indent=2))
@@ -4736,13 +4957,16 @@ main() {
     backend-drain|backend-resume)
       (( $# == 2 )) || die "用法：a $1 1|2"
       backend_maintenance "${1#backend-}" "$2" ;;
+    entry-health-refresh|entry-health-rollback)
+      (( $# == 1 )) || die "用法：a $1"
+      backend_maintenance "${1#entry-}" "" ;;
     health-refresh|health-rollback)
       (( $# == 2 )) || die "用法：a $1 --maintenance"
       if [[ $1 == health-refresh ]]; then manage_core refresh-health "$2"; else manage_core rollback-health "$2"; fi ;;
     connect-refresh|connect-rollback)
       (( $# == 2 )) || die "用法：a $1 --maintenance"
       if [[ $1 == connect-refresh ]]; then manage_core refresh-connect "$2"; else manage_core rollback-connect "$2"; fi ;;
-    recover) recover_backend ;;
+    recover) recover_backend "${@:2}" ;;
     queue)
       shift
       case ${1:-} in

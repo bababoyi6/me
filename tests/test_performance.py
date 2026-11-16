@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Unprivileged regression tests; all mutation paths point into temporary dirs."""
 import ast
+import csv
 import json
 import os
 from pathlib import Path
@@ -115,6 +116,19 @@ if state_is_current; then exit 1; fi
         self.assertIsNone(namespace["cpu_usage"]([10] * 8, [0] * 8)["busy_percent"])
         namespace["read"] = lambda path: "oom_kill 2\npgmajfault 5\npswpin 0\npswpout 0\nSYNTHETIC_SECRET 123\n" if path == "/proc/vmstat" else ""
         self.assertEqual(namespace["counters"](), {"Vm.oom_kill": 2, "Vm.pgmajfault": 5, "Vm.pswpin": 0, "Vm.pswpout": 0})
+        files = {"/proc/pressure/cpu": "some avg10=2.00 avg60=0.30 avg300=0.10 total=1100\n",
+                 "/sys/fs/cgroup/system.slice/tdh.service/cpu.max": "40000 100000\n",
+                 "/sys/fs/cgroup/system.slice/tdh.service/cpu.stat": "nr_periods 10\nnr_throttled 3\nthrottled_usec 1200\n"}
+        namespace["read"] = lambda path: files.get(Path(path).as_posix(), "")
+        self.assertEqual(namespace["pressure_totals"](), {"cpu.some": 1100})
+        self.assertEqual(namespace["cpu_control"]("/system.slice/tdh.service"),
+                         {"quota_usec": 40000, "period_usec": 100000, "unlimited": False,
+                          "nr_periods": 10, "nr_throttled": 3, "throttled_usec": 1200})
+        self.assertIsNone(namespace["cpu_control"]("/system.slice/../tdh.service"))
+        self.assertIsNone(namespace["cpu_control"]("/system.slice/absent.service"))
+        self.assertEqual(namespace["counter_deltas"]({"cpu.some": 1000, "io.some": 500},
+                         {"cpu.some": 1100, "io.some": 10, "memory.some": 50}),
+                         {"cpu.some": 100, "io.some": None, "memory.some": None})
 
     def test_report_command_timeout_and_output_limit(self):
         source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]
@@ -385,14 +399,16 @@ timeout() {
         self.assertNotIn("performance_apply()", SCRIPT.read_text())
         self.assertNotIn("perf-apply)", SCRIPT.read_text())
 
-    def test_runtime_templates_match_production_baseline(self):
+    def test_runtime_templates_match_reviewed_baseline_and_health_change(self):
         import hashlib
-        manifest = json.loads((ROOT / "tests/fixtures/runtime-template-hashes.json").read_text())
-        text = SCRIPT.read_text()
+        manifest = json.loads((ROOT / "tests/fixtures/runtime-template-hashes.json").read_text(encoding="utf-8"))
+        text = SCRIPT.read_text(encoding="utf-8")
+        overrides = manifest["maintenance_overrides"]
+        self.assertEqual(set(overrides), {"write_haproxy_config"})
         for name, expected in manifest["functions"].items():
             start = text.index(name + "() {\n")
             end = text.index("\n}\n", start) + 3
-            self.assertEqual(hashlib.sha256(text[start:end].encode()).hexdigest(), expected, name)
+            self.assertEqual(hashlib.sha256(text[start:end].encode()).hexdigest(), overrides.get(name, expected), name)
 
     def test_iperf_aggregate_cap_and_no_raw_error_output(self):
         import importlib.util
@@ -442,7 +458,11 @@ write_telemt_config 10.77.1.2 24431 19091 443
 ''')
         config = self.config.read_text()
         self.assertEqual(config.count("send-proxy-v2"), 4)
-        self.assertEqual(config.count("agent-check"), 4)
+        self.assertEqual(config.count("track telemt_health/"), 4)
+        health, routes = config.split('backend telemt_health\n', 1)[1].split('\nbackend telemt_a\n', 1)
+        self.assertEqual(health.count(' check\n'), 2)
+        self.assertIn('tcp-check expect rbinary ^75700[aA]$\n', health)
+        self.assertNotIn('agent-check', routes)
         self.assertIn("maxconn 2048", config)
         self.assertNotIn("splice-auto", config)
         telemt = (self.base / "telemt/telemt.toml").read_text()
@@ -450,6 +470,45 @@ write_telemt_config 10.77.1.2 24431 19091 443
                          'listen = "127.0.0.1:19091"', 'proxy_protocol_trusted_cidrs = ["10.77.1.1/32"]',
                          'read_only = true', 'classic = false', 'secure = false', 'tls = true'):
             self.assertIn(required, telemt)
+
+        # Exercise the actual generated health/tracking blocks on private loopback.
+        from lab import Lab
+        managed = config[config.index('\nbackend telemt_health\n'):config.index('\nbackend tls_fallback_unknown\n')]
+        managed = ''.join(line for line in managed.splitlines(keepends=True)
+                          if not line.lstrip().startswith(('server apple_a ', 'server apple_b ')))
+        lab = Lab(HAPROXY, managed_backends=managed)
+        self.addCleanup(lab.close)
+
+        def wait_status(expected):
+            deadline = time.monotonic() + 8
+            while time.monotonic() < deadline:
+                rows = csv.DictReader(lab.stat('show stat').lstrip('# ').splitlines())
+                state = {row['pxname']: row['status'] for row in rows if row['svname'] == 'vps1'}
+                if all(state.get(name) == status for name, status in expected.items()):
+                    return
+                time.sleep(.05)
+            self.fail(f'Expected server state {expected}, got {state}')
+
+        names = ('telemt_health', 'telemt_a', 'telemt_b')
+        wait_status(dict.fromkeys(names, 'UP'))
+        self.assertEqual(lab.transfer('apple.com', 'D', 1024, 0)[0], '1')
+        self.assertEqual(lab.transfer('gs.apple.com', 'D', 1024, 0)[0], '2')
+        lab.backends[0].agent_reply = b'not-up\n'
+        wait_status(dict.fromkeys(names, 'DOWN'))
+        self.assertEqual(lab.transfer('apple.com', 'D', 1024, 0)[0], '2')
+        lab.backends[0].agent_reply = b''
+        time.sleep(2.2)
+        wait_status(dict.fromkeys(names, 'DOWN'))
+        lab.backends[0].agent_reply = None
+        wait_status(dict.fromkeys(names, 'UP'))
+        for name in ('telemt_a', 'telemt_b'):
+            self.assertFalse(lab.stat(f'set server {name}/vps1 state drain').strip())
+        wait_status({'telemt_health': 'UP', 'telemt_a': 'DRAIN', 'telemt_b': 'DRAIN'})
+        self.assertEqual(lab.transfer('apple.com', 'D', 1024, 0)[0], '2')
+        for name in ('telemt_a', 'telemt_b'):
+            self.assertFalse(lab.stat(f'set server {name}/vps1 state ready').strip())
+        wait_status(dict.fromkeys(names, 'UP'))
+        self.assertEqual(lab.transfer('apple.com', 'D', 1024, 0)[0], '1')
 
 
 if __name__ == "__main__":

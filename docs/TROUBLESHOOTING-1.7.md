@@ -4,6 +4,8 @@
 
 先用 `a status`、`a diagnose`、`a perf 5` 收集脱敏观察。`a links`、`state.env`、WG 配置、API 令牌、加入码及回执均含凭据，不贴到公共日志。以下操作必须在获准维护的节点上执行，本轮没有执行生产命令。
 
+开发分支的 `a perf` 增加 `pressure_stall_usec_delta` 和服务 `cpu_control`，采样期间只读取本机。前者按 CPU、内存、I/O 给出资源等待微秒数。后者在 cgroup v2 可用时报告本组 CPU 配额、周期和本次采样的节流增量。`unlimited` 只表示当前 cgroup 没有自己的配额，父级仍可能限额。空对象或 `null` 表示相应计数不可用。结合 CPU steal、TCP RTT 和队列看，有助于避免把 VPS 的算力竞争误判成 TCP 缓冲不足。[Linux PSI](https://docs.kernel.org/accounting/psi.html) · [cgroup v2 CPU 控制](https://docs.kernel.org/admin-guide/cgroup-v2.html#cpu-interface-files)
+
 | 现象 | 定位顺序 | 恢复方式/边界 |
 |---|---|---|
 | 高延迟单流吞吐下降，但 CPU 不高 | 核对实际核心、WG RTT 与 TCP 的 rb/tb；3.5.16 固定缓冲在 100ms 实验出现明显限制 | 参考长链路报告，保留旧核心回退；不要用更换 Secret 或盲目放大 sysctl 处理。原生移植仍是未发布候选，四流排队延迟待优化 |
@@ -17,6 +19,7 @@
 | 两条线路都断 | 入口监听、HAProxy、两个 WG 握手、两个后端健康 | 两后端均失效没有第三个代理；Apple 伪装回落不能转发 MTProto |
 | WG 数据面短断 | 比较握手时间与 RX/TX，检查对端 UDP 和路径 MTU | 链路恢复后允许重握手；原连接可能超时并重连 |
 | 手动 stop WG 后核心未重启 | `Requires=` 可能已停掉依赖 | 在该后端运行 `a recover`，再检查入口状态 |
+| 后端核心仍在运行，但健康检查未就绪 | 查看 API、健康代理和 DC 多数票 | 开发版 `a recover` 保留现有核心并等待就绪。确定需要重启时，可先在入口排空该后端并等存量连接结束，再在后端运行 `a recover --restart` |
 | 核心升级预检失败 | 包摘要、非特权 `--version`、旧配置严格解析、当前 API、MainPID 身份 | 服务尚未替换；不要重新初始化节点 |
 | 新核心安装时反复退出、API 不通且报 Permission denied | 核对配置父目录；上游安全读取需要目录的读及搜索权限 | 托管新安装使用 root:telemt 0750；旧节点由核心维护事务迁移，勿放开密钥/状态文件权限，详见升级文档 |
 | 核心替换后恢复失败 | 保留入口 drain，检查事务阶段和旧二进制摘要 | `a core-rollback --maintenance`；不删除 transaction.json 或旧核心 |
