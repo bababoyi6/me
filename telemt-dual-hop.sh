@@ -2421,9 +2421,9 @@ def migrate_health(path, rollback, request=exchange, reload=reload_entry):
         raise MaintenanceError('两条线路的四条路径未全部 UP；请先恢复后端或结束排空')
     if not have_backup:
         publish(previous, old, info)
-    if current != target:
-        publish(path, target, info, validate=True)
     try:
+        if current != target:
+            publish(path, target, info, validate=True)
         reload()
         wait_runtime(request, not rollback, require_ready=not rollback)
     except (Exception, KeyboardInterrupt):

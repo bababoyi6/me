@@ -126,3 +126,20 @@ class EntryMaintenanceTests(unittest.TestCase):
                 migrate_health(path,False,lab.stat,reload)
         self.assertEqual(path.read_bytes(), original)
         self.assertEqual(len(reloads),4)
+
+        from entry_maintenance import publish as real_publish
+        injected = False
+
+        def fail_after_replace(target, content, info, *, validate=False):
+            nonlocal injected
+            real_publish(target, content, info, validate=validate)
+            if target == path and not injected:
+                injected = True
+                raise OSError('synthetic directory sync failure after replace')
+
+        with patch('entry_maintenance.publish', side_effect=fail_after_replace):
+            with self.assertRaisesRegex(MaintenanceError, '已恢复'):
+                migrate_health(path,False,lab.stat,reload)
+        self.assertTrue(injected)
+        self.assertEqual(path.read_bytes(), original)
+        wait_runtime(lab.stat,False,require_ready=True)
