@@ -49,9 +49,11 @@ jobs:
           if ! id telemt >/dev/null 2>&1; then
             sudo useradd --system --no-create-home --shell /usr/sbin/nologin telemt
           fi
-          sudo install -d -m 0755 "$RUNNER_TEMP/security2-install-lab"
+          lab="/tmp/tdh-security2-install-${GITHUB_RUN_ID}"
+          sudo install -d -m 0755 "$lab"
+          trap 'sudo rm -rf -- "$lab"' EXIT
           sudo env GITHUB_ACTIONS=true PYTHONPATH="$GITHUB_WORKSPACE/tests" timeout --kill-after=5 45 \
-            python3 - "$RUNNER_TEMP/security2-install.tar.gz" "$RUNNER_TEMP/security2-install-lab" <<'PY'
+            python3 - "$RUNNER_TEMP/security2-install.tar.gz" "$lab" <<'PY'
           from pathlib import Path
           import sys
           from core_delivery_ci import install_case
