@@ -84,7 +84,7 @@ jobs:
       - name: Verify public TLS source on fixed security2.2
         if: inputs.stage == 'public-source'
         run: |
-          sudo timeout --kill-after=10 180 systemd-run --quiet --wait --pipe --collect --unit="tdh-public-tls-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=150 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/tls_public_source_ci.py --candidate "$RUNNER_TEMP/tls-core" --output "$RUNNER_TEMP/tls-evidence/public-source.json"
+          sudo timeout --kill-after=10 180 systemd-run --quiet --wait --pipe --collect --unit="tdh-paired-public-tls-${GITHUB_RUN_ID}" -p CPUQuota=100% -p MemoryMax=512M -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=150 -p OOMPolicy=stop -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" --setenv="PYTHONPATH=$PYTHONPATH" python3 tests/tls_public_source_ci.py --candidate "$RUNNER_TEMP/tls-core" --output "$RUNNER_TEMP/tls-evidence/public-source.json"
       - name: Compare two-tunnel shared capacity with released balanced2
         if: inputs.stage == 'dual-capacity'
         run: |
