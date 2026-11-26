@@ -2265,13 +2265,23 @@ class MaintenanceError(RuntimeError):
 
 
 def exchange(command):
+    deadline = time.monotonic() + 3
+
+    def set_remaining_timeout(connection):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('HAProxy runtime response deadline')
+        connection.settimeout(remaining)
+
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
-        connection.settimeout(3)
+        set_remaining_timeout(connection)
         connection.connect('/run/telemt-dual-hop/haproxy.sock')
+        set_remaining_timeout(connection)
         connection.sendall((command+'\n').encode('ascii'))
         connection.shutdown(socket.SHUT_WR)
         output = bytearray()
         while True:
+            set_remaining_timeout(connection)
             part = connection.recv(16384)
             if not part:
                 return output.decode('ascii')
@@ -4400,8 +4410,43 @@ def processes():
                         "cpu_control": cpu_control(group), "at": time.monotonic()}
     return result
 
+def qdisc_snapshot():
+    try:
+        queues = json.loads(command("tc", "-j", "-s", "qdisc", "show"))
+    except ValueError:
+        return None
+    if not isinstance(queues, list):
+        return None
+    devices = {}
+    for queue in queues:
+        if not isinstance(queue, dict):
+            continue
+        device, kind = queue.get("dev"), queue.get("kind")
+        if (not isinstance(device, str) or not isinstance(kind, str)
+                or not re.fullmatch(r"[a-z0-9_]+", kind)):
+            continue
+        identity = (kind, str(queue.get("handle", "")), str(queue.get("parent", "")), queue.get("root") is True)
+        metrics = {key: queue[key] for key in ("bytes", "packets", "drops", "overlimits", "requeues", "backlog", "qlen")
+                   if type(queue.get(key)) is int and queue[key] >= 0}
+        devices.setdefault(device, []).append((identity, metrics))
+    return devices
+
+def qdisc_report(before, after):
+    if after is None:
+        return None
+    previous = dict(before or ())
+    comparable = (before is not None and len(previous) == len(before) == len(after)
+                  and previous.keys() == {identity for identity, _ in after})
+    result = []
+    for identity, metrics in after:
+        counters = {key: value for key, value in metrics.items() if key not in ("backlog", "qlen")}
+        delta = counter_deltas(previous[identity] if comparable else {}, counters)
+        result.append({"kind": identity[0], **metrics, **{key + "_delta": value for key, value in delta.items()}})
+    return result
+
 def interfaces(details=False):
     result = {}
+    queues = qdisc_snapshot()
     for path in sorted(pathlib.Path("/sys/class/net").glob("*")):
         if path.name == "lo":
             continue
@@ -4409,17 +4454,12 @@ def interfaces(details=False):
         if not re.fullmatch(r"[A-Za-z0-9_.:-]{1,15}", name):
             continue
         alias = name if name in ("tdh1", "tdh2", "tdh-b1", "tdh-b2") else f"nic{len(result)}"
-        row = {"mtu": integer(read(path / "mtu").strip())}
+        row = {"mtu": integer(read(path / "mtu").strip()),
+               "_device": (name, integer(read(path / "ifindex").strip())),
+               "qdisc": queues.get(name, []) if queues is not None else None}
         for field in ("rx_bytes", "tx_bytes", "rx_dropped", "tx_dropped", "rx_errors", "tx_errors"):
             row[field] = integer(read(path / "statistics" / field).strip())
         if details:
-            try:
-                queues = json.loads(command("tc", "-j", "-s", "qdisc", "show", "dev", name))
-                row["qdisc"] = [{key: q[key] for key in ("kind", "drops", "overlimits", "backlog", "qlen")
-                                 if key in q and (key == "kind" or isinstance(q[key], (int, float)))} for q in queues
-                                if re.fullmatch(r"[a-z0-9_]+", str(q.get("kind", "")))]
-            except (ValueError, TypeError):
-                row["qdisc"] = None
             features = command("ethtool", "-k", name)
             row["offload"] = {k: v == "on" for k, v in re.findall(
                 r"^(generic-receive-offload|generic-segmentation-offload|tcp-segmentation-offload|tx-udp-segmentation): (on|off)", features, re.M)} or None
@@ -4550,9 +4590,13 @@ for name, row in p1.items():
         prior = (previous.get("cpu_control") or {}) if same_process else {}
         values = {key: control.pop(key) for key in ("nr_periods", "nr_throttled", "throttled_usec") if key in control}
         control.update({key + "_delta": value for key, value in counter_deltas(prior, values).items()})
-for name, row in i1.items():
+prior_interfaces = {row["_device"]: row for row in i0.values() if row["_device"][1] is not None}
+for row in i1.values():
+    device = row.pop("_device")
+    prior = prior_interfaces.get(device, {})
+    row["qdisc"] = qdisc_report(prior.get("qdisc"), row["qdisc"])
     for field in ("rx_bytes", "tx_bytes", "rx_dropped", "tx_dropped", "rx_errors", "tx_errors"):
-        old, new = i0.get(name, {}).get(field), row[field]
+        old, new = prior.get(field), row[field]
         row[field + "_delta"] = new - old if old is not None and new is not None and new >= old else None
 cpu_load = {name: cpu_usage(c0.get(name, values), values) for name, values in c1.items()}
 sysctls = {}

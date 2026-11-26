@@ -126,7 +126,7 @@ class AgentHandler(socketserver.BaseRequestHandler):
 
 
 class Lab:
-    def __init__(self, binary, splice=False, master=False, *, managed_backends=None):
+    def __init__(self, binary, splice=False, master=False, *, managed_backends=None, managed_frontend=None):
         self.tmp = tempfile.TemporaryDirectory(prefix="tdh-lab-")
         self.root = Path(self.tmp.name)
         self.backends = [Backend(b"1"), Backend(b"2")]
@@ -144,7 +144,8 @@ class Lab:
     timeout connect 1s
     timeout client 15s
     timeout server 15s
-frontend mtp_tls
+"""
+        frontend = f"""frontend mtp_tls
     bind 127.0.0.1:{self.port}
     option tcp-smart-accept
     tcp-request inspect-delay 3s
@@ -153,6 +154,11 @@ frontend mtp_tls
     use_backend telemt_b if {{ req.ssl_sni -i gs.apple.com }}
     default_backend telemt_a
 """
+        if managed_frontend is not None:
+            frontend = managed_frontend.replace('bind 0.0.0.0:443', f'bind 127.0.0.1:{self.port}', 1)
+            if f'bind 127.0.0.1:{self.port}\n' not in frontend:
+                raise ValueError('expected the generated frontend listener')
+        config += frontend
         if managed_backends is not None:
             for index, (backend, agent) in enumerate(zip(self.backends, self.agents), 1):
                 managed_backends = managed_backends.replace(f'10.77.{index}.2:24431',
