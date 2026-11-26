@@ -23,10 +23,9 @@ def quantiles(values):
             'p99_population_inference':False,'max':max(ordered)}
 
 
-def trial(row):
-    r=row['result']
-    if (r.get('complete') is not True or r.get('errors')!=[] or r.get('logical_clients')!=row['cohort'] or
-            r.get('idle_connections')!=row['cohort']-11 or len(r.get('idle_recovery_ms',[]))!=row['cohort']-11):
+def mixed_result(r, cohort):
+    if (r.get('complete') is not True or r.get('errors')!=[] or r.get('logical_clients')!=cohort or
+            r.get('idle_connections')!=cohort-11 or len(r.get('idle_recovery_ms',[]))!=cohort-11):
         raise ValueError('incomplete mixed transfer')
     bulk=r.get('bulk',[])
     if len(bulk)!=5 or sorted(v.get('direction') for v in bulk)!=['D']*4+['U']:
@@ -60,6 +59,12 @@ def trial(row):
                 if name=='new_connection' and sample.get('sha256_verified') is not True:raise ValueError('unverified new connection')
             values=[s['elapsed_ms'] for s in samples if phase=='baseline' or s['active_bulk']>0]
             data[phase+'_'+name+'_ms']=quantiles(values)
+    data['sample_limited']=any(data['loaded_'+n+'_ms']['n']<20 for n in ('message','new_connection'))
+    return data
+
+
+def trial(row):
+    data=mixed_result(row['result'],row['cohort'])
     cpu=row.get('cpu_percent_one_core',{})
     if set(cpu)!=set(('backend','client','dc','haproxy','controller','observer_children')) or any(not number(v) for v in cpu.values()):
         raise ValueError('CPU accounting incomplete')
@@ -68,7 +73,6 @@ def trial(row):
     if not number(row.get('sampled_backend_peak_rss')):raise ValueError('missing RSS')
     data['harness_limited']=(sum(cpu[k] for k in ('client','haproxy','controller','observer_children'))>=70 or cpu['dc']>=70 or
         any(sum(s['percent'][k] for k in ('client','haproxy'))>=70 or s['percent']['dc']>=70 for s in row['process_cpu_intervals']))
-    data['sample_limited']=any(data['loaded_'+n+'_ms']['n']<20 for n in ('message','new_connection'))
     data['peak_backend_rss']=row['sampled_backend_peak_rss']
     data['cpu']=cpu
     data['max_router_backlog_bytes']=max(q['backlog'] for s in row['qdisc_samples'] for q in s['rows'] if q['kind']=='netem')

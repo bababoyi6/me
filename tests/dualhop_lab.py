@@ -34,6 +34,7 @@ profile.add_argument('--soak',action='store_true')
 profile.add_argument('--benchmark',action='store_true')
 profile.add_argument('--candidate-check',action='store_true')
 profile.add_argument('--candidate-capacity',action='store_true')
+profile.add_argument('--shared-queue',action='store_true')
 profile.add_argument('--endurance-seconds',type=int,choices=(60,86400),default=0)
 parser.add_argument('--rtt',type=int,choices=(10,20,50,100,200),default=10)
 parser.add_argument('--loss-percent',type=float,choices=(0,.1,.5),default=0)
@@ -48,9 +49,17 @@ if args.candidate_check and (args.build!='bulk' or not args.separate_dc or args.
     parser.error('candidate path check requires bulk, separate mock DC and 100/200ms entry RTT')
 if args.candidate_capacity and (args.build!='bulk' or not args.separate_dc or args.rtt!=100):
     parser.error('candidate capacity requires bulk, separate mock DC and 100ms entry RTT')
+if args.shared_queue and (args.build!='bulk' or not args.separate_dc or args.rtt!=100
+                          or os.environ.get('GITHUB_ACTIONS')!='true'):
+    parser.error('shared queue screen requires an ephemeral CI runner, a fixed core and 100ms RTT')
+if args.shared_queue and args.role=='run':
+    from paired_performance import resources
+    budget=resources()
+    if (budget['cpu_max'],budget['memory_max'],budget['swap_max'])!=('300000 100000',str(1536*1024**2),'0'):
+        parser.error('shared queue screen requires the fixed CI resource limits')
 if args.endurance_seconds and (args.build!='bulk' or not args.separate_dc or args.rtt!=100):
     parser.error('endurance requires bulk, separate mock DC and 100ms entry RTT')
-if args.build=='bulk' and not (args.candidate_check or args.candidate_capacity or args.endurance_seconds):
+if args.build=='bulk' and not (args.candidate_check or args.candidate_capacity or args.shared_queue or args.endurance_seconds):
     parser.error('bulk requires a bounded candidate or endurance check')
 ROOT=Path(args.root).resolve()
 HERE=Path(__file__).resolve()
@@ -89,7 +98,7 @@ def backend():
         endpoint=(f'198.18.0.{1 if args.index==1 else 5}',26000) if args.separate_dc else None
         return FullLab(binary,listen_endpoint=(address,24431),start_haproxy=False,
                        experimental_binary=experimental,dc_endpoint=endpoint,artifact_registry=ROOT/'artifact-registry',
-                       shared_binary_root=ROOT if args.candidate_check or args.candidate_capacity or args.endurance_seconds else None,
+                       shared_binary_root=ROOT if args.candidate_check or args.candidate_capacity or args.shared_queue or args.endurance_seconds else None,
                        startup_report=ROOT/'results'/f'stable-backend{args.index}-startup.json' if args.build=='stable' else None,
                        offline_lab=args.build=='stable')
     lab=create_lab()
@@ -197,7 +206,8 @@ def separate_dc(net,shared):
             command('ip','-n',ns,'link','set',dev,'up')
     process=subprocess.Popen(['ip','netns','exec',dc,'python3',str(HERE.with_name('mock_dc_worker.py')),
                               '--topology','dualhop','--output',str(shared/'dc.json'),
-                              *(['--sample-seconds','5','--socket-timeout','25'] if args.endurance_seconds else [])],
+                              *(['--sample-seconds','5','--socket-timeout','25'] if args.endurance_seconds else []),
+                              *(['--echo','--socket-timeout','25'] if args.shared_queue else [])],
                              stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
     net.processes.append(process)
     deadline=time.monotonic()+5
@@ -365,6 +375,10 @@ frontend mtp_tls
                     'backend_states':states,'wireguard_before_bytes':before_wg,
                     'accepted':False,'retry_performed':False})
                 raise
+        if args.shared_queue:
+            from shared_queue_lab import run_screen
+            run_screen(ROOT / 'results', shared, counts, wait_state)
+            return
         if args.candidate_capacity:
             from candidate_contract import validate_wireguard
             for domain,expected in (('apple.com',1),('gs.apple.com',2)):
@@ -531,7 +545,7 @@ frontend mtp_tls
 
 def run():
     (ROOT/"results").mkdir(exist_ok=True,mode=0o700)
-    net=Network(SimpleNamespace(root=str(ROOT),wg=args.wg,start_iperf=False,
+    net=Network(SimpleNamespace(root=str(ROOT),wg=args.wg,start_iperf=args.shared_queue,iperf='iperf3',
                                rtt_ms=args.rtt,loss_percent=args.loss_percent,jitter_ms=args.jitter_ms,rate_mbps=100,mtu=1420,
                                ownership_ledger=bool(args.endurance_seconds)))
     temp=tempfile.TemporaryDirectory(prefix='tdh-e2e-dual-' if args.endurance_seconds else 'tdh-audit-dual-',dir='/tmp')
@@ -544,6 +558,9 @@ def run():
         assert memory_available()>192*1024**2,'memory safety margin'
         net.setup()
         network_extra(net)
+        if args.shared_queue:
+            from shared_queue_lab import prepare_shared_path
+            prepare_shared_path(net, ROOT / 'results')
         if args.separate_dc:
             separate_dc(net,shared)
         for number,ns in ((1,NAMES[2]),(2,'tdh-audit-b2')):
@@ -553,6 +570,7 @@ def run():
                                       *(['--separate-dc'] if args.separate_dc else []),
                                       *(['--candidate-check'] if args.candidate_check else []),
                                       *(['--candidate-capacity'] if args.candidate_capacity else []),
+                                      *(['--shared-queue'] if args.shared_queue else []),
                                       *(['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else []),
                                       'backend','--shared',str(shared),'--index',str(number)],
                                      stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
@@ -565,6 +583,9 @@ def run():
             time.sleep(.2)
         entry_args=['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else ['--candidate-check'] if args.candidate_check else ['--candidate-capacity'] if args.candidate_capacity else ['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
         entry_deadline=args.endurance_seconds+120 if args.endurance_seconds else 90 if args.candidate_check else 150 if args.candidate_capacity else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
+        if args.shared_queue:
+            entry_args = ['--shared-queue']
+            entry_deadline = 220
         result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),'ip','netns','exec',NAMES[0],
                                'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--stable-release',args.stable_release,'--rtt',str(args.rtt),
                                '--loss-percent',str(args.loss_percent),'--jitter-ms',str(args.jitter_ms),
