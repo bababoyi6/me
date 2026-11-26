@@ -583,10 +583,14 @@ def run():
             time.sleep(.2)
         entry_args=['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else ['--candidate-check'] if args.candidate_check else ['--candidate-capacity'] if args.candidate_capacity else ['--soak'] if args.soak else ['--benchmark'] if args.benchmark else []
         entry_deadline=args.endurance_seconds+120 if args.endurance_seconds else 90 if args.candidate_check else 150 if args.candidate_capacity else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
+        entry_namespace = ['ip', 'netns', 'exec', NAMES[0]]
         if args.shared_queue:
             entry_args = ['--shared-queue']
             entry_deadline = 220
-        result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),'ip','netns','exec',NAMES[0],
+            # ip netns exec also replaces the sysfs view. Enter only the owned
+            # network namespace to keep the runner's cgroup counters visible.
+            entry_namespace = ['nsenter', '--net=/run/netns/' + NAMES[0], '--']
+        result=subprocess.run(['timeout','--signal=TERM','--kill-after=5',str(entry_deadline),*entry_namespace,
                                'python3',str(HERE),'--root',str(ROOT),'--haproxy',args.haproxy,'--wg',args.wg,'--build',args.build,'--stable-release',args.stable_release,'--rtt',str(args.rtt),
                                '--loss-percent',str(args.loss_percent),'--jitter-ms',str(args.jitter_ms),
                                *(['--separate-dc'] if args.separate_dc else []),
