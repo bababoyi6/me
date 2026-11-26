@@ -7,6 +7,7 @@
 | 选择或回退后端核心 | [v1.7.3 默认核心、架构差异和已有后端](CORE-DEFAULT-SECURITY2-20261116.md) |
 | 排查运行问题 | [故障排查](TROUBLESHOOTING-1.7.md)、[后端与 splice](BACKEND-AND-SPLICE.md) |
 | 了解架构和验证范围 | [v1.7 架构](ARCHITECTURE-1.7.md)、[安全核心扩展验证](SECURITY2-EXTERNAL-QUALIFICATION-20261116.md) |
+| 查性能与可靠性的优化优先级 | [优化审查与验收计划](OPTIMIZATION-REVIEW-20261126.md) |
 | 查历史发布和原始证据 | [GitHub Releases](https://github.com/bababoyi6/me/releases)、[性能与验收记录](benchmarks/) |
 
 ## 历史 GitHub Actions

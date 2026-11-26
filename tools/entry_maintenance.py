@@ -17,13 +17,23 @@ class MaintenanceError(RuntimeError):
 
 
 def exchange(command):
+    deadline = time.monotonic() + 3
+
+    def set_remaining_timeout(connection):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('HAProxy runtime response deadline')
+        connection.settimeout(remaining)
+
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
-        connection.settimeout(3)
+        set_remaining_timeout(connection)
         connection.connect('/run/telemt-dual-hop/haproxy.sock')
+        set_remaining_timeout(connection)
         connection.sendall((command+'\n').encode('ascii'))
         connection.shutdown(socket.SHUT_WR)
         output = bytearray()
         while True:
+            set_remaining_timeout(connection)
             part = connection.recv(16384)
             if not part:
                 return output.decode('ascii')

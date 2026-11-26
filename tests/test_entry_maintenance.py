@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools'))
-from entry_maintenance import maintain, MaintenanceError, migrate_health, tracked_health_config, wait_runtime
+from entry_maintenance import exchange, maintain, MaintenanceError, migrate_health, tracked_health_config, wait_runtime
 
 LEGACY = b'''backend telemt_a
     server vps1 10.77.1.2:24431 check port 19101 inter 2s fall 3 rise 2 send-proxy-v2 agent-check agent-port 19101 agent-inter 2s
@@ -21,6 +21,16 @@ backend telemt_b
 
 
 class EntryMaintenanceTests(unittest.TestCase):
+    def test_runtime_response_has_one_deadline_even_when_bytes_keep_arriving(self):
+        with patch('entry_maintenance.socket.socket') as create, \
+                patch('entry_maintenance.time.monotonic', side_effect=[10, 10.1, 10.2, 11, 12, 13]):
+            connection = create.return_value.__enter__.return_value
+            connection.recv.return_value = b'x'
+            with self.assertRaises(TimeoutError):
+                exchange('show stat')
+            self.assertEqual(connection.recv.call_count, 2)
+            self.assertEqual([call.args[0] for call in connection.settimeout.call_args_list][-2:], [2, 1])
+
     def test_drain_requires_healthy_peer_on_both_lines(self):
         calls = []
         def request(command):

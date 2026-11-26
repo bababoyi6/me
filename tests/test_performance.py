@@ -6,10 +6,16 @@ import json
 import os
 from pathlib import Path
 import shutil
+import socket
+import socketserver
+import ssl
 import subprocess
 import tempfile
+import threading
 import time
 import unittest
+
+from release_pins import manager_with_version
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "telemt-dual-hop.sh"
@@ -142,6 +148,27 @@ if state_is_current; then exit 1; fi
         self.assertLess(time.monotonic() - start, 4)
         self.assertEqual(namespace["command"]("python3", "-c", "print('x'*2000000)"), "")
 
+    def test_queue_deltas_require_same_queue_and_hide_device_identity(self):
+        source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]
+        tree = ast.parse(source)
+        definitions = [node for node in tree.body if isinstance(node, (ast.Import, ast.ImportFrom, ast.FunctionDef))]
+        scope = {}
+        exec(compile(ast.Module(body=definitions, type_ignores=[]), "report", "exec"), scope)
+        scope["command"] = lambda *args: json.dumps([
+            {"dev": "private-nic", "kind": "fq_codel", "root": True, "handle": "10:",
+             "bytes": 100, "drops": 7, "overlimits": 12, "backlog": 4096, "qlen": 2},
+            {"dev": "private-nic", "kind": "INVALID!", "bytes": 800},
+        ])
+        old = scope["qdisc_snapshot"]()["private-nic"]
+        identity = old[0][0]
+        sample = {"bytes": 800, "drops": 2, "overlimits": 20, "backlog": 1024, "qlen": 1}
+        report = scope["qdisc_report"](old, [(identity, sample)])
+        self.assertEqual(report, [{"kind": "fq_codel", **sample, "bytes_delta": 700,
+                                   "drops_delta": None, "overlimits_delta": 8}])
+        self.assertIsNone(scope["qdisc_report"](old, [(("fq_codel", "20:", "", True), sample)])[0]["bytes_delta"])
+        self.assertIsNone(scope["qdisc_report"](None, [(identity, sample)])[0]["bytes_delta"])
+        self.assertIsNone(scope["qdisc_report"](old, None))
+
     def test_api_sampling_uses_fixed_loopback_and_numeric_allowlist(self):
         from unittest.mock import patch
         source = SCRIPT.read_text().split('timeout 55 python3 - "$seconds" "$TDH_STATE" <<\'PY\'\n', 1)[1].split("\nPY\n", 1)[0]
@@ -234,11 +261,11 @@ if [[ ${1:-} == --self-test ]]; then exit 0; fi
 
     def test_manager_update_and_failure_preserve_running_configuration(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        old_manager = manager.read_bytes()
+        old_manager = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(old_manager)
         old_state = self.state.read_bytes()
         download = self.base / "download"
-        candidate = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"')
+        candidate = manager_with_version(old_manager, "1.7.4")
         download.write_bytes(candidate)
         prelude = '''
 curl() {
@@ -257,7 +284,8 @@ install_shortcut() { :; }
         self.assertEqual(self.config.read_bytes(), self.original)
         self.assertFalse((self.base / "systemctl.log").exists())
         prelude = 'curl() { cp "$TDH_BASE/download" "${@: -1}"; }\ninstall_shortcut() { :; }\n'
-        for content in (candidate.replace(b'SCHEMA="5"', b'SCHEMA="6"').replace(b'1.7.4', b'1.7.5'), b"invalid download"):
+        wrong_schema = manager_with_version(candidate.replace(b'SCHEMA="5"', b'SCHEMA="6"'), "1.7.5")
+        for content in (wrong_schema, b"invalid download"):
             download.write_bytes(content)
             self.bash(command.replace('v1.7.4', 'v1.7.5'), success=False, prelude=prelude)
             self.assertEqual(manager.read_bytes(), candidate)
@@ -266,9 +294,10 @@ install_shortcut() { :; }
     def test_update_checks_fixed_pin_before_selftest_and_staging(self):
         manager = self.base / "manager"
         previous = self.base / "manager.previous"
-        manager.write_bytes(SCRIPT.read_bytes())
+        installed = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(installed)
         previous.write_bytes(b"existing rollback\n")
-        (self.base / "download").write_bytes(SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"'))
+        (self.base / "download").write_bytes(manager_with_version(installed, "1.7.4"))
         prelude = '''
 curl() { cp "$TDH_BASE/download" "${@: -1}"; }
 bash() { touch "$TDH_BASE/bash-called"; return 99; }
@@ -278,7 +307,7 @@ timeout() { touch "$TDH_BASE/selftest-called"; return 99; }
         self.assertIn("SHA256", result.stderr)
         self.assertFalse((self.base / "bash-called").exists())
         self.assertFalse((self.base / "selftest-called").exists())
-        self.assertEqual(manager.read_bytes(), SCRIPT.read_bytes())
+        self.assertEqual(manager.read_bytes(), installed)
         self.assertEqual(previous.read_bytes(), b"existing rollback\n")
         self.assertEqual(list(self.base.glob("manager.download.*")), [])
 
@@ -292,16 +321,15 @@ timeout() { touch "$TDH_BASE/selftest-called"; return 99; }
 
     def test_update_default_at_locked_version_does_not_download(self):
         for version in ("1.7.2", "1.7.3"):
-            (self.base / "manager").write_bytes(
-                SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', f'TDH_VERSION="{version}"'.encode()))
+            (self.base / "manager").write_bytes(manager_with_version(SCRIPT.read_bytes(), version))
             self.bash("update_manager", prelude='curl() { touch "$TDH_BASE/network-called"; return 99; }')
             self.assertFalse((self.base / "network-called").exists())
 
     def test_manager_update_rejects_changed_staged_bytes(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        (self.base / "download").write_bytes(
-            SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"'))
+        installed = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(installed)
+        (self.base / "download").write_bytes(manager_with_version(installed, "1.7.4"))
         prelude = '''
 curl() { cp "$TDH_BASE/download" "${@: -1}"; }
 install() { command install "$@"; printf '\\n# changed during staging\\n' >>"${@: -1}"; }
@@ -310,15 +338,15 @@ install_shortcut() { touch "$TDH_BASE/shortcut-called"; }
         result = self.bash('update_manager --release v1.7.4 --sha256 "$(sha256sum < "$TDH_BASE/download" | cut -d" " -f1)"',
                            success=False, prelude=prelude)
         self.assertIn("待安装管理脚本的 SHA256", result.stderr)
-        self.assertEqual(manager.read_bytes(), SCRIPT.read_bytes())
+        self.assertEqual(manager.read_bytes(), installed)
         self.assertFalse((self.base / "shortcut-called").exists())
         self.assertFalse((self.base / "manager.previous").exists())
         self.assertEqual(list(self.base.glob("manager.update.*")), [])
 
     def test_oversized_manager_download_is_stopped_and_cleaned_before_execution(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        before = manager.read_bytes()
+        before = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(before)
         (self.base / "download").write_bytes(SCRIPT.read_bytes() + b'\n#' + b'x' * 1048576 + b'\n')
         self.bash('update_manager --release v1.7.4 --sha256 "$(printf %064d 0)"', success=False, prelude='''
 curl() {
@@ -363,9 +391,9 @@ install_shortcut() {{ :; }}
 
     def test_shortcut_failure_does_not_replace_manager(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        old = manager.read_bytes()
-        (self.base / "download").write_bytes(old.replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"'))
+        old = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(old)
+        (self.base / "download").write_bytes(manager_with_version(old, "1.7.4"))
         self.bash('update_manager --release v1.7.4 --sha256 "$(sha256sum < "$TDH_BASE/download" | cut -d" " -f1)"', success=False, prelude='''
 curl() { cp "$TDH_BASE/download" "${@: -1}"; }
 install_shortcut() { return 1; }
@@ -375,9 +403,9 @@ install_shortcut() { return 1; }
 
     def test_stalled_selftest_cannot_replace_manager_or_rollback(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        before = manager.read_bytes()
-        (self.base / "download").write_bytes(before.replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"'))
+        before = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(before)
+        (self.base / "download").write_bytes(manager_with_version(before, "1.7.4"))
         guard = '''
 curl() { cp "$TDH_BASE/download" "${@: -1}"; }
 install_shortcut() { :; }
@@ -471,26 +499,72 @@ write_telemt_config 10.77.1.2 24431 19091 443
                          'read_only = true', 'classic = false', 'secure = false', 'tls = true'):
             self.assertIn(required, telemt)
 
-        # Exercise the actual generated health/tracking blocks on private loopback.
-        from lab import Lab
-        managed = config[config.index('\nbackend telemt_health\n'):config.index('\nbackend tls_fallback_unknown\n')]
-        managed = ''.join(line for line in managed.splitlines(keepends=True)
-                          if not line.lstrip().startswith(('server apple_a ', 'server apple_b ')))
-        lab = Lab(HAPROXY, managed_backends=managed)
+        # Replace only the public endpoints with an owned TLS origin.
+        from lab import Lab, exact
+        certificate, key = self.base/'origin.pem', self.base/'origin.key'
+        unknown = 'fallback.test'
+        subprocess.run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
+                        '-subj', '/CN=fallback.test', '-addext', 'subjectAltName=DNS:fallback.test,DNS:apple.com,DNS:gs.apple.com',
+                        '-keyout', key, '-out', certificate], check=True, timeout=10, capture_output=True)
+        origin_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        origin_context.load_cert_chain(certificate, key)
+        client_context = ssl.create_default_context(cafile=str(certificate))
+        marker = b'private test TLS origin'
+
+        class OriginHandler(socketserver.BaseRequestHandler):
+            def handle(self):
+                self.request.settimeout(3)
+                try:
+                    with origin_context.wrap_socket(self.request, server_side=True) as tls:
+                        tls.sendall(marker)
+                except OSError:
+                    # HAProxy health checks connect without doing TLS.
+                    pass
+
+        class Origin(socketserver.ThreadingTCPServer):
+            daemon_threads = True
+
+        origin = Origin(('127.0.0.1', 0), OriginHandler)
+        threading.Thread(target=origin.serve_forever, daemon=True).start()
+        self.addCleanup(origin.server_close)
+        self.addCleanup(origin.shutdown)
+        frontend, managed = config[config.index('frontend mtp_tls\n'):].split('backend telemt_health\n', 1)
+        managed = 'backend telemt_health\n' + managed
+        for name in ('apple_a', 'apple_b', 'apple_unknown'):
+            line = next(line for line in managed.splitlines() if line.startswith(f'    server {name} '))
+            prefix, _, options = line.lstrip().split(maxsplit=3)[1:]
+            fixed_options = options.split(' resolvers ', 1)[0]
+            managed = managed.replace(line, f'    server {prefix} 127.0.0.1:{origin.server_address[1]} {fixed_options}')
+        lab = Lab(HAPROXY, managed_backends=managed, managed_frontend=frontend)
         self.addCleanup(lab.close)
 
-        def wait_status(expected):
+        def wait_status(expected, server='vps1'):
             deadline = time.monotonic() + 8
             while time.monotonic() < deadline:
                 rows = csv.DictReader(lab.stat('show stat').lstrip('# ').splitlines())
-                state = {row['pxname']: row['status'] for row in rows if row['svname'] == 'vps1'}
+                state = {row['pxname']: row['status'] for row in rows if row['svname'] == server}
                 if all(state.get(name) == status for name, status in expected.items()):
                     return
                 time.sleep(.05)
             self.fail(f'Expected server state {expected}, got {state}')
 
+        def assert_origin(domain, backend, server):
+            def counters():
+                rows = csv.DictReader(lab.stat('show stat').lstrip('# ').splitlines())
+                return {(row['pxname'], row['svname']): int(row['stot'] or 0) for row in rows}
+            before = counters()
+            with socket.create_connection(('127.0.0.1', lab.port), timeout=4) as raw:
+                with client_context.wrap_socket(raw, server_hostname=domain) as tls:
+                    self.assertEqual(exact(tls, len(marker)), marker)
+            after = counters()
+            self.assertEqual(after[(backend, server)] - before[(backend, server)], 1)
+            for route in ('telemt_a', 'telemt_b'):
+                for node in ('vps1', 'vps2'):
+                    self.assertEqual(after[(route, node)], before[(route, node)])
+
         names = ('telemt_health', 'telemt_a', 'telemt_b')
         wait_status(dict.fromkeys(names, 'UP'))
+        assert_origin(unknown, 'tls_fallback_unknown', 'apple_unknown')
         self.assertEqual(lab.transfer('apple.com', 'D', 1024, 0)[0], '1')
         self.assertEqual(lab.transfer('gs.apple.com', 'D', 1024, 0)[0], '2')
         lab.backends[0].agent_reply = b'not-up\n'
@@ -509,6 +583,12 @@ write_telemt_config 10.77.1.2 24431 19091 443
             self.assertFalse(lab.stat(f'set server {name}/vps1 state ready').strip())
         wait_status(dict.fromkeys(names, 'UP'))
         self.assertEqual(lab.transfer('apple.com', 'D', 1024, 0)[0], '1')
+        for backend in lab.backends:
+            backend.agent_up = False
+        for server in ('vps1', 'vps2'):
+            wait_status(dict.fromkeys(names, 'DOWN'), server)
+        assert_origin('apple.com', 'telemt_a', 'apple_a')
+        assert_origin('gs.apple.com', 'telemt_b', 'apple_b')
 
 
 if __name__ == "__main__":
