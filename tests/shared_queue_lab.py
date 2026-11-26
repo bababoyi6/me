@@ -2,6 +2,7 @@
 from concurrent.futures import ThreadPoolExecutor
 import json
 import re
+import subprocess
 import threading
 import time
 from types import SimpleNamespace
@@ -27,7 +28,11 @@ def save(path, report):
 
 
 def tc(namespace, *args):
-    return command('ip', 'netns', 'exec', namespace, 'tc', *args)
+    result = subprocess.run(('ip', 'netns', 'exec', namespace, 'tc', *args),
+                            capture_output=True, text=True, timeout=10)
+    if result.returncode:
+        raise RuntimeError(f"{namespace}: tc {' '.join(args)}: {result.stderr.strip()[:160]}")
+    return result.stdout.strip()
 
 
 def prepare_shared_path(network, results):
@@ -63,7 +68,16 @@ def set_policy(policy):
     if policy not in ORDER:
         raise ValueError('unregistered shared queue')
     for namespace, device in SHARED_LINK:
-        tc(namespace, 'qdisc', 'replace', 'dev', device, 'parent', '1:10', 'handle', '10:',
+        leaf = re.search(r'^qdisc (\w+) 10: parent 1:10\b',
+                         tc(namespace, 'qdisc', 'show', 'dev', device), re.M)
+        if leaf and leaf[1] not in ORDER:
+            raise RuntimeError('unexpected shared queue on the private test class')
+        if leaf:
+            if leaf[1] == policy:
+                continue
+            # The same qdisc handle cannot change kind in place.
+            tc(namespace, 'qdisc', 'del', 'dev', device, 'parent', '1:10', 'handle', '10:')
+        tc(namespace, 'qdisc', 'add', 'dev', device, 'parent', '1:10', 'handle', '10:',
            policy, 'limit', '1000')
 
 
