@@ -58,8 +58,8 @@ ec8de62将创建/配置两端与UP分离：**先使接收端监听就绪，再UP
 
 ```powershell
 gh run view 42651841645 --repo bababoyi6/me
-python lab-control/work/2026-11-09-shared-entry/collect.py 42651841645 --artifact queue-lifecycle --artifact managed-queue
-python lab-control/work/2026-11-09-shared-entry/summarize.py
+python lab-control/archive/2026-11/2026-11-09-shared-entry/collect.py 42651841645 --artifact queue-lifecycle --artifact managed-queue
+python lab-control/archive/2026-11/2026-11-09-shared-entry/summarize.py
 ```
 
 [原始结果、失败日志、压缩前后摘要与资格判定](benchmarks/shared-entry-20261109/README.md)。11月10日再次按GitHub Releases API过滤draft/prerelease，正式最新版仍为3.5.17/`66708d2866f3f3a4541c4fa67984d408e71a8af4`；锁文件/核心补丁未改。
