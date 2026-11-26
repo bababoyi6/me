@@ -6,7 +6,7 @@ on:
         description: Exact already-built core for this bounded screen
         type: choice
         default: native17
-        options: [balanced2, native17]
+        options: [balanced2, native17, security2-shared]
 permissions:
   contents: read
   actions: read
@@ -15,6 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   screen:
+    if: inputs.core != 'security2-shared'
     runs-on: ubuntu-22.04
     timeout-minutes: 18
     steps:
@@ -49,3 +50,49 @@ jobs:
           name: private-shaper
           path: ${{ runner.temp }}/shaper-evidence/*.json
           retention-days: 14
+  shared-screen:
+    if: inputs.core == 'security2-shared'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prepare fixed core and disposable tools
+        run: |
+          set -euo pipefail
+          mkdir -m 700 "$RUNNER_TEMP/shared-queue-evidence"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          curl -q -fL --retry 2 --connect-timeout 10 --max-time 75 --max-filesize 12000000 \
+            --proto '=https' --proto-redir '=https' --tlsv1.2 \
+            https://github.com/bababoyi6/me/releases/download/telemt-core-3.5.5-tdh.balanced2.security2.2/telemt-3.5.5-tdh.balanced2.security2.2-x86_64-linux-gnu-install.tar.gz \
+            -o "$RUNNER_TEMP/shared-queue-core.tar.gz"
+          printf '%s  %s\n' '38b6bf95c6fd02c6ee3f160aac11163808d7f80ecc0c0702a08edc37c63aecbb' \
+            "$RUNNER_TEMP/shared-queue-core.tar.gz" | sha256sum --check
+          sudo timeout 90 apt-get update -qq -o Acquire::Retries=1
+          sudo timeout 120 apt-get install -y --no-install-recommends haproxy iproute2 wireguard-tools ethtool iperf3 python3-cryptography
+          sudo modprobe tcp_bbr
+      - name: Compare 100 Mbps shared FIFO and FQ-CoDel in four trials
+        run: |
+          sudo timeout --kill-after=10 325 systemd-run --quiet --wait --pipe --collect \
+            --unit="tdh-paired-shared-queue-${GITHUB_RUN_ID}" \
+            -p CPUQuota=300% -p MemoryMax=1536M -p MemoryHigh=1200M -p MemorySwapMax=0 \
+            -p TasksMax=512 -p RuntimeMaxSec=310 -p OOMPolicy=stop -p UMask=0077 \
+            -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true \
+            --setenv="RUNNER_TEMP=$RUNNER_TEMP" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" \
+            python3 -B tests/security2_shared_queue_ci.py --archive "$RUNNER_TEMP/shared-queue-core.tar.gz" \
+            --evidence "$RUNNER_TEMP/shared-queue-evidence"
+      - name: Allow runner to read only the measured reports
+        if: always()
+        run: |
+          for report in supervisor.json dual-shared-queue.json dual-shared-calibration.json; do
+            path="$RUNNER_TEMP/shared-queue-evidence/$report"
+            if sudo test -f "$path"; then sudo chown "$(id -u):$(id -g)" "$path"; fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-queue-evidence
+          path: ${{ runner.temp }}/shared-queue-evidence/*.json
+          retention-days: 14
+          if-no-files-found: warn
