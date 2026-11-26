@@ -7,7 +7,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly TDH_VERSION="1.7.3"
+readonly TDH_VERSION="1.7.4"
 readonly TDH_CONFIG_SCHEMA="5"
 readonly TDH_PROTOCOL_VERSION="1.2.1"
 readonly TELEMT_VERSION="3.5.17"

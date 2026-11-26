@@ -15,6 +15,8 @@ import threading
 import time
 import unittest
 
+from release_pins import manager_with_version
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "telemt-dual-hop.sh"
 HAPROXY = os.environ.get("TDH_TEST_HAPROXY", shutil.which("haproxy") or "")
@@ -259,11 +261,11 @@ if [[ ${1:-} == --self-test ]]; then exit 0; fi
 
     def test_manager_update_and_failure_preserve_running_configuration(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        old_manager = manager.read_bytes()
+        old_manager = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(old_manager)
         old_state = self.state.read_bytes()
         download = self.base / "download"
-        candidate = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"')
+        candidate = manager_with_version(old_manager, "1.7.4")
         download.write_bytes(candidate)
         prelude = '''
 curl() {
@@ -282,7 +284,8 @@ install_shortcut() { :; }
         self.assertEqual(self.config.read_bytes(), self.original)
         self.assertFalse((self.base / "systemctl.log").exists())
         prelude = 'curl() { cp "$TDH_BASE/download" "${@: -1}"; }\ninstall_shortcut() { :; }\n'
-        for content in (candidate.replace(b'SCHEMA="5"', b'SCHEMA="6"').replace(b'1.7.4', b'1.7.5'), b"invalid download"):
+        wrong_schema = manager_with_version(candidate.replace(b'SCHEMA="5"', b'SCHEMA="6"'), "1.7.5")
+        for content in (wrong_schema, b"invalid download"):
             download.write_bytes(content)
             self.bash(command.replace('v1.7.4', 'v1.7.5'), success=False, prelude=prelude)
             self.assertEqual(manager.read_bytes(), candidate)
@@ -291,9 +294,10 @@ install_shortcut() { :; }
     def test_update_checks_fixed_pin_before_selftest_and_staging(self):
         manager = self.base / "manager"
         previous = self.base / "manager.previous"
-        manager.write_bytes(SCRIPT.read_bytes())
+        installed = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(installed)
         previous.write_bytes(b"existing rollback\n")
-        (self.base / "download").write_bytes(SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"'))
+        (self.base / "download").write_bytes(manager_with_version(installed, "1.7.4"))
         prelude = '''
 curl() { cp "$TDH_BASE/download" "${@: -1}"; }
 bash() { touch "$TDH_BASE/bash-called"; return 99; }
@@ -303,7 +307,7 @@ timeout() { touch "$TDH_BASE/selftest-called"; return 99; }
         self.assertIn("SHA256", result.stderr)
         self.assertFalse((self.base / "bash-called").exists())
         self.assertFalse((self.base / "selftest-called").exists())
-        self.assertEqual(manager.read_bytes(), SCRIPT.read_bytes())
+        self.assertEqual(manager.read_bytes(), installed)
         self.assertEqual(previous.read_bytes(), b"existing rollback\n")
         self.assertEqual(list(self.base.glob("manager.download.*")), [])
 
@@ -317,16 +321,15 @@ timeout() { touch "$TDH_BASE/selftest-called"; return 99; }
 
     def test_update_default_at_locked_version_does_not_download(self):
         for version in ("1.7.2", "1.7.3"):
-            (self.base / "manager").write_bytes(
-                SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', f'TDH_VERSION="{version}"'.encode()))
+            (self.base / "manager").write_bytes(manager_with_version(SCRIPT.read_bytes(), version))
             self.bash("update_manager", prelude='curl() { touch "$TDH_BASE/network-called"; return 99; }')
             self.assertFalse((self.base / "network-called").exists())
 
     def test_manager_update_rejects_changed_staged_bytes(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        (self.base / "download").write_bytes(
-            SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"'))
+        installed = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(installed)
+        (self.base / "download").write_bytes(manager_with_version(installed, "1.7.4"))
         prelude = '''
 curl() { cp "$TDH_BASE/download" "${@: -1}"; }
 install() { command install "$@"; printf '\\n# changed during staging\\n' >>"${@: -1}"; }
@@ -335,15 +338,15 @@ install_shortcut() { touch "$TDH_BASE/shortcut-called"; }
         result = self.bash('update_manager --release v1.7.4 --sha256 "$(sha256sum < "$TDH_BASE/download" | cut -d" " -f1)"',
                            success=False, prelude=prelude)
         self.assertIn("待安装管理脚本的 SHA256", result.stderr)
-        self.assertEqual(manager.read_bytes(), SCRIPT.read_bytes())
+        self.assertEqual(manager.read_bytes(), installed)
         self.assertFalse((self.base / "shortcut-called").exists())
         self.assertFalse((self.base / "manager.previous").exists())
         self.assertEqual(list(self.base.glob("manager.update.*")), [])
 
     def test_oversized_manager_download_is_stopped_and_cleaned_before_execution(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        before = manager.read_bytes()
+        before = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(before)
         (self.base / "download").write_bytes(SCRIPT.read_bytes() + b'\n#' + b'x' * 1048576 + b'\n')
         self.bash('update_manager --release v1.7.4 --sha256 "$(printf %064d 0)"', success=False, prelude='''
 curl() {
@@ -388,9 +391,9 @@ install_shortcut() {{ :; }}
 
     def test_shortcut_failure_does_not_replace_manager(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        old = manager.read_bytes()
-        (self.base / "download").write_bytes(old.replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"'))
+        old = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(old)
+        (self.base / "download").write_bytes(manager_with_version(old, "1.7.4"))
         self.bash('update_manager --release v1.7.4 --sha256 "$(sha256sum < "$TDH_BASE/download" | cut -d" " -f1)"', success=False, prelude='''
 curl() { cp "$TDH_BASE/download" "${@: -1}"; }
 install_shortcut() { return 1; }
@@ -400,9 +403,9 @@ install_shortcut() { return 1; }
 
     def test_stalled_selftest_cannot_replace_manager_or_rollback(self):
         manager = self.base / "manager"
-        manager.write_bytes(SCRIPT.read_bytes())
-        before = manager.read_bytes()
-        (self.base / "download").write_bytes(before.replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.7.4"'))
+        before = manager_with_version(SCRIPT.read_bytes(), "1.7.3")
+        manager.write_bytes(before)
+        (self.base / "download").write_bytes(manager_with_version(before, "1.7.4"))
         guard = '''
 curl() { cp "$TDH_BASE/download" "${@: -1}"; }
 install_shortcut() { :; }

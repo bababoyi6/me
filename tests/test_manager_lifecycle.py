@@ -9,6 +9,8 @@ import subprocess
 import tempfile
 import unittest
 
+from release_pins import manager_version, manager_with_version
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "telemt-dual-hop.sh"
 
@@ -66,7 +68,7 @@ apt_get_with_lock_wait() { return 99; }
         return result
 
     def old_manager(self, version="1.3.1"):
-        data = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', f'TDH_VERSION="{version}"'.encode())
+        data = manager_with_version(SCRIPT.read_bytes(), version)
         self.manager.write_bytes(data)
         self.manager.chmod(0o755)
         return data
@@ -80,7 +82,7 @@ apt_get_with_lock_wait() { return 99; }
         result = subprocess.run(["bash", str(self.shortcut), "--help"], env=self.env,
                                 capture_output=True, text=True, timeout=5)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Telemt Dual-Hop 1.7.3", result.stdout)
+        self.assertIn("Telemt Dual-Hop " + manager_version(SCRIPT.read_bytes()), result.stdout)
 
     def test_backend_recover_preserves_active_services_and_waits_for_health(self):
         fixture = '''
@@ -236,7 +238,7 @@ health_agent_is_up() {
     def test_rollback_stage_and_rename_failures_preserve_both_versions(self):
         old = self.old_manager("1.4.1")
         previous = self.base / "manager.previous"
-        expected = SCRIPT.read_bytes().replace(b'TDH_VERSION="1.7.3"', b'TDH_VERSION="1.3.1"')
+        expected = manager_with_version(SCRIPT.read_bytes(), "1.3.1")
         previous.write_bytes(expected)
         for prelude in ("install() { return 74; }", "mv() { return 73; }"):
             with self.subTest(failure=prelude):
