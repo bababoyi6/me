@@ -15,7 +15,12 @@ from paired_performance import resources
 from path_capacity import controls
 
 
-SHARED_LINK = ((NAMES[0], 'tdh-la0'), (NAMES[1], 'tdh-la1'))
+SHARED_LINK = {'U': (NAMES[0], 'tdh-la0'), 'D': (NAMES[1], 'tdh-la1')}
+LINK_PROFILES = {
+    'symmetric': {'U': 100, 'D': 100},
+    'uplink-limited': {'U': 50, 'D': 100},
+    'downlink-limited': {'U': 100, 'D': 50},
+}
 ORDER = ('pfifo', 'fq_codel', 'fq_codel', 'pfifo')
 DOMAIN_A, DOMAIN_B = 'apple.com', 'gs.apple.com'
 MIB = 1024 ** 2
@@ -35,15 +40,17 @@ def tc(namespace, *args):
     return result.stdout.strip()
 
 
-def prepare_shared_path(network, results):
+def prepare_shared_path(network, results, profile):
     """Place propagation at the two branches and rate at the common link."""
+    rates = LINK_PROFILES[profile]
     for namespace, device in ((NAMES[1], 'tdh-lb0'), (NAMES[1], 'tdh-lc0'),
                               (NAMES[2], 'tdh-lb1'), ('tdh-audit-b2', 'tdh-lc1')):
         tc(namespace, 'qdisc', 'replace', 'dev', device, 'root', 'netem', 'delay', '50ms', 'limit', '10000')
-    for namespace, device in SHARED_LINK:
+    for direction, (namespace, device) in SHARED_LINK.items():
+        rate = f'{rates[direction]}mbit'
         tc(namespace, 'qdisc', 'replace', 'dev', device, 'root', 'handle', '1:', 'htb', 'default', '10')
         tc(namespace, 'class', 'add', 'dev', device, 'parent', '1:', 'classid', '1:10',
-           'htb', 'rate', '100mbit', 'ceil', '100mbit', 'quantum', '1514')
+           'htb', 'rate', rate, 'ceil', rate, 'quantum', '1514')
     set_policy('pfifo')
     calibration = []
     measurements = {}
@@ -55,19 +62,20 @@ def prepare_shared_path(network, results):
             if not match or not 95 <= float(match[1]) <= 125:
                 raise RuntimeError('private tunnel RTT outside the preregistered range')
             measurements[index] = float(match[1])
+        # The offered probe rate is fixed at 100 Mbps in both profiles.
         controls(network, 100, calibration)
-        if any(not 60 <= row['mbps'] <= 105 for row in calibration):
+        if any(not .60 <= row['mbps'] / rates[row['direction']] <= 1.05 for row in calibration):
             raise RuntimeError('receiver-local capacity outside the preregistered range')
     finally:
-        save(results / 'dual-shared-calibration.json', {'link_mbps_each_direction': 100,
+        save(results / 'dual-shared-calibration.json', {'link_profile': profile, 'link_mbps': rates,
             'rtt_ms': 100, 'measured_idle_tunnel_rtt_ms': measurements,
-            'controls': calibration, 'queue': snapshot('pfifo')})
+            'controls': calibration, 'queue': snapshot('pfifo', rates)})
 
 
 def set_policy(policy):
     if policy not in ORDER:
         raise ValueError('unregistered shared queue')
-    for namespace, device in SHARED_LINK:
+    for namespace, device in SHARED_LINK.values():
         leaf = re.search(r'^qdisc (\w+) 10: parent 1:10\b',
                          tc(namespace, 'qdisc', 'show', 'dev', device), re.M)
         if leaf and leaf[1] not in ORDER:
@@ -81,14 +89,15 @@ def set_policy(policy):
            policy, 'limit', '1000')
 
 
-def snapshot(policy):
+def snapshot(policy, rates):
     # Jammy HTB can write formatted xstats into JSON output.
     observed = {}
-    for namespace, device in SHARED_LINK:
+    for direction, (namespace, device) in SHARED_LINK.items():
         qdisc = tc(namespace, '-s', '-d', 'qdisc', 'show', 'dev', device)
         classes = tc(namespace, '-s', '-d', 'class', 'show', 'dev', device)
+        rate = f'{rates[direction]}Mbit'
         if ('qdisc htb 1: root' not in qdisc or f'qdisc {policy} 10: parent 1:10' not in qdisc
-                or 'class htb 1:10' not in classes or 'rate 100Mbit ceil 100Mbit' not in classes):
+                or 'class htb 1:10' not in classes or f'rate {rate} ceil {rate}' not in classes):
             raise RuntimeError('shared queue layout or rate did not match the plan')
         observed[device] = {'qdisc': qdisc, 'class': classes}
     return observed
@@ -184,11 +193,13 @@ def compare(original, shaped):
             and max(latency.values()) <= .90 and cpu <= 1.10 and memory <= 1.10}
 
 
-def run_screen(results, shared, counts, wait_state):
+def run_screen(results, shared, counts, wait_state, profile):
+    rates = LINK_PROFILES[profile]
     endpoint = SimpleNamespace(front=24433, real_dc=False)
     output = results / 'dual-shared-queue.json'
-    report = {'scope': 'private 100ms, 100Mbps shared outer WireGuard link, two backends, synthetic DC',
-              'order': ORDER, 'trials': [], 'complete': False, 'qualified': False}
+    report = {'scope': 'private 100ms shared outer WireGuard link, two backends, synthetic DC',
+              'link_profile': profile, 'link_mbps': rates, 'order': ORDER,
+              'trials': [], 'complete': False, 'qualified': False}
     try:
         wait_state(True)
         for index, policy in enumerate(ORDER):
@@ -196,17 +207,17 @@ def run_screen(results, shared, counts, wait_state):
             set_policy(policy)
             trial = {'pair': index // 2 + 1, 'policy': policy}
             report['trials'].append(trial)
-            trial['queue_before'] = snapshot(policy)
+            trial['queue_before'] = snapshot(policy, rates)
             initial = counts()
             measure_mixed(endpoint, trial)
             trial['mixed_assignments'] = [new - old for old, new in zip(initial, counts())]
             if (min(trial['mixed_assignments']) < 1
                     or sum(trial['mixed_assignments']) != trial['mixed']['dc_connections']):
                 raise RuntimeError('mixed connection totals or two-line coverage did not match')
-            trial['queue_after_mixed'] = snapshot(policy)
+            trial['queue_after_mixed'] = snapshot(policy, rates)
             trial['solo'] = solo(endpoint, counts, domain)
             trial['failover'] = failover(endpoint, shared, counts, wait_state)
-            trial['queue_after'] = snapshot(policy)
+            trial['queue_after'] = snapshot(policy, rates)
             save(output, report)
         dc = json.loads((shared / 'dc.json').read_text())['backends']
         report['dc_errors'] = [node['errors'] for node in dc]

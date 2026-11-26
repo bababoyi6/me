@@ -7,11 +7,16 @@ on:
         type: choice
         default: native17
         options: [balanced2, native17, security2-shared]
+      link_profile:
+        description: Directional link rates for the security2-shared screen
+        type: choice
+        default: symmetric
+        options: [symmetric, uplink-limited, downlink-limited]
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: private-shaper-screen
+  group: private-shaper-screen-${{ inputs.core == 'security2-shared' && (inputs.link_profile || 'symmetric') || 'single-tunnel' }}
   cancel-in-progress: false
 jobs:
   screen:
@@ -72,7 +77,9 @@ jobs:
           sudo timeout 90 apt-get update -qq -o Acquire::Retries=1
           sudo timeout 120 apt-get install -y --no-install-recommends haproxy iproute2 wireguard-tools ethtool iperf3 python3-cryptography
           sudo modprobe tcp_bbr
-      - name: Compare 100 Mbps shared FIFO and FQ-CoDel in four trials
+      - name: Compare shared FIFO and FQ-CoDel in four trials
+        env:
+          LINK_PROFILE: ${{ inputs.link_profile || 'symmetric' }}
         run: |
           sudo timeout --kill-after=10 325 systemd-run --quiet --wait --pipe --collect \
             --unit="tdh-paired-shared-queue-${GITHUB_RUN_ID}" \
@@ -81,7 +88,7 @@ jobs:
             -p "WorkingDirectory=$GITHUB_WORKSPACE" --setenv=GITHUB_ACTIONS=true \
             --setenv="RUNNER_TEMP=$RUNNER_TEMP" --setenv="TDH_SOURCE_COMMIT=$GITHUB_SHA" \
             python3 -B tests/security2_shared_queue_ci.py --archive "$RUNNER_TEMP/shared-queue-core.tar.gz" \
-            --evidence "$RUNNER_TEMP/shared-queue-evidence"
+            --evidence "$RUNNER_TEMP/shared-queue-evidence" --link-profile "$LINK_PROFILE"
       - name: Allow runner to read only the measured reports
         if: always()
         run: |

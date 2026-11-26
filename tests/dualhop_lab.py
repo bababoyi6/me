@@ -35,6 +35,7 @@ profile.add_argument('--benchmark',action='store_true')
 profile.add_argument('--candidate-check',action='store_true')
 profile.add_argument('--candidate-capacity',action='store_true')
 profile.add_argument('--shared-queue',action='store_true')
+parser.add_argument('--link-profile')
 profile.add_argument('--endurance-seconds',type=int,choices=(60,86400),default=0)
 parser.add_argument('--rtt',type=int,choices=(10,20,50,100,200),default=10)
 parser.add_argument('--loss-percent',type=float,choices=(0,.1,.5),default=0)
@@ -52,6 +53,13 @@ if args.candidate_capacity and (args.build!='bulk' or not args.separate_dc or ar
 if args.shared_queue and (args.build!='bulk' or not args.separate_dc or args.rtt!=100
                           or os.environ.get('GITHUB_ACTIONS')!='true'):
     parser.error('shared queue screen requires an ephemeral CI runner, a fixed core and 100ms RTT')
+if args.link_profile and not args.shared_queue:
+    parser.error('link profile applies only to the shared queue screen')
+if args.shared_queue:
+    from shared_queue_lab import LINK_PROFILES
+    args.link_profile = args.link_profile or 'symmetric'
+    if args.link_profile not in LINK_PROFILES:
+        parser.error('unregistered shared link profile')
 if args.shared_queue and args.role=='run':
     from paired_performance import resources
     budget=resources()
@@ -377,7 +385,7 @@ frontend mtp_tls
                 raise
         if args.shared_queue:
             from shared_queue_lab import run_screen
-            run_screen(ROOT / 'results', shared, counts, wait_state)
+            run_screen(ROOT / 'results', shared, counts, wait_state, args.link_profile)
             return
         if args.candidate_capacity:
             from candidate_contract import validate_wireguard
@@ -560,7 +568,7 @@ def run():
         network_extra(net)
         if args.shared_queue:
             from shared_queue_lab import prepare_shared_path
-            prepare_shared_path(net, ROOT / 'results')
+            prepare_shared_path(net, ROOT / 'results', args.link_profile)
         if args.separate_dc:
             separate_dc(net,shared)
         for number,ns in ((1,NAMES[2]),(2,'tdh-audit-b2')):
@@ -570,7 +578,7 @@ def run():
                                       *(['--separate-dc'] if args.separate_dc else []),
                                       *(['--candidate-check'] if args.candidate_check else []),
                                       *(['--candidate-capacity'] if args.candidate_capacity else []),
-                                      *(['--shared-queue'] if args.shared_queue else []),
+                                      *(['--shared-queue','--link-profile',args.link_profile] if args.shared_queue else []),
                                       *(['--endurance-seconds',str(args.endurance_seconds)] if args.endurance_seconds else []),
                                       'backend','--shared',str(shared),'--index',str(number)],
                                      stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
@@ -585,7 +593,7 @@ def run():
         entry_deadline=args.endurance_seconds+120 if args.endurance_seconds else 90 if args.candidate_check else 150 if args.candidate_capacity else 450 if args.soak else 180 if args.benchmark else 150 if args.separate_dc else 60
         entry_namespace = ['ip', 'netns', 'exec', NAMES[0]]
         if args.shared_queue:
-            entry_args = ['--shared-queue']
+            entry_args = ['--shared-queue','--link-profile',args.link_profile]
             entry_deadline = 220
             # ip netns exec also replaces the sysfs view. Enter only the owned
             # network namespace to keep the runner's cgroup counters visible.

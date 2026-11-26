@@ -10,6 +10,7 @@ import tempfile
 from network_lab import RESERVED_NAMES, command
 from paired_performance import resources
 from release_pins import OLD_TLS_CACHE_SHA256, TLS_CANDIDATES
+from shared_queue_lab import LINK_PROFILES
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / 'tools'))
@@ -45,6 +46,7 @@ def main(args):
     before_artifacts = temporary_artifacts()
     report = {'source_commit': os.environ['TDH_SOURCE_COMMIT'], 'archive_sha256': ARCHIVE_SHA256,
               'binary_sha256': OLD_TLS_CACHE_SHA256, 'version': version, 'resources_before': before,
+              'link_profile': args.link_profile, 'link_mbps': LINK_PROFILES[args.link_profile],
               'worker_exit': None, 'complete': False, 'qualified': False, 'cleanup_verified': False}
     try:
         with tempfile.TemporaryDirectory(prefix='tdh-audit-shared-queue-', dir=runner_temp) as directory:
@@ -57,7 +59,8 @@ def main(args):
             try:
                 worker = subprocess.run(['timeout', '--signal=TERM', '--kill-after=10', '280',
                     sys.executable, '-B', str(REPO / 'tests/dualhop_lab.py'), '--root', str(root),
-                    '--build', 'bulk', '--separate-dc', '--rtt', '100', '--shared-queue', 'run'], timeout=295)
+                    '--build', 'bulk', '--separate-dc', '--rtt', '100', '--shared-queue',
+                    '--link-profile', args.link_profile, 'run'], timeout=295)
                 report['worker_exit'] = worker.returncode
             finally:
                 for name in ('dual-shared-calibration.json', 'dual-shared-queue.json'):
@@ -67,7 +70,9 @@ def main(args):
                 report['remaining_key_files'] = sorted(path.name for path in root.glob('*.key'))
         result_path = args.evidence / 'dual-shared-queue.json'
         result = json.loads(result_path.read_text()) if result_path.is_file() else {}
-        report['complete'] = report['worker_exit'] == 0 and result.get('complete') is True
+        report['complete'] = (report['worker_exit'] == 0 and result.get('complete') is True
+                              and result.get('link_profile') == args.link_profile
+                              and result.get('link_mbps') == report['link_mbps'])
         report['qualified'] = report['complete'] and result.get('qualified') is True
     finally:
         after = resources()
@@ -88,4 +93,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--archive', required=True, type=Path)
     parser.add_argument('--evidence', required=True, type=Path)
+    parser.add_argument('--link-profile', choices=LINK_PROFILES, default='symmetric')
     raise SystemExit(main(parser.parse_args()))
