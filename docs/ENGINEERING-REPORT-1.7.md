@@ -171,7 +171,7 @@ WSL Ubuntu **26.04.1**，内核 `6.18.40.1-microsoft-standard-WSL2`，Python 3.1
 
 ## 实际验收命令与复现
 
-以下是实际执行命令的核心形式，完整输入归档路径在 `lab-control/work/2026-11-07-stable-compat/`，原始结果在 `lab-control/evidence/2026-11-07-stable-compat/`，已审查可分享结果位于本文相邻 `benchmarks/stable-20261107/`。
+以下是实际执行命令的核心形式，完整输入归档路径在 `lab-control/archive/2026-11/2026-11-07-stable-compat/`，原始结果在 `lab-control/evidence/2026-11-07-stable-compat/`，已审查可分享结果位于本文相邻 `benchmarks/stable-20261107/`。
 
 ```text
 git status --short --branch / git remote -v / git log -12 --oneline

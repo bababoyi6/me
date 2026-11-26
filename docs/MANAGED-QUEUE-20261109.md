@@ -66,9 +66,9 @@ Linux仅使用有界免费GitHub CI，无本地Linux测试、VPS访问或付费�
 
 ```powershell
 # Windows：仅数据导出/分析，不运行Linux工具
-python lab-control/work/2026-11-09-managed-queue/collect.py 42592010385 --artifact queue-lifecycle
-python lab-control/work/2026-11-09-managed-queue/collect.py 42592016609 --root-tests
-python lab-control/work/2026-11-09-managed-queue/prepare_evidence.py
+python lab-control/archive/2026-11/2026-11-09-managed-queue/collect.py 42592010385 --artifact queue-lifecycle
+python lab-control/archive/2026-11/2026-11-09-managed-queue/collect.py 42592016609 --root-tests
+python lab-control/archive/2026-11/2026-11-09-managed-queue/prepare_evidence.py
 # GitHub：最后两次只验证改过的生命周期，不再跑性能
 gh workflow run managed-queue.yml --repo bababoyi6/me --ref dev/telemt-stable-compat-20261107 -f skip_performance=true
 ```

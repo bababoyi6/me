@@ -47,8 +47,8 @@
 ```powershell
 gh run view 42657447265 --repo bababoyi6/me
 gh run view 42659213985 --repo bababoyi6/me
-python lab-control/work/2026-11-10-core-policy/collect.py 42659213985 --artifact fresh-core-evidence
-python lab-control/work/2026-11-10-core-policy/prepare.py
+python lab-control/archive/2026-11/2026-11-10-core-policy/collect.py 42659213985 --artifact fresh-core-evidence
+python lab-control/archive/2026-11/2026-11-10-core-policy/prepare.py
 ```
 
 [全部原始结果、失败记录与逐文件摘要](benchmarks/core-policy-20261110/README.md)。本轮再次筛选GitHub Releases API的非draft/prerelease正式版，最新仍3.5.17/`66708d2866f3f3a4541c4fa67984d408e71a8af4`，精确官方锁和已发布资产不变。后续交付仅补文档/证据，其基础CI和source由PR/交付回执单列。

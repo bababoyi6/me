@@ -12,3 +12,5 @@ bash -c 'set -e; tmp=$(mktemp); trap '\''rm -f -- "$tmp"'\'' EXIT; curl -q -fL -
 安装后输入 `a` 打开管理菜单。加入码、回执码及代理链接请自行保管。
 
 v1.7.3 的 x86_64 新安装默认使用 `security2.2` 核心；aarch64 仍使用官方核心。安装管理器不会自动替换已有后端的核心。[核心对照、回退入口与验证边界](docs/CORE-DEFAULT-SECURITY2-20261116.md)
+
+[更新、故障排查和维护文档](docs/README.md)
